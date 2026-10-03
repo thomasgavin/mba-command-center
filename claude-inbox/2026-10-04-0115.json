@@ -1,0 +1,113 @@
+{
+  "v": 1,
+  "exportedAt": "2026-10-03T18:15:54.671Z",
+  "source": "MBA Command Center",
+  "note": "Baseline is SEED in index.html; apply changed[] over it.",
+  "stamp": "2026-10-04-0115",
+  "notes": [
+    {
+      "id": "n1791050837660694",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Deadline for payment extended to 5 nov",
+      "createdAt": "2026-10-03T18:07:17.660Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791049895665591",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "Deadline for payment changed to 5 mov by insead on my request due to delay in loan processing",
+      "createdAt": "2026-10-03T17:51:35.665Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791047161234214",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "The date gas been extended by Insead on my request to 5 nov due to loan delays",
+      "createdAt": "2026-10-03T17:06:01.234Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791039114071829",
+      "itemId": "nri-fema",
+      "itemTitle": "Resolve NRI / FEMA co-applicant problem",
+      "text": "Remove this, not applicable",
+      "createdAt": "2026-10-03T14:51:54.071Z",
+      "state": "read"
+    }
+  ],
+  "changed": [
+    {
+      "id": "scholarship-r3",
+      "title": "Chase Round 3 scholarship decision",
+      "status": "done",
+      "due": "2026-09-11",
+      "priority": "Critical",
+      "dateType": "Awaiting",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "poa-exec",
+      "title": "Execute PoA at SBI Hindon branch",
+      "status": "done",
+      "due": "2026-10-10",
+      "priority": "High",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "tuition-apr",
+      "title": "Pay EUR 44,860 final instalment",
+      "status": "blocked",
+      "due": "2027-04-15",
+      "priority": "Critical",
+      "dateType": "Confirmed",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "flight",
+      "title": "Book flight to Paris for 3 January",
+      "status": "done",
+      "due": "2026-11-20",
+      "priority": "High",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "move",
+      "title": "Move to Fontainebleau",
+      "status": "todo",
+      "due": "2027-01-03",
+      "priority": "Critical",
+      "dateType": "Confirmed",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "locus-exit",
+      "title": "Plan Locus exit: notice, LWD, handover",
+      "status": "doing",
+      "due": "2026-11-15",
+      "priority": "Critical",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "handover-hf",
+      "title": "Hand over HelloFresh FR and UK engagements",
+      "status": "done",
+      "due": "2026-12-05",
+      "priority": "High",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    }
+  ]
+}
