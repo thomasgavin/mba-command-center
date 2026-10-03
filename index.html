@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>MBA Command Center</title>
+<!-- added to the iPhone home screen, so it needs a real icon and a name: with
+     neither, iOS renders a screenshot of the page under the first letter of the
+     title. apple-touch-icon has to be a fetchable PNG; a data URI is ignored. -->
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png" sizes="512x512" type="image/png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="27D">
+<meta name="theme-color" content="#ff6429">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -529,6 +539,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <div class="sp"></div>
     <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
     <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
+    <button class="tbtn" id="syncBtn" title="Check the repo for changes from your other device."><span>&#8635;</span><span class="lbl">Sync</span></button>
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
@@ -701,6 +712,13 @@ var calCur=null, undoFn=null, toastT=null;
 var savedAt=null, syncedAt=null;   /* last local change, last export pulled in */
 /* a send handed to GitHub's editor that we have not yet seen land in the repo */
 var pending=null;
+/* When each item last changed on THIS device, id -> ISO. The board used to sync
+   whole-board last-publish-wins, which meant a device that was behind could
+   overwrite a device that was ahead just by pressing the button: the phone
+   published a state that predated a date moved on the laptop, and the laptop
+   took it on next pull. Per-item clocks make a merge instead of a replace --
+   an incoming change only lands if it is genuinely newer than what is here. */
+var touched={};
 
 function load(){
   SEED.forEach(function(s){
@@ -717,23 +735,54 @@ function load(){
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
+  touched=(st&&st.touched)||null;
+  if(!touched){
+    /* a board saved before per-item clocks existed: date every edit it already
+       has to its last save, so this device still argues "as of then" rather
+       than losing every item to the first export that arrives */
+    touched={};
+    var when=savedAt||new Date().toISOString();
+    if(st&&st.items) Object.keys(st.items).forEach(function(k){ touched[k]=when; });
+  }
+}
+var DFIELDS=["status","due","priority","dateType","snoozes","origDue"];
+
+function seedOf(id){ for(var j=0;j<SEED.length;j++) if(SEED[j].id===id) return SEED[j]; return null; }
+function diffOf(i){
+  var s=seedOf(i.id), d={};
+  if(!s) return d;
+  if(i.status!==s.s) d.status=i.status;
+  if(i.due!==s.d) d.due=i.due;
+  if(i.priority!==s.p) d.priority=i.priority;
+  if(i.dateType!==s.dt) d.dateType=i.dateType;
+  if(i.snoozes) d.snoozes=i.snoozes;
+  if(i.origDue) d.origDue=i.origDue;
+  return d;
+}
+function sameDiff(a,b){
+  a=a||{}; b=b||{};
+  for(var n=0;n<DFIELDS.length;n++){ var f=DFIELDS[n]; if((a[f]===undefined?null:a[f])!==(b[f]===undefined?null:b[f])) return false; }
+  return true;
 }
 function save(){
-  var out={};
+  var prev=null; try{ prev=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
+  var pit=(prev&&prev.items)||{}, now=new Date().toISOString(), out={};
   Object.keys(items).forEach(function(k){
-    var i=items[k], s=null;
-    for(var j=0;j<SEED.length;j++) if(SEED[j].id===k) s=SEED[j];
-    var diff={};
-    if(!s) return;
-    if(i.status!==s.s) diff.status=i.status;
-    if(i.due!==s.d) diff.due=i.due;
-    if(i.priority!==s.p) diff.priority=i.priority;
-    if(i.dateType!==s.dt) diff.dateType=i.dateType;
-    if(i.snoozes) diff.snoozes=i.snoozes;
-    if(i.origDue) diff.origDue=i.origDue;
-    if(Object.keys(diff).length) out[k]=diff;
+    if(!seedOf(k)) return;
+    var diff=diffOf(items[k]), had=pit[k];
+    if(Object.keys(diff).length){
+      /* only move the clock when the values really moved, or every save would
+         make this device look like the most recent authority on everything */
+      if(!had || !sameDiff(had,diff)) touched[k]=now;
+      out[k]=diff;
+    }else if(had && Object.keys(had).length){
+      /* back to its SEED value: that is an edit too, and it has to be able to
+         win against an older change sitting on the other device */
+      touched[k]=now;
+    }
   });
-  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,saved:new Date().toISOString(),syncedAt:syncedAt,pending:pending})); }catch(e){}
+  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,
+    saved:now,syncedAt:syncedAt,pending:pending,touched:touched})); }catch(e){}
 }
 
 /* ---------- dates ---------- */
@@ -1232,10 +1281,26 @@ var URL_CAP=6000;   /* keep the prefilled URL comfortably under server limits */
 var RELAY="https://mba-cc-relay.thomasgavin777.workers.dev";
 var RELAY_KEY="";   /* public by definition; turns away bots, not readers */
 
+/* Every entry carries `at`, the moment this device last changed that item, so
+   the device reading it can merge per item instead of swallowing the lot.
+   An item the owner put BACK to its SEED value ships as {id,at,seed:true}: the
+   revert is an edit, and without a marker it would be indistinguishable from
+   "this device never heard of that item" and so could never propagate.
+   Items absent from this list carry no claim at all, which is what stops a
+   device that is behind from overwriting one that is ahead. */
 function changedItems(){
-  return all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
-    return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
-    .map(function(i){ return {id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue}; });
+  var out=[];
+  all().forEach(function(i){
+    if(!seedOf(i.id)) return;
+    var d=diffOf(i);
+    if(Object.keys(d).length){
+      out.push({id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,
+                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,at:touched[i.id]||null});
+    }else if(touched[i.id]){
+      out.push({id:i.id,title:i.title,at:touched[i.id],seed:true});
+    }
+  });
+  return out;
 }
 function fullPayload(){
   return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
@@ -1391,6 +1456,7 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
+document.getElementById("syncBtn").addEventListener("click",function(){ pullFromRepo(true); });
 document.getElementById("exportBtn").addEventListener("click",function(e){
   if(e.shiftKey){ exportAll(); return; }   /* shift-click still downloads the full snapshot */
   sendToClaude();
@@ -1609,73 +1675,138 @@ document.addEventListener("keydown",function(e){
    -------------------------------------------------------------- */
 var API="https://api.github.com/repos/"+REPO+"/contents/"+INBOX;
 
+/* notes union by id, newest first -- a note must never be lost to a sync */
+function mergeNotes(incoming){
+  var seen={}, added=0;
+  notes.forEach(function(n){ seen[n.id]=true; });
+  (incoming||[]).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; added++; } });
+  notes.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+  return added;
+}
+
+/* Two kinds of file land in claude-inbox/:
+   - a SNAPSHOT published by one of the owner's devices.
+   - a PATCH written by Claude after reading a note ("INSEAD granted 30 more
+     days, so this instalment and everything gated on it move"). It touches only
+     the items it names and does not wait its turn behind local edits: it was
+     written in response to them.
+   A snapshot used to reset every item to SEED and then lay its own diff over
+   the top, which made it a whole-board replace. That is what let the phone,
+   publishing a state that predated a date moved on the laptop, put the old date
+   back. Now both kinds merge item by item against `touched`, and an item the
+   file says nothing about is left exactly as it is. */
+/* The per-item clocks make a merge idempotent and order-independent, which is
+   what lets several files be folded in rather than only the newest. That
+   matters: whichever device published last used to define the whole board, so
+   the other device's changes were simply never read. */
+function mergePayload(pay){
+  if(!pay||!pay.exportedAt) return false;
+  var isPatch = pay.op==="patch";
+  var changed = pay.changed||[], incoming = pay.notes||[];
+
+  /* a snapshot with no notes and no changes describes nothing. It used to be
+     able to blank the board anyway, by way of the old reset-to-SEED. */
+  if(!isPatch && !changed.length && !incoming.length) return false;
+
+  var moved=0;
+  changed.forEach(function(c){
+    var i=items[c.id], sd=seedOf(c.id);
+    if(!i||!sd) return;
+    /* a patch is deliberate and recent by construction, so it lands; a
+       snapshot has to out-date what this device already holds */
+    var theirs = c.at || pay.exportedAt, mine = touched[c.id]||null;
+    if(!isPatch && mine && theirs <= mine) return;
+
+    if(c.seed){
+      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
+    }else{
+      DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
+    }
+    touched[c.id]=theirs; moved++;
+  });
+
+  var added = mergeNotes(incoming);
+  return moved>0 || added>0;
+}
+
+/* single-payload entry: the guards plus a save and a repaint */
 function applyRemote(pay){
   if(!pay||!pay.exportedAt) return false;
-  /* already seen this one */
-  if(syncedAt && pay.exportedAt <= syncedAt) return false;
-
-  /* Two kinds of file land in claude-inbox/:
-     - a SNAPSHOT published by one of the user's devices. It describes a whole
-       board, so it replaces ours -- but only if our own edits are older, or a
-       reload would undo a drag just made.
-     - a PATCH written by Claude after reading a note ("INSEAD granted 30 more
-       days, so this instalment and everything gated on it move"). It touches
-       only the items it names, so it layers over whatever is here and does not
-       wait its turn behind local edits: it was written in response to them. */
-  var isPatch = pay.op==="patch";
-  if(!isPatch && savedAt && pay.exportedAt <= savedAt) return false;
-
-  if(!isPatch){
-    /* snapshot: reset to the seed baseline, then lay the published diff over it */
-    SEED.forEach(function(sd){
-      var i=items[sd.id]; if(!i) return;
-      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
-    });
-  }
-  (pay.changed||[]).forEach(function(c){
-    var i=items[c.id]; if(!i) return;
-    ["status","due","priority","dateType","snoozes","origDue"].forEach(function(f){
-      if(c[f]!==undefined) i[f]=c[f];
-    });
-  });
-  /* notes: union by id, newest first -- a note must never be lost to a sync */
-  var seen={}; notes.forEach(function(n){ seen[n.id]=true; });
-  (pay.notes||[]).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; } });
-  notes.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
-
+  if(syncedAt && pay.exportedAt <= syncedAt) return false;   /* already seen this one */
+  var did=mergePayload(pay);
   syncedAt=pay.exportedAt;
-  save(); render();
-  return true;
+  if(did){ save(); render(); }
+  return did;
 }
+
+var PULL_FILES=5;      /* how many of the newest files to read notes out of */
+var PULL_GAP=8000;     /* ms; a focus pull that soon after the last one is noise */
+var lastPull=0, pulling=false;
 
 function pullFromRepo(announce){
   if(!window.fetch||location.protocol==="file:") return;   /* opened as a local file: nothing to pull from */
+  if(pulling) return;
+  if(!announce && Date.now()-lastPull < PULL_GAP) return;
+  pulling=true; lastPull=Date.now();
   fetch(API,{headers:{Accept:"application/vnd.github+json"}})
     .then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(list){
       if(!Array.isArray(list)||!list.length) throw 0;
-      var jsons=list.filter(function(f){ return /\.json$/.test(f.name); });
+      var jsons=list.filter(function(f){ return /\.json$/.test(f.name) && f.download_url; });
+      if(!jsons.length) throw 0;
       /* a send we handed to GitHub's editor is only believable once the file is
          actually here: until then those notes keep their NEW badge */
       if(pending && jsons.some(function(f){ return INBOX+"/"+f.name===pending.path; })){
         markSent(pending.ids||[]);
         toast("Your notes reached the repo.");
       }
-      /* filenames are YYYY-MM-DD-HHMM.json, so newest sorts last */
-      var newest=jsons.sort(function(a,b){ return a.name.localeCompare(b.name); }).pop();
-      if(!newest||!newest.download_url) throw 0;
-      return fetch(newest.download_url).then(function(r){ return r.json(); });
+      /* Names are YYYY-MM-DD-HHMM[_n].json, so newest sorts last. Read the last
+         few rather than only the newest: board state comes from the newest, but
+         a note that exists only in an earlier file would otherwise never be
+         seen, and notes are the thing that must never be dropped. */
+      jsons.sort(function(a,b){ return a.name.localeCompare(b.name); });
+      var take=jsons.slice(-PULL_FILES);
+      return Promise.all(take.map(function(f){
+        return fetch(f.download_url).then(function(r){ return r.json(); }).catch(function(){ return null; });
+      }));
     })
-    .then(function(pay){
-      if(applyRemote(pay)){
-        toast(pay.op==="patch"
-          ? ("Claude updated your board"+(pay.why?": "+pay.why:"")+".")
-          : "Pulled the latest board from the repo.");
+    .then(function(pays){
+      pays=(pays||[]).filter(function(x){ return x&&x.exportedAt; });
+      if(!pays.length) throw 0;
+      /* order by the clock inside the file, not by filename: the name is only a
+         minute, and two files from the same minute say nothing about order */
+      pays.sort(function(a,b){ return a.exportedAt.localeCompare(b.exportedAt); });
+
+      /* Fold in every recent file, oldest first, not just the newest one. The
+         newest file is whichever device pressed the button last, and reading
+         only that one is exactly how the other device's work went missing. */
+      var did=false, patch=null;
+      pays.forEach(function(pay){
+        if(syncedAt && pay.exportedAt <= syncedAt) return;   /* already seen */
+        if(mergePayload(pay)){ did=true; if(pay.op==="patch") patch=pay; }
+      });
+      var hi=pays[pays.length-1].exportedAt;
+      if(!syncedAt || hi>syncedAt) syncedAt=hi;
+
+      if(did){
+        save(); render();
+        toast(patch
+          ? ("Claude updated your board"+(patch.why?": "+patch.why:"")+".")
+          : "Caught up with the repo.");
       }
       else if(announce) toast("Already up to date with the repo.");
     })
-    .catch(function(){ if(announce) toast("Could not reach the repo. Your local board is unchanged."); });
+    .catch(function(){ if(announce) toast("Could not reach the repo. Your local board is unchanged."); })
+    .then(function(){ pulling=false; });
 }
+
+/* A board added to the iPhone home screen opens with no address bar and no way
+   to pull-to-refresh, so it would otherwise never see another device's changes
+   without being force-quit. Re-pull whenever it comes back to the foreground. */
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible") pullFromRepo(false);
+});
+window.addEventListener("focus",function(){ pullFromRepo(false); });
 
 /* ---------- boot ---------- */
 load();

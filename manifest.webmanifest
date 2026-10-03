@@ -1,0 +1,15 @@
+{
+  "name": "MBA Command Center",
+  "short_name": "27D",
+  "description": "INSEAD MBA'27D pre-departure admin",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f5f9",
+  "theme_color": "#ff6429",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
