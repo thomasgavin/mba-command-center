@@ -46,6 +46,7 @@ body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--page); color:var(--ink);
   font-size:13.5px; line-height:1.45; letter-spacing:-.011em;
+  -webkit-text-size-adjust:100%; text-size-adjust:100%;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   overflow:hidden;
 }
@@ -524,6 +525,19 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
   .day{min-height:74px} .zone{width:60px;height:54px}
   .tbtn .lbl{display:none}
+
+  /* iOS zooms the whole page the moment a focused control is under 16px, and
+     the zoom stays after the keyboard closes -- which is what pushed the
+     drawer's close button off the right edge and left no way back but a manual
+     pinch. 16px is the threshold; nothing else prevents it short of banning
+     pinch-zoom outright, which is worse. */
+  input[type=date],textarea,.pal-box input{font-size:16px}
+  /* the drawer is the full screen here, so it has to respect the notch and the
+     home bar, and the close button has to be a thumb-sized target */
+  .drawer{height:100dvh}
+  .dh{padding-top:max(16px,env(safe-area-inset-top));padding-right:max(16px,env(safe-area-inset-right))}
+  .x{width:40px;height:40px;font-size:15px;border-radius:11px}
+  .db{padding-bottom:max(20px,env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -849,6 +863,9 @@ function patch(id,p,label){
     else if(o.status==="todo" && depsOpen(o).length) o.status="blocked";
   });
   save(); render();
+  /* a date moved on this device has to reach the other one without being
+     asked to; that is the same complaint as a note needing a button press */
+  autoSend();
   if(openId===id && dMode==="item") renderDrawer(true);
   if(label) toast(label);
 }
@@ -864,7 +881,8 @@ function addNote(itemId,text){
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
     createdAt:new Date().toISOString(),state:"new"});
   save(); render();
-  toast("Note saved. Export it with “For Claude”.");
+  autoSend();
+  toast(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.");
 }
 
 /* ---------- toast ---------- */
@@ -919,21 +937,27 @@ function renderOverview(){
        '<button class="hbtn" data-dn="'+next.id+'">Mark done</button></div></div>';
   }
 
-  /* hero B: money */
-  var paidPct=MONEY.paid/MONEY.total, nextPct=MONEY.next/MONEY.total;
-  var tOct=items["tuition-oct"], tApr=items["tuition-apr"];
+  /* hero B: money.
+     This block used to print "2026-10-05" and "2027-04-15" as literals, so the
+     instalment could move to 5 Nov on its own card while the tuition summary
+     still said 5 Oct. Every date and every amount here now comes off the items
+     themselves, which is the only way the two can't drift apart. */
+  var tOct=items["tuition-oct"], tApr=items["tuition-apr"], tDep=items["deposit"];
+  var oDone=tOct.status==="done", aDone=tApr.status==="done", dDone=tDep.status==="done";
+  var paid=(dDone?MONEY.paid:0)+(oDone?MONEY.next:0)+(aDone?MONEY.last:0);
+  var paidPct=paid/MONEY.total, nextPct=(oDone?0:MONEY.next/MONEY.total);
   h+='<div class="tile hero b">'+
      '<h3><span class="pin" style="background:#ff8f4e"></span>Tuition</h3>'+
-     '<div class="big">'+eur(MONEY.total-MONEY.paid).replace("€",'<sup style="margin:0 3px 0 0">€</sup>')+'</div>'+
+     '<div class="big">'+eur(MONEY.total-paid).replace("€",'<sup style="margin:0 3px 0 0">€</sup>')+'</div>'+
      '<div class="met">still to pay of '+eur(MONEY.total)+' &middot; approx. ₹'+Math.round(MONEY.total*MONEY.rate/100000)+'L at '+MONEY.rate+'</div>'+
      '<div class="mbar">'+
        '<i style="width:'+(paidPct*100).toFixed(1)+'%;background:#00c9a7"></i>'+
        '<i style="width:'+(nextPct*100).toFixed(1)+'%;background:#ff6429"></i>'+
      '</div>'+
      '<div class="mleg">'+
-       '<div class="mrow"><span class="sw" style="background:#00c9a7"></span><span class="lb">Deposit paid</span><span class="vl">'+eur(MONEY.paid)+'</span></div>'+
-       '<div class="mrow"><span class="sw" style="background:#ff6429"></span><span class="lb">Instalment <span class="dt">'+fmtD("2026-10-05")+'</span></span><span class="vl">'+eur(MONEY.next)+'</span></div>'+
-       '<div class="mrow"><span class="sw" style="background:rgba(255,255,255,.3)"></span><span class="lb">Final <span class="dt">'+fmtD("2027-04-15")+'</span></span><span class="vl">'+eur(MONEY.last)+'</span></div>'+
+       '<div class="mrow"><span class="sw" style="background:#00c9a7"></span><span class="lb">Deposit '+(dDone?"paid":"due")+'</span><span class="vl">'+eur(MONEY.paid)+'</span></div>'+
+       '<div class="mrow"><span class="sw" style="background:'+(oDone?"#00c9a7":"#ff6429")+'"></span><span class="lb">Instalment <span class="dt">'+(oDone?"paid":fmtD(tOct.due))+'</span></span><span class="vl">'+eur(MONEY.next)+'</span></div>'+
+       '<div class="mrow"><span class="sw" style="background:'+(aDone?"#00c9a7":"rgba(255,255,255,.3)")+'"></span><span class="lb">Final <span class="dt">'+(aDone?"paid":fmtD(tApr.due))+'</span></span><span class="vl">'+eur(MONEY.last)+'</span></div>'+
      '</div>'+
      '<div class="foot"><button class="hbtn solid" data-go="tuition-oct">October instalment</button>'+
      '<button class="hbtn" data-go="sbi-sanction">Loan</button></div></div>';
@@ -1351,23 +1375,62 @@ function sendToClaude(){
   if(RELAY){ relaySend(pay, json); return; }
   sendViaGitHub(json, pay.stamp);
 }
-function relaySend(pay, json){
-  var n=notes.length, ids=notes.map(function(x){ return x.id; });
-  toast("Sending "+n+" note"+(n===1?"":"s")+"…");
+
+/* Automatic send. Writing a note and then having to press a second button was
+   the whole thing this page exists to avoid, and a note that is never pressed
+   never reaches Claude. It only works down the relay: the GitHub route needs a
+   real click to open its editor and a human to press "Commit changes", so it
+   stays manual and the top-bar button remains the fallback.
+   Debounced, because a burst of edits should be one file, not six -- the relay
+   only has ten filenames per minute. */
+var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
+function autoSend(){
+  if(!RELAY||sending) return;
+  clearTimeout(autoT);
+  autoT=setTimeout(function(){ autoT=null; runAuto(); }, AUTO_MS);
+}
+function runAuto(){
+  if(!RELAY||sending) return;
+  var pay=leanPayload();
+  if(!pay.notes.length && !pay.changed.length) return;   /* nothing to say */
+  relaySend(pay, JSON.stringify(pay,null,2), true);
+}
+/* a pending send must not die with the tab */
+function flushAuto(){ if(autoT){ clearTimeout(autoT); autoT=null; runAuto(); } }
+window.addEventListener("pagehide",flushAuto);
+document.addEventListener("visibilitychange",function(){ if(document.hidden) flushAuto(); });
+var sending=false;
+function relaySend(pay, json, quiet){
+  var n=notes.filter(function(x){ return x.state!=="read"; }).length;
+  var ids=notes.map(function(x){ return x.id; });
+  sending=true;
+  if(!quiet) toast("Sending "+n+" note"+(n===1?"":"s")+"…");
   var hd={"Content-Type":"application/json"};
   if(RELAY_KEY) hd["X-Relay-Key"]=RELAY_KEY;
   fetch(RELAY,{method:"POST",headers:hd,body:json})
     .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
     .then(function(res){
       if(!res.ok||!res.j.ok) throw res;
+      sending=false; autoTries=0;
       /* only what we actually sent: a note written while this was in flight
          has not reached the repo */
       markSent(ids);
-      toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
+      /* an automatic send says it happened and nothing more; the point is that
+         the owner no longer has to think about it */
+      if(quiet) toast(n?("Saved and sent to Claude."):"Saved and synced.");
+      else toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
     })
     .catch(function(err){
       /* notes deliberately stay unread: nothing was delivered */
+      sending=false;
       var why=(err&&err.j&&err.j.error)||"the relay could not be reached";
+      if(quiet){
+        /* never open a tab the owner did not ask for. Try again shortly, then
+           say plainly that it needs the button. */
+        if(autoTries++<1){ clearTimeout(autoT); autoT=setTimeout(function(){ autoT=null; runAuto(); },AUTO_RETRY); return; }
+        toast("Saved here, but not sent: "+why+". Press “For Claude” to retry.");
+        return;
+      }
       toast("Not sent: "+why+". Your notes are still here — opening GitHub instead.");
       setTimeout(function(){ sendViaGitHub(json, (pay&&pay.stamp)||stamp()); },1200);
     });
@@ -1753,7 +1816,10 @@ function applyRemote(pay){
   return did;
 }
 
-var PULL_FILES=5;      /* how many of the newest files to read notes out of */
+/* How many of the newest files to read. It was 5 when a file meant the owner
+   had pressed a button; now every edit burst writes one, so a device left alone
+   for a day can be further back than five files and would never catch up. */
+var PULL_FILES=12;
 var PULL_GAP=8000;     /* ms; a focus pull that soon after the last one is noise */
 var lastPull=0, pulling=false;
 
