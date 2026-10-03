@@ -698,6 +698,7 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
 var calCur=null, undoFn=null, toastT=null;
+var savedAt=null, syncedAt=null;   /* last local change, last export pulled in */
 
 function load(){
   SEED.forEach(function(s){
@@ -711,6 +712,8 @@ function load(){
     Object.keys(p).forEach(function(f){ items[k][f]=p[f]; });
   });
   notes=(st&&st.notes)||[];
+  savedAt=(st&&st.saved)||null;
+  syncedAt=(st&&st.syncedAt)||null;
 }
 function save(){
   var out={};
@@ -727,7 +730,7 @@ function save(){
     if(i.origDue) diff.origDue=i.origDue;
     if(Object.keys(diff).length) out[k]=diff;
   });
-  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,saved:new Date().toISOString()})); }catch(e){}
+  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,saved:new Date().toISOString(),syncedAt:syncedAt})); }catch(e){}
 }
 
 /* ---------- dates ---------- */
@@ -1538,10 +1541,69 @@ document.addEventListener("keydown",function(e){
   if(ix>=0){ setView(VIEWS[ix].v); }
 });
 
+/* ---------- pull: the other half of "For Claude" ----------
+   localStorage is per browser, per device, so each device otherwise keeps
+   its own divergent board. Every "For Claude" publishes this device's state
+   to claude-inbox/ in the repo; on load we pull the newest one back, which
+   lets a phone and a laptop converge on whoever published last.
+   No token: the repo is public and GitHub's contents API allows CORS.
+   Board state is last-publish-wins; notes are merged by id so none are lost.
+   A device whose own edits are NEWER than the published file keeps its own
+   board -- otherwise a reload would silently undo what you just dragged.
+   -------------------------------------------------------------- */
+var API="https://api.github.com/repos/"+REPO+"/contents/"+INBOX;
+
+function applyRemote(pay){
+  if(!pay||!pay.exportedAt) return false;
+  /* our own edits are newer than this export: keep them, nothing to do */
+  if(savedAt && pay.exportedAt <= savedAt) return false;
+  if(syncedAt && pay.exportedAt <= syncedAt) return false;
+
+  /* board: reset to the seed baseline, then lay the published diff over it */
+  SEED.forEach(function(sd){
+    var i=items[sd.id]; if(!i) return;
+    i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
+  });
+  (pay.changed||[]).forEach(function(c){
+    var i=items[c.id]; if(!i) return;
+    ["status","due","priority","dateType","snoozes","origDue"].forEach(function(f){
+      if(c[f]!==undefined) i[f]=c[f];
+    });
+  });
+  /* notes: union by id, newest first -- a note must never be lost to a sync */
+  var seen={}; notes.forEach(function(n){ seen[n.id]=true; });
+  (pay.notes||[]).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; } });
+  notes.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+
+  syncedAt=pay.exportedAt;
+  save(); render();
+  return true;
+}
+
+function pullFromRepo(announce){
+  if(!window.fetch||location.protocol==="file:") return;   /* opened as a local file: nothing to pull from */
+  fetch(API,{headers:{Accept:"application/vnd.github+json"}})
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(list){
+      if(!Array.isArray(list)||!list.length) throw 0;
+      /* filenames are YYYY-MM-DD-HHMM.json, so newest sorts last */
+      var newest=list.filter(function(f){ return /\.json$/.test(f.name); })
+                     .sort(function(a,b){ return a.name.localeCompare(b.name); }).pop();
+      if(!newest||!newest.download_url) throw 0;
+      return fetch(newest.download_url).then(function(r){ return r.json(); });
+    })
+    .then(function(pay){
+      if(applyRemote(pay)) toast("Pulled the latest board from the repo.");
+      else if(announce) toast("Already up to date with the repo.");
+    })
+    .catch(function(){ if(announce) toast("Could not reach the repo. Your local board is unchanged."); });
+}
+
 /* ---------- boot ---------- */
 load();
 render();
 setView("over");
+pullFromRepo(false);   /* catch up with whatever another device published */
 
 </script>
 </body>
