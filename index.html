@@ -709,7 +709,13 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
 var calCur=null, undoFn=null, toastT=null;
-var savedAt=null, syncedAt=null;   /* last local change, last export pulled in */
+var savedAt=null, syncedAt=null;   /* last local change, newest export seen */
+/* Inbox filenames this device has already folded in. syncedAt used to do this
+   job as a high-water mark, and it was wrong once the merge went per item: the
+   phone's OWN publish pushed syncedAt past every file in the folder, so the
+   laptop's older file -- the one holding the moved date -- was skipped forever
+   and no amount of reloading could fix it. A file is read once, by name. */
+var seenF=null;
 /* a send handed to GitHub's editor that we have not yet seen land in the repo */
 var pending=null;
 /* When each item last changed on THIS device, id -> ISO. The board used to sync
@@ -735,6 +741,10 @@ function load(){
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
+  seenF=(st&&st.seen)||null;
+  /* a board saved before this existed has read nothing by name, so it gets one
+     pass over the folder. That is the repair path for a device stuck behind. */
+  if(!seenF) seenF={};
   touched=(st&&st.touched)||null;
   if(!touched){
     /* a board saved before per-item clocks existed: date every edit it already
@@ -746,6 +756,10 @@ function load(){
   }
 }
 var DFIELDS=["status","due","priority","dateType","snoozes","origDue"];
+/* id -> the timestamp a merge just applied, consumed by the next save(). Without
+   it save() sees a brand new diff and dates it "now", so taking the other
+   device's change would make this device claim it as its own later edit. */
+var fromMerge={};
 
 function seedOf(id){ for(var j=0;j<SEED.length;j++) if(SEED[j].id===id) return SEED[j]; return null; }
 function diffOf(i){
@@ -773,16 +787,17 @@ function save(){
     if(Object.keys(diff).length){
       /* only move the clock when the values really moved, or every save would
          make this device look like the most recent authority on everything */
-      if(!had || !sameDiff(had,diff)) touched[k]=now;
+      if(!had || !sameDiff(had,diff)) touched[k]=fromMerge[k]||now;
       out[k]=diff;
     }else if(had && Object.keys(had).length){
       /* back to its SEED value: that is an edit too, and it has to be able to
          win against an older change sitting on the other device */
-      touched[k]=now;
+      touched[k]=fromMerge[k]||now;
     }
   });
+  fromMerge={};
   try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,
-    saved:now,syncedAt:syncedAt,pending:pending,touched:touched})); }catch(e){}
+    saved:now,syncedAt:syncedAt,pending:pending,touched:touched,seen:seenF})); }catch(e){}
 }
 
 /* ---------- dates ---------- */
@@ -1722,7 +1737,7 @@ function mergePayload(pay){
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }
-    touched[c.id]=theirs; moved++;
+    touched[c.id]=theirs; fromMerge[c.id]=theirs; moved++;
   });
 
   var added = mergeNotes(incoming);
@@ -1732,9 +1747,8 @@ function mergePayload(pay){
 /* single-payload entry: the guards plus a save and a repaint */
 function applyRemote(pay){
   if(!pay||!pay.exportedAt) return false;
-  if(syncedAt && pay.exportedAt <= syncedAt) return false;   /* already seen this one */
   var did=mergePayload(pay);
-  syncedAt=pay.exportedAt;
+  if(!syncedAt || pay.exportedAt>syncedAt) syncedAt=pay.exportedAt;
   if(did){ save(); render(); }
   return did;
 }
@@ -1767,25 +1781,33 @@ function pullFromRepo(announce){
       jsons.sort(function(a,b){ return a.name.localeCompare(b.name); });
       var take=jsons.slice(-PULL_FILES);
       return Promise.all(take.map(function(f){
-        return fetch(f.download_url).then(function(r){ return r.json(); }).catch(function(){ return null; });
+        return fetch(f.download_url)
+          .then(function(r){ return r.json(); })
+          .then(function(j){ return j?{name:f.name,pay:j}:null; })
+          .catch(function(){ return null; });
       }));
     })
-    .then(function(pays){
-      pays=(pays||[]).filter(function(x){ return x&&x.exportedAt; });
+    .then(function(got){
+      var pays=(got||[]).filter(function(x){ return x&&x.pay&&x.pay.exportedAt; });
       if(!pays.length) throw 0;
       /* order by the clock inside the file, not by filename: the name is only a
          minute, and two files from the same minute say nothing about order */
-      pays.sort(function(a,b){ return a.exportedAt.localeCompare(b.exportedAt); });
+      pays.sort(function(a,b){ return a.pay.exportedAt.localeCompare(b.pay.exportedAt); });
 
       /* Fold in every recent file, oldest first, not just the newest one. The
          newest file is whichever device pressed the button last, and reading
          only that one is exactly how the other device's work went missing. */
       var did=false, patch=null;
-      pays.forEach(function(pay){
-        if(syncedAt && pay.exportedAt <= syncedAt) return;   /* already seen */
-        if(mergePayload(pay)){ did=true; if(pay.op==="patch") patch=pay; }
+      pays.forEach(function(f){
+        if(seenF[f.name]) return;            /* this exact file has been read */
+        seenF[f.name]=1;
+        if(mergePayload(f.pay)){ did=true; if(f.pay.op==="patch") patch=f.pay; }
       });
-      var hi=pays[pays.length-1].exportedAt;
+      /* a name can only ever be read once, so the list cannot grow past the
+         handful of files a pull looks at plus a little history */
+      var names=Object.keys(seenF);
+      if(names.length>60) names.sort().slice(0,names.length-60).forEach(function(k){ delete seenF[k]; });
+      var hi=pays[pays.length-1].pay.exportedAt;
       if(!syncedAt || hi>syncedAt) syncedAt=hi;
 
       if(did){
@@ -1793,8 +1815,10 @@ function pullFromRepo(announce){
         toast(patch
           ? ("Claude updated your board"+(patch.why?": "+patch.why:"")+".")
           : "Caught up with the repo.");
+      }else{
+        save();   /* nothing moved, but remember which files were read */
+        if(announce) toast("Already up to date with the repo.");
       }
-      else if(announce) toast("Already up to date with the repo.");
     })
     .catch(function(){ if(announce) toast("Could not reach the repo. Your local board is unchanged."); })
     .then(function(){ pulling=false; });

@@ -52,7 +52,13 @@ bridge is `claude-inbox/`:
 - **Pull:** on load, and again whenever the page returns to the foreground, the
   app lists `claude-inbox/` through GitHub's contents API (public repo,
   CORS-allowed, no token) and folds in the newest few files, oldest first by the
-  `exportedAt` inside each file rather than by filename.
+  `exportedAt` inside each file rather than by filename. A file is read once,
+  tracked **by filename** in `seen`. It used to be tracked by a `syncedAt`
+  high-water mark, which quietly broke the whole bridge: a device's own publish
+  pushed `syncedAt` past every file in the folder, so the other device's older
+  file — the one actually holding the change — was skipped forever and no reload
+  could recover it. Per-item clocks already make a re-read harmless, so there is
+  nothing for a timestamp gate to protect.
 
 Board state merges **per item**, not per board. Each item carries `at`, the
 moment that device last changed it (kept in `touched`), and an incoming change
