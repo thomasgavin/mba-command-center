@@ -529,7 +529,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <div class="sp"></div>
     <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
     <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
-    <button class="tbtn hot" id="exportBtn"><span>&#8681;</span><span class="lbl">For Claude</span></button>
+    <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
   <nav class="views" role="tablist">
@@ -606,7 +606,8 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 /* ===========================================================
    MBA Command Center - logic
    Local file. Everything persists to localStorage on this
-   device; "For Claude" writes a file Claude can read back.
+   device; "For Claude" commits notes to the repo for Claude
+   to read (public repo), shift-click downloads them instead.
    =========================================================== */
 
 /* ---------- taxonomy ---------- */
@@ -1179,7 +1180,7 @@ function renderDrawer(keepDraft){
   h+='<div class="fld"><label>Note for Claude</label>'+
      '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
      '<div class="row-b" style="margin-top:8px"><button class="btn o" data-save="1">Leave note</button></div>'+
-     '<div class="hint">Stored on this device. Hit <b>For Claude</b> in the top bar to export every note as a file Claude can read.</div></div>';
+     '<div class="hint">Stored on this device. Hit <b>For Claude</b> in the top bar to commit your notes to the repo, where Claude reads them. That repo is public. Shift-click to download instead.</div></div>';
   if(mine.length){
     h+='<div class="fld"><label>'+mine.length+' note'+(mine.length>1?"s":"")+' on this item</label>'+
        mine.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
@@ -1205,15 +1206,57 @@ function openNotes(){
   setTimeout(function(){ var t=document.getElementById("gn"); if(t) t.focus(); },300);
 }
 
-/* ---------- export ---------- */
+/* ---------- export ----------
+   Two routes out of this device:
+   - sendToClaude(): commits a small notes+changes file straight into the
+     GitHub repo through GitHub's own prefilled-editor URL, so no token and
+     no download. Claude reads claude-inbox/ from the repo.
+     NOTE: this repository is PUBLIC, so anything sent this way is public.
+   - exportAll(): the original full-snapshot download, kept as a fallback.
+   -------------------------------------------------------------- */
+var REPO="thomasgavin/mba-command-center", BRANCH="main", INBOX="claude-inbox";
+var URL_CAP=6000;   /* keep the prefilled URL comfortably under server limits */
+
+function changedItems(){
+  return all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
+    return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
+    .map(function(i){ return {id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue}; });
+}
+function fullPayload(){
+  return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
+    notes:notes, changed:changedItems(),
+    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,dateType:i.dateType,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
+}
+/* lean on purpose: the baseline task list already lives in SEED in this file,
+   so Claude rebuilds the full picture from SEED + changed. Only the deltas travel. */
+function leanPayload(){
+  return {v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
+    note:"Baseline is SEED in index.html; apply changed[] over it.",
+    notes:notes, changed:changedItems()};
+}
+function stamp(){
+  var d=new Date(), z=function(n){ return (n<10?"0":"")+n; };
+  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());
+}
+function sendToClaude(){
+  var json=JSON.stringify(leanPayload(),null,2);
+  var url="https://github.com/"+REPO+"/new/"+BRANCH+
+    "?filename="+encodeURIComponent(INBOX+"/"+stamp()+".json")+
+    "&value="+encodeURIComponent(json)+
+    "&message="+encodeURIComponent("Notes for Claude - "+stamp());
+  if(url.length>URL_CAP){   /* too much to carry in a URL: fall back to the file */
+    exportAll(); return;
+  }
+  /* open synchronously inside the click, or the popup blocker eats it */
+  var w=window.open(url,"_blank","noopener");
+  /* best-effort: rejects when the page is not a secure context or focus was taken */
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ var cp=navigator.clipboard.writeText(json); if(cp&&cp.catch) cp.catch(function(){}); } }catch(e){}
+  notes.forEach(function(n){ n.state="read"; }); save(); render();
+  if(!w){ toast("Pop-up blocked. The JSON is on your clipboard - paste it into a new file in the repo."); return; }
+  toast("GitHub opened - press “Commit changes” to send "+notes.length+" note"+(notes.length===1?"":"s")+". Copy is on your clipboard.");
+}
 function exportAll(){
-  var pay={exportedAt:new Date().toISOString(),source:"MBA Command Center",
-    notes:notes,
-    changed:all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
-      return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
-      .map(function(i){ return {id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue}; }),
-    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,dateType:i.dateType,blockedBy:depsOpen(i).map(function(d){return d;})}; })
-  };
+  var pay=fullPayload();
   var b=new Blob([JSON.stringify(pay,null,2)],{type:"application/json"});
   var a=document.createElement("a");
   a.href=URL.createObjectURL(b);
@@ -1289,7 +1332,10 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
-document.getElementById("exportBtn").addEventListener("click",exportAll);
+document.getElementById("exportBtn").addEventListener("click",function(e){
+  if(e.shiftKey){ exportAll(); return; }   /* shift-click still downloads the full snapshot */
+  sendToClaude();
+});
 
 /* --- double click to annotate --- */
 stage.addEventListener("dblclick",function(e){
