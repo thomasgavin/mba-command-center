@@ -699,6 +699,8 @@ var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
 var calCur=null, undoFn=null, toastT=null;
 var savedAt=null, syncedAt=null;   /* last local change, last export pulled in */
+/* a send handed to GitHub's editor that we have not yet seen land in the repo */
+var pending=null;
 
 function load(){
   SEED.forEach(function(s){
@@ -714,6 +716,7 @@ function load(){
   notes=(st&&st.notes)||[];
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
+  pending=(st&&st.pending)||null;
 }
 function save(){
   var out={};
@@ -730,7 +733,7 @@ function save(){
     if(i.origDue) diff.origDue=i.origDue;
     if(Object.keys(diff).length) out[k]=diff;
   });
-  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,saved:new Date().toISOString(),syncedAt:syncedAt})); }catch(e){}
+  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,saved:new Date().toISOString(),syncedAt:syncedAt,pending:pending})); }catch(e){}
 }
 
 /* ---------- dates ---------- */
@@ -1198,7 +1201,7 @@ function openNotes(){
   var h='<div class="fld"><label>Add a note</label>'+
     '<textarea id="gn" placeholder="Anything you want Claude to know or act on. Not tied to one item."></textarea>'+
     '<div class="row-b" style="margin-top:8px"><button class="btn o" data-gsave="1">Leave note</button>'+
-    '<button class="btn" data-export="1">Export all for Claude</button></div></div>';
+    '<button class="btn o" data-export="1" title="Saves a full snapshot to this device. Does not reach the repo.">Download a copy</button></div></div>';
   h+= notes.length ? '<div class="fld"><label>'+notes.length+' note'+(notes.length>1?"s":"")+'</label>'+
       notes.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
         (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+esc(p.text)+'</div>'+
@@ -1220,6 +1223,15 @@ function openNotes(){
 var REPO="thomasgavin/mba-command-center", BRANCH="main", INBOX="claude-inbox";
 var URL_CAP=6000;   /* keep the prefilled URL comfortably under server limits */
 
+/* The relay is a Cloudflare Worker holding the GitHub token server-side, so the
+   send is one press and nothing secret sits on the device to be evicted. The
+   address is not a secret -- it is in this file, which is public -- so it lives
+   here rather than in localStorage, where a week of not visiting would wipe it.
+   Empty RELAY means not deployed yet: everything falls back to the GitHub
+   editor route below, which is what shipped before this. */
+var RELAY="";
+var RELAY_KEY="";   /* public by definition; turns away bots, not readers */
+
 function changedItems(){
   return all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
     return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
@@ -1235,28 +1247,72 @@ function fullPayload(){
 function leanPayload(){
   return {v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
     note:"Baseline is SEED in index.html; apply changed[] over it.",
+    /* the relay names the file from this, so both routes stamp in the same zone
+       and the newest-file sort on pull stays honest */
+    stamp:stamp(),
     notes:notes, changed:changedItems()};
 }
 function stamp(){
   var d=new Date(), z=function(n){ return (n<10?"0":"")+n; };
   return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());
 }
+/* A note counts as sent only once it is in the repo. Marking notes read on the
+   click was the bug that wasted an evening: the GitHub route needs the owner to
+   press "Commit changes" on a page we never hear back from, so a closed tab, a
+   blocked pop-up or a signed-out browser left the notes looking delivered and
+   the folder empty. Now the relay confirms on the spot, and the GitHub route
+   waits for the next pull to find the file before it believes the send. */
+function markSent(ids){
+  notes.forEach(function(n){ if(!ids||ids.indexOf(n.id)>=0) n.state="read"; });
+  pending=null; save(); render();
+}
 function sendToClaude(){
-  var json=JSON.stringify(leanPayload(),null,2);
+  var pay=leanPayload(), json=JSON.stringify(pay,null,2);
+  if(RELAY){ relaySend(pay, json); return; }
+  sendViaGitHub(json, pay.stamp);
+}
+function relaySend(pay, json){
+  var n=notes.length, ids=notes.map(function(x){ return x.id; });
+  toast("Sending "+n+" note"+(n===1?"":"s")+"…");
+  var hd={"Content-Type":"application/json"};
+  if(RELAY_KEY) hd["X-Relay-Key"]=RELAY_KEY;
+  fetch(RELAY,{method:"POST",headers:hd,body:json})
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
+    .then(function(res){
+      if(!res.ok||!res.j.ok) throw res;
+      /* only what we actually sent: a note written while this was in flight
+         has not reached the repo */
+      markSent(ids);
+      toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
+    })
+    .catch(function(err){
+      /* notes deliberately stay unread: nothing was delivered */
+      var why=(err&&err.j&&err.j.error)||"the relay could not be reached";
+      toast("Not sent: "+why+". Your notes are still here — opening GitHub instead.");
+      setTimeout(function(){ sendViaGitHub(json, (pay&&pay.stamp)||stamp()); },1200);
+    });
+}
+function sendViaGitHub(json, st){
   var url="https://github.com/"+REPO+"/new/"+BRANCH+
-    "?filename="+encodeURIComponent(INBOX+"/"+stamp()+".json")+
+    "?filename="+encodeURIComponent(INBOX+"/"+st+".json")+
     "&value="+encodeURIComponent(json)+
-    "&message="+encodeURIComponent("Notes for Claude - "+stamp());
-  if(url.length>URL_CAP){   /* too much to carry in a URL: fall back to the file */
-    exportAll(); return;
+    "&message="+encodeURIComponent("Notes for Claude - "+st);
+  if(url.length>URL_CAP){
+    /* too much to carry in a URL. This used to download in silence, which read
+       as a successful send; say what happened instead. */
+    exportAll();
+    toast("Too long for GitHub’s editor, so it downloaded instead. Commit that file to "+INBOX+"/ yourself.");
+    return;
   }
   /* open synchronously inside the click, or the popup blocker eats it */
   var w=window.open(url,"_blank","noopener");
   /* best-effort: rejects when the page is not a secure context or focus was taken */
   try{ if(navigator.clipboard&&navigator.clipboard.writeText){ var cp=navigator.clipboard.writeText(json); if(cp&&cp.catch) cp.catch(function(){}); } }catch(e){}
-  notes.forEach(function(n){ n.state="read"; }); save(); render();
+  /* remember what we asked for so the next pull can tell whether it landed */
+  pending={path:INBOX+"/"+st+".json", ids:notes.map(function(n){ return n.id; }), at:new Date().toISOString()};
+  save(); render();
   if(!w){ toast("Pop-up blocked. The JSON is on your clipboard - paste it into a new file in the repo."); return; }
-  toast("GitHub opened - press “Commit changes” to send "+notes.length+" note"+(notes.length===1?"":"s")+". Copy is on your clipboard.");
+  toast("GitHub opened. Press “Commit changes” there, or the "+notes.length+" note"+(notes.length===1?"":"s")+" stay on this device.");
 }
 function exportAll(){
   var pay=fullPayload();
@@ -1266,7 +1322,7 @@ function exportAll(){
   a.download="mba-for-claude-"+iso(todayD())+".json";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
-  notes.forEach(function(n){ n.state="read"; }); save(); render();
+  /* a file in Downloads has not reached the repo, so the notes stay unread */
   toast("Exported "+pay.notes.length+" note"+(pay.notes.length===1?"":"s")+" and "+pay.changed.length+" change"+(pay.changed.length===1?"":"s")+" to your downloads.");
 }
 
@@ -1598,9 +1654,15 @@ function pullFromRepo(announce){
     .then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(list){
       if(!Array.isArray(list)||!list.length) throw 0;
+      var jsons=list.filter(function(f){ return /\.json$/.test(f.name); });
+      /* a send we handed to GitHub's editor is only believable once the file is
+         actually here: until then those notes keep their NEW badge */
+      if(pending && jsons.some(function(f){ return INBOX+"/"+f.name===pending.path; })){
+        markSent(pending.ids||[]);
+        toast("Your notes reached the repo.");
+      }
       /* filenames are YYYY-MM-DD-HHMM.json, so newest sorts last */
-      var newest=list.filter(function(f){ return /\.json$/.test(f.name); })
-                     .sort(function(a,b){ return a.name.localeCompare(b.name); }).pop();
+      var newest=jsons.sort(function(a,b){ return a.name.localeCompare(b.name); }).pop();
       if(!newest||!newest.download_url) throw 0;
       return fetch(newest.download_url).then(function(r){ return r.json(); });
     })
