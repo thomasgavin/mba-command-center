@@ -106,6 +106,9 @@ body::before{
   flex:none;display:flex;gap:2px;padding:9px 20px 0;border-bottom:1px solid var(--line);
   background:rgba(255,255,255,.62);backdrop-filter:blur(10px);overflow-x:auto;
   scrollbar-width:none;
+  /* the strip scrolls sideways only. Without this a swipe along it dragged the
+     page vertically and rubber-banded the whole board. */
+  touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
 }
 .views::-webkit-scrollbar{display:none}
 .vt{
@@ -123,6 +126,69 @@ body::before{
 }
 .vt[aria-selected="true"]::after{transform:scaleX(1)}
 .vt small{font-size:10.5px;font-weight:700;background:var(--wash);color:var(--ink3);border-radius:20px;padding:1px 5px}
+
+/* ---------- category sub-tabs ---------- */
+.subs{
+  flex:none;display:none;gap:6px;padding:10px 20px;border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.5);overflow-x:auto;scrollbar-width:none;
+  /* pan-x only, or dragging the strip drags the page with it */
+  touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+}
+.subs.on{display:flex}
+.subs::-webkit-scrollbar{display:none}
+.st{
+  flex:none;border:1px solid var(--line);background:#fff;border-radius:20px;height:30px;padding:0 12px;
+  font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;transition:all .14s;
+}
+.st:hover{background:var(--wash)}
+.st small{font-size:10.5px;font-weight:700;color:var(--ink4);font-variant-numeric:tabular-nums}
+.st[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.st[aria-selected="true"] small{color:rgba(255,255,255,.7)}
+
+/* ---------- milestones ---------- */
+.miles{grid-column:span 12}
+.mline{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;touch-action:pan-x;overscroll-behavior-x:contain}
+.mstone{
+  flex:none;min-width:146px;border:1px solid var(--line);border-radius:var(--r2);padding:10px 11px;
+  background:var(--wash2);cursor:pointer;transition:all .14s var(--ease);
+}
+.mstone i{display:block;width:7px;height:7px;border-radius:50%;margin-bottom:7px}
+.mstone b{display:block;font-size:12px;font-weight:650;line-height:1.3;letter-spacing:-.01em}
+.mstone span{display:block;font-size:10.5px;font-weight:600;color:var(--ink4);margin-top:4px;font-variant-numeric:tabular-nums}
+.mstone:hover{background:#fff;box-shadow:var(--sh);transform:translateY(-1px)}
+.mstone.done{background:rgba(0,169,143,.07);border-color:rgba(0,169,143,.26)}
+.mstone.done b{color:var(--green)}
+.mstone.now{border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(255,100,41,.1)}
+.mstone.now span{color:var(--orange)}
+
+/* ---------- sequence trackers (visa, housing) ----------
+   Not .trk: that is already the "Progress by track" tile, and its grid-column
+   quietly won over this one. */
+.seqt{grid-column:span 6;display:flex;flex-direction:column}
+.steps{display:flex;flex-direction:column;gap:2px}
+.step{
+  display:flex;align-items:center;gap:9px;padding:7px 2px;cursor:pointer;border-radius:7px;
+  transition:background .13s;position:relative;
+}
+.step:hover{background:var(--wash2)}
+.step i{
+  width:9px;height:9px;border-radius:50%;flex:none;border:2px solid var(--line);background:#fff;
+}
+.step b{font-size:12px;font-weight:600;letter-spacing:-.01em;min-width:0;flex:1}
+.step span{font-size:10.5px;font-weight:650;color:var(--ink4);flex:none;font-variant-numeric:tabular-nums}
+.step.done i{background:var(--green);border-color:var(--green)}
+.step.done b{color:var(--ink4)}
+.step.now i{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.14)}
+.step.now b{color:var(--ink)}
+.step.now span{color:var(--orange)}
+.step.gap i{border-color:var(--red);background:rgba(224,38,60,.12)}
+.step.gap span{color:var(--red)}
+.cbar{height:9px;border-radius:20px;background:var(--wash);display:flex;overflow:hidden;margin-bottom:13px}
+.cbar i{display:block;height:100%}
+.cbar .ok{background:var(--green)}
+.cbar .gap{background:repeating-linear-gradient(45deg,rgba(224,38,60,.3) 0 4px,rgba(224,38,60,.12) 4px 8px)}
+.seqt .hint{margin-top:auto;padding-top:10px}
 
 /* ---------- stage ---------- */
 .stage{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 20px 120px;-webkit-overflow-scrolling:touch}
@@ -337,12 +403,15 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .gax .gm div{flex:1;font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;padding:8px 0 8px 8px;border-left:1px solid var(--line2)}
 .gsec{display:flex;align-items:center;gap:7px;padding:7px 12px;background:var(--wash2);border-bottom:1px solid var(--line2);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
 .gsec i{width:7px;height:7px;border-radius:50%;flex:none}
-.grow{display:flex;border-bottom:1px solid var(--line2);height:32px;cursor:pointer;transition:background .12s}
+.grow{display:flex;border-bottom:1px solid var(--line2);min-height:32px;cursor:pointer;transition:background .12s}
 .grow:hover{background:var(--wash2)}
 .grow:last-child{border-bottom:0}
-.grow .gl{width:186px;flex:none;border-right:1px solid var(--line);padding:0 11px;display:flex;align-items:center;gap:7px;min-width:0}
+.grow .gl{width:186px;flex:none;border-right:1px solid var(--line);display:flex;gap:7px;min-width:0}
 .grow .gl i{width:6px;height:6px;border-radius:50%;flex:none}
-.grow .gl span{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* wrap rather than clip: a cut-off title is useless for telling two tasks
+   apart, and the rows can afford the height */
+.grow .gl span{font-size:11.5px;font-weight:600;white-space:normal;overflow-wrap:anywhere;line-height:1.25}
+.grow .gl{padding:6px 11px;align-items:center}
 .gtrack{flex:1;position:relative}
 .gtrack .gg{position:absolute;inset:0;display:flex;pointer-events:none}
 .gtrack .gg div{flex:1;border-left:1px solid var(--line2)}
@@ -381,6 +450,29 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 }
 .ev:hover{transform:translateX(1px)}
 .ev.hole{opacity:.3}
+
+/* month as a vertical agenda, for portrait phones */
+.agenda .dow{display:none}
+.agenda .cgrid{display:block}
+.ard{display:flex;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line2)}
+.ard:last-child{border-bottom:0}
+.ard.today{background:rgba(255,100,41,.05)}
+.arh{flex:none;width:40px;text-align:center}
+.arh b{display:block;font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.arh span{display:block;font-size:9.5px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}
+.arh em{display:block;font-style:normal;font-size:9px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.ard.today .arh b{color:var(--orange)}
+.arl{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+/* .calrow, not .agr or .arw: both were already taken by the overview agenda
+   row and the critical-path chevron, and the clash silently zeroed this box. */
+.calrow{
+  display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:var(--r3);background:var(--wash2);cursor:grab;touch-action:none;flex-wrap:wrap;
+}
+.calrow i{width:7px;height:7px;border-radius:50%;flex:none;margin-top:5px}
+.calrow b{font-size:12.5px;font-weight:650;line-height:1.3;letter-spacing:-.01em;flex:1;min-width:0;overflow-wrap:anywhere}
+.calrow span{flex-basis:100%;padding-left:15px;font-size:10.5px;font-weight:600;color:var(--ink4)}
+.calrow.done b{color:var(--ink4);text-decoration:line-through}
 
 /* ---------- dependency graph ---------- */
 .gfx{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:18px;overflow-x:auto}
@@ -430,6 +522,8 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   transform:translateX(102%);transition:transform .28s var(--ease);
 }
 .drawer.on{transform:none}
+/* starts out of the pannable area; showDrawer flips this before it slides in */
+.drawer{visibility:hidden}
 .dh{flex:none;display:flex;align-items:flex-start;gap:10px;padding:16px 16px 13px;border-bottom:1px solid var(--line)}
 .dh h3{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1}
 .x{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
@@ -513,7 +607,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
   .mstack{grid-column:span 12;grid-row:span 1;flex-direction:row}
-  .pipe,.att,.trk,.agd{grid-column:span 12}
+  .pipe,.att,.trk,.agd{grid-column:span 12} .seqt{grid-column:span 6}
   .cols{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:720px){
@@ -525,6 +619,15 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
   .day{min-height:74px} .zone{width:60px;height:54px}
   .tbtn .lbl{display:none}
+  .subs{padding:9px 13px}
+  /* every wide tile is full width here, and the trackers stack */
+  .miles,.seqt,.pipe{grid-column:span 12}
+  /* all of them visible at once: a rail you have to swipe is not an answer */
+  .mline{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:7px}
+  .mstone{min-width:0}
+  /* the timeline label column cannot take 186px of a 390px screen */
+  .gax .gl,.grow .gl{width:124px}
+  .ginner{min-width:760px}
 
   /* iOS zooms the whole page the moment a focused control is under 16px, and
      the zoom stays after the keyboard closes -- which is what pushed the
@@ -565,6 +668,8 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <button class="vt" role="tab" data-v="graph" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.8"/><circle cx="8" cy="3.4" r="1.8"/><circle cx="8" cy="12.6" r="1.8"/><circle cx="13" cy="8" r="1.8"/><path d="M4.5 7 6.6 4.6M4.5 9l2.1 2.4M9.5 4.4 11.6 6.8M9.5 11.6 11.6 9.2"/></svg>Dependencies</button>
     <button class="vt" role="tab" data-v="list" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4h9M5.5 8h9M5.5 12h9"/><circle cx="2.2" cy="4" r="1"/><circle cx="2.2" cy="8" r="1"/><circle cx="2.2" cy="12" r="1"/></svg>List<small id="nList">0</small></button>
   </nav>
+
+  <nav class="subs" id="subs" role="tablist" aria-label="Filter by category"></nav>
 
   <main class="stage" id="stage">
     <section class="view on" id="v-over"><div class="bento" id="bento"></div></section>
@@ -645,6 +750,19 @@ var TRACKS={
   career:{label:"Career",         c:"#00a98f"}
 };
 var TORDER=["fin","visa","move","admin","acad","career"];
+/* The owner thinks in four buckets, not six tracks, so the four are what the
+   sub-tabs offer and the track stays as the card's finer label. Nothing is
+   dropped: every track belongs to exactly one category. Visa and the move are
+   both "getting there and living there"; leaving the job is career, because
+   that is what the Locus exit and the HelloFresh handover actually are. */
+var CATS=[
+  {k:"money", label:"Financial",    tracks:["fin"]},
+  {k:"life",  label:"Student Life", tracks:["visa","move"]},
+  {k:"study", label:"Academics",    tracks:["acad"]},
+  {k:"work",  label:"Career",       tracks:["career","admin"]}
+];
+var TRACK_CAT={};
+CATS.forEach(function(c){ c.tracks.forEach(function(t){ TRACK_CAT[t]=c.k; }); });
 var STATUS=[
   {k:"blocked",label:"Blocked",    c:"#b066ff"},
   {k:"todo",   label:"To do",      c:"#8b8095"},
@@ -652,7 +770,38 @@ var STATUS=[
   {k:"done",   label:"Done",       c:"#00a98f"}
 ];
 var PRI={Critical:"#e0263c",High:"#ff6429",Medium:"#ff9f00",Low:"#8b8095"};
-var CHAIN=["scholarship-r3","sbi-sanction","cf-interview","cf-validation","vfs-appt","visa-issued","flight","move","programme-start"];
+var CHAIN=["scholarship-r3","sbi-sanction","cf-interview","cf-validation","vfs-appt","flight"];
+
+/* ---------- milestones ----------
+   Dates and outcomes, not work. "Student visa in hand", "Move to
+   Fontainebleau", "Programme starts" and "Graduation" used to sit in the task
+   list, where a Critical graduation in December 2027 was noise on a board about
+   this month, and none of them is a thing you can do -- they happen when the
+   work in front of them is finished.
+   One that mirrors a task reads its date and status straight off that task, so
+   there is never a second copy of a date. One that is a fixed fact carries its
+   own date and is marked reached when its `gate` task is done. */
+var MILES=[
+  {t:"Loan sanctioned",           item:"sbi-sanction"},
+  {t:"First tuition instalment",  item:"tuition-oct"},
+  {t:"Visa in hand",              d:"2026-11-30", gate:"vfs-appt", k:"visa"},
+  {t:"Move to Fontainebleau",     d:"2027-01-03", gate:"flight",   k:"move"},
+  {t:"Programme starts",          d:"2027-01-07", gate:"flight",   k:"acad"},
+  {t:"Final tuition instalment",  item:"tuition-apr"},
+  /* he named the exchange and there is no date on record for it; inventing one
+     would be worse than saying so */
+  {t:"Exchange programme",        d:null, k:"acad", note:"period not decided yet"},
+  {t:"Graduation",                d:"2027-12-15", k:"acad"}
+];
+
+/* The visa is a sequence, not a task: these are its steps in order, and the
+   last one issuing is what "visa in hand" means. */
+var VISA_STEPS=["eef-init","attest","cf-interview","docs-apost","cf-validation","vfs-appt"];
+
+/* Housing is a coverage problem, not a checkbox: Club 8 covers the first six
+   months and the rest of the programme is uncovered. */
+var HOUSING={from:"2027-01-03", to:"2027-07-03", end:"2027-12-15",
+  booked:"club8-book", next:"housing-h2", detail:"club8-detail"};
 
 /* ---------- seed, from the vault ---------- */
 var SEED=[
@@ -684,15 +833,15 @@ var SEED=[
  {id:"docs-apost",  t:"Apostille and attest academic documents",      k:"visa",  s:"todo", p:"High",     d:"2026-10-18", dt:"Target"},
  {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25",dt:"Target", dep:["cf-interview","docs-apost"]},
  {id:"vfs-appt",    t:"VFS appointment during India trip",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10",dt:"Target", dep:["cf-validation"]},
- {id:"visa-issued", t:"Student visa in hand",                         k:"visa",  s:"blocked",p:"Critical",d:"2026-11-30",dt:"Target", dep:["vfs-appt"]},
  {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", dt:"Target"},
 
  /* housing and move */
- {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", dt:"Target", dep:["visa-issued"]},
+ {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", dt:"Target", dep:["vfs-appt"],
+   n:"The visa has to be issued first, which is what the VFS appointment starts."},
  {id:"club8-detail",t:"Confirm Club 8 inventory and move-in window",  k:"move",  s:"todo", p:"Medium",   d:"2026-11-15", dt:"Target", dep:["club8-book"]},
  {id:"shipping",    t:"Shipping and baggage plan",                    k:"move",  s:"todo", p:"Medium",   d:"2026-12-15", dt:"Target"},
- {id:"move",        t:"Move to Fontainebleau",                        k:"move",  s:"blocked",p:"Critical",d:"2027-01-03",dt:"Confirmed", dep:["flight"]},
- {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"blocked",p:"Medium",  d:"2027-01-10", dt:"Target", dep:["move"]},
+ {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"todo", p:"Medium",  d:"2027-01-10", dt:"Target",
+   n:"After arriving in Fontainebleau."},
  {id:"housing-h2",  t:"Solve housing after 3 July 2027",              k:"move",  s:"todo", p:"High",     d:"2027-03-01", dt:"Target",
    n:"Club 8 covers 2027-01-03 to roughly 2027-07-03. The programme runs to 2027-12-15, so five months are uncovered."},
 
@@ -705,10 +854,8 @@ var SEED=[
  /* academics */
  {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20", dt:"Target"},
  {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31", dt:"Target"},
- {id:"programme-start",t:"Programme starts, Fontainebleau campus",    k:"acad",  s:"blocked",p:"Critical",d:"2027-01-07",dt:"Confirmed", dep:["move"]},
  {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28", dt:"Awaiting",
    n:"Required for graduation. What Gavin is using for it is not recorded."},
- {id:"graduation",  t:"Graduation",                                   k:"acad",  s:"blocked",p:"Critical",d:"2027-12-15",dt:"Confirmed", dep:["programme-start"]},
 
  /* career */
  {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31", dt:"Target",
@@ -722,6 +869,9 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 /* ---------- state ---------- */
 var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
+/* which category the lists are filtered to; "all" or a CATS key. Not persisted
+   on purpose: a filter you forgot you set is a board that looks empty. */
+var cat="all";
 var calCur=null, undoFn=null, toastT=null;
 var savedAt=null, syncedAt=null;   /* last local change, newest export seen */
 /* Inbox filenames this device has already folded in. syncedAt used to do this
@@ -843,6 +993,11 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){retur
 /* ---------- derived ---------- */
 function all(){ return Object.keys(items).map(function(k){return items[k];}); }
 function live(){ return all().filter(function(i){return i.status!=="done";}); }
+function inCat(i){ return cat==="all" || TRACK_CAT[i.track]===cat; }
+/* what the list views show. Overview always shows everything: it is the answer
+   to "where do I stand", which a filter would quietly make wrong. */
+function pool(){ return all().filter(inCat); }
+function catLabel(k){ for(var j=0;j<CATS.length;j++) if(CATS[j].k===k) return CATS[j].label; return "Everything"; }
 function byDue(a,b){ if(!a.due) return 1; if(!b.due) return -1; return a.due<b.due?-1:a.due>b.due?1:0; }
 function depsOpen(i){ return (i.deps||[]).filter(function(d){ return items[d]&&items[d].status!=="done"; }); }
 function isNow(i){ return i.status!=="done" && depsOpen(i).length===0; }
@@ -900,8 +1055,9 @@ function hideToast(){ document.getElementById("toast").classList.remove("on"); }
    RENDER
    =========================================================== */
 function render(){
-  document.getElementById("nBoard").textContent=live().length;
-  document.getElementById("nList").textContent=all().length;
+  document.getElementById("nBoard").textContent=pool().filter(function(i){return i.status!=="done";}).length;
+  document.getElementById("nList").textContent=pool().length;
+  renderSubs();
   var u=unread(); var nb=document.getElementById("notesN");
   nb.textContent=notes.length; nb.parentNode.classList.toggle("hot",u>0);
   renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList();
@@ -917,11 +1073,92 @@ function ring(pct,colour,inner){
     '<circle cx="27" cy="27" r="'+r+'" stroke="'+colour+'" stroke-width="5" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"></circle>'+
     '</svg><div class="rv" style="color:'+colour+'">'+inner+'</div></div>';
 }
+/* A milestone's date and state come from its task where it has one, so the two
+   can never disagree; a fixed one is reached when its gate task is done. */
+function mileState(m){
+  var it=m.item?items[m.item]:null;
+  var g=m.gate?items[m.gate]:null;
+  return {
+    due: it?it.due:(m.d||null),
+    done: it?it.status==="done":(g?g.status==="done":false),
+    going: it?it.status==="doing":(g?g.status==="doing":false),
+    id: m.item||m.gate||null,
+    track: m.k||(it?it.track:null)
+  };
+}
+function renderMiles(){
+  var rows=MILES.map(function(m){ var st=mileState(m); return {m:m,st:st}; });
+  /* undated last, otherwise in date order: the exchange has no date on record */
+  rows.sort(function(a,b){
+    if(!a.st.due) return 1;
+    if(!b.st.due) return -1;
+    return a.st.due.localeCompare(b.st.due);
+  });
+  var nextUp=null;
+  rows.forEach(function(r){ if(!nextUp && !r.st.done && r.st.due) nextUp=r; });
+  var done=rows.filter(function(r){return r.st.done;}).length;
+  return '<div class="tile miles"><h3><span class="pin" style="background:#b066ff"></span>Milestones'+
+    '<span class="more">'+done+' of '+rows.length+' reached</span></h3>'+
+    '<div class="mline">'+rows.map(function(r){
+      var st=r.st, cls=st.done?"done":(r===nextUp?"now":(st.going?"going":""));
+      return '<div class="mstone '+cls+'"'+(st.id?' data-go="'+st.id+'"':'')+
+        (st.id?' title="Opens the task this depends on"':'')+'>'+
+        '<i style="background:'+(st.done?"#00a98f":(r===nextUp?"#ff6429":tc(st.track||"acad")))+'"></i>'+
+        '<b>'+esc(r.m.t)+'</b>'+
+        '<span>'+(st.due?fmtD(st.due):esc(r.m.note||"no date yet"))+'</span></div>';
+    }).join("")+'</div></div>';
+}
+
+/* The visa is a sequence. Its last step issuing is what "visa in hand" means,
+   which is why that is a milestone here and not a task anyone can tick. */
+function renderVisa(){
+  var steps=VISA_STEPS.map(function(id){return items[id];}).filter(Boolean);
+  if(!steps.length) return "";
+  var done=steps.filter(function(i){return i.status==="done";}).length;
+  var nx=null; steps.forEach(function(i){ if(!nx && i.status!=="done") nx=i; });
+  var outcome=null;
+  MILES.forEach(function(m){ if(m.t==="Visa in hand") outcome=m; });
+  return '<div class="tile seqt"><h3><span class="pin" style="background:'+tc("visa")+'"></span>Student visa'+
+    '<span class="more">'+done+' of '+steps.length+' steps</span></h3>'+
+    '<div class="steps">'+steps.map(function(i){
+      var cls=i.status==="done"?"done":(i===nx?"now":"");
+      return '<div class="step '+cls+'" data-go="'+i.id+'">'+
+        '<i></i><b>'+esc(i.title)+'</b><span>'+(i.status==="done"?"done":fmtD(i.due))+'</span></div>';
+    }).join("")+'</div>'+
+    (outcome?'<p class="hint">Visa in hand targeted for '+fmtD(outcome.d)+
+      ', once the VFS appointment has run.</p>':'')+'</div>';
+}
+
+/* Housing is coverage, not a checkbox: Club 8 holds the first six months and
+   the rest of the programme is not booked. */
+function renderHousing(){
+  var bk=items[HOUSING.booked], nx=items[HOUSING.next], dt=items[HOUSING.detail];
+  var a=D(HOUSING.from), b=D(HOUSING.to), e=D(HOUSING.end);
+  var covered=Math.round((b-a)/(e-a)*100);
+  var months=Math.round((e-b)/(30.4*86400000));
+  return '<div class="tile seqt"><h3><span class="pin" style="background:'+tc("move")+'"></span>Accommodation'+
+    '<span class="more">'+covered+'% of the programme covered</span></h3>'+
+    '<div class="cbar"><i class="ok" style="width:'+covered+'%"></i><i class="gap" style="width:'+(100-covered)+'%"></i></div>'+
+    '<div class="steps tight">'+
+      '<div class="step done"'+(bk?' data-go="'+bk.id+'"':'')+'><i></i><b>Club 8, booked</b>'+
+        '<span>'+fmtD(HOUSING.from)+' &ndash; '+fmtD(HOUSING.to)+'</span></div>'+
+      (dt?'<div class="step '+(dt.status==="done"?"done":"now")+'" data-go="'+dt.id+'"><i></i><b>'+esc(dt.title)+
+        '</b><span>'+(dt.status==="done"?"done":fmtD(dt.due))+'</span></div>':'')+
+      (nx?'<div class="step '+(nx.status==="done"?"done":"gap")+'" data-go="'+nx.id+'"><i></i><b>Not booked yet</b>'+
+        '<span>'+fmtD(HOUSING.to)+' &ndash; '+fmtD(HOUSING.end)+'</span></div>':'')+
+    '</div>'+
+    '<p class="hint">'+months+' months from July 2027 still need somewhere to live.</p></div>';
+}
+
 function renderOverview(){
   var L=live().slice().sort(byDue);
   var hard=L.filter(function(i){return i.dateType==="Confirmed"&&i.due;});
   var next=(hard[0]||L[0]||null);
   var h="";
+
+  /* he asked for this first, and he was right: it is the only tile that answers
+     "is this whole thing on track" rather than "what is due this week" */
+  h+=renderMiles();
 
   /* hero A: the next hard deadline */
   if(next){
@@ -963,15 +1200,21 @@ function renderOverview(){
      '<button class="hbtn" data-go="sbi-sanction">Loan</button></div></div>';
 
   /* stacked metrics */
-  var dMove=dleft("2027-01-03"), admit=D("2026-06-25"), mv=D("2027-01-03");
+  var moveM=null; MILES.forEach(function(m){ if(m.t==="Move to Fontainebleau") moveM=m; });
+  var moveD=mileState(moveM).due;
+  var dMove=dleft(moveD), admit=D("2026-06-25"), mv=D(moveD);
   var elapsed=(todayD()-admit)/(mv-admit);
   var done=all().filter(function(i){return i.status==="done";}).length, tot=all().length;
   h+='<div class="mstack">'+
      '<div class="tile">'+ring(elapsed,"#b066ff",dMove)+
-       '<div class="mx"><div class="v">'+dMove+' days</div><div class="k">to Fontainebleau<br>'+fmtD("2027-01-03")+'</div></div></div>'+
+       '<div class="mx"><div class="v">'+dMove+' days</div><div class="k">to Fontainebleau<br>'+fmtD(moveD)+'</div></div></div>'+
      '<div class="tile">'+ring(done/tot,"#00a98f",Math.round(done/tot*100)+"%")+
-       '<div class="mx"><div class="v">'+done+' / '+tot+'</div><div class="k">milestones closed<br>'+(tot-done)+' still open</div></div></div>'+
+       '<div class="mx"><div class="v">'+done+' / '+tot+'</div><div class="k">tasks closed<br>'+(tot-done)+' still open</div></div></div>'+
      '</div>';
+
+  /* the two things that are sequences rather than tasks */
+  h+=renderVisa();
+  h+=renderHousing();
 
   /* critical path */
   h+='<div class="tile pipe"><h3><span class="pin" style="background:#3264ff"></span>Critical path to the start line<span class="more">money, then visa, then move</span></h3><div class="chain">';
@@ -1063,9 +1306,9 @@ function cardHTML(i){
     '<button class="mini" data-act="note" title="Note for Claude" aria-label="Note">&#9998;</button></div></div>';
 }
 function renderBoard(){
-  var h="";
+  var h="", P=pool();
   STATUS.forEach(function(s){
-    var g=all().filter(function(i){return (i.status||"todo")===s.k;}).sort(byDue);
+    var g=P.filter(function(i){return (i.status||"todo")===s.k;}).sort(byDue);
     h+='<div class="col" data-status="'+s.k+'"><div class="col-h"><i style="background:'+s.c+'"></i><b>'+s.label+'</b><em>'+g.length+'</em></div>'+
        '<div class="stack">'+g.map(cardHTML).join("")+'</div></div>';
   });
@@ -1074,7 +1317,8 @@ function renderBoard(){
 
 /* ---------- gantt ---------- */
 function renderGantt(){
-  var ds=all().map(function(i){return i.due;}).filter(Boolean).sort();
+  var P=pool();
+  var ds=P.map(function(i){return i.due;}).filter(Boolean).sort();
   if(!ds.length){ document.getElementById("gantt").innerHTML=""; return; }
   var s=D(ds[0]), e=D(ds[ds.length-1]), t=todayD();
   if(t<s) s=t; if(t>e) e=t;
@@ -1113,24 +1357,60 @@ function renderGantt(){
 }
 
 /* ---------- calendar ---------- */
+/* A seven-column month grid in 390px gives each day about 50px, which is not
+   enough for a date and a task title -- in portrait it read as broken. Below
+   720px the same month is drawn as a vertical agenda instead: one row per day
+   that actually has something on it. Dropping onto a day is a desktop gesture
+   anyway; the snooze rail still works on both. */
+function narrow(){ return window.matchMedia("(max-width:720px)").matches; }
+var MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 function renderCal(){
   if(!calCur){ var t=todayD(); calCur=new Date(t.getFullYear(),t.getMonth(),1); }
-  var MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
   document.getElementById("calTitle").textContent=MN[calCur.getMonth()]+" "+calCur.getFullYear();
+  var P=pool();
+  var evOn=function(k){
+    return P.filter(function(i){return i.due===k;})
+            .sort(function(a,b){return (PRI[a.priority]?0:1)-(PRI[b.priority]?0:1);});
+  };
+  var tIso=iso(todayD());
+  document.getElementById("v-cal").classList.toggle("agenda",narrow());
+  if(narrow()){ renderAgenda(evOn,tIso); return; }
+
   var first=new Date(calCur.getFullYear(),calCur.getMonth(),1);
   var start=new Date(first); start.setDate(1-((first.getDay()+6)%7));
-  var tIso=iso(todayD()), h="";
+  var h="";
   for(var c=0;c<42;c++){
     var d=new Date(start); d.setDate(start.getDate()+c);
     var k=iso(d), out=d.getMonth()!==calCur.getMonth();
-    var ev=all().filter(function(i){return i.due===k;}).sort(function(a,b){return (PRI[a.priority]?0:1)-(PRI[b.priority]?0:1);});
     h+='<div class="day'+(out?" out":"")+(k===tIso?" today":"")+'" data-day="'+k+'"><div class="dn">'+d.getDate()+'</div>'+
-       ev.map(function(i){
+       evOn(k).map(function(i){
          return '<div class="ev" data-id="'+i.id+'" style="background:'+(i.status==="done"?"#bdb6c6":tc(i.track))+'" title="'+esc(i.title)+'">'+
            esc(i.title.length>22?i.title.slice(0,21)+"…":i.title)+'</div>';
        }).join("")+'</div>';
   }
   document.getElementById("cgrid").innerHTML=h;
+}
+var DOWN=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+function renderAgenda(evOn,tIso){
+  var y=calCur.getFullYear(), m=calCur.getMonth();
+  var last=new Date(y,m+1,0).getDate(), h="", any=0;
+  for(var dd=1;dd<=last;dd++){
+    var d=new Date(y,m,dd), k=iso(d), ev=evOn(k);
+    if(!ev.length) continue;
+    any++;
+    h+='<div class="ard'+(k===tIso?" today":"")+'" data-day="'+k+'">'+
+       '<div class="arh"><b>'+dd+'</b><span>'+DOWN[(d.getDay()+6)%7]+'</span>'+
+       (k===tIso?'<em>today</em>':'')+'</div><div class="arl">'+
+       ev.map(function(i){
+         var n=dleft(i.due);
+         return '<div class="calrow'+(i.status==="done"?" done":"")+'" data-id="'+i.id+'">'+
+           '<i style="background:'+(i.status==="done"?"#bdb6c6":tc(i.track))+'"></i>'+
+           '<b>'+esc(i.title)+'</b>'+
+           '<span>'+esc(tl(i.track))+(n!==null&&n<0&&i.status!=="done"?" &middot; late":"")+'</span></div>';
+       }).join("")+'</div></div>';
+  }
+  document.getElementById("cgrid").innerHTML=
+    any?h:'<p class="tip" style="padding:16px">Nothing due in '+MN[m]+'. Use &#8249; and &#8250; to look at another month.</p>';
 }
 
 /* ---------- dependency graph ---------- */
@@ -1149,12 +1429,15 @@ function renderGraph(){
   all().forEach(function(i){
     if((i.deps||[]).length){ linked[i.id]=1; i.deps.forEach(function(d){ if(items[d]) linked[d]=1; }); }
   });
-  var pool=all().filter(function(i){ return linked[i.id]; });
+  /* depth is computed over every item, so a chain that crosses categories keeps
+     its real shape; the filter only decides what is drawn */
+  var graphPool=all().filter(function(i){ return linked[i.id]; });
   var maxD=0;
-  pool.forEach(function(i){ maxD=Math.max(maxD,dep(i.id)); });
+  graphPool.forEach(function(i){ maxD=Math.max(maxD,dep(i.id)); });
+  var shown=graphPool.filter(inCat);
   var layers=[];
-  for(var l=0;l<=maxD;l++) layers.push(pool.filter(function(i){return depth[i.id]===l;}).sort(byDue));
-  var hidden=all().length-pool.length;
+  for(var l=0;l<=maxD;l++) layers.push(shown.filter(function(i){return depth[i.id]===l;}).sort(byDue));
+  var hidden=all().length-graphPool.length;
   var h='<svg class="fsvg" id="fsvg"></svg>';
   layers.forEach(function(g,ix){
     h+='<div class="layer"><div class="lhd">'+(ix===0?"No prerequisites":"Stage "+(ix+1))+'</div>';
@@ -1196,9 +1479,9 @@ function drawEdges(){
 
 /* ---------- list ---------- */
 function renderList(){
-  var h="";
+  var h="", P=pool();
   TORDER.forEach(function(k){
-    var g=all().filter(function(i){return i.track===k;}).sort(byDue);
+    var g=P.filter(function(i){return i.track===k;}).sort(byDue);
     if(!g.length) return;
     var dn=g.filter(function(i){return i.status==="done";}).length;
     h+='<div class="lgrp"><div class="lgh"><i style="background:'+tc(k)+'"></i><b>'+esc(tl(k))+'</b><em>'+dn+' of '+g.length+' done</em></div><div class="lwrap">';
@@ -1222,10 +1505,29 @@ function renderList(){
 /* ===========================================================
    DRAWER
    =========================================================== */
-function showDrawer(){ document.getElementById("scrim").classList.add("on"); var d=document.getElementById("drawer"); d.classList.add("on"); d.setAttribute("aria-hidden","false"); }
+/* A closed drawer parked at translateX(102%) sits outside the viewport, and
+   overflow:hidden on an ancestor does NOT clip a position:fixed child -- which
+   is why tapping a task let the whole page pan sideways like a web page.
+   visibility:hidden takes it out of hit-testing and out of the scrollable area
+   entirely; it is set in JS rather than CSS so the slide-in still animates
+   instead of being skipped by a discrete transition. */
+var drawerT=null;
+function showDrawer(){
+  document.getElementById("scrim").classList.add("on");
+  var d=document.getElementById("drawer");
+  clearTimeout(drawerT);
+  d.style.visibility="visible";
+  /* one frame with the drawer visible but still off-screen, so the transform
+     has somewhere to animate from */
+  requestAnimationFrame(function(){ d.classList.add("on"); });
+  d.setAttribute("aria-hidden","false");
+}
 function hideDrawer(){
   document.getElementById("scrim").classList.remove("on");
   var d=document.getElementById("drawer"); d.classList.remove("on"); d.setAttribute("aria-hidden","true");
+  clearTimeout(drawerT);
+  /* hide only once it has slid out, or the animation is lost */
+  drawerT=setTimeout(function(){ if(!d.classList.contains("on")) d.style.visibility="hidden"; },320);
   openId=null; dMode=null; noteDraft="";
 }
 function openItem(id,focusNote){
@@ -1546,6 +1848,31 @@ stage.addEventListener("dblclick",function(e){
   var id=c.dataset.id||c.dataset.go; if(id) openItem(id,true);
 });
 
+/* --- category sub-tabs ---
+   Every view but Overview gets them. Overview is the "where do I stand" answer
+   and a filter would quietly make it wrong, so it never filters. */
+function renderSubs(){
+  var el=document.getElementById("subs");
+  if(view==="over"){ el.classList.remove("on"); el.innerHTML=""; return; }
+  el.classList.add("on");
+  var mk=function(k,label){
+    var n=(k==="all"?all():all().filter(function(i){return TRACK_CAT[i.track]===k;}));
+    var open=n.filter(function(i){return i.status!=="done";}).length;
+    return '<button class="st" role="tab" data-c="'+k+'" aria-selected="'+(cat===k)+'">'+
+      esc(label)+'<small>'+open+'</small></button>';
+  };
+  var h=mk("all","Everything");
+  CATS.forEach(function(c){ h+=mk(c.k,c.label); });
+  el.innerHTML=h;
+}
+document.getElementById("subs").addEventListener("click",function(e){
+  var b=e.target.closest?e.target.closest(".st"):null;
+  if(!b) return;
+  cat=b.dataset.c;
+  render();
+  document.getElementById("stage").scrollTop=0;
+});
+
 /* --- views --- */
 Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
   b.addEventListener("click",function(){ setView(b.dataset.v); });
@@ -1555,6 +1882,7 @@ function setView(v){
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
   ["over","board","time","cal","graph","list"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
+  renderSubs();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
