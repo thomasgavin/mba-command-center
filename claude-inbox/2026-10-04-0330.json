@@ -1,0 +1,33 @@
+{
+  "v": 1,
+  "exportedAt": "2026-10-03T20:30:02.000Z",
+  "op": "patch",
+  "source": "Claude",
+  "why": "Campus France interview blocked, EEF validation now to do",
+  "stamp": "2026-10-04-0330",
+  "changed": [
+    {
+      "id": "cf-interview",
+      "title": "Book Campus France interview",
+      "status": "blocked",
+      "manual": true,
+      "at": "2026-10-03T20:30:02.000Z"
+    },
+    {
+      "id": "cf-validation",
+      "title": "Campus France EEF validated",
+      "status": "todo",
+      "manual": true,
+      "at": "2026-10-03T20:30:02.000Z"
+    }
+  ],
+  "ack": [
+    "n1791054175853317",
+    "n1791050837660694",
+    "n1791049895665591",
+    "n1791047161234214",
+    "n1791039114071829",
+    "n1791036159823489"
+  ],
+  "notes": []
+}
