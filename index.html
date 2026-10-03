@@ -7,8 +7,12 @@
 <title>MBA Command Center</title>
 <!-- added to the iPhone home screen, so it needs a real icon and a name: with
      neither, iOS renders a screenshot of the page under the first letter of the
-     title. apple-touch-icon has to be a fetchable PNG; a data URI is ignored. -->
-<link rel="apple-touch-icon" href="icon.png">
+     title. apple-touch-icon has to be a fetchable PNG; a data URI is ignored,
+     and iOS wants the 180px one it actually draws: given only a 512 it would
+     sometimes take nothing at all. The sized link comes first, with an
+     unsized duplicate behind it for older iOS. -->
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon.png" sizes="512x512" type="image/png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -100,6 +104,8 @@ body::before{
   background:rgba(255,255,255,.26);border-radius:20px;padding:0 6px;font-size:11px;font-weight:700;
 }
 .tbtn:not(.hot) .n{background:var(--wash);color:var(--ink3)}
+/* the manual send is a fallback; it only shows when there is something to retry */
+.tbtn.off{display:none}
 
 /* ---------- view switcher ---------- */
 .views{
@@ -372,6 +378,14 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .col-h b{font-size:12px;font-weight:700;letter-spacing:-.01em}
 .col-h em{margin-left:auto;font-style:normal;font-size:11px;font-weight:700;color:var(--ink4);font-variant-numeric:tabular-nums}
 .stack{display:flex;flex-direction:column;gap:9px}
+/* each section sits on its own tint, so the eye finds "in progress" without
+   reading the heading. The tint comes from the status colour, set per column. */
+.col{border-radius:var(--r);padding:11px 11px 13px;background:var(--ct,transparent);
+  border:1px solid var(--cb,transparent);transition:background .2s}
+.col-h{margin-bottom:9px}
+
+.btn.wide{width:100%;height:40px;font-size:13.5px}
+.dsave{margin-top:4px}
 
 /* ---------- list ---------- */
 .lgrp{margin-bottom:22px}
@@ -612,7 +626,12 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 }
 @media (max-width:720px){
   .top{padding:0 11px;gap:8px;height:54px} .brand p{display:none} .brand h1{font-size:13px} .cmdk{min-width:0;flex:1;padding:0 9px}
+  /* at this width the label and the shortcut both go, which left a blank box
+     in the bar. It is still the search button, so it gets a glyph and a
+     square footprint rather than stretching across the gap. */
   .cmdk span{display:none} .cmdk kbd{display:none}
+  .cmdk{flex:0 0 auto;width:40px;justify-content:center}
+  .cmdk::before{content:"\2315";font-size:17px;color:#6a6076;transform:rotate(-45deg)}
   .views{padding:9px 13px 0} .stage{padding:14px 13px 130px}
   .bento{gap:12px}
   .hero,.hero.b{grid-column:span 12} .hero .big{font-size:48px}
@@ -763,10 +782,13 @@ var CATS=[
 ];
 var TRACK_CAT={};
 CATS.forEach(function(c){ c.tracks.forEach(function(t){ TRACK_CAT[t]=c.k; }); });
+/* Order matters twice over: it is the column order on the board and the button
+   order in the drawer. In progress first, because that is what he is actually
+   doing; done last, because it is history. */
 var STATUS=[
-  {k:"blocked",label:"Blocked",    c:"#b066ff"},
-  {k:"todo",   label:"To do",      c:"#8b8095"},
   {k:"doing",  label:"In progress",c:"#3264ff"},
+  {k:"todo",   label:"To do",      c:"#8b8095"},
+  {k:"blocked",label:"Blocked",    c:"#b066ff"},
   {k:"done",   label:"Done",       c:"#00a98f"}
 ];
 var PRI={Critical:"#e0263c",High:"#ff6429",Medium:"#ff9f00",Low:"#8b8095"};
@@ -893,7 +915,7 @@ var touched={};
 function load(){
   SEED.forEach(function(s){
     items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,dateType:s.dt,
-                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null};
+                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false};
   });
   var st=null; try{ st=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
   if(st&&st.items) Object.keys(st.items).forEach(function(k){
@@ -919,7 +941,7 @@ function load(){
     if(st&&st.items) Object.keys(st.items).forEach(function(k){ touched[k]=when; });
   }
 }
-var DFIELDS=["status","due","priority","dateType","snoozes","origDue"];
+var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual"];
 /* id -> the timestamp a merge just applied, consumed by the next save(). Without
    it save() sees a brand new diff and dates it "now", so taking the other
    device's change would make this device claim it as its own later edit. */
@@ -935,6 +957,7 @@ function diffOf(i){
   if(i.dateType!==s.dt) d.dateType=i.dateType;
   if(i.snoozes) d.snoozes=i.snoozes;
   if(i.origDue) d.origDue=i.origDue;
+  if(i.manual) d.manual=true;
   return d;
 }
 function sameDiff(a,b){
@@ -1007,13 +1030,20 @@ function tc(k){ return (TRACKS[k]||{c:"#8b8095"}).c; }
 function tl(k){ return (TRACKS[k]||{label:k}).label; }
 
 /* ---------- mutations ---------- */
-function patch(id,p,label){
+/* The cascade used to overwrite the status the owner had just chosen: picking
+   "To do" on a gated item snapped straight back to Blocked, and picking
+   "Blocked" on an ungated one snapped to To do, so those buttons looked dead.
+   An explicit choice now wins and is remembered in `manual`; the cascade still
+   derives a state for every item he has not ruled on himself. */
+function patch(id,p,label,derived){
   var i=items[id]; if(!i) return;
   Object.keys(p).forEach(function(f){ i[f]=p[f]; });
-  if(i.status!=="done" && i.status!=="doing"){
+  if(p.status!==undefined && !derived) i.manual=true;
+  if(!i.manual && i.status!=="done" && i.status!=="doing"){
     i.status = depsOpen(i).length ? "blocked" : (i.status==="blocked" ? "todo" : i.status);
   }
   all().forEach(function(o){
+    if(o.manual) return;                       /* his call, not ours */
     if(o.status==="blocked" && depsOpen(o).length===0) o.status="todo";
     else if(o.status==="todo" && depsOpen(o).length) o.status="blocked";
   });
@@ -1060,6 +1090,12 @@ function render(){
   renderSubs();
   var u=unread(); var nb=document.getElementById("notesN");
   nb.textContent=notes.length; nb.parentNode.classList.toggle("hot",u>0);
+  /* Sending is automatic, so a permanent "For Claude" button is a question
+     about why it is there. It appears only when there is genuinely something
+     to retry: a send the relay refused, or the GitHub route waiting on a
+     commit. Shift-click to download is still there when it is. */
+  var needs = !!pending || autoTries>0 || !RELAY;
+  document.getElementById("exportBtn").classList.toggle("off",!needs);
   renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
@@ -1309,7 +1345,8 @@ function renderBoard(){
   var h="", P=pool();
   STATUS.forEach(function(s){
     var g=P.filter(function(i){return (i.status||"todo")===s.k;}).sort(byDue);
-    h+='<div class="col" data-status="'+s.k+'"><div class="col-h"><i style="background:'+s.c+'"></i><b>'+s.label+'</b><em>'+g.length+'</em></div>'+
+    h+='<div class="col" data-status="'+s.k+'" style="--ct:'+s.c+'12;--cb:'+s.c+'2e">'+
+       '<div class="col-h"><i style="background:'+s.c+'"></i><b>'+s.label+'</b><em>'+g.length+'</em></div>'+
        '<div class="stack">'+g.map(cardHTML).join("")+'</div></div>';
   });
   document.getElementById("cols").innerHTML=h;
@@ -1575,8 +1612,13 @@ function renderDrawer(keepDraft){
      ["Confirmed","Target","Awaiting"].map(function(p){return '<button data-ty="'+p+'" aria-pressed="'+(i.dateType===p)+'">'+p+'</button>';}).join("")+'</div></div>';
   h+='<div class="fld"><label>Note for Claude</label>'+
      '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
-     '<div class="row-b" style="margin-top:8px"><button class="btn o" data-save="1">Leave note</button></div>'+
-     '<div class="hint">Stored on this device. Hit <b>For Claude</b> in the top bar to commit your notes to the repo, where Claude reads them. That repo is public. Shift-click to download instead.</div></div>';
+     '<div class="row-b" style="margin-top:8px"><button class="btn" data-save="1">Add note</button></div>'+
+     '<div class="hint">Claude picks this up on its own, within a few seconds. The repo is public, so keep account and document numbers out of it.</div></div>';
+  /* He looked for a save button and found only "Leave note". Every control
+     above writes immediately, so what was missing was a way to say "done",
+     not a way to save. */
+  h+='<div class="fld dsave"><button class="btn o wide" data-done="1">Done</button>'+
+     '<div class="hint">Every change above is already saved and on its way to your other device. A note is optional.</div></div>';
   if(mine.length){
     h+='<div class="fld"><label>'+mine.length+' note'+(mine.length>1?"s":"")+' on this item</label>'+
        mine.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
@@ -1636,7 +1678,7 @@ function changedItems(){
     var d=diffOf(i);
     if(Object.keys(d).length){
       out.push({id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,
-                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,at:touched[i.id]||null});
+                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,at:touched[i.id]||null});
     }else if(touched[i.id]){
       out.push({id:i.id,title:i.title,at:touched[i.id],seed:true});
     }
@@ -1686,6 +1728,39 @@ function sendToClaude(){
    Debounced, because a burst of edits should be one file, not six -- the relay
    only has ten filenames per minute. */
 var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
+
+/* Bump on every deploy. An iPhone home-screen app holds its cached copy until
+   it is force-quit, which is why a fix did not arrive until he cleared it. The
+   page asks the server what the live build is, with caching off, and reloads
+   itself past the cache when they differ. */
+var BUILD="2026-10-03-2040";
+var verT=0;
+function checkBuild(announce){
+  if(!window.fetch||location.protocol==="file:") return;
+  if(Date.now()-verT < 20000 && !announce) return;
+  verT=Date.now();
+  fetch(location.pathname+"?b="+Date.now(),{cache:"no-store"})
+    .then(function(r){ return r.ok?r.text():null; })
+    .then(function(t){
+      if(!t) return;
+      var m=t.match(/var BUILD="([^"]+)"/);
+      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version."); return; }
+      /* if a reload for this exact version has already happened and the page
+         still came back old, something upstream is serving a stale copy and
+         reloading again would just loop every time he opens the board */
+      var tried=null;
+      try{ tried=sessionStorage.getItem("mbacc_ver"); }catch(e){}
+      if(tried===m[1]){ if(announce) toast("A newer version exists but the cache will not let go. Pull down to reload."); return; }
+      try{ sessionStorage.setItem("mbacc_ver",m[1]); }catch(e){}
+      toast("A new version is live. Loading it now…");
+      /* the query string is what actually defeats the cache; a plain reload
+         on iOS standalone will happily serve the same stale copy */
+      setTimeout(function(){
+        location.replace(location.pathname+"?v="+encodeURIComponent(m[1]));
+      },900);
+    })
+    .catch(function(){});
+}
 function autoSend(){
   if(!RELAY||sending) return;
   clearTimeout(autoT);
@@ -1820,13 +1895,17 @@ document.getElementById("dBody").addEventListener("click",function(e){
   }
   if(b.dataset.export){ exportAll(); openNotes(); return; }
   if(!openId) return;
+  if(b.dataset.done){ hideDrawer(); return; }
   if(b.dataset.sn){ snooze(openId,+b.dataset.sn); return; }
-  if(b.dataset.st){ patch(openId,{status:b.dataset.st}); return; }
-  if(b.dataset.pr){ patch(openId,{priority:b.dataset.pr}); return; }
-  if(b.dataset.ty){ patch(openId,{dateType:b.dataset.ty}); return; }
+  /* each of these saves on the spot -- say so, or it reads as needing a save */
+  if(b.dataset.st){ var sl=null; STATUS.forEach(function(x){ if(x.k===b.dataset.st) sl=x.label; });
+    patch(openId,{status:b.dataset.st},"Saved: "+(sl||b.dataset.st)); return; }
+  if(b.dataset.pr){ patch(openId,{priority:b.dataset.pr},"Saved: "+b.dataset.pr+" priority"); return; }
+  if(b.dataset.ty){ patch(openId,{dateType:b.dataset.ty},"Saved: date is "+b.dataset.ty); return; }
 });
 document.getElementById("dBody").addEventListener("change",function(e){
-  if(e.target.id==="dd"&&openId) patch(openId,{due:e.target.value||null});
+  if(e.target.id==="dd"&&openId) patch(openId,{due:e.target.value||null},
+    e.target.value?("Saved: "+fmtD(e.target.value)):"Date cleared");
 });
 document.getElementById("dBody").addEventListener("keydown",function(e){
   if((e.metaKey||e.ctrlKey)&&e.key==="Enter"){
@@ -1836,7 +1915,11 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
-document.getElementById("syncBtn").addEventListener("click",function(){ pullFromRepo(true); });
+/* Sync means "make this screen current", which includes the app itself: a
+   stale home-screen copy was the thing that made a shipped fix look missing. */
+document.getElementById("syncBtn").addEventListener("click",function(){
+  pullFromRepo(true); checkBuild(true);
+});
 document.getElementById("exportBtn").addEventListener("click",function(e){
   if(e.shiftKey){ exportAll(); return; }   /* shift-click still downloads the full snapshot */
   sendToClaude();
@@ -1886,6 +1969,45 @@ function setView(v){
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
+/* --- swipe between sections ---
+   Deliberately narrow, because this page is full of competing gestures: cards
+   are dragged with touch, the gantt and the milestone rail scroll sideways, and
+   the drawer is its own surface. So a swipe only counts when it starts on
+   nothing draggable, outside any sideways-scrolling box, travels more than
+   64px, and is clearly more horizontal than vertical. */
+var swX=0, swY=0, swOk=false;
+function scrollableX(el){
+  for(var n=el; n && n!==document.body; n=n.parentNode){
+    if(n.nodeType!==1) continue;
+    var ov=getComputedStyle(n).overflowX;
+    if((ov==="auto"||ov==="scroll") && n.scrollWidth>n.clientWidth+4) return true;
+  }
+  return false;
+}
+document.getElementById("stage").addEventListener("touchstart",function(e){
+  swOk=false;
+  if(e.touches.length!==1) return;
+  if(drag) return;                                  /* a card is being dragged */
+  var t=e.target;
+  if(t.closest&&(t.closest("[data-id]")||t.closest("input,textarea,button,select"))) return;
+  if(scrollableX(t)) return;
+  swX=e.touches[0].clientX; swY=e.touches[0].clientY; swOk=true;
+},{passive:true});
+document.getElementById("stage").addEventListener("touchend",function(e){
+  if(!swOk||drag) return;
+  swOk=false;
+  var t=e.changedTouches[0];
+  var dx=t.clientX-swX, dy=t.clientY-swY;
+  if(Math.abs(dx)<64 || Math.abs(dx)<Math.abs(dy)*1.6) return;
+  var ix=0; VIEWS.forEach(function(v,j){ if(v.v===view) ix=j; });
+  var nx=ix+(dx<0?1:-1);
+  if(nx<0||nx>=VIEWS.length) return;
+  setView(VIEWS[nx].v);
+  /* the tab for the new section may be off the end of the strip */
+  var tab=document.querySelector('.vt[data-v="'+VIEWS[nx].v+'"]');
+  if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+},{passive:true});
+
 document.getElementById("calPrev").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCal(); });
 document.getElementById("calNext").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()+1,1); renderCal(); });
 window.addEventListener("resize",function(){ if(view==="graph") drawEdges(); });
@@ -2124,7 +2246,7 @@ function mergePayload(pay){
     if(!isPatch && mine && theirs <= mine) return;
 
     if(c.seed){
-      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
+      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false;
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }
@@ -2222,13 +2344,14 @@ function pullFromRepo(announce){
    to pull-to-refresh, so it would otherwise never see another device's changes
    without being force-quit. Re-pull whenever it comes back to the foreground. */
 document.addEventListener("visibilitychange",function(){
-  if(document.visibilityState==="visible") pullFromRepo(false);
+  if(document.visibilityState==="visible"){ pullFromRepo(false); checkBuild(false); }
 });
-window.addEventListener("focus",function(){ pullFromRepo(false); });
+window.addEventListener("focus",function(){ pullFromRepo(false); checkBuild(false); });
 
 /* ---------- boot ---------- */
 load();
 render();
+checkBuild(false);
 setView("over");
 pullFromRepo(false);   /* catch up with whatever another device published */
 

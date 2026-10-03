@@ -49,7 +49,9 @@ bridge is `claude-inbox/`:
   file rather than six, and flushed on `pagehide` so a closed tab does not lose
   it. The payload is lean (`notes[]` + `changed[]`, the same diff shape `save()`
   uses). It only works down the relay, so the "For Claude" button stays as the
-  manual fallback: the GitHub route needs a real click to open its prefilled
+  manual fallback, but it is **hidden unless it is needed** (`pending`, a failed
+  automatic send, or no relay configured) — a permanent button next to automatic
+  sending just raises the question of why it is there: the GitHub route needs a real click to open its prefilled
   editor at `claude-inbox/<YYYY-MM-DD-HHMM>.json` and a human to press "Commit
   changes", and an automatic send must never open a tab nobody asked for. A
   failed automatic send retries once after 25s, then says it needs the button —
@@ -126,6 +128,37 @@ unknown keys, `save()` only stores seed ids) and published files mentioning it
 merge as no-ops. Notes survive regardless, since they carry their own
 `itemTitle`. Check `claude-inbox/` for edits on an id before retiring it.
 
+## Status, and who decides it
+
+A task's status is his to set, and the dependency cascade is only a default.
+`patch()` marks an item `manual` the moment he sets its status by hand, and the
+cascade skips every manual item from then on. Without that flag, setting a
+blocked task to In progress looked like it did nothing: the cascade re-ran on the
+next edit, saw an open dependency and put it straight back to Blocked. `manual`
+is part of the diff (`DFIELDS`), so it travels between his devices like any
+other field, and a revert to the SEED value clears it.
+
+`STATUS` order is load-bearing twice: it is the column order on the board **and**
+the button order in the drawer. In progress first because that is what he is
+actually doing, Done last because it is history.
+
+Every change in the drawer saves itself the moment it is made and says so in a
+toast. The drawer's footer button is **Done** (it just closes), and the note
+field is explicitly optional — there used to be only "Leave note", which read as
+the save button and made a status change feel unsaved without one.
+
+## Staying on the current version
+
+`BUILD` near the top of the script is a plain datestamp and **must be bumped in
+the same commit as any change to `index.html`**. An iPhone home-screen app holds
+its cached copy until it is force-quit, which is why fixes did not reach him for
+hours. `checkBuild()` re-fetches the page with `cache:"no-store"` on foreground,
+on focus, on boot and when he presses Sync, compares the stamp, and reloads via
+`?v=<build>` — a plain `location.reload()` is served the same stale copy. If
+`BUILD` is forgotten the board simply never reloads itself, which is the safe
+failure. A reload is attempted once per version (tracked in `sessionStorage`),
+so a cache that refuses to let go says so instead of looping.
+
 ## Categories
 
 The owner thinks in four buckets, so `CATS` maps the six tracks onto
@@ -169,6 +202,11 @@ The board is used on an iPhone, mostly from the home screen.
   works on both.
 - Timeline labels wrap (`white-space:normal`); a truncated title cannot tell two
   tasks apart.
+- **A horizontal swipe on `#stage` moves between views**, and it has to stand
+  down for anything else that wants the gesture: a card (`[data-id]`, which is a
+  drag handle), a form control, and any ancestor that actually scrolls sideways
+  (`scrollableX()`). It needs 64px and must be 1.6x more horizontal than
+  vertical, or scrolling the board would change section.
 
 ## Before adding a CSS class
 
@@ -184,7 +222,13 @@ committed file before naming anything.
   semicolon-free lines, comments that explain *why*.
 - Keep it dependency-free and single-file. Two exceptions, neither of them page
   logic: `relay/` is the Cloudflare Worker that commits notes so no token has to
-  live in the owner's browser (see `relay/README.md`), and `icon.png` plus
+  live in the owner's browser (see `relay/README.md`), and the icons plus
   `manifest.webmanifest` exist because the board is installed on the owner's
-  iPhone home screen and iOS will not take an icon from a data URI.
+  iPhone home screen and iOS will not take an icon from a data URI. There are
+  three PNGs because iOS picks `apple-touch-icon` by declared size and, given
+  only a 512, drew nothing at all: `icon-180.png` is the one it uses,
+  `icon.png` (512) and `icon-1024.png` are for the manifest. Full bleed, no
+  rounded corners and no transparency — iOS masks the icon itself and a
+  pre-rounded one comes out double-rounded. Changing an icon does not update a
+  home-screen bookmark that already exists; it has to be removed and re-added.
 - Branch for work, never commit straight to `main`; merge through a PR.
