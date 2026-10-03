@@ -284,6 +284,7 @@ body::before{
   position:fixed;z-index:400;pointer-events:none;width:248px;box-shadow:var(--sh2);
   transform:rotate(1.6deg) scale(1.02);opacity:.97;
 }
+body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 
 /* ---------- board ---------- */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
@@ -528,7 +529,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <div class="sp"></div>
     <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
     <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
-    <button class="tbtn hot" id="exportBtn"><span>&#8681;</span><span class="lbl">For Claude</span></button>
+    <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
   <nav class="views" role="tablist">
@@ -605,7 +606,8 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 /* ===========================================================
    MBA Command Center - logic
    Local file. Everything persists to localStorage on this
-   device; "For Claude" writes a file Claude can read back.
+   device; "For Claude" commits notes to the repo for Claude
+   to read (public repo), shift-click downloads them instead.
    =========================================================== */
 
 /* ---------- taxonomy ---------- */
@@ -815,6 +817,7 @@ function render(){
   var u=unread(); var nb=document.getElementById("notesN");
   nb.textContent=notes.length; nb.parentNode.classList.toggle("hot",u>0);
   renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList();
+  if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
 }
 
@@ -1177,7 +1180,7 @@ function renderDrawer(keepDraft){
   h+='<div class="fld"><label>Note for Claude</label>'+
      '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
      '<div class="row-b" style="margin-top:8px"><button class="btn o" data-save="1">Leave note</button></div>'+
-     '<div class="hint">Stored on this device. Hit <b>For Claude</b> in the top bar to export every note as a file Claude can read.</div></div>';
+     '<div class="hint">Stored on this device. Hit <b>For Claude</b> in the top bar to commit your notes to the repo, where Claude reads them. That repo is public. Shift-click to download instead.</div></div>';
   if(mine.length){
     h+='<div class="fld"><label>'+mine.length+' note'+(mine.length>1?"s":"")+' on this item</label>'+
        mine.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
@@ -1203,15 +1206,57 @@ function openNotes(){
   setTimeout(function(){ var t=document.getElementById("gn"); if(t) t.focus(); },300);
 }
 
-/* ---------- export ---------- */
+/* ---------- export ----------
+   Two routes out of this device:
+   - sendToClaude(): commits a small notes+changes file straight into the
+     GitHub repo through GitHub's own prefilled-editor URL, so no token and
+     no download. Claude reads claude-inbox/ from the repo.
+     NOTE: this repository is PUBLIC, so anything sent this way is public.
+   - exportAll(): the original full-snapshot download, kept as a fallback.
+   -------------------------------------------------------------- */
+var REPO="thomasgavin/mba-command-center", BRANCH="main", INBOX="claude-inbox";
+var URL_CAP=6000;   /* keep the prefilled URL comfortably under server limits */
+
+function changedItems(){
+  return all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
+    return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
+    .map(function(i){ return {id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue}; });
+}
+function fullPayload(){
+  return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
+    notes:notes, changed:changedItems(),
+    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,dateType:i.dateType,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
+}
+/* lean on purpose: the baseline task list already lives in SEED in this file,
+   so Claude rebuilds the full picture from SEED + changed. Only the deltas travel. */
+function leanPayload(){
+  return {v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
+    note:"Baseline is SEED in index.html; apply changed[] over it.",
+    notes:notes, changed:changedItems()};
+}
+function stamp(){
+  var d=new Date(), z=function(n){ return (n<10?"0":"")+n; };
+  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+"-"+z(d.getHours())+z(d.getMinutes());
+}
+function sendToClaude(){
+  var json=JSON.stringify(leanPayload(),null,2);
+  var url="https://github.com/"+REPO+"/new/"+BRANCH+
+    "?filename="+encodeURIComponent(INBOX+"/"+stamp()+".json")+
+    "&value="+encodeURIComponent(json)+
+    "&message="+encodeURIComponent("Notes for Claude - "+stamp());
+  if(url.length>URL_CAP){   /* too much to carry in a URL: fall back to the file */
+    exportAll(); return;
+  }
+  /* open synchronously inside the click, or the popup blocker eats it */
+  var w=window.open(url,"_blank","noopener");
+  /* best-effort: rejects when the page is not a secure context or focus was taken */
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ var cp=navigator.clipboard.writeText(json); if(cp&&cp.catch) cp.catch(function(){}); } }catch(e){}
+  notes.forEach(function(n){ n.state="read"; }); save(); render();
+  if(!w){ toast("Pop-up blocked. The JSON is on your clipboard - paste it into a new file in the repo."); return; }
+  toast("GitHub opened - press “Commit changes” to send "+notes.length+" note"+(notes.length===1?"":"s")+". Copy is on your clipboard.");
+}
 function exportAll(){
-  var pay={exportedAt:new Date().toISOString(),source:"MBA Command Center",
-    notes:notes,
-    changed:all().filter(function(i){ var s=null; for(var j=0;j<SEED.length;j++) if(SEED[j].id===i.id) s=SEED[j];
-      return s && (i.status!==s.s||i.due!==s.d||i.priority!==s.p||i.dateType!==s.dt); })
-      .map(function(i){ return {id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue}; }),
-    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,dateType:i.dateType,blockedBy:depsOpen(i).map(function(d){return d;})}; })
-  };
+  var pay=fullPayload();
   var b=new Blob([JSON.stringify(pay,null,2)],{type:"application/json"});
   var a=document.createElement("a");
   a.href=URL.createObjectURL(b);
@@ -1287,7 +1332,10 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
-document.getElementById("exportBtn").addEventListener("click",exportAll);
+document.getElementById("exportBtn").addEventListener("click",function(e){
+  if(e.shiftKey){ exportAll(); return; }   /* shift-click still downloads the full snapshot */
+  sendToClaude();
+});
 
 /* --- double click to annotate --- */
 stage.addEventListener("dblclick",function(e){
@@ -1304,6 +1352,7 @@ function setView(v){
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
   ["over","board","time","cal","graph","list"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
+  if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
 document.getElementById("calPrev").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCal(); });
@@ -1311,25 +1360,47 @@ document.getElementById("calNext").addEventListener("click",function(){ calCur=n
 window.addEventListener("resize",function(){ if(view==="graph") drawEdges(); });
 
 /* ===========================================================
-   DRAG: pointer capture, so the stream cannot be lost
+   DRAG: listeners live on the document, never on the dragged
+   node, so a re-render (or a lost pointer capture) can never
+   strand a ghost. Every teardown sweeps the DOM by class, so
+   even an orphaned ghost from an earlier gesture is removed.
    =========================================================== */
 var drag=null;
+
+/* sweep: belt-and-braces removal of anything a drag may have left behind */
+function killGhosts(){
+  Array.prototype.forEach.call(document.querySelectorAll(".ghost"),function(g){ g.remove(); });
+  Array.prototype.forEach.call(document.querySelectorAll(".hole"),function(n){ n.classList.remove("hole"); });
+}
+function clearHot(){
+  Array.prototype.forEach.call(document.querySelectorAll(".zone.hot,.col.over,.day.over"),function(n){
+    n.classList.remove("hot"); n.classList.remove("over");
+  });
+}
+function dragIdle(){
+  killGhosts(); clearHot();
+  document.body.classList.remove("dragging");
+  document.getElementById("rail").classList.remove("up");
+}
+
 stage.addEventListener("pointerdown",function(e){
   if(e.button) return;
+  if(drag) endDrag();                       /* never leave an older gesture running */
   var act=e.target.closest("[data-act]");
   if(act && act.dataset.act!=="grip") return;
   var src=e.target.closest(".card,.ev"); if(!src||!src.dataset.id) return;
+  if(!items[src.dataset.id]) return;
   drag={id:src.dataset.id,el:src,x0:e.clientX,y0:e.clientY,on:false,ghost:null,pid:e.pointerId};
+  /* capture is an optimisation only: the document listeners below work without it */
   try{ src.setPointerCapture(e.pointerId); }catch(err){}
-  src.addEventListener("pointermove",onMove);
-  src.addEventListener("pointerup",onUp);
-  src.addEventListener("pointercancel",onCancel);
 });
+
 function onMove(e){
   if(!drag||e.pointerId!==drag.pid) return;
   var dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
   if(!drag.on){
     if(Math.abs(dx)+Math.abs(dy)<7) return;
+    killGhosts();                            /* start from a clean slate */
     drag.on=true;
     var r=drag.el.getBoundingClientRect(), i=items[drag.id]||{}, n=i.due?dleft(i.due):null;
     var g=document.createElement("div");
@@ -1342,6 +1413,7 @@ function onMove(e){
     drag.gx=Math.min(Math.max(e.clientX-r.left,14),w-24); drag.gy=Math.max(e.clientY-r.top,12);
     document.body.appendChild(g); drag.ghost=g;
     drag.el.classList.add("hole");
+    document.body.classList.add("dragging");
     hideToast();
     document.getElementById("rail").classList.add("up");
   }
@@ -1354,24 +1426,15 @@ function onMove(e){
   var col=el.closest(".col"); if(col){ col.classList.add("over"); return; }
   var day=el.closest(".day"); if(day) day.classList.add("over");
 }
-function clearHot(){
-  Array.prototype.forEach.call(document.querySelectorAll(".zone.hot,.col.over,.day.over"),function(n){
-    n.classList.remove("hot"); n.classList.remove("over");
-  });
-}
+
 function endDrag(){
-  if(!drag) return null;
+  if(!drag){ dragIdle(); return null; }
   var d=drag; drag=null;
-  d.el.removeEventListener("pointermove",onMove);
-  d.el.removeEventListener("pointerup",onUp);
-  d.el.removeEventListener("pointercancel",onCancel);
-  try{ d.el.releasePointerCapture(d.pid); }catch(e){}
-  if(d.ghost) d.ghost.remove();
-  d.el.classList.remove("hole");
-  document.getElementById("rail").classList.remove("up");
-  clearHot();
+  try{ if(d.el.hasPointerCapture && d.el.hasPointerCapture(d.pid)) d.el.releasePointerCapture(d.pid); }catch(err){}
+  dragIdle();
   return d;
 }
+
 function onUp(e){
   if(!drag||e.pointerId!==drag.pid) return;
   var moved=drag.on;
@@ -1382,8 +1445,9 @@ function onUp(e){
   var column=el?el.closest(".col"):null;
   var cell=el?el.closest(".day"):null;
   var d=endDrag();
-  if(!moved) return;
+  if(!moved||!d) return;
   justDragged=true; setTimeout(function(){ justDragged=false; },300);
+  if(!items[d.id]) return;
   var z=zone;
   if(z){
     if(z.dataset.done){ var q=items[d.id]; patch(d.id,{status:"done"},"Closed: "+q.title); }
@@ -1391,7 +1455,7 @@ function onUp(e){
     return;
   }
   var col=column;
-  if(col){
+  if(col&&col.dataset.status){
     var s=null; STATUS.forEach(function(x){ if(x.k===col.dataset.status) s=x; });
     patch(d.id,{status:col.dataset.status},"Moved to "+(s?s.label:col.dataset.status));
     return;
@@ -1404,6 +1468,18 @@ function onUp(e){
   }
 }
 function onCancel(e){ endDrag(); }
+
+/* One permanent set of listeners: they no-op while no drag is live, and they
+   keep firing even if the dragged node is replaced by a re-render mid-gesture. */
+document.addEventListener("pointermove",onMove,{passive:false});
+document.addEventListener("pointerup",onUp);
+document.addEventListener("pointercancel",onCancel);
+/* if capture is yanked away (node removed, browser quirk) the gesture is over */
+document.addEventListener("lostpointercapture",function(e){
+  if(drag&&e.pointerId===drag.pid&&drag.el&&!drag.el.isConnected) endDrag();
+});
+window.addEventListener("blur",function(){ endDrag(); });
+document.addEventListener("visibilitychange",function(){ if(document.hidden) endDrag(); });
 
 /* ===========================================================
    COMMAND PALETTE
@@ -1452,6 +1528,7 @@ document.getElementById("palL").addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){
   if((e.metaKey||e.ctrlKey)&&(e.key==="k"||e.key==="K")){ e.preventDefault(); openPal(); return; }
   if(e.key==="Escape"){
+    if(drag){ endDrag(); return; }
     if(document.getElementById("pal").classList.contains("on")) closePal();
     else if(document.getElementById("drawer").classList.contains("on")) hideDrawer();
     return;
