@@ -1,0 +1,79 @@
+{
+  "v": 1,
+  "exportedAt": "2026-10-03T18:11:56.999Z",
+  "source": "MBA Command Center",
+  "note": "Baseline is SEED in index.html; apply changed[] over it.",
+  "stamp": "2026-10-04-0111",
+  "notes": [
+    {
+      "id": "n1791036159823489",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "1 month extension approved by INSEAD due to loan delays",
+      "createdAt": "2026-10-03T14:02:39.823Z",
+      "state": "read"
+    }
+  ],
+  "changed": [
+    {
+      "id": "tuition-oct",
+      "title": "Pay EUR 53,000 tuition instalment",
+      "status": "doing",
+      "due": "2026-11-05",
+      "priority": "Critical",
+      "dateType": "Confirmed",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "scholarship-r3",
+      "title": "Chase Round 3 scholarship decision",
+      "status": "done",
+      "due": "2026-09-11",
+      "priority": "Critical",
+      "dateType": "Awaiting",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "nri-fema",
+      "title": "Resolve NRI / FEMA co-applicant problem",
+      "status": "done",
+      "due": "2026-10-12",
+      "priority": "High",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "tuition-apr",
+      "title": "Pay EUR 44,860 final instalment",
+      "status": "blocked",
+      "due": "2027-04-15",
+      "priority": "Critical",
+      "dateType": "Confirmed",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "flight",
+      "title": "Book flight to Paris for 3 January",
+      "status": "done",
+      "due": "2026-11-20",
+      "priority": "High",
+      "dateType": "Target",
+      "snoozes": 0,
+      "origDue": null
+    },
+    {
+      "id": "move",
+      "title": "Move to Fontainebleau",
+      "status": "todo",
+      "due": "2027-01-03",
+      "priority": "Critical",
+      "dateType": "Confirmed",
+      "snoozes": 0,
+      "origDue": null
+    }
+  ]
+}
