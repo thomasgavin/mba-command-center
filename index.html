@@ -284,6 +284,7 @@ body::before{
   position:fixed;z-index:400;pointer-events:none;width:248px;box-shadow:var(--sh2);
   transform:rotate(1.6deg) scale(1.02);opacity:.97;
 }
+body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 
 /* ---------- board ---------- */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
@@ -815,6 +816,7 @@ function render(){
   var u=unread(); var nb=document.getElementById("notesN");
   nb.textContent=notes.length; nb.parentNode.classList.toggle("hot",u>0);
   renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList();
+  if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
 }
 
@@ -1304,6 +1306,7 @@ function setView(v){
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
   ["over","board","time","cal","graph","list"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
+  if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
 document.getElementById("calPrev").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCal(); });
@@ -1311,25 +1314,47 @@ document.getElementById("calNext").addEventListener("click",function(){ calCur=n
 window.addEventListener("resize",function(){ if(view==="graph") drawEdges(); });
 
 /* ===========================================================
-   DRAG: pointer capture, so the stream cannot be lost
+   DRAG: listeners live on the document, never on the dragged
+   node, so a re-render (or a lost pointer capture) can never
+   strand a ghost. Every teardown sweeps the DOM by class, so
+   even an orphaned ghost from an earlier gesture is removed.
    =========================================================== */
 var drag=null;
+
+/* sweep: belt-and-braces removal of anything a drag may have left behind */
+function killGhosts(){
+  Array.prototype.forEach.call(document.querySelectorAll(".ghost"),function(g){ g.remove(); });
+  Array.prototype.forEach.call(document.querySelectorAll(".hole"),function(n){ n.classList.remove("hole"); });
+}
+function clearHot(){
+  Array.prototype.forEach.call(document.querySelectorAll(".zone.hot,.col.over,.day.over"),function(n){
+    n.classList.remove("hot"); n.classList.remove("over");
+  });
+}
+function dragIdle(){
+  killGhosts(); clearHot();
+  document.body.classList.remove("dragging");
+  document.getElementById("rail").classList.remove("up");
+}
+
 stage.addEventListener("pointerdown",function(e){
   if(e.button) return;
+  if(drag) endDrag();                       /* never leave an older gesture running */
   var act=e.target.closest("[data-act]");
   if(act && act.dataset.act!=="grip") return;
   var src=e.target.closest(".card,.ev"); if(!src||!src.dataset.id) return;
+  if(!items[src.dataset.id]) return;
   drag={id:src.dataset.id,el:src,x0:e.clientX,y0:e.clientY,on:false,ghost:null,pid:e.pointerId};
+  /* capture is an optimisation only: the document listeners below work without it */
   try{ src.setPointerCapture(e.pointerId); }catch(err){}
-  src.addEventListener("pointermove",onMove);
-  src.addEventListener("pointerup",onUp);
-  src.addEventListener("pointercancel",onCancel);
 });
+
 function onMove(e){
   if(!drag||e.pointerId!==drag.pid) return;
   var dx=e.clientX-drag.x0, dy=e.clientY-drag.y0;
   if(!drag.on){
     if(Math.abs(dx)+Math.abs(dy)<7) return;
+    killGhosts();                            /* start from a clean slate */
     drag.on=true;
     var r=drag.el.getBoundingClientRect(), i=items[drag.id]||{}, n=i.due?dleft(i.due):null;
     var g=document.createElement("div");
@@ -1342,6 +1367,7 @@ function onMove(e){
     drag.gx=Math.min(Math.max(e.clientX-r.left,14),w-24); drag.gy=Math.max(e.clientY-r.top,12);
     document.body.appendChild(g); drag.ghost=g;
     drag.el.classList.add("hole");
+    document.body.classList.add("dragging");
     hideToast();
     document.getElementById("rail").classList.add("up");
   }
@@ -1354,24 +1380,15 @@ function onMove(e){
   var col=el.closest(".col"); if(col){ col.classList.add("over"); return; }
   var day=el.closest(".day"); if(day) day.classList.add("over");
 }
-function clearHot(){
-  Array.prototype.forEach.call(document.querySelectorAll(".zone.hot,.col.over,.day.over"),function(n){
-    n.classList.remove("hot"); n.classList.remove("over");
-  });
-}
+
 function endDrag(){
-  if(!drag) return null;
+  if(!drag){ dragIdle(); return null; }
   var d=drag; drag=null;
-  d.el.removeEventListener("pointermove",onMove);
-  d.el.removeEventListener("pointerup",onUp);
-  d.el.removeEventListener("pointercancel",onCancel);
-  try{ d.el.releasePointerCapture(d.pid); }catch(e){}
-  if(d.ghost) d.ghost.remove();
-  d.el.classList.remove("hole");
-  document.getElementById("rail").classList.remove("up");
-  clearHot();
+  try{ if(d.el.hasPointerCapture && d.el.hasPointerCapture(d.pid)) d.el.releasePointerCapture(d.pid); }catch(err){}
+  dragIdle();
   return d;
 }
+
 function onUp(e){
   if(!drag||e.pointerId!==drag.pid) return;
   var moved=drag.on;
@@ -1382,8 +1399,9 @@ function onUp(e){
   var column=el?el.closest(".col"):null;
   var cell=el?el.closest(".day"):null;
   var d=endDrag();
-  if(!moved) return;
+  if(!moved||!d) return;
   justDragged=true; setTimeout(function(){ justDragged=false; },300);
+  if(!items[d.id]) return;
   var z=zone;
   if(z){
     if(z.dataset.done){ var q=items[d.id]; patch(d.id,{status:"done"},"Closed: "+q.title); }
@@ -1391,7 +1409,7 @@ function onUp(e){
     return;
   }
   var col=column;
-  if(col){
+  if(col&&col.dataset.status){
     var s=null; STATUS.forEach(function(x){ if(x.k===col.dataset.status) s=x; });
     patch(d.id,{status:col.dataset.status},"Moved to "+(s?s.label:col.dataset.status));
     return;
@@ -1404,6 +1422,18 @@ function onUp(e){
   }
 }
 function onCancel(e){ endDrag(); }
+
+/* One permanent set of listeners: they no-op while no drag is live, and they
+   keep firing even if the dragged node is replaced by a re-render mid-gesture. */
+document.addEventListener("pointermove",onMove,{passive:false});
+document.addEventListener("pointerup",onUp);
+document.addEventListener("pointercancel",onCancel);
+/* if capture is yanked away (node removed, browser quirk) the gesture is over */
+document.addEventListener("lostpointercapture",function(e){
+  if(drag&&e.pointerId===drag.pid&&drag.el&&!drag.el.isConnected) endDrag();
+});
+window.addEventListener("blur",function(){ endDrag(); });
+document.addEventListener("visibilitychange",function(){ if(document.hidden) endDrag(); });
 
 /* ===========================================================
    COMMAND PALETTE
@@ -1452,6 +1482,7 @@ document.getElementById("palL").addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){
   if((e.metaKey||e.ctrlKey)&&(e.key==="k"||e.key==="K")){ e.preventDefault(); openPal(); return; }
   if(e.key==="Escape"){
+    if(drag){ endDrag(); return; }
     if(document.getElementById("pal").classList.contains("on")) closePal();
     else if(document.getElementById("drawer").classList.contains("on")) hideDrawer();
     return;
