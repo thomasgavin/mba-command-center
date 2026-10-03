@@ -60,9 +60,10 @@ in an export — only the deltas travel.
 
 ## The twice-daily Routine
 
-`MBA note inbox check` (`trig_01WGRB3Nms2psPukb61NbcFE`) fires at 08:47 and 18:47
-Asia/Kolkata, starting a fresh session that reads `claude-inbox/` and acts on
-notes from roughly the last 14 hours. It polls; it is not woken by a commit.
+`MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
+17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session that
+reads `claude-inbox/` and acts on notes from roughly the last 14 hours. It polls;
+it is not woken by a commit.
 Claude cannot write to the owner's `localStorage`, so it can research, draft and
 propose changes — it cannot move a date on their board for them.
 
