@@ -98,17 +98,27 @@ export default {
     var payload;
     try{ payload = JSON.parse(raw); }catch(e){ return out(400, {error:"not JSON"}); }
     if(!looksLikeAnExport(payload)) return out(400, {error:"not a board export"});
+    if(!payload.notes.length && !payload.changed.length && payload.op!=="patch")
+      return out(400, {error:"nothing to send: no notes and no changes"});
 
     /* re-serialise what we validated, so nothing unparsed reaches the repo */
     var body = JSON.stringify(payload, null, 2) + "\n";
     var now  = new Date();
 
-    /* two sends inside one minute collide on the filename; GitHub answers 422
+    /* Two sends inside one minute collide on the filename; GitHub answers 422
        because the file exists and we sent no sha. Take the next free suffix
-       rather than overwriting the earlier note. */
+       rather than overwriting the earlier note.
+       The separator is "_" and not "-": the board picks the newest file by
+       sorting names, and "-" (0x2D) sorts BEFORE "." (0x2E), so
+       "...-0111-1.json" lands before "...-0111.json" and the board would read
+       the older of a colliding pair. "_" (0x5F) sorts after "." and keeps the
+       order honest. Seen for real on 2026-10-03. */
     var base = stampFrom(payload, now);
-    for(var n=0; n<5; n++){
-      var name = base + (n ? "-"+n : "");
+    for(var n=0; n<10; n++){
+      /* nine suffixed slots, then a millisecond tail: the stamp is only a
+         minute, and pressing the button six times inside one used to run out
+         of names and fail the send outright */
+      var name = base + (n ? (n<9 ? "_"+n : "_"+(Date.now()%1000000)) : "");
       var path = INBOX+"/"+name+".json";
       var r = await commit(env, path, body, "Notes from the board - "+name);
       if(r.ok){
