@@ -1555,15 +1555,27 @@ var API="https://api.github.com/repos/"+REPO+"/contents/"+INBOX;
 
 function applyRemote(pay){
   if(!pay||!pay.exportedAt) return false;
-  /* our own edits are newer than this export: keep them, nothing to do */
-  if(savedAt && pay.exportedAt <= savedAt) return false;
+  /* already seen this one */
   if(syncedAt && pay.exportedAt <= syncedAt) return false;
 
-  /* board: reset to the seed baseline, then lay the published diff over it */
-  SEED.forEach(function(sd){
-    var i=items[sd.id]; if(!i) return;
-    i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
-  });
+  /* Two kinds of file land in claude-inbox/:
+     - a SNAPSHOT published by one of the user's devices. It describes a whole
+       board, so it replaces ours -- but only if our own edits are older, or a
+       reload would undo a drag just made.
+     - a PATCH written by Claude after reading a note ("INSEAD granted 30 more
+       days, so this instalment and everything gated on it move"). It touches
+       only the items it names, so it layers over whatever is here and does not
+       wait its turn behind local edits: it was written in response to them. */
+  var isPatch = pay.op==="patch";
+  if(!isPatch && savedAt && pay.exportedAt <= savedAt) return false;
+
+  if(!isPatch){
+    /* snapshot: reset to the seed baseline, then lay the published diff over it */
+    SEED.forEach(function(sd){
+      var i=items[sd.id]; if(!i) return;
+      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null;
+    });
+  }
   (pay.changed||[]).forEach(function(c){
     var i=items[c.id]; if(!i) return;
     ["status","due","priority","dateType","snoozes","origDue"].forEach(function(f){
@@ -1593,7 +1605,11 @@ function pullFromRepo(announce){
       return fetch(newest.download_url).then(function(r){ return r.json(); });
     })
     .then(function(pay){
-      if(applyRemote(pay)) toast("Pulled the latest board from the repo.");
+      if(applyRemote(pay)){
+        toast(pay.op==="patch"
+          ? ("Claude updated your board"+(pay.why?": "+pay.why:"")+".")
+          : "Pulled the latest board from the repo.");
+      }
       else if(announce) toast("Already up to date with the repo.");
     })
     .catch(function(){ if(announce) toast("Could not reach the repo. Your local board is unchanged."); });
