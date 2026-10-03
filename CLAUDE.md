@@ -86,6 +86,19 @@ before `at` existed still merge: no `at` falls back to the file's `exportedAt`.
 A note's full picture needs `SEED` + `changed[]`. Do not expect a complete board
 in an export — only the deltas travel.
 
+## Answering a note
+
+A note is a question for Claude, and until it is answered it is outstanding. A
+patch file may carry `ack:[noteId,...]`; those notes are marked `answered` and
+read, the NEW badge clears, and they stop riding along in every file the board
+publishes. Answered notes are still kept and still merge by id — they are just
+not re-sent, apart from a two-day tail so a device that has not pulled yet still
+receives one it never saw. **Ack the notes a patch acts on**, or the next
+session cannot tell what is new and will redo the work.
+
+A patch that changes a status should also set `manual:true` on those items,
+otherwise the dependency cascade quietly reverts it on his next edit.
+
 ## The twice-daily Routine
 
 `MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
