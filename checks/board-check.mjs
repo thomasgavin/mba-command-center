@@ -266,6 +266,14 @@ for (var w2 of [390, 1280]) {
 
 /* ---- 6. a deleted task leaves every view except the list ---- */
 {
+  /* the Visa tile read items[] directly and kept showing a deleted step */
+  var sv = await open(390);
+  var kv = await sv.p.evaluate(function () {
+    delItem("cf-interview");
+    return { step: !!document.querySelector('.step[data-go="cf-interview"]'), html: renderVisa().indexOf('data-go="cf-interview"') >= 0 };
+  });
+  ok("a deleted task is out of the Visa tile", !kv.step && !kv.html, JSON.stringify(kv));
+  await sv.ctx.close();
   var s6 = await open(390);
   var k6 = await s6.p.evaluate(function () {
     var k = Object.keys(items)[0];

@@ -1598,6 +1598,8 @@ function ring(pct,colour,inner){
 function mileState(m){
   var it=m.item?items[m.item]:null;
   var g=m.gate?items[m.gate]:null;
+  if(it&&it.deleted) it=null;  /* a deleted task is gone from every tile, not only the list */
+  if(g&&g.deleted) g=null;
   return {
     due: it?it.due:(m.d||null),
     done: it?it.status==="done":(g?g.status==="done":false),
@@ -1632,7 +1634,7 @@ function renderMiles(){
 /* The visa is a sequence. Its last step issuing is what "visa in hand" means,
    which is why that is a milestone here and not a task anyone can tick. */
 function renderVisa(){
-  var steps=VISA_STEPS.map(function(id){return items[id];}).filter(Boolean);
+  var steps=VISA_STEPS.map(function(id){return items[id];}).filter(function(i){return i&&!i.deleted;});
   if(!steps.length) return "";
   var done=steps.filter(function(i){return i.status==="done";}).length;
   var nx=null; steps.forEach(function(i){ if(!nx && i.status!=="done") nx=i; });
@@ -1653,6 +1655,7 @@ function renderVisa(){
    the rest of the programme is not booked. */
 function renderHousing(){
   var bk=items[HOUSING.booked], nx=items[HOUSING.next], dt=items[HOUSING.detail];
+  if(bk&&bk.deleted) bk=null; if(nx&&nx.deleted) nx=null; if(dt&&dt.deleted) dt=null;
   var a=D(HOUSING.from), b=D(HOUSING.to), e=D(HOUSING.end);
   var covered=Math.round((b-a)/(e-a)*100);
   var months=Math.round((e-b)/(30.4*86400000));
@@ -2518,7 +2521,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1510";
+var BUILD="2026-10-04-1530";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
