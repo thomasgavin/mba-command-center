@@ -255,13 +255,26 @@ Three things keep it from eating itself or his subscription:
 ## The twice-daily Routine
 
 `MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
-17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session that
-reads `claude-inbox/` and acts on notes from roughly the last 14 hours. It polls;
-it is not woken by a commit.
+17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session on
+this repo. It polls; it is not woken by a commit.
+
+**Its job is `/nudge`, not notes.** It used to poll `claude-inbox/` for anything
+unanswered, and that has been dead weight since the relay started asking for a
+run the moment a note lands: by the time the Routine fires, the note was
+answered hours ago. It still answers an outstanding note if `/nudge` happens to
+see one, which is the whole fallback for a relay that is down — one line in the
+prompt rather than a second pass over the folder.
+
+**Only the owner can change it.** `update_trigger` refuses it — it was created
+through the API by him, not by an agent — so a run that wants it changed writes
+the replacement prompt out and asks. Same for adding a scheduled workflow that
+runs Claude on a timer: creating one is blocked, and the Routine is the way.
+
 Claude cannot write to the owner's `localStorage`, so a run never changes what
-is on screen at the time. It commits a patch into `claude-inbox/` instead, and
-the board applies it on the owner's next page load. So a date does move, just
-one page load later, not during the run.
+is on screen at the time. On the relay route a nudge or a reply reaches the
+board on its open socket in the same second; on the file route it commits into
+`claude-inbox/` and the board applies it on the next page load. So a date does
+move, just one page load later, not during the run.
 
 ## Privacy
 
