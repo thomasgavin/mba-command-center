@@ -120,5 +120,10 @@ These need a person, and a person reading the diff.
 Branch, PR, merge — never commit code straight to `main`. The one sanctioned
 exception is a data-only patch file into `claude-inbox/`.
 
+**If a code change also touches `claude-inbox/`, put `[skip ci]` in the commit
+message.** The Answer notes workflow fires on any push to that folder, so
+merging a code PR that happens to correct a file there spends a Claude run on
+nothing. Observed once, on the PR that wrote this document.
+
 The standing permission to commit, push, open the PR and merge without asking is
 paid for by the list above, not by care taken afterwards.
