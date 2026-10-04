@@ -129,7 +129,13 @@ the board already reads. That is what keeps the GitHub pull a working fallback
 rather than dead code, and it means the history survives the Worker being
 deleted. `relay/README.md` has the deployment and the secrets; `relay/` is now
 deployed by `.github/workflows/relay.yml` rather than pasted into a dashboard,
-because a Durable Object namespace is created by a deploy.
+because a Durable Object namespace is created by a deploy. **The Worker's own
+secrets are repository secrets too** (`RELAY_GH_TOKEN`, `RELAY_AGENT_KEY`), and
+the deploy pushes them on. A `GH_TOKEN` set only in the dashboard came back
+`401 Bad credentials` after the first deploy from CI, and the symptom was the
+worst kind: the relay accepted every note, logged it, told the board all was
+well, and never asked GitHub for a run. `/state` now reports the last attempt
+as `lastJob` so that failure is one URL away instead of invisible.
 
 ## The Chat view, and answering a note
 
@@ -201,8 +207,8 @@ Three things keep it from eating itself or his subscription:
 - `concurrency: answer-notes` so a burst of notes is one conversation, with
   `--max-turns 30` and a 12-minute timeout as the ceiling on a single run.
 - It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`, generated with
-  `claude setup-token`, and `RELAY_AGENT_KEY` matching the Worker's `AGENT_KEY`
-  for the relay route. Without either, the job falls back or fails and nothing
+  `claude setup-token`, and `RELAY_AGENT_KEY`, which the deploy also pushes
+  onto the Worker as `AGENT_KEY`, so the two ends match by construction. Without either, the job falls back or fails and nothing
   else breaks — the Routine still picks the notes up on its schedule.
 - The relay caps itself at **20 runs an hour** across all callers. Its address
   is public, and a run spends his subscription rather than a line in a public

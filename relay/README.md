@@ -69,17 +69,26 @@ Then **Actions → Deploy relay → Run workflow**.
 cd relay && npx wrangler@4 login && npx wrangler@4 deploy
 ```
 
-**3. The Worker's own secrets.**
+**3. The Worker's own secrets — as repository secrets, not in the dashboard.**
 
-**Settings → Variables and Secrets** on the Worker, type **Secret** each time.
-A deploy leaves them alone, so this is also one-off:
+Add these at **Settings → Secrets and variables → Actions** alongside the two
+above. The deploy pushes them onto the Worker every time it runs:
 
-- `GH_TOKEN` — the token from step 1.
-- `AGENT_KEY` — any long random string. Add the *same* value as a repository
-  secret named `RELAY_AGENT_KEY`, so the GitHub job can read the conversation
-  and post a reply. This one is genuinely secret: it is the only thing that can
-  write a message in Claude's name.
-- `RELAY_KEY` — optional, and public by construction. Bots only.
+- `RELAY_GH_TOKEN` — the GitHub token from step 1. It becomes `GH_TOKEN` on the
+  Worker.
+- `RELAY_AGENT_KEY` — any long random string. It becomes `AGENT_KEY` on the
+  Worker, and the Answer-notes job reads the same repository secret, so the two
+  ends match by construction. This one is genuinely secret: it is the only
+  thing that can read the whole conversation or write a message as Claude.
+
+Setting them in the Cloudflare dashboard works too, but do not do only that.
+`GH_TOKEN` was added by hand and then answered `401 Bad credentials` after the
+first deploy from CI, and the symptom was a relay that accepted every note and
+silently never asked for a run. Keeping them here makes the Worker reproducible
+and a deploy unable to leave it half configured.
+
+`RELAY_KEY` stays optional and dashboard-only if you want it. It is public by
+construction — bots only.
 
 **4. Point the board at it.**
 
@@ -136,6 +145,11 @@ curl -X POST https://mba-note-relay.<your-subdomain>.workers.dev \
 A healthy Worker answers `{"ok":true,"path":"claude-inbox/…json", …}`. `403`
 means the relay key does not match, `400` means the payload was rejected, and
 `502` means GitHub refused the commit, usually an expired token.
+
+If a send comes back `"job":{"ok":false,...}`, or replies stop arriving,
+`/state` reports the last attempt as `lastJob` with GitHub's own status and
+message. `401` means the Worker's `GH_TOKEN` is missing or expired; `403` means
+it lacks **Contents: Read and write** on this repository.
 
 For the log and the push side:
 
