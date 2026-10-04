@@ -304,6 +304,43 @@ pipes and flattens newlines: a row that silently splits is a log that cannot
 be trusted. A day already on disk is **merged, not replaced**, since a
 redeploy re-arms the alarm and a second firing that day must add to it.
 
+## Notifications on his lock screen
+
+A nudge in Chat is not a notification. He said so plainly: *"when I said
+notification I meant mobile notifications, not in app chats"*. On iOS there is
+exactly one way in, and every part of it is required:
+
+- **The board must be on his Home Screen.** Safari tabs get no Web Push on iOS,
+  and `PushManager` is simply absent there, so the banner says to install rather
+  than offering a button that cannot work.
+- **`sw.js` is the third exception to single-file** (after `relay/` and the
+  icons), because a push is delivered to a service worker and nothing else.
+  It has **no `fetch` handler, deliberately**: a worker that caches the page
+  would serve a stale `index.html` and quietly defeat `checkBuild()`, which is
+  the whole mechanism that gets a fix to his phone.
+- **The relay is the sender**, because it is the only part of this that is awake
+  when a nudge is written. It generates its own VAPID keypair on first use and
+  keeps it in Durable Object storage -- not a repository secret, because a VAPID
+  key identifies a sender and unlocks nothing, and one more secret is one more
+  way for the two ends to disagree.
+- **The push carries no payload.** A bare push wakes `sw.js`, which asks
+  `/push/latest` what to say. That keeps aes128gcm out of the Worker and keeps
+  the note text out of Apple's push service entirely. Every path through the
+  push handler ends in `showNotification`, the failed fetch included: **iOS
+  revokes the permission of a worker that takes a push and shows nothing.**
+- **Only Claude's notes ring the phone.** His own edits are the thing he just
+  did, and a device that buzzes at its owner for typing is a device with
+  notifications turned off by the weekend.
+- A notification is **tagged per task**, so a second nudge about the same task
+  replaces the first rather than stacking.
+- A 404 or 410 from the push service drops that device; **any other failure
+  keeps it**, because a transient error must not silently unsubscribe his phone.
+
+`checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
+board is handed, the same way the push service will. A signature that is subtly
+wrong is a 403 at Apple and silence on his phone hours later, which is
+indistinguishable from "nothing was worth sending" -- so it is checked, not read.
+
 ## Privacy
 
 **This repository is public.** The owner chose that knowingly for `claude-inbox/`.
@@ -571,7 +608,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 76 invariants, three widths, a real browser. Every one of them was a
+that runs: 87 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
@@ -581,9 +618,10 @@ back are one change, not two.
 
 - Match the existing style in `index.html`: `var`, terse helper names, no
   semicolon-free lines, comments that explain *why*.
-- Keep it dependency-free and single-file. Two exceptions, neither of them page
+- Keep it dependency-free and single-file. Three exceptions, none of them page
   logic: `relay/` is the Cloudflare Worker that commits notes so no token has to
-  live in the owner's browser (see `relay/README.md`), and the icons plus
+  live in the owner's browser (see `relay/README.md`), `sw.js` is the service
+  worker iOS requires before it will deliver a push at all, and the icons plus
   `manifest.webmanifest` exist because the board is installed on the owner's
   iPhone home screen and iOS will not take an icon from a data URI. There are
   three PNGs because iOS picks `apple-touch-icon` by declared size and, given

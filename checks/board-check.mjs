@@ -51,6 +51,18 @@ var server = http.createServer(function (req, res) {
   var u = req.url.split("?")[0];
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (u === "/contents") { res.setHeader("Content-Type", "application/json"); return res.end("[]"); }
+  /* sw.js is served as a real script or the browser refuses to register it --
+     GitHub Pages gets this right, and a harness that does not cannot see the
+     service worker at all */
+  if (u === "/sw.js") {
+    res.setHeader("Content-Type", "application/javascript");
+    res.setHeader("Service-Worker-Allowed", "/");
+    return res.end(fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"));
+  }
+  if (u === "/manifest.webmanifest") {
+    res.setHeader("Content-Type", "application/manifest+json");
+    return res.end(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8"));
+  }
   res.setHeader("Content-Type", "text/html");
   res.end(page());
 });
@@ -584,93 +596,130 @@ for (var w2 of [390, 1280]) {
   await s16.ctx.close();
 }
 
-/* ---- 15. the build stamp moved with the page ---- */
+/* ---- 17. Needs attention sits straight under the milestones on Overview ---- */
 {
-  var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];
-  ok("BUILD is a datestamp", /^\d{4}-\d{2}-\d{2}-\d{4}$/.test(stamp || ""), String(stamp));
+  var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"'), iHero = src.indexOf('class="tile hero a"');
+  ok("Needs attention comes right after the milestones", iMiles > 0 && iAtt > iMiles && iAtt < iHero, iMiles + "/" + iAtt + "/" + iHero);
 }
 
-/* ---- 16. the task card is a summary, not a form ----
-   It was four segmented controls stacked down the page: every option of every
-   field on screen at once, seventeen buttons to describe four values, with the
-   loudest thing on the card an orange button that only closed it. */
+/* ---- 17. nudges reach the lock screen, and the worker stays out of the way ----
+   "Notifications" meant his phone, not a card in Chat. On iOS that needs a
+   service worker, and a service worker is the one thing that can quietly undo
+   the BUILD stamp by serving a cached page. */
 {
-  var s16 = await open(390);
-  var k16 = await s16.p.evaluate(function () {
-    var k = Object.keys(items)[0];
-    patch(k, { status: "todo", priority: "High" }, null, true);
-    openItem(k);
-    return k;
-  });
-  await s16.p.waitForTimeout(350);
-  var shut = await s16.p.evaluate(function () {
-    return { rows: document.querySelectorAll("#dBody .prow").length,
-             open: document.querySelectorAll("#dBody .pex").length,
-             nt: !!document.getElementById("nt"),
-             add: !!document.querySelector("#dBody .nadd"),
-             segs: document.querySelectorAll("#dBody .seg").length };
-  });
-  ok("a card opens closed: four rows, nothing expanded",
-     shut.rows === 4 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
-  ok("and the composer is one line until he asks for it",
-     !shut.nt && shut.add, JSON.stringify(shut));
+  var sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+  ok("the service worker never intercepts a request",
+     !/addEventListener\s*\(\s*["']fetch["']/.test(sw),
+     "a cached index.html beats checkBuild() and the board stops updating itself");
 
-  /* a row that does not say what it holds is just a label */
-  var vals = await s16.p.evaluate(function () {
-    return Array.prototype.map.call(document.querySelectorAll("#dBody .prow"), function (r) {
-      return r.querySelector(".pkey").textContent + "=" + r.querySelector(".pval").textContent;
+  /* Drive the real push handler with a fake self: iOS revokes the permission of
+     a worker that takes a push and shows nothing, so the failing fetch matters
+     as much as the good one. */
+  var shown = [];
+  function runSW(fetchImpl) {
+    shown = [];
+    var listeners = {};
+    var self_ = {
+      addEventListener: function (k, fn) { listeners[k] = fn; },
+      registration: {
+        scope: "https://x/",
+        showNotification: function (t, o) { shown.push({ title: t, body: o.body, tag: o.tag, data: o.data }); }
+      },
+      clients: { matchAll: async function () { return []; }, openWindow: function () {} },
+      skipWaiting: function () {}
+    };
+    var fn = new Function("self", "fetch", "btoa", "atob", sw + "\nreturn arguments[0];");
+    fn(self_, fetchImpl, null, null);
+    return { listeners: listeners };
+  }
+  var waits = [];
+  var ev = function () { return { waitUntil: function (p) { waits.push(p); } }; };
+
+  var r17 = runSW(async function () {
+    return { ok: true, json: async function () { return { title: "SBI sanction", body: "Where does it stand?", tag: "nudge-sbi", about: "sbi-sanction" }; } };
+  });
+  waits = []; r17.listeners.push(ev());
+  await Promise.all(waits);
+  ok("a push shows the nudge it was about",
+     shown.length === 1 && shown[0].title === "SBI sanction" && shown[0].data.go === "sbi-sanction",
+     JSON.stringify(shown));
+
+  var r17b = runSW(async function () { throw new Error("offline"); });
+  waits = []; r17b.listeners.push(ev());
+  await Promise.all(waits);
+  ok("a push whose fetch fails still shows something",
+     shown.length === 1 && !!shown[0].title,
+     "iOS revokes a worker that takes a push and shows nothing: " + JSON.stringify(shown));
+
+  /* one nudge replaces the last rather than stacking five on his lock screen */
+  ok("a nudge notification is tagged", shown.length === 1 && !!shown[0].tag, JSON.stringify(shown));
+}
+
+/* ---- 18. the offer to turn them on appears only where it can work ---- */
+{
+  var s18 = await open(390);
+  var reg = await s18.p.evaluate(function () {
+    return navigator.serviceWorker.getRegistration().then(function (r) {
+      return { has: !!r, scope: r ? r.scope : null };
     });
   });
-  ok("every row states the value it holds",
-     vals[0] === "Status=To do" && vals[2] === "Priority=High", JSON.stringify(vals));
+  ok("the service worker registers", reg.has, JSON.stringify(reg));
 
-  var one = await s16.p.evaluate(function () {
-    document.querySelector('#dBody .prow[data-row="status"]').click();
-    var a = document.querySelectorAll("#dBody .pex").length;
-    document.querySelector('#dBody .prow[data-row="priority"]').click();
-    return { first: a, after: document.querySelectorAll("#dBody .pex").length,
-             which: document.querySelector('#dBody .prow[aria-expanded="true"]').dataset.row };
+  /* the harness runs with no relay, and an offer to subscribe to nothing is an
+     offer that fails when he taps it */
+  var noRelay = await s18.p.evaluate(function () {
+    syncPush();
+    return document.getElementById("pbn").classList.contains("off");
   });
-  ok("one row is open at a time", one.first === 1 && one.after === 1 && one.which === "priority",
-     JSON.stringify(one));
+  ok("no relay, no offer", noRelay);
 
-  /* answering the question closes it -- otherwise the stack of controls is back */
-  var set = await s16.p.evaluate(function () {
-    document.querySelector('#dBody [data-pr="Low"]').click();
-    return { open: document.querySelectorAll("#dBody .pex").length,
-             val: document.querySelector('#dBody .prow[data-row="priority"] .pval').textContent,
-             real: items[openId].priority };
+  var states = await s18.p.evaluate(function () {
+    RELAY = "https://relay.example";
+    var el = document.getElementById("pbn"), read = function () {
+      return { off: el.classList.contains("off"), quiet: el.classList.contains("quiet"),
+               txt: document.getElementById("pbnT").textContent,
+               btn: document.getElementById("pbnB").textContent };
+    };
+    pushSubbed = false; syncPush(); var offer = read();
+    pushSubbed = true;  syncPush(); var done = read();
+    return { offer: offer, done: done };
   });
-  ok("choosing a value closes the row and shows it",
-     set.open === 0 && set.val === "Low" && set.real === "Low", JSON.stringify(set));
+  ok("it offers once, with a button to tap",
+     !states.offer.off && !!states.offer.btn, JSON.stringify(states.offer));
+  ok("and goes away once he is subscribed", states.done.off, JSON.stringify(states.done));
 
-  /* an overdue countdown on a task he has already finished is the board being
-     wrong about something he closed */
-  var done16 = await s16.p.evaluate(function () {
-    patch(openId, { due: "2020-01-01", status: "done" }, null, true);
-    return document.querySelector('#dBody .prow[data-row="due"] .pval').textContent;
+  /* An iPhone in a Safari tab cannot be asked at all. A dead button there reads
+     as the feature being broken; the sentence is the whole fix. */
+  var safari = await s18.p.evaluate(function () {
+    RELAY = "https://relay.example";
+    iOS = function () { return true; };
+    standalone = function () { return false; };
+    pushOK = function () { return false; };
+    syncPush();
+    var el = document.getElementById("pbn");
+    return { off: el.classList.contains("off"), quiet: el.classList.contains("quiet"),
+             txt: document.getElementById("pbnT").textContent,
+             btn: document.getElementById("pbnB").textContent };
   });
-  ok("a Done task is never late", !/late|ago/.test(done16), done16);
+  ok("on an iPhone in Safari it says to install, and offers no dead button",
+     !safari.off && safari.quiet && /Home Screen/.test(safari.txt) && !safari.btn,
+     JSON.stringify(safari));
+  await s18.ctx.close();
+}
 
-  /* the composer unfolds where it stood, not somewhere else */
-  var wrote = await s16.p.evaluate(function () {
-    document.querySelector("#dBody .nadd").click();
-    return { nt: !!document.getElementById("nt"), add: !!document.querySelector("#dBody .nadd") };
+/* ---- 19. a tapped notification lands on the task it was about ---- */
+{
+  var s19 = await open(390);
+  var id19 = await s19.p.evaluate(function () { return Object.keys(items)[0]; });
+  await s19.p.goto(URL_ + "?go=" + id19, { waitUntil: "load" });
+  await s19.p.waitForTimeout(600);
+  var landed = await s19.p.evaluate(function () {
+    return { open: openId, shown: document.getElementById("drawer").classList.contains("on") };
   });
-  ok("tapping Add a note opens the composer", wrote.nt && !wrote.add, JSON.stringify(wrote));
-
-  /* an orange full-width button that only closes the card is the loudest thing
-     on it doing the least, and it read "Done" under a status button of the
-     same word */
-  var foot = await s16.p.evaluate(function () {
-    var b = document.querySelector("#dBody [data-done]");
-    return { txt: b.textContent, primary: b.classList.contains("o"),
-             statuses: STATUS.map(function (x) { return x.label; }) };
-  });
-  ok("the close button is not the primary action, and is not called Done",
-     !foot.primary && foot.statuses.indexOf(foot.txt) < 0, JSON.stringify(foot));
-  await s16.ctx.close();
+  ok("a notification tapped from cold opens that task",
+     landed.open === id19 && landed.shown, JSON.stringify(landed) + " wanted " + id19);
+  await s19.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */
@@ -685,11 +734,4 @@ server.close();
 console.log(out.join("\n"));
 console.log("\n" + bad + " failing of " + out.length);
 process.exit(bad ? 1 : 0);
-
-/* ---- 16. Needs attention sits straight under the milestones on Overview ---- */
-{
-  var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"'), iHero = src.indexOf('class="tile hero a"');
-  ok("Needs attention comes right after the milestones", iMiles > 0 && iAtt > iMiles && iAtt < iHero, iMiles + "/" + iAtt + "/" + iHero);
-}
 

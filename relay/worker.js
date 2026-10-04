@@ -50,6 +50,11 @@ var HIST_MAX   = 2000;          /* entries held between archives, as a stop */
 var MAX_RUNS   = 20;            /* Claude runs an hour, from every caller together */
 var ARCHIVE_MS = 24*3600*1000;  /* one snapshot commit a day, not one per message */
 var MAX_BACK   = 400;           /* events a catch-up will hand back at once */
+var PUSH_MAX   = 8;             /* devices on the push list; he has two */
+/* VAPID wants a way to contact the sender. It is the board, not an address:
+   this repository is public and an email written into it is a line in a
+   scraper's list. */
+var PUSH_SUB   = "https://thomasgavin.github.io/mba-command-center/";
 
 function cors(extra){
   var h = {
@@ -66,6 +71,16 @@ function out(code, obj){
 }
 
 /* base64 of UTF-8, chunked: a spread over one big array blows the stack */
+/* base64url over raw bytes, which is what JOSE and VAPID speak -- not the
+   same thing as b64() below, which is standard base64 over a string for
+   GitHub's contents API. */
+function b64u(buf){
+  var b = new Uint8Array(buf), s = "";
+  for(var i=0;i<b.length;i++) s += String.fromCharCode(b[i]);
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function enc(str){ return new TextEncoder().encode(str); }
+
 function b64(str){
   var bytes = new TextEncoder().encode(str), s = "";
   for(var i=0;i<bytes.length;i+=0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i+0x8000));
@@ -229,6 +244,93 @@ function olderThan(days, iso){
 
 export class Board {
   constructor(ctx, env){ this.ctx = ctx; this.env = env; }
+
+  /* ---------- Web Push ----------
+     Everything under here exists so a nudge can reach his lock screen. iOS
+     will only deliver one to a home-screen app through a service worker and
+     VAPID, so the relay is the push sender: it is the only part of this that
+     is awake when a nudge is written. */
+
+  /* The keypair is generated here and kept in storage rather than handed in as
+     a secret. A VAPID key identifies this sender to Apple and nothing else --
+     it unlocks no account -- so making it a repository secret would be one
+     more thing for him to paste and one more way for the two ends to disagree.
+     Generated once, on the first request that needs it. */
+  async vapid(){
+    var v = await this.ctx.storage.get("vapid");
+    if(v) return v;
+    var kp = await crypto.subtle.generateKey({name:"ECDSA", namedCurve:"P-256"}, true, ["sign"]);
+    v = {
+      pub: b64u(await crypto.subtle.exportKey("raw", kp.publicKey)),
+      jwk: await crypto.subtle.exportKey("jwk", kp.privateKey)
+    };
+    await this.ctx.storage.put("vapid", v);
+    return v;
+  }
+
+  /* One JWT per push service origin, good for twelve hours. `sub` is the board
+     itself rather than an address: this repository is public and an email in it
+     is a line in a scraper's list. */
+  async vapidAuth(endpoint){
+    var v = await this.vapid();
+    var aud = new URL(endpoint).origin;
+    var head = b64u(enc(JSON.stringify({typ:"JWT", alg:"ES256"})));
+    var body = b64u(enc(JSON.stringify({
+      aud: aud, exp: Math.floor(Date.now()/1000) + 12*3600, sub: PUSH_SUB
+    })));
+    var key = await crypto.subtle.importKey("jwk", v.jwk,
+      {name:"ECDSA", namedCurve:"P-256"}, false, ["sign"]);
+    /* WebCrypto returns r||s, which is exactly the 64 bytes a JOSE ES256
+       signature is; nothing has to unpick a DER wrapper. */
+    var sig = await crypto.subtle.sign({name:"ECDSA", hash:"SHA-256"}, key,
+      enc(head+"."+body));
+    return {jwt: head+"."+body+"."+b64u(sig), pub: v.pub};
+  }
+
+  /* A bare push: no encrypted body, so the service worker wakes and asks
+     /push/latest what to say. That keeps the note text out of Apple's push
+     service entirely and keeps aes128gcm out of this file. */
+  async notify(){
+    var subs = (await this.ctx.storage.get("subs")) || {};
+    var eps = Object.keys(subs), dead = [];
+    for(var i=0;i<eps.length && i<PUSH_MAX;i++){
+      var ep = eps[i], r = null;
+      try{
+        var a = await this.vapidAuth(ep);
+        r = await fetch(ep, {method:"POST", headers:{
+          "TTL":"86400", "Urgency":"normal", "Content-Length":"0",
+          "Authorization":"vapid t="+a.jwt+", k="+a.pub
+        }});
+      }catch(e){ r = null; }
+      /* 404 and 410 are the push service saying this device is gone for good.
+         Anything else may be transient and the subscription stays. */
+      if(r && (r.status===404 || r.status===410)) dead.push(ep);
+    }
+    if(dead.length){
+      dead.forEach(function(k){ delete subs[k]; });
+      await this.ctx.storage.put("subs", subs);
+    }
+    await this.ctx.storage.put("lastPush", {at:new Date().toISOString(), sent:eps.length, dropped:dead.length});
+  }
+
+  /* What the worker will read back. Only Claude's own notes ring a phone: his
+     own edits are the thing he just did, and a device buzzing at its owner for
+     typing is the fastest way to have notifications turned off. */
+  async maybeNotify(payload){
+    var ns = (payload && payload.notes) || [];
+    var mine = ns.filter(function(n){ return n && n.from === "claude"; });
+    if(!mine.length) return;
+    var n = mine[mine.length-1];
+    var nudge = n.kind === "nudge";
+    await this.ctx.storage.put("latest", {
+      title: nudge ? (n.itemTitle || "Worth a look") : "Claude replied",
+      body: String(n.text || "").slice(0, 180),
+      tag: nudge ? ("nudge-"+(n.about||"board")) : "reply",
+      about: n.about || n.itemId || null,
+      at: new Date().toISOString()
+    });
+    await this.notify();
+  }
 
   async append(kind, payload){
     var seq = ((await this.ctx.storage.get("seq")) || 0) + 1;
@@ -496,6 +598,8 @@ export class Board {
       var s = Math.max(0, parseInt(u.searchParams.get("since")||"0", 10) || 0);
       return out(200, {seq:(await this.ctx.storage.get("seq"))||0,
         lastJob:(await this.ctx.storage.get("lastJob"))||null,
+        devices:Object.keys((await this.ctx.storage.get("subs"))||{}).length,
+        lastPush:(await this.ctx.storage.get("lastPush"))||null,
         evs:await this.backlog(s)});
     }
 
@@ -505,6 +609,9 @@ export class Board {
       var ev = await this.append(who, payload);
       await this.fold(payload, who);
       this.push(ev);
+      /* the socket reaches a board that is open; this reaches the phone in his
+         pocket, which is the whole point of a nudge */
+      try{ await this.maybeNotify(payload); }catch(e){}
       await this.armArchive();
       var started = null;
       /* only a note of his starts a run; a date moved on its own is not a
@@ -512,6 +619,32 @@ export class Board {
       if(p === "/send" && (payload.notes||[]).some(function(n){ return n && n.from !== "claude" && !n.answered; }))
         started = await this.startJob();
       return out(200, {ok:true, seq:ev.seq, job:started});
+    }
+
+    /* The public key the board needs before it can subscribe at all. */
+    if(p === "/push/key") return out(200, {key:(await this.vapid()).pub});
+
+    /* What the service worker reads after a bare push wakes it. It is the same
+       note the board already shows in Chat, and /state is already open, so this
+       exposes nothing new -- but it is the one place note text leaves the log,
+       so it hands back a trimmed line and never the whole thread. */
+    if(p === "/push/latest"){
+      var l = (await this.ctx.storage.get("latest")) || null;
+      return out(200, l || {title:"MBA Command Center", body:"Something new from Claude.", tag:"mbacc", about:null});
+    }
+
+    if(p === "/push/sub" || p === "/push/unsub"){
+      var sb = await request.json();
+      var ep = sb && sb.endpoint;
+      if(typeof ep !== "string" || !/^https:\/\//.test(ep)) return out(400, {error:"no endpoint"});
+      var subs = (await this.ctx.storage.get("subs")) || {};
+      if(p === "/push/unsub") delete subs[ep];
+      else {
+        if(Object.keys(subs).length >= PUSH_MAX && !subs[ep]) return out(429, {error:"too many devices"});
+        subs[ep] = {at:new Date().toISOString()};
+      }
+      await this.ctx.storage.put("subs", subs);
+      return out(200, {ok:true, devices:Object.keys(subs).length});
     }
 
     if(p === "/agent/pull"){
@@ -573,6 +706,24 @@ export default {
 
     if(p === "/ws" || p === "/state")
       return board(env).fetch(new Request("https://do"+p+u.search, request));
+
+    /* The push endpoints are the board's, not the job's: they take no secret,
+       exactly like /state. A subscription endpoint is already a capability URL
+       issued to one device by Apple -- the worst a stranger can do with these
+       is subscribe their own phone to his nudges, which PUSH_MAX caps, or read
+       the one line Chat is already showing him. They are routed here, before
+       the POST-only and looksLikeAnExport gates below, because a subscription
+       is not a board export. */
+    if(p === "/push/key" || p === "/push/latest")
+      return board(env).fetch(new Request("https://do"+p, {method:"GET"}));
+    if(p === "/push/sub" || p === "/push/unsub"){
+      if(request.method !== "POST") return out(405, {error:"POST only"});
+      var praw = await request.text();
+      if(praw.length > 4096) return out(413, {error:"payload too large"});
+      return board(env).fetch(new Request("https://do"+p, {
+        method:"POST", headers:{"Content-Type":"application/json"}, body:praw
+      }));
+    }
 
     if(request.method !== "POST") return out(405, {error:"POST only"});
 
