@@ -1,0 +1,46 @@
+# The relay used to be pasted into the Cloudflare dashboard by hand, which was
+# fine while it was 130 lines of one shape. It now holds a Durable Object, and a
+# Durable Object namespace is created by a deploy rather than by a dashboard
+# field, so the deploy belongs here where it is repeatable and reviewable.
+name: Deploy relay
+
+on:
+  push:
+    branches: [main]
+    paths: ["relay/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-relay
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The Worker's own secrets (GH_TOKEN, AGENT_KEY) are set on the Worker and
+      # a deploy leaves them alone, so nothing secret needs to be here beyond
+      # the token that performs the deploy itself.
+      - name: Deploy
+        working-directory: relay
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # Until the token is added this does nothing, on purpose: a red run on
+          # main would read as a broken deploy when the truth is that the relay
+          # has not been handed over from the dashboard yet.
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "No CLOUDFLARE_API_TOKEN yet, so nothing to deploy."
+            echo "See relay/README.md for the two secrets this needs."
+            exit 0
+          fi
+          npx --yes wrangler@4 deploy

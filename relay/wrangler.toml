@@ -1,0 +1,18 @@
+# Deployed by .github/workflows/relay.yml on every push that touches relay/.
+# The name must not change: it is the hostname in index.html's RELAY.
+name = "mba-cc-relay"
+main = "worker.js"
+compatibility_date = "2026-09-30"
+
+# One Durable Object, one instance, named "board". It is the only place the
+# board's open socket and the GitHub job can see each other -- two requests to
+# a plain Worker land in different isolates with no way to reach one another.
+[[durable_objects.bindings]]
+name = "BOARD"
+class_name = "Board"
+
+# SQLite backed because that is the only kind the free plan allows, and it is
+# the recommended backend regardless.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Board"]

@@ -6,12 +6,41 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 
 # Answer notes
 
-Gavin writes a note on the board, the relay commits it into `claude-inbox/`,
-and that push runs this. He is waiting in the Chat view for a reply, so the
-deliverable is **a committed patch carrying an answer**, not a run log.
+Gavin writes a note on the board, the relay asks for a run, and here you are.
+He is watching the Chat view, so the deliverable is **an answer he receives**,
+not a run log.
 
 Read `CLAUDE.md` first. Treat it as the authority on the data model and the
 privacy rule, and as possibly stale on anything else.
+
+## 0. Which route you are on
+
+Two, and the first one is normal.
+
+**The relay**, when `RELAY_AGENT_KEY` is set in the environment. Chat does not
+pass through git on this route at all:
+
+```sh
+curl -sf -X POST "$RELAY_URL/agent/pull" -H "X-Agent-Key: $RELAY_AGENT_KEY"
+```
+
+That returns `{"seq":…, "notes":[…], "changed":[…]}` — the whole conversation
+and the board's current diff against `SEED`. Send the patch of section 3 back
+the same way:
+
+```sh
+curl -sf -X POST "$RELAY_URL/agent/reply" -H "X-Agent-Key: $RELAY_AGENT_KEY" \
+     -H 'Content-Type: application/json' --data @patch.json
+```
+
+**Commit nothing on this route.** The board is holding an open socket and hears
+the reply within a second of that call returning; a commit would only add noise
+to a repo that gets one archive commit a day from the relay anyway.
+
+**The files**, when there is no key, or the pull fails. Then `claude-inbox/` is
+the channel and the rest of this document applies as written. A board that has
+not picked up the new version still publishes there, so notes can arrive by
+both routes in the same run: merge them by id, answer each one once.
 
 ## 1. Find what is actually unanswered
 
@@ -88,13 +117,15 @@ change — that renders under your message as the receipt.
 
 ## 4. Age out the thread
 
-He asked for a week of history and no more. Delete every file in
+He asked for a week of history and no more. On the relay route it prunes
+itself, so there is nothing to do. On the file route, delete every file in
 `claude-inbox/` whose `exportedAt` is more than 7 days old, in the same commit.
 Keep `README.md`.
 
-## 5. Commit
+## 5. Commit — file route only
 
-Commit **to `main`**, data only:
+Nothing is committed on the relay route. On the file route, commit **to
+`main`**, data only:
 
 ```
 git commit -m "Claude: <why>"
@@ -102,7 +133,8 @@ git commit -m "Claude: <why>"
 
 The message must start with `Claude:` — the workflow skips its own pushes on
 that prefix, and without it your reply triggers another run that replies to
-itself.
+itself. (The relay route cannot loop at all: a reply posted to the relay never
+asks for a run.)
 
 Never change `index.html` or any other code from this workflow. Code goes on a
 branch with a PR, as always.

@@ -1,19 +1,35 @@
-# relay — one-press sending
+# relay — the board's little server
 
-The board is a static page, so it cannot commit to this repo by itself. It needs
-a credential, and a credential in the browser is the thing we were trying to
-avoid: WebKit drops script-writable storage after about a week without a visit,
-which on an iPhone means pasting a GitHub token in again, forever.
+It started as a mailman. The board is a static page, so it cannot commit to this
+repo by itself, and a credential in the browser was the thing to avoid: WebKit
+drops script-writable storage after about a week without a visit, which on an
+iPhone means pasting a GitHub token in again, forever. The Worker holds the
+token instead, and nothing secret reaches either device.
 
-This Worker holds the token instead. The board posts a note to the Worker, the
-Worker commits it. Nothing secret reaches either device, so nothing on them can
-expire. `worker.js` is the whole thing, about 110 lines, no dependencies.
+It is now also the board's **memory and loudspeaker**. It keeps the last 7 days
+of chat and board edits as a numbered, append-only log, hands every device an
+open WebSocket, and pushes each new event down it. A note typed on the laptop
+appears on the phone as it is typed; a reply from the GitHub job appears the
+moment the job writes it. Chat no longer passes through git at all, apart from
+one archive commit a day so the history survives this Worker being deleted.
+
+## Why a Durable Object
+
+A plain Worker cannot push. Two requests to the same Worker land in different
+isolates with no way to reach each other, so a reply written by the GitHub job
+could never find the socket the phone is holding. A Durable Object is the one
+place they can meet.
+
+SQLite backed, because that is the only kind Cloudflare's free plan allows, and
+sockets are accepted with `acceptWebSocket` rather than `accept`: the standard
+API bills for the whole time a socket is open, which for a board left on a desk
+all day is the difference between free and not.
 
 ## What it costs
 
-Nothing. Cloudflare's free Workers plan allows 100,000 requests a day. A few
-notes a day uses a rounding error of that, and the Worker makes one outbound
-call to GitHub per note.
+Nothing. The free plan allows 100,000 Durable Object requests a day and 13,000
+GB-s of compute, and an idle socket hibernates, so it costs nothing while it
+waits. A few notes a day is a rounding error against that.
 
 ## Setting it up
 
@@ -31,25 +47,45 @@ At <https://github.com/settings/personal-access-tokens/new>:
 
 Copy the `github_pat_…` value. GitHub shows it once.
 
-**2. The Worker.**
+**2. Deploying the Worker.**
 
-Sign in at <https://dash.cloudflare.com> (a free account is enough), then:
+Not by pasting into the dashboard any more. A Durable Object namespace is
+created by a deploy, not by a dashboard field, so `wrangler` has to do it.
+Either way is one-off; after that `.github/workflows/relay.yml` redeploys on
+every push that touches `relay/`.
 
-- **Compute (Workers)** → **Create** → **Start with Hello World** → **Deploy**.
-  Name it `mba-note-relay`.
-- Open **Edit code**, delete what is there, paste all of `worker.js`, **Deploy**.
-- **Settings** → **Variables and Secrets** → **Add**:
-  - Type **Secret**, name `GH_TOKEN`, value the token from step 1.
-  - Optionally type **Secret**, name `RELAY_KEY`, value any random string.
-- **Deploy** once more so the secrets take effect.
+*From CI, which is the one to pick* — add two repository secrets at
+**Settings → Secrets and variables → Actions**:
 
-Copy the Worker's address, which looks like
-`https://mba-note-relay.<your-subdomain>.workers.dev`.
+- `CLOUDFLARE_API_TOKEN` — <https://dash.cloudflare.com/profile/api-tokens>,
+  **Create Token** → use the **Edit Cloudflare Workers** template.
+- `CLOUDFLARE_ACCOUNT_ID` — the Account ID on the Workers overview page.
 
-**3. Point the board at it.**
+Then **Actions → Deploy relay → Run workflow**.
 
-Set `RELAY` in `index.html` to that address. If you set `RELAY_KEY`, set the
-matching constant too.
+*Or from a Mac*, once:
+
+```sh
+cd relay && npx wrangler@4 login && npx wrangler@4 deploy
+```
+
+**3. The Worker's own secrets.**
+
+**Settings → Variables and Secrets** on the Worker, type **Secret** each time.
+A deploy leaves them alone, so this is also one-off:
+
+- `GH_TOKEN` — the token from step 1.
+- `AGENT_KEY` — any long random string. Add the *same* value as a repository
+  secret named `RELAY_AGENT_KEY`, so the GitHub job can read the conversation
+  and post a reply. This one is genuinely secret: it is the only thing that can
+  write a message in Claude's name.
+- `RELAY_KEY` — optional, and public by construction. Bots only.
+
+**4. Point the board at it.**
+
+Set `RELAY` in `index.html` to the Worker's address. If you set `RELAY_KEY`, set
+the matching constant too. The board derives the socket address from `RELAY`, so
+there is nothing else to configure.
 
 Note what `RELAY_KEY` is and is not. It sits in `index.html`, and this
 repository is public, so anyone reading the page can read the key. It turns away
@@ -63,6 +99,12 @@ uninteresting to abuse:
 
 - It writes one shape of file: a board export with `notes[]` and `changed[]`.
   Anything else is refused.
+- **It will start at most 20 Claude runs an hour**, counted across every caller
+  together. This is the cap that matters now. Junk in a public folder costs a
+  `git rm`; a Claude run costs the owner's subscription, so the ceiling is the
+  difference between a public address being survivable and being a bill.
+- Reading the whole conversation, or writing a message as Claude, needs
+  `AGENT_KEY`, which is not in the page and not in this repo.
 - It writes to `claude-inbox/` on `main` and nowhere else. The caller never
   supplies a path. It may supply a timestamp, which has to match
   `YYYY-MM-DD-HHMM` exactly, and the folder and `.json` extension are added by
@@ -94,3 +136,16 @@ curl -X POST https://mba-note-relay.<your-subdomain>.workers.dev \
 A healthy Worker answers `{"ok":true,"path":"claude-inbox/…json", …}`. `403`
 means the relay key does not match, `400` means the payload was rejected, and
 `502` means GitHub refused the commit, usually an expired token.
+
+For the log and the push side:
+
+```
+curl https://mba-cc-relay.<your-subdomain>.workers.dev/state
+```
+
+answers `{"seq":N,"evs":[…]}`. If a `/send` comes back with
+`"job":{"ok":false,"why":"github 403"}`, the relay reached GitHub but was not
+allowed to start a run: the `GH_TOKEN` needs **Contents: Read and write** on
+this repository, which is also what it needs to commit. Nothing is lost when a
+start fails — the note is already in the log and already on the other device,
+and the twice-daily Routine is still the backstop.

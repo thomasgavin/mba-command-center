@@ -72,7 +72,8 @@ bridge is `claude-inbox/`:
   could recover it. Per-item clocks already make a re-read harmless, so there is
   nothing for a timestamp gate to protect.
 
-  The timer exists because a reply he can only see by reloading is not a
+  The timer is the **fallback** now, not the main route: see the socket below.
+  It exists because a reply he can only see by reloading is not a
   conversation. `pollGap()` decides the cadence each tick: **10s on the Chat
   view, 90s on every other view, and nothing at all while the page is hidden**,
   since `visibilitychange` already pulls on the way back. One slow 4s ticker
@@ -95,6 +96,40 @@ before `at` existed still merge: no `at` falls back to the file's `exportedAt`.
 
 A note's full picture needs `SEED` + `changed[]`. Do not expect a complete board
 in an export — only the deltas travel.
+
+## The socket, and why the poll is still there
+
+Chat does not travel through git any more. The relay keeps the last 7 days as a
+**numbered, append-only log**, every device holds an open WebSocket to it, and
+each new event is pushed down that socket as it happens. A note typed on the
+laptop lands on the phone as it is typed; a reply from the job lands the moment
+the job writes it.
+
+- `relaySeq` is how far down the log this device has read, and it is part of the
+  saved state. A reconnect asks for everything after that number, so a reload
+  costs one short catch-up rather than a re-read of the folder.
+- An event is applied through the **same `mergePayload`** a pulled file goes
+  through. Push and pull cannot disagree about who wins, and hearing the same
+  event twice -- a catch-up overlapping a push -- is a no-op rather than merely
+  unlikely, because `applyEv` ignores anything at or below `relaySeq`.
+- `pullFromRepo` and its timer are kept deliberately. The poll skips itself
+  while `wsLive()`, and covers the socket being down, a relay that has not been
+  deployed yet, and a device so far behind that the log no longer reaches it.
+  That is also why this could ship without a flag day.
+- A send goes to `RELAY+"/send"`, and a 404 there falls back to posting to the
+  relay root, which is the old commit-it-into-the-folder route. A half-upgraded
+  pair of devices keeps working instead of silently failing to send.
+- Reconnects back off from 2s to a minute and **never run while the page is
+  hidden** -- a phone in a pocket would spend the night retrying, and coming
+  back to the foreground reconnects anyway. A 45-second ping keeps a phone
+  network from dropping an idle socket.
+
+The relay commits one archive snapshot a day into `claude-inbox/`, in the shape
+the board already reads. That is what keeps the GitHub pull a working fallback
+rather than dead code, and it means the history survives the Worker being
+deleted. `relay/README.md` has the deployment and the secrets; `relay/` is now
+deployed by `.github/workflows/relay.yml` rather than pasted into a dashboard,
+because a Durable Object namespace is created by a deploy.
 
 ## The Chat view, and answering a note
 
@@ -133,10 +168,21 @@ otherwise the dependency cascade quietly reverts it on his next edit.
 
 ## Instant replies: the Answer notes workflow
 
-`.github/workflows/notes.yml` runs on every push that touches `claude-inbox/`
-and invokes the `answer-notes` skill, so a note is answered in under a minute
-instead of waiting for the Routine. The skill holds the whole procedure; the
-workflow is only the trigger.
+`.github/workflows/notes.yml` invokes the `answer-notes` skill, so a note is
+answered in under a minute instead of waiting for the Routine. The skill holds
+the whole procedure; the workflow is only the trigger.
+
+It fires two ways. **`repository_dispatch`** is the normal one: the relay asks
+for a run the moment a note lands in its log, and the skill then reads the
+conversation from `$RELAY_URL/agent/pull` and posts the reply to
+`/agent/reply`, committing nothing. **`push`** on `claude-inbox/` is the old
+route, kept because a board that has not picked up the new version still
+publishes there. Both are wanted; neither is dead code.
+
+The forty seconds a reply takes is the runner booting and installing Claude
+Code, not the transport. No change to how messages travel will move it; only
+running Claude somewhere already awake would, and that means an API key billed
+per message rather than the subscription.
 
 It runs the **Claude Code CLI**, not `anthropics/claude-code-action`. The
 action refuses this trigger outright -- `Unsupported event type: push` -- as it
@@ -147,14 +193,20 @@ eleven seconds and looks like a bad secret.
 
 Three things keep it from eating itself or his subscription:
 
-- **It must not answer its own reply.** Claude's patch lands in the same folder,
-  so the job skips any head commit whose message starts `Claude:` (the skill
-  commits with that prefix) or contains `[skip ci]`.
+- **It must not answer its own reply.** On the relay route it cannot loop at
+  all, because a reply posted to the relay never asks for a run. On the push
+  route the job skips any head commit whose message starts `Claude:` (the
+  skill's prefix) or `Relay snapshot` (the daily archive, which holds nothing
+  the board has not seen), or contains `[skip ci]`.
 - `concurrency: answer-notes` so a burst of notes is one conversation, with
   `--max-turns 30` and a 12-minute timeout as the ceiling on a single run.
 - It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`, generated with
-  `claude setup-token`. Without it the job fails on the first run and nothing
+  `claude setup-token`, and `RELAY_AGENT_KEY` matching the Worker's `AGENT_KEY`
+  for the relay route. Without either, the job falls back or fails and nothing
   else breaks — the Routine still picks the notes up on its schedule.
+- The relay caps itself at **20 runs an hour** across all callers. Its address
+  is public, and a run spends his subscription rather than a line in a public
+  folder.
 
 ## The twice-daily Routine
 
