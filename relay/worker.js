@@ -44,6 +44,9 @@ var ORIGIN = "https://thomasgavin.github.io";
 var allowOrigin = ORIGIN;
 
 var KEEP_DAYS  = 7;             /* matches CHAT_DAYS in index.html */
+var HIST       = "history";     /* the audit log, one readable file per day */
+var HIST_DAYS  = 30;            /* how far back it is kept */
+var HIST_MAX   = 2000;          /* entries held between archives, as a stop */
 var MAX_RUNS   = 20;            /* Claude runs an hour, from every caller together */
 var ARCHIVE_MS = 24*3600*1000;  /* one snapshot commit a day, not one per message */
 var MAX_BACK   = 400;           /* events a catch-up will hand back at once */
@@ -69,6 +72,38 @@ function b64(str){
   return btoa(s);
 }
 
+function unb64(b){
+  var bin = atob(String(b).replace(/\s+/g,""));
+  var bytes = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+/* A task title is the owner's text and goes into a markdown table cell, so a
+   pipe in it would split the row and a newline would end it. The log is in a
+   public repo and nobody renders it as HTML, but a table that silently
+   mangles itself is still a log that cannot be trusted. */
+function md(v){
+  return String(v===null||v===undefined ? "" : v)
+    .replace(/\r?\n/g, " ").replace(/\|/g, "\\|").trim();
+}
+/* An alarm that fires twice in one UTC day -- a redeploy re-arms it -- must add
+   to that day rather than replace it. Rows are whole lines and identical ones
+   are the same change seen twice, so a union keyed on the line is enough. */
+function mergeHistory(oldBody, newBody){
+  var rows = function(t){
+    return String(t).split("\n").filter(function(l){
+      return /^\| \d{2}:\d{2} \|/.test(l);
+    });
+  };
+  var seen = {}, all = [];
+  rows(oldBody).concat(rows(newBody)).forEach(function(l){
+    if(seen[l]) return; seen[l]=true; all.push(l);
+  });
+  all.sort(function(a,b){ return a.slice(0,8).localeCompare(b.slice(0,8)); });
+  var head = String(newBody).split("|---|---|---|---|")[0];
+  return head + "|---|---|---|---|\n" + all.join("\n") + "\n";
+}
+
 /* The pull picks the newest file by sorting names, so every writer has to stamp
    in the same zone or the sort lies. The board stamps in the owner's local time
    and we cannot infer that here, so we take its stamp -- but only as four
@@ -85,6 +120,34 @@ function stampFrom(payload, d){
   return (typeof s==="string" && STAMP_RE.test(s)) ? s : utcStamp(d);
 }
 
+/* What the audit log reports, and how each value reads to a person.
+   Deliberately not every field in the diff: `manual`, `snoozes` and `origDue`
+   are bookkeeping the board keeps about itself -- a snooze already shows up as
+   the due date it moved -- and logging them would bury the three or four lines
+   a day that actually mean something. */
+var EFFORT_LABEL = {quick:"under an hour", hours:"a few hours", day:"a full day",
+                    multi:"several days", wait:"mostly waiting"};
+var STATUS_LABEL = {doing:"In progress", todo:"To do", blocked:"Blocked", done:"Done"};
+function plain(v){ return (v===null||v===undefined||v==="") ? "\u2014" : String(v); }
+var HIST_FIELDS = [
+  {k:"status",   label:"Status",   show:function(v){ return plain(STATUS_LABEL[v]||v); }},
+  {k:"due",      label:"Due",      show:plain},
+  {k:"priority", label:"Priority", show:plain},
+  {k:"dateType", label:"Date is",  show:plain},
+  {k:"effort",   label:"Effort",   show:function(v){ return plain(EFFORT_LABEL[v]||v); }},
+  {k:"deleted",  label:"Deleted",  show:function(v){ return v ? "yes" : "no"; }}
+];
+/* An item at its SEED value has no entry for the field at all, and an item
+   reset to SEED travels as {id,at,seed:true}. Both mean "whatever the baseline
+   says", which from the log's point of view is the same absence. */
+function fieldOf(row, k){
+  if(!row || row.seed) return null;
+  var v = row[k];
+  if(v===undefined) return null;
+  if(k==="deleted") return !!v;
+  return v;
+}
+
 /* a board export, not arbitrary JSON: both arrays must be present and sane */
 function looksLikeAnExport(p){
   if(!p || typeof p!=="object" || Array.isArray(p)) return false;
@@ -94,17 +157,39 @@ function looksLikeAnExport(p){
   return true;
 }
 
-async function commit(env, path, body, message){
-  return fetch("https://api.github.com/repos/"+REPO+"/contents/"+path, {
-    method: "PUT",
-    headers: {
-      "Authorization": "Bearer "+env.GH_TOKEN,
-      "Accept": "application/vnd.github+json",
-      "User-Agent": "mba-command-center-relay",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({message:message, content:b64(body), branch:BRANCH})
-  });
+function gh(env, path, init){
+  init = init || {};
+  init.headers = {
+    "Authorization": "Bearer "+env.GH_TOKEN,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "mba-command-center-relay",
+    "Content-Type": "application/json"
+  };
+  return fetch("https://api.github.com/repos/"+REPO+"/contents/"+path, init);
+}
+/* `sha` turns a create into a replace. A day's history file is written once by
+   the archive, but an alarm that fires twice in a day -- a redeploy re-arms it
+   -- must rewrite that day rather than fail with a 422 and lose the entries. */
+async function commit(env, path, body, message, sha){
+  var b = {message:message, content:b64(body), branch:BRANCH};
+  if(sha) b.sha = sha;
+  return gh(env, path, {method:"PUT", body:JSON.stringify(b)});
+}
+/* Both return null rather than throwing: the audit log is bookkeeping, and a
+   GitHub hiccup must never take the chat down with it. */
+async function listDir(env, path){
+  try{
+    var r = await gh(env, path+"?ref="+BRANCH, {method:"GET"});
+    if(!r.ok) return null;
+    var j = await r.json();
+    return Array.isArray(j) ? j : null;
+  }catch(e){ return null; }
+}
+async function removeFile(env, path, sha, message){
+  try{
+    return await gh(env, path, {method:"DELETE",
+      body:JSON.stringify({message:message, sha:sha, branch:BRANCH})});
+  }catch(e){ return null; }
 }
 
 /* Write a file into claude-inbox/, taking the next free name on a collision.
@@ -174,12 +259,28 @@ export class Board {
      `mergePayload`, so this copy is not what keeps the two devices honest -- it
      exists only so the daily archive is one coherent file rather than a replay
      of every event. Per item, newest `at` wins, same rule as the board. */
-  async fold(payload){
+  async fold(payload, by){
     var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}};
+    var hist = (await this.ctx.storage.get("hist")) || [];
+    var who  = by==="claude" ? "Claude" : "you";
     (payload.changed||[]).forEach(function(c){
       if(!c || !c.id) return;
       var had = snap.items[c.id];
       if(had && (had.at||"") > (c.at||"")) return;
+      /* The audit log is written here because this is the one place every
+         change passes through, from either device and from Claude alike. It
+         records the move, not the state: "what did this become, from what, and
+         who did it" is the question a log is for, and the snapshot already
+         answers "what is it now". */
+      HIST_FIELDS.forEach(function(f){
+        var a = fieldOf(had, f.k), b = fieldOf(c, f.k);
+        if(a===b) return;
+        if(hist.length < HIST_MAX) hist.push({
+          at: c.at || payload.exportedAt || new Date().toISOString(),
+          id: c.id, title: c.title || had&&had.title || c.id,
+          f: f.label, a: f.show(a), b: f.show(b), by: who
+        });
+      });
       snap.items[c.id] = c;
     });
     (payload.notes||[]).forEach(function(n){
@@ -190,7 +291,80 @@ export class Board {
       snap.notes[n.id] = n;
     });
     await this.ctx.storage.put("snap", snap);
+    await this.ctx.storage.put("hist", hist);
     return snap;
+  }
+
+  /* The audit log, written out with the daily archive.
+     One file per UTC day, because that makes both halves trivial: a day is
+     written once and never edited again, and pruning is deleting a filename
+     older than the window rather than rewriting a rolling file. */
+  async writeHistory(){
+    var hist = (await this.ctx.storage.get("hist")) || [];
+    if(!hist.length) return {days:0, lines:0};
+    var days = {};
+    hist.forEach(function(h){
+      var d = (h.at||"").slice(0,10);
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      (days[d] = days[d] || []).push(h);
+    });
+    var wrote = 0, lines = 0, kept = [];
+    for(var d of Object.keys(days).sort()){
+      var rows = days[d].slice().sort(function(a,b){ return (a.at||"").localeCompare(b.at||""); });
+      var body = "# "+d+"\n\n"+
+        "Every change to the board on this day, as the relay saw it. Kept for "+
+        HIST_DAYS+" days, then deleted.\n\n"+
+        "| Time (UTC) | Task | Change | By |\n|---|---|---|---|\n"+
+        rows.map(function(h){
+          return "| "+(h.at||"").slice(11,16)+" | "+md(h.title)+" | "+
+                 md(h.f)+" "+md(h.a)+" \u2192 "+md(h.b)+" | "+md(h.by)+" |";
+        }).join("\n")+"\n";
+      var path = HIST+"/"+d+".md";
+      /* a day already on disk is replaced, so an alarm that fires twice in one
+         day adds the newer entries rather than failing on a name that exists */
+      var sha = null;
+      var have = await listDir(this.env, HIST);
+      if(have) have.forEach(function(f){ if(f.name === d+".md") sha = f.sha; });
+      if(sha){
+        var old = await this.readHistory(path);
+        if(old) body = mergeHistory(old, body);
+      }
+      /* A throw here, not just a bad status: GitHub being unreachable must
+         leave the day pending and let the loop carry on to the next one,
+         rather than abort the write and skip the prune behind it. */
+      var r = null;
+      try{ r = await commit(this.env, path, body, "History "+d, sha); }catch(e){ r = null; }
+      if(r && r.ok){ wrote++; lines += rows.length; }
+      else { kept = kept.concat(days[d]); }   /* try again on the next archive */
+    }
+    await this.ctx.storage.put("hist", kept);
+    return {days:wrote, lines:lines};
+  }
+
+  async readHistory(path){
+    try{
+      var r = await gh(this.env, path+"?ref="+BRANCH, {method:"GET"});
+      if(!r.ok) return null;
+      var j = await r.json();
+      return j && j.content ? unb64(j.content) : null;
+    }catch(e){ return null; }
+  }
+
+  /* Delete the days that have fallen out of the window. Nothing else in the
+     repo is on a clock like this, so it is done here rather than left to a
+     workflow that would need its own schedule. */
+  async pruneHistory(){
+    var have = await listDir(this.env, HIST);
+    if(!have) return 0;
+    var cut = new Date(Date.now() - HIST_DAYS*86400000).toISOString().slice(0,10);
+    var gone = 0;
+    for(var f of have){
+      var m = /^(\d{4}-\d{2}-\d{2})\.md$/.exec(f.name||"");
+      if(!m || m[1] >= cut) continue;
+      var r = await removeFile(this.env, HIST+"/"+f.name, f.sha, "History: drop "+m[1]);
+      if(r && r.ok) gone++;
+    }
+    return gone;
   }
 
   async prune(){
@@ -279,6 +453,9 @@ export class Board {
       }, null, 2)+"\n";
       await writeInbox(this.env, utcStamp(now), body, "Relay snapshot");
     }
+    /* after the snapshot, never instead of it: the archive is what keeps the
+       GitHub fallback alive, and the log must not be able to cost it */
+    try{ await this.writeHistory(); await this.pruneHistory(); }catch(e){}
     await this.ctx.storage.setAlarm(Date.now() + ARCHIVE_MS);
   }
 
@@ -324,8 +501,9 @@ export class Board {
 
     if(p === "/send" || p === "/agent/reply"){
       var payload = await request.json();
-      var ev = await this.append(p === "/send" ? "board" : "claude", payload);
-      await this.fold(payload);
+      var who = p === "/send" ? "board" : "claude";
+      var ev = await this.append(who, payload);
+      await this.fold(payload, who);
       this.push(ev);
       await this.armArchive();
       var started = null;

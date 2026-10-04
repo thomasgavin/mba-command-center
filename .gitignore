@@ -4,3 +4,6 @@
 # here is served, and nothing here belongs in the history.
 node_modules/
 package-lock.json
+
+# wrangler dev leaves a local DO state directory behind
+relay/.wrangler/

@@ -127,6 +127,18 @@ So the worst an abuser achieves is junk JSON in a folder that is already public,
 which is a `git rm` to clean up. Nothing private is exposed, because nothing
 private is there: see the privacy note in `CLAUDE.md`.
 
+## The audit log
+
+The daily alarm also writes `history/YYYY-MM-DD.md` — every board change that
+day as a table, kept for `HIST_DAYS` (30) and then deleted. Entries are
+recorded in `fold()`, which is the only place that sees both the old value and
+the new one. The write and the prune sit inside a `try` after the snapshot: the
+archive keeps the GitHub fallback alive and the log must never cost it, so a
+failed write leaves the day pending for the next run instead of dropping it.
+
+This needs the same `GH_TOKEN` as the archive, with Contents: read and write —
+the prune issues DELETEs, which nothing here did before.
+
 ## If it breaks
 
 The board falls back on its own. A failed send keeps your notes on the device,

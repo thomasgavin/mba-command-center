@@ -276,6 +276,34 @@ board on its open socket in the same second; on the file route it commits into
 `claude-inbox/` and the board applies it on the next page load. So a date does
 move, just one page load later, not during the run.
 
+## The audit log
+
+`history/YYYY-MM-DD.md` is a readable table of every board change that day:
+the time, the task, the field with its old and new value, and whether it was
+him or Claude. **Kept for 30 days** (`HIST_DAYS` in `relay/worker.js`), then
+the file is deleted. He asked for it on 2026-10-04 — nothing recorded history
+before it. `claude-inbox/` looked like one and is not: those are raw sync
+payloads, they expire at 7 days, and a file per edit burst is not something a
+person reads.
+
+It is written by the **relay**, in `fold()`, because that is the one place
+every change passes through — both devices and Claude alike — and the one
+place that still holds the previous value to diff against. The daily archive
+alarm writes the day out and prunes anything past the window; it runs after
+the snapshot and inside a `try`, because the archive is what keeps the GitHub
+fallback alive and bookkeeping must never be able to cost it. A write that
+fails leaves the entries pending for the next run rather than dropping them.
+
+`HIST_FIELDS` is deliberately not every field in the diff. `manual`, `snoozes`
+and `origDue` are bookkeeping the board keeps about itself — a snooze already
+shows up as the due date it moved — and logging them would bury the three or
+four lines a day that mean something.
+
+A task title is his text going into a markdown table cell, so `md()` escapes
+pipes and flattens newlines: a row that silently splits is a log that cannot
+be trusted. A day already on disk is **merged, not replaced**, since a
+redeploy re-arms the alarm and a second firing that day must add to it.
+
 ## Privacy
 
 **This repository is public.** The owner chose that knowingly for `claude-inbox/`.

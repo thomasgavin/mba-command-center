@@ -13,7 +13,8 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs      # 68 checks, three widths, a real browser
+node checks/board-check.mjs          # 68 checks, three widths, a real browser
+node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -146,6 +147,19 @@ It arrives unprompted, so it names its task before he reads it and the header
 is the way back to that task. A second ask reads as a second ask.
 *Checked: `a nudge renders as a nudge and a reply does not`, `the first ask and
 the second read differently`, `tapping the nudge opens that task`.*
+
+### The audit log records the move, not the state
+`history/YYYY-MM-DD.md` is written by the relay from `fold()`, the only place
+that still holds the previous value. A title is the owner's text in a markdown
+cell, so pipes are escaped and newlines flattened — a row that splits is a log
+that cannot be trusted. A day already on disk is merged, not replaced, because
+a redeploy re-arms the alarm. GitHub being unreachable leaves the day pending
+rather than dropping it, and must never throw: the daily archive runs first and
+is what keeps the GitHub fallback alive.
+*Checked by `checks/relay-history-check.mjs`: `only what moved is recorded`,
+`a pipe in a title cannot split the row`, `a second write that day keeps the
+first entries`, `a day past the window is deleted`, `a GitHub outage does not
+throw`.*
 
 ### No console errors
 A page that throws on load has already lost the state he was looking at. The
