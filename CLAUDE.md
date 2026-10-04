@@ -207,10 +207,19 @@ otherwise the dependency cascade quietly reverts it on his next edit.
 answered in under a minute instead of waiting for the Routine. The skill holds
 the whole procedure; the workflow is only the trigger.
 
+**A note can ask for a code change, and the run makes it.** That is the point
+of the Chat view: he changes the board by asking. The runner has the
+repository, a token, a browser and permission to push, so it edits
+`index.html`, bumps `BUILD`, runs `checks/board-check.mjs` and pushes to
+`main` — which is the deploy. It used to be told never to touch code, and the
+result was a board whose chat answered "I can't do that from here", which is
+the bridge failing at its only job. The one real limit is his
+`localStorage`: the runner cannot read or write what is in *his* browser.
+
 It fires two ways. **`repository_dispatch`** is the normal one: the relay asks
 for a run the moment a note lands in its log, and the skill then reads the
 conversation from `$RELAY_URL/agent/pull` and posts the reply to
-`/agent/reply`, committing nothing. **`push`** on `claude-inbox/` is the old
+`/agent/reply`, committing nothing unless the note asked for a change. **`push`** on `claude-inbox/` is the old
 route, kept because a board that has not picked up the new version still
 publishes there. Both are wanted; neither is dead code.
 
