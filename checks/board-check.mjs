@@ -147,6 +147,23 @@ for (var w2 of [390, 1280]) {
       }).map(function (n) { return (n.className || n.tagName) + "|" + n.textContent.slice(0, 24); });
     });
     if (wide.length) over.push(id + " overruns " + JSON.stringify(wide.slice(0, 2)));
+    /* The collapsed card is the easy case. Every row has to fit open too --
+       the date input is the one that ignores width:100% in Safari, and it only
+       exists while the Due row is expanded. */
+    var rows = await s2.p.evaluate(function () {
+      var bad = [], cw = document.documentElement.clientWidth;
+      ["status", "due", "priority", "effort"].forEach(function (k) {
+        dRow = k; renderDrawer();
+        var b = document.getElementById("dBody");
+        if (b.scrollWidth > b.clientWidth + 1) bad.push(k + " " + b.scrollWidth + ">" + b.clientWidth);
+        Array.prototype.forEach.call(b.querySelectorAll(".pex *"), function (n) {
+          if (n.getBoundingClientRect().right > cw + 1) bad.push(k + ":" + (n.className || n.tagName));
+        });
+      });
+      dRow = null; renderDrawer();
+      return bad;
+    });
+    if (rows.length) over.push(id + " open " + JSON.stringify(rows.slice(0, 2)));
   }
   ok(w2 + "px: the drawer fits, for every task", over.length === 0, over.slice(0, 4).join(" ; "));
   await s2.ctx.close();
@@ -159,6 +176,10 @@ for (var w2 of [390, 1280]) {
     var k = Object.keys(items)[0]; openId = k; dMode = "item"; renderDrawer(); showDrawer();
   });
   await s3.p.waitForTimeout(400);
+  /* the date input and the note composer only exist while their row is open,
+     so a check that never opens one is a check that cannot see them */
+  await s3.p.evaluate(function () { dNote = true; dRow = "due"; renderDrawer(); });
+  await s3.p.waitForTimeout(200);
   var small = await s3.p.$$eval("input,textarea,select", function (ns) {
     return ns.filter(function (n) { return parseFloat(getComputedStyle(n).fontSize) < 16; })
              .map(function (n) { return (n.id || n.tagName) + " " + getComputedStyle(n).fontSize; });
@@ -479,6 +500,88 @@ for (var w2 of [390, 1280]) {
      both.indexOf("written in tab A") >= 0 && both.indexOf("written in tab B") >= 0,
      JSON.stringify(both));
   await ctx14.close();
+}
+
+/* ---- 16. the task card is a summary, not a form ----
+   It was four segmented controls stacked down the page: every option of every
+   field on screen at once, seventeen buttons to describe four values, with the
+   loudest thing on the card an orange button that only closed it. */
+{
+  var s16 = await open(390);
+  var k16 = await s16.p.evaluate(function () {
+    var k = Object.keys(items)[0];
+    patch(k, { status: "todo", priority: "High" }, null, true);
+    openItem(k);
+    return k;
+  });
+  await s16.p.waitForTimeout(350);
+  var shut = await s16.p.evaluate(function () {
+    return { rows: document.querySelectorAll("#dBody .prow").length,
+             open: document.querySelectorAll("#dBody .pex").length,
+             nt: !!document.getElementById("nt"),
+             add: !!document.querySelector("#dBody .nadd"),
+             segs: document.querySelectorAll("#dBody .seg").length };
+  });
+  ok("a card opens closed: four rows, nothing expanded",
+     shut.rows === 4 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
+  ok("and the composer is one line until he asks for it",
+     !shut.nt && shut.add, JSON.stringify(shut));
+
+  /* a row that does not say what it holds is just a label */
+  var vals = await s16.p.evaluate(function () {
+    return Array.prototype.map.call(document.querySelectorAll("#dBody .prow"), function (r) {
+      return r.querySelector(".pkey").textContent + "=" + r.querySelector(".pval").textContent;
+    });
+  });
+  ok("every row states the value it holds",
+     vals[0] === "Status=To do" && vals[2] === "Priority=High", JSON.stringify(vals));
+
+  var one = await s16.p.evaluate(function () {
+    document.querySelector('#dBody .prow[data-row="status"]').click();
+    var a = document.querySelectorAll("#dBody .pex").length;
+    document.querySelector('#dBody .prow[data-row="priority"]').click();
+    return { first: a, after: document.querySelectorAll("#dBody .pex").length,
+             which: document.querySelector('#dBody .prow[aria-expanded="true"]').dataset.row };
+  });
+  ok("one row is open at a time", one.first === 1 && one.after === 1 && one.which === "priority",
+     JSON.stringify(one));
+
+  /* answering the question closes it -- otherwise the stack of controls is back */
+  var set = await s16.p.evaluate(function () {
+    document.querySelector('#dBody [data-pr="Low"]').click();
+    return { open: document.querySelectorAll("#dBody .pex").length,
+             val: document.querySelector('#dBody .prow[data-row="priority"] .pval').textContent,
+             real: items[openId].priority };
+  });
+  ok("choosing a value closes the row and shows it",
+     set.open === 0 && set.val === "Low" && set.real === "Low", JSON.stringify(set));
+
+  /* an overdue countdown on a task he has already finished is the board being
+     wrong about something he closed */
+  var done16 = await s16.p.evaluate(function () {
+    patch(openId, { due: "2020-01-01", status: "done" }, null, true);
+    return document.querySelector('#dBody .prow[data-row="due"] .pval').textContent;
+  });
+  ok("a Done task is never late", !/late|ago/.test(done16), done16);
+
+  /* the composer unfolds where it stood, not somewhere else */
+  var wrote = await s16.p.evaluate(function () {
+    document.querySelector("#dBody .nadd").click();
+    return { nt: !!document.getElementById("nt"), add: !!document.querySelector("#dBody .nadd") };
+  });
+  ok("tapping Add a note opens the composer", wrote.nt && !wrote.add, JSON.stringify(wrote));
+
+  /* an orange full-width button that only closes the card is the loudest thing
+     on it doing the least, and it read "Done" under a status button of the
+     same word */
+  var foot = await s16.p.evaluate(function () {
+    var b = document.querySelector("#dBody [data-done]");
+    return { txt: b.textContent, primary: b.classList.contains("o"),
+             statuses: STATUS.map(function (x) { return x.label; }) };
+  });
+  ok("the close button is not the primary action, and is not called Done",
+     !foot.primary && foot.statuses.indexOf(foot.txt) < 0, JSON.stringify(foot));
+  await s16.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

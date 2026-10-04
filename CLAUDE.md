@@ -348,11 +348,36 @@ setting a status by hand and the cascade would skip the task for ever after.
 `changedItems()` deliberately still reads `all()`, not `alive()`, or the
 deletion itself would never travel.
 
+## The task card: a summary first, a form only when asked
+
+The drawer answers two questions, in that order: what is this task, and what do
+I want to change. Status, due, priority and effort are **one row each**, stating
+the value they hold with a chevron; tapping one opens its options inline, and
+choosing a value closes it again. One row is open at a time, and nothing is
+saved by opening one.
+
+It was the other way round. The composer came first and the four fields were
+four segmented controls stacked down the page, so the card put **every option of
+every field on screen at once** -- seventeen buttons to describe four values --
+opened on an empty form with a paragraph of instructions under it, and ended in
+a full-width orange button that only closed it, labelled "Done" directly under a
+status button reading Done. Nothing in it looked more important than anything
+else, which is the definition of no hierarchy.
+
+`dRow` (which row is open) and `dNote` (whether the composer is unfolded) are
+drawer state: they reset on close and never reach `localStorage`.
+
+**A Done task is never late.** The countdown is advice about what is left to do,
+so it is suppressed once the status is done -- it only ever read as the board
+being wrong about something he had already closed.
+
+The expanded row is where the width goes, and a Safari `input[type=date]` is in
+one of them, so the check opens **every row on every task** at 390px, not just
+the collapsed card.
+
 ## A note is his first, and Claude's only if he says so
 
-The task details page is the drawer: the note composer and the thread sit
-directly under the title, because reading the thread and adding to it is what
-he opened it for; the controls are below. A note carries `forClaude`. Unticked
+A note carries `forClaude`. Unticked
 it saves, syncs and sits in the task's thread and nothing else — `outNotes()`
 drops it, so it never travels, and it is written `state:"read"` because "new"
 means "not yet delivered" and nobody is delivering it. `sendDefault` remembers
@@ -546,7 +571,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 68 invariants, three widths, a real browser. Every one of them was a
+that runs: 76 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

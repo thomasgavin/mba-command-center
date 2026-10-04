@@ -599,6 +599,39 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 }
 .seg button:hover{background:var(--wash)}
 .seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* ---------- task details: the property rows ----------
+   Four stacked segmented controls put every option of every field on screen at
+   once -- seventeen buttons to describe four values -- so the card read as a
+   settings screen and nothing in it looked more important than anything else.
+   A row states the value it holds and opens only when he taps it. The value is
+   the answer to "what is this task", which is what he opened the card for; the
+   options are the answer to "change it", which is a second question. */
+.pgrp{border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;margin-bottom:17px;background:#fff}
+.prow{display:flex;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;
+  border:0;border-top:1px solid var(--line2);background:#fff;font:inherit;cursor:pointer;
+  padding:11px 12px;color:var(--ink2);transition:background .13s}
+.prow:first-child{border-top:0}
+.prow:hover{background:var(--wash)}
+.prow[aria-expanded="true"]{background:var(--wash)}
+.pkey{flex:none;font-size:12px;font-weight:600;color:var(--ink4)}
+/* the value can be a long date plus a qualifier, and the drawer is the width of
+   the phone -- it has to be allowed to shrink below its longest word */
+.pval{flex:1;min-width:0;text-align:right;font-size:13px;font-weight:700;color:var(--ink);
+  overflow-wrap:anywhere;line-height:1.35}
+.pval small{display:block;font-size:10.5px;font-weight:600;color:var(--ink4);margin-top:2px}
+.pval.un{color:var(--ink4);font-weight:600}
+.pcar{flex:none;color:var(--ink4);font-size:11px;transition:transform .16s var(--ease)}
+.prow[aria-expanded="true"] .pcar{transform:rotate(90deg)}
+.pex{padding:2px 12px 13px;background:var(--wash);border-top:1px solid var(--line2);min-width:0}
+/* An empty composer with a paragraph under it was the first thing on a task
+   with no notes, so the card opened on a form rather than on the task. */
+.nadd{display:flex;align-items:center;gap:8px;width:100%;min-width:0;border:1px dashed var(--line);
+  border-radius:var(--r3);background:#fff;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--ink3);padding:11px 12px;cursor:pointer;text-align:left}
+.nadd:hover{background:var(--wash);color:var(--ink2)}
+.nadd b{font-size:15px;line-height:1;color:var(--ink4);font-weight:700;flex:none}
+.dsub{font-size:12px;color:var(--ink3);line-height:1.5;margin:-6px 0 15px;overflow-wrap:anywhere}
 input[type=date],textarea{
   width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
   font:inherit;font-size:13px;color:var(--ink);padding:9px 11px;
@@ -1134,6 +1167,10 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 /* ---------- state ---------- */
 var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
+/* Which property row is open in the task card, and whether the note composer
+   is unfolded. Both are drawer state, not board state: they reset when it
+   closes and never reach localStorage. */
+var dRow=null, dNote=false;
 /* How much of the conversation is kept. Every note rides along in the files the
    board publishes and in both devices' localStorage, so an unbounded thread is
    an unbounded cost for a planning board nobody reads back a month later.
@@ -2146,21 +2183,29 @@ function hideDrawer(){
   clearTimeout(drawerT);
   /* hide only once it has slid out, or the animation is lost */
   drawerT=setTimeout(function(){ if(!d.classList.contains("on")) d.style.visibility="hidden"; },320);
-  openId=null; dMode=null; noteDraft="";
+  openId=null; dMode=null; noteDraft=""; dRow=null; dNote=false;
   syncFab();
 }
 function openItem(id,focusNote){
   var i=items[id]; if(!i) return;
   openId=id; dMode="item"; noteDraft="";
+  /* a card opens showing what the task is, never with a row already open;
+     the composer unfolds only when the caller came to write */
+  dRow=null; dNote=!!focusNote;
   renderDrawer(false); showDrawer();
   if(focusNote) setTimeout(function(){ var t=document.getElementById("nt"); if(t){t.focus();} },300);
 }
 /* The task details page.
-   Order is the argument: what he came to do is read the thread and add to it,
-   so the note timeline and its composer sit directly under the title. The
-   controls that change the task are below them, and the dates are one row of
-   chips rather than two full-width fields -- "Push the date" plus a date
-   picker took a third of a phone screen to move something by a day. */
+   It answers two questions in that order: what is this task, and what do I
+   want to change. The four things that can change are one row each, stating
+   the value they hold and opening only when he taps one; the thread and its
+   composer follow, with the composer folded to a line until he wants it.
+
+   It was the other way round -- composer first, then four segmented controls
+   down the page -- and the result was a card that opened on an empty form and
+   put every option of every field on screen at once: seventeen buttons to
+   describe four values, with nothing in it looking more important than
+   anything else. */
 function renderDrawer(keepDraft){
   var i=items[openId]; if(!i) return;
   var ta=document.getElementById("nt");
@@ -2178,57 +2223,39 @@ function renderDrawer(keepDraft){
        '<div class="row-b" style="margin-top:9px"><button class="btn" data-undel="1">Put it back</button></div></div>';
   }
 
-  h+='<div class="fld"><div class="row-b">'+
+  /* What the task is. The track is not editable, so it is a label rather than a
+     control, and the brief reads as the sentence under the title it always was. */
+  h+='<div class="fld" style="margin-bottom:12px"><div class="row-b">'+
      '<span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+esc(tl(i.track))+'</span>'+
-     '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-     '<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>'+
-     (i.snoozes?'<span class="chip dt">pushed '+i.snoozes+'&times;'+(i.origDue?' from '+fmtD(i.origDue):'')+'</span>':'')+
-     (effOf(i.effort)?'<span class="chip ef">'+esc(effOf(i.effort).label)+'</span>':'')+
-     '</div>'+(i.brief?'<p class="hint" style="margin-top:10px;font-size:12.5px;color:var(--ink2)">'+esc(i.brief)+'</p>':'')+'</div>';
+     '</div></div>';
+  if(i.brief) h+='<div class="dsub">'+esc(i.brief)+'</div>';
 
-  /* --- the feed: composer first, then the thread, newest at the top --- */
-  h+='<div class="fld"><label>Notes</label>'+
-     '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
-     '<div class="nrow">'+
-       '<label class="ck"><input type="checkbox" id="ntc"'+(sendDefault?' checked':'')+'>'+
-       '<span>Send to Claude</span></label>'+
-       '<button class="btn o" data-save="1">Add note</button>'+
-     '</div>'+
-     '<div class="hint">Unticked it stays on your board and syncs to your other device. '+
-     'Ticked it also goes to Claude, who answers in Chat. The repo is public, so keep '+
-     'account and document numbers out of it.</div>';
+  /* --- the four things that can change, one row each --- */
+  h+='<div class="pgrp">'+
+     prow("status","Status",statusVal(i))+
+     prow("due","Due",dueVal(i,n))+
+     prow("priority","Priority",priVal(i))+
+     prow("effort","How long",effVal(i))+
+     '</div>';
+
+  /* --- the thread, and a composer that is one line until he wants it --- */
+  h+='<div class="fld"><label>Notes</label>';
+  if(dNote){
+    h+='<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
+       '<div class="nrow">'+
+         '<label class="ck"><input type="checkbox" id="ntc"'+(sendDefault?' checked':'')+'>'+
+         '<span>Send to Claude</span></label>'+
+         '<button class="btn o" data-save="1">Add note</button>'+
+       '</div>'+
+       '<div class="hint">Ticked, it also goes to Claude, who answers in Chat. '+
+       'The repo is public, so keep account and document numbers out of it.</div>';
+  }else{
+    h+='<button class="nadd" data-nadd="1"><b>+</b><span>Add a note</span></button>';
+  }
   h+= mine.length
     ? '<div class="ntl">'+mine.map(function(p){ return noteRow(p); }).join("")+'</div>'
-    : '<div class="hint" style="margin-top:12px">Nothing on this task yet.</div>';
+    : '<div class="hint">Nothing on this task yet.</div>';
   h+='</div>';
-
-  /* --- the controls --- */
-  h+='<div class="fld"><label>State</label><div class="seg">'+
-     STATUS.map(function(s){return '<button data-st="'+s.k+'" aria-pressed="'+((i.status||"todo")===s.k)+'">'+s.label+'</button>';}).join("")+'</div></div>';
-
-  /* one row: the date, and the four ways he actually moves it */
-  h+='<div class="fld"><label>Due</label><div class="drow">'+
-     '<input type="date" id="dd" value="'+esc(i.due||"")+'">'+
-     [1,3,5,14].map(function(d){return '<button class="pch" data-sn="'+d+'">+'+d+'</button>';}).join("")+
-     '</div>'+
-     '<div class="seg" style="margin-top:7px">'+
-     ["Confirmed","Target","Awaiting"].map(function(x){return '<button data-ty="'+x+'" aria-pressed="'+(i.dateType===x)+'">'+x+'</button>';}).join("")+
-     '</div></div>';
-
-  h+='<div class="fld"><label>Priority</label><div class="seg">'+
-     ["Critical","High","Medium","Low"].map(function(x){return '<button data-pr="'+x+'" aria-pressed="'+(i.priority===x)+'">'+x+'</button>';}).join("")+'</div></div>';
-
-  /* The one thing a due date cannot tell you. Claude reads it to decide how
-     early to say anything, so the "start by" line under it is not decoration:
-     it is the number the nudge is built on, shown so he can argue with it. */
-  var sb=startBy(i);
-  h+='<div class="fld"><label>How long it takes</label><div class="seg wrp">'+
-     EFFORT.map(function(e){return '<button data-ef="'+e.k+'" aria-pressed="'+(i.effort===e.k)+'">'+esc(e.label)+'</button>';}).join("")+'</div>'+
-     (sb?'<div class="sby">Start by <b>'+fmtD(sb)+'</b>'+
-         (dleft(sb)!==null&&dleft(sb)<0?' &middot; <span class="sbl">that was '+Math.abs(dleft(sb))+'d ago</span>':'')+
-         '</div>'
-        :'<div class="hint">Unset. Claude reminds you off the due date alone until it knows, which is too late for anything that takes real time.</div>')+
-     '</div>';
 
   if((i.deps||[]).length){
     h+='<div class="fld"><label>Waiting on</label>';
@@ -2245,17 +2272,88 @@ function renderDrawer(keepDraft){
     h+='</div>';
   }
 
-  /* He looked for a save button and found only "Leave note". Every control
-     above writes immediately, so what was missing was a way to say "done",
-     not a way to save. Delete sits beside it, quiet and not red-by-default:
-     it is reversible, and dressing it as a hazard would be a lie. */
-  h+='<div class="fld dsave"><button class="btn o wide" data-done="1">Done</button>'+
+  /* He looked for a save button once and found only "Leave note", so there has
+     to be something here that ends the visit. It is not the primary action
+     though: it was an orange full-width button that did nothing but close, which
+     made the loudest thing on the card the one that changed the least -- and it
+     read "Done" directly under a status button reading "Done". */
+  h+='<div class="fld dsave"><button class="btn wide" data-done="1">Close</button>'+
      (i.deleted?'':'<div class="row-b" style="margin-top:8px"><button class="btn del" data-del="1">Delete this task</button></div>')+
      '<div class="hint">Every change above is already saved and on its way to your other device.'+
      (i.deleted?'':' Deleting keeps the notes and can be undone from the list.')+'</div></div>';
 
   document.getElementById("dBody").innerHTML=h;
   var t2=document.getElementById("nt"); if(t2&&noteDraft) t2.value=noteDraft;
+}
+/* One property row. It states the value it holds, and opens -- one at a time --
+   to the options that change it. The value is what he came to read; the options
+   are a second question, and asking both at once is what made the card read as
+   a form. v.t and v.s are already markup, so neither is escaped again here. */
+function prow(k,label,v){
+  var open=dRow===k;
+  return '<button class="prow" data-row="'+k+'" aria-expanded="'+open+'">'+
+    '<span class="pkey">'+esc(label)+'</span>'+
+    '<span class="pval'+(v.un?" un":"")+'"'+(v.c?' style="color:'+v.c+'"':'')+'>'+v.t+
+      (v.s?'<small>'+v.s+'</small>':'')+'</span>'+
+    '<span class="pcar">&#9656;</span></button>'+
+    (open?'<div class="pex">'+pexOf(k)+'</div>':'');
+}
+function statusVal(i){
+  var l=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) l=x.label; });
+  return {t:esc(l||"To do")};
+}
+/* Everything the old chip row said about the date, on the one line that owns
+   it: a second copy of a date anywhere on this board is how they drift apart. */
+function dueVal(i,n){
+  if(!i.due) return {t:"Not set",un:true};
+  var m=[];
+  if(i.dateType) m.push(esc(i.dateType));
+  /* a finished task is not late. The countdown is advice about what is left to
+     do, and on a Done task there is none -- it only ever read as the board
+     being wrong about something he had already closed. */
+  var c=i.status==="done"?"":cTxt(n);
+  if(c) m.push(n!==null&&n<0?'<span class="sbl">'+esc(c)+'</span>':esc(c));
+  if(i.snoozes) m.push("pushed "+i.snoozes+"&times;");
+  return {t:esc(fmtD(i.due)),s:m.join(" &middot; ")};
+}
+function priVal(i){ return {t:esc(i.priority||"Not set"),c:PRI[i.priority]||null,un:!i.priority}; }
+function effVal(i){
+  var e=effOf(i.effort); if(!e) return {t:"Not set",un:true};
+  var sb=startBy(i), late=sb!==null&&dleft(sb)!==null&&dleft(sb)<0;
+  return {t:esc(e.label),
+    s:sb?(late?'<span class="sbl">start by '+esc(fmtD(sb))+'</span>':"start by "+esc(fmtD(sb))):""};
+}
+/* The options for one row, built only when that row is open. */
+function pexOf(k){
+  var i=items[openId]; if(!i) return "";
+  if(k==="status")
+    return '<div class="seg">'+STATUS.map(function(x){
+      return '<button data-st="'+x.k+'" aria-pressed="'+((i.status||"todo")===x.k)+'">'+x.label+'</button>'; }).join("")+'</div>';
+  if(k==="priority")
+    return '<div class="seg">'+["Critical","High","Medium","Low"].map(function(x){
+      return '<button data-pr="'+x+'" aria-pressed="'+(i.priority===x)+'">'+x+'</button>'; }).join("")+'</div>';
+  if(k==="due")
+    /* the date, the four ways he actually moves it, and what kind of date it is */
+    return '<div class="drow"><input type="date" id="dd" value="'+esc(i.due||"")+'">'+
+      [1,3,5,14].map(function(d){return '<button class="pch" data-sn="'+d+'">+'+d+'</button>';}).join("")+
+      '</div><div class="seg" style="margin-top:7px">'+
+      ["Confirmed","Target","Awaiting"].map(function(x){
+        return '<button data-ty="'+x+'" aria-pressed="'+(i.dateType===x)+'">'+x+'</button>'; }).join("")+
+      '</div>'+
+      (i.snoozes?'<div class="hint">Pushed '+i.snoozes+' time'+(i.snoozes>1?"s":"")+
+        (i.origDue?', from '+esc(fmtD(i.origDue)):'')+'.</div>':'');
+  if(k==="effort"){
+    /* The one thing a due date cannot tell you, so the start-by under it is not
+       decoration: it is the number the nudge is built on, shown so he can
+       argue with it. */
+    var sb=startBy(i);
+    return '<div class="seg wrp">'+EFFORT.map(function(e){
+        return '<button data-ef="'+e.k+'" aria-pressed="'+(i.effort===e.k)+'">'+esc(e.label)+'</button>'; }).join("")+'</div>'+
+      (sb?'<div class="sby">Start by <b>'+fmtD(sb)+'</b>'+
+          (dleft(sb)!==null&&dleft(sb)<0?' &middot; <span class="sbl">that was '+Math.abs(dleft(sb))+'d ago</span>':'')+'</div>'
+         :'<div class="hint">Claude reminds you off the due date alone until it knows, which is too late for anything that takes real time.</div>');
+  }
+  return "";
 }
 /* one entry in a note thread. The timestamp is never typed: it is the moment
    the note was written, which is the only thing that makes the thread readable
@@ -2399,7 +2497,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1135";
+var BUILD="2026-10-04-1210";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2560,10 +2658,16 @@ document.getElementById("dBody").addEventListener("click",function(e){
     var ta=document.getElementById("nt"), v=(ta.value||"").trim();
     var ck=document.getElementById("ntc"), ask=!ck||ck.checked;
     if(ck) sendDefault=ask;                     /* his last answer is the next default */
-    if(v&&openId){ addNote(openId,v,true,ask); noteDraft=""; renderDrawer(false);
+    if(v&&openId){ addNote(openId,v,true,ask); noteDraft=""; dNote=false; renderDrawer(false);
       toast(ask?"Note added and sent to Claude.":"Note added to this task."); }
     return;
   }
+  /* one row open at a time: the card is a summary, and two open rows is the
+     stack of controls this replaced. Nothing is saved by opening one. */
+  if(b.dataset.row){ dRow=(dRow===b.dataset.row?null:b.dataset.row); renderDrawer(true); return; }
+  if(b.dataset.nadd){ dNote=true; renderDrawer(true);
+    var nt=document.getElementById("nt"); if(nt) nt.focus();
+    return; }
   if(b.dataset.del){ var dz=openId; hideDrawer(); delItem(dz); return; }
   if(b.dataset.undel){ undelItem(openId); return; }
   if(b.dataset.gsave){
@@ -2577,10 +2681,10 @@ document.getElementById("dBody").addEventListener("click",function(e){
   if(b.dataset.sn){ snooze(openId,+b.dataset.sn); return; }
   /* each of these saves on the spot -- say so, or it reads as needing a save */
   if(b.dataset.st){ var sl=null; STATUS.forEach(function(x){ if(x.k===b.dataset.st) sl=x.label; });
-    patch(openId,{status:b.dataset.st},"Saved: "+(sl||b.dataset.st)); return; }
-  if(b.dataset.pr){ patch(openId,{priority:b.dataset.pr},"Saved: "+b.dataset.pr+" priority"); return; }
+    dRow=null; patch(openId,{status:b.dataset.st},"Saved: "+(sl||b.dataset.st)); return; }
+  if(b.dataset.pr){ dRow=null; patch(openId,{priority:b.dataset.pr},"Saved: "+b.dataset.pr+" priority"); return; }
   if(b.dataset.ty){ patch(openId,{dateType:b.dataset.ty},"Saved: date is "+b.dataset.ty); return; }
-  if(b.dataset.ef){ var ef=effOf(b.dataset.ef);
+  if(b.dataset.ef){ var ef=effOf(b.dataset.ef); dRow=null;
     patch(openId,{effort:b.dataset.ef},"Saved: "+(ef?ef.label.toLowerCase():b.dataset.ef)); return; }
 });
 document.getElementById("dBody").addEventListener("change",function(e){
