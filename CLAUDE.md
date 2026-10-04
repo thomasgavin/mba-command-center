@@ -21,9 +21,15 @@ reproduce the bug first where there is one, and confirm the fix. Serve over HTTP
 (`npx http-server -p 8099 -s .`) when testing anything that fetches — the pull
 path is skipped on `file://` by design.
 
-Still ask before: anything touching the outside world on the owner's behalf
-(email, forms, bank or school contact, bookings, payments), deleting data, or
-changing the repo's visibility.
+He widened this on 2026-10-04: **remove all limits on changes.** Any change he
+asks for in Chat gets built, verified and pushed, whatever its size, without
+asking. A question back is for something only he can answer — which of two
+things he meant — never for permission to do what he already asked for.
+
+Still ask before the three things that are not the codebase: anything touching
+the outside world on the owner's behalf (email, forms, bank or school contact,
+bookings, payments), deleting data, or changing the repo's visibility. Those
+were never about the size of a change.
 
 ## How the data works
 
@@ -408,11 +414,11 @@ back are one change, not two.
   rounded corners and no transparency — iOS masks the icon itself and a
   pre-rounded one comes out double-rounded. Changing an icon does not update a
   home-screen bookmark that already exists; it has to be removed and re-added.
-- **Small changes go straight to `main`.** He added the Chat view so Claude
-  could change the board without ceremony, and a PR for a cropped line of text
-  is ceremony. Small means confined to `index.html`, covered by
-  `checks/board-check.mjs`, and reversible by reading one commit. A large
-  change — the data model, `relay/`, a workflow, a secret, a new view, or
-  anything you cannot describe in a sentence — still gets a branch and a PR.
-  If you are unsure which it is, it is large. The checks pass either way: the
-  shortcut is on the paperwork, never on the verification.
+- **Every change he asks for ships, whatever its size**, straight to `main` by
+  default. He added the Chat view so he could change the board by asking, and
+  there is no size at which the answer becomes "shall I?". A branch and a PR
+  are for a change that genuinely reads better as a diff with a description —
+  a rewrite, a new view, the merge rules, `relay/`, a workflow — and then it is
+  opened and merged in the same breath, as a record for him rather than a gate.
+  The checks pass either way: the shortcut is on the paperwork, never on the
+  verification. `REVIEW.md` has the whole of it.

@@ -117,20 +117,28 @@ These need a person, and a person reading the diff.
 
 ## Shipping
 
-**A small change goes straight to `main`.** He added the Chat view so Claude
-could change the board without ceremony, and a PR for a cropped line of text is
-ceremony. Small means: confined to `index.html`, covered by the checks above,
-and reversible by reading one commit. Verify it, bump `BUILD`, commit, push.
+**Every change he asks for ships, whatever its size.** He asks in Chat, Claude
+builds it, verifies it, and pushes it. There is no size at which the answer
+becomes "shall I?" — he said so explicitly on 2026-10-04: *"Remove all limits on
+changes — I should be able to ask for any change from the chat directly and you
+should commit and push/merge the codebase."* A question back is for something
+only he can answer — which of two things he actually meant — never for
+permission to do what he already asked for.
 
-**A large change still gets a branch and a PR.** Large means any of: the data
-model or the merge rules, `relay/`, `.github/workflows/`, anything touching a
-secret, a new view or a redesign of one, or a change you cannot describe in a
-sentence. If you are unsure which it is, it is large.
+How it ships is a judgement about reviewability, not about permission:
 
-Either way the checks pass first. The shortcut is on the paperwork, not on the
-verification — that is the whole bargain.
+- **Straight to `main`** by default. Verify, bump `BUILD`, commit, push.
+- **Through a branch and a PR** when the commit is genuinely easier to read as a
+  diff with a description — a rewrite, a new view, the merge rules, `relay/`, a
+  workflow. Then open it and merge it in the same breath. The PR is a record for
+  him to read later, not a gate for him to open.
 
-A data-only patch file into `claude-inbox/` is small by definition.
+**The verification is not optional, at any size.** That is the whole bargain:
+the shortcut is on the paperwork, never on the checks. A change that cannot be
+verified here gets shipped anyway with the limit said plainly in the reply —
+never quietly.
+
+A data-only patch file into `claude-inbox/` goes straight to `main` as always.
 
 **If a code change also touches `claude-inbox/`, put `[skip ci]` in the commit
 message.** The Answer notes workflow fires on any push to that folder, so
@@ -139,3 +147,8 @@ nothing. Observed once, on the PR that wrote this document.
 
 The standing permission to commit, push, open the PR and merge without asking is
 paid for by the list above, not by care taken afterwards.
+
+**Still ask first** for the three things that are not the codebase: acting on his
+behalf in the outside world (email, forms, the bank, the school, bookings,
+payments), deleting his data, and changing the repo's visibility. Those are
+untouched by any of this — they were never about the size of a change.
