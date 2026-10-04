@@ -13,8 +13,9 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 76 checks, three widths, a real browser
+node checks/board-check.mjs          # 87 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
+node checks/relay-push-check.mjs     # 17 checks on VAPID and Web Push
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -180,6 +181,40 @@ is what keeps the GitHub fallback alive.
 `a pipe in a title cannot split the row`, `a second write that day keeps the
 first entries`, `a day past the window is deleted`, `a GitHub outage does not
 throw`.*
+
+### A service worker may never serve the page
+`sw.js` exists only to receive pushes. The moment it answers a `fetch`, it can
+serve a cached `index.html`, and `checkBuild()` -- the thing that gets a fix onto
+his phone -- is beaten by its own cache. There is no `fetch` listener and there
+must never be one.
+*Checked: `the service worker never intercepts a request`.*
+
+### A push always shows something
+iOS revokes the notification permission of a worker that receives a push and
+displays nothing. The push is payload-less by design, so the worker fetches what
+to say -- and the path where that fetch fails still has to end in a
+notification.
+*Checked: `a push shows the nudge it was about`,
+`a push whose fetch fails still shows something`, `a nudge notification is tagged`.*
+
+### The VAPID signature is verified, not assumed
+A wrong signature is a 403 at the push service and silence on his phone hours
+later, which reads exactly like "nothing was worth sending". The JWT is checked
+against the public key the board is given, and the contact claim is the board's
+URL rather than an email, because this repository is public.
+*Checked: `relay-push-check.mjs` -- `and it verifies against the key the board
+was given`, `the contact is the board, not an address`.*
+
+### The offer to turn notifications on appears only where it can work
+No relay, no offer. Already subscribed, no offer. An iPhone in a Safari tab gets
+a sentence saying to install it, not a button that does nothing.
+*Checked: `no relay, no offer`, `and goes away once he is subscribed`,
+`on an iPhone in Safari it says to install, and offers no dead button`.*
+
+### Every check in this file actually runs
+A section added after `process.exit` is a rule nobody enforces and nobody can
+see is missing -- that happened to the Overview check. New sections go above
+`await browser.close()`.
 
 ### No console errors
 A page that throws on load has already lost the state he was looking at. The

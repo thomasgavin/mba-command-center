@@ -708,6 +708,23 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 .sby b{color:var(--ink2)}
 .sbl{color:var(--red)}
 
+/* ---------- turning on notifications ----------
+   It sits at the top of Chat because that is where nudges land, so the offer is
+   next to the thing it is offering. It takes a real tap: iOS will not grant
+   notification permission from anything else. */
+.pbn{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;
+  margin:0 0 10px;padding:10px 12px;border-radius:var(--r3);
+  background:rgba(255,100,41,.08);border:1px solid rgba(255,100,41,.25);
+  font-size:12.5px;line-height:1.45;color:var(--ink2)}
+.pbn.off{display:none}
+.pbn span{flex:1;min-width:0;overflow-wrap:anywhere}
+.pbn button{flex:none;border:0;border-radius:var(--r3);height:32px;padding:0 13px;
+  background:linear-gradient(140deg,#ff6429,#ff8244);color:#fff;font:inherit;
+  font-size:12.5px;font-weight:700;cursor:pointer}
+.pbn button:hover{filter:brightness(1.05)}
+.pbn.quiet{background:var(--wash);border-color:var(--line)}
+.pbn.quiet button{display:none}
+
 /* ---------- a nudge ---------- */
 /* Claude speaking first. It is the same note object as a reply, but a bubble
    that appears with no question above it has to say what it is and what it is
@@ -954,6 +971,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <section class="view" id="v-list"><div id="lviews"></div></section>
 
     <section class="view" id="v-chat">
+      <div class="pbn off" id="pbn"><span id="pbnT"></span><button id="pbnB"></button></div>
       <div class="chatw" id="chatw"></div>
       <div class="cfoot">
         <div class="cbox">
@@ -2500,7 +2518,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1315";
+var BUILD="2026-10-04-1340";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3266,6 +3284,91 @@ setInterval(function(){
   pullFromRepo(false);
 },POLL_TICK);
 
+/* ---------- notifications on the lock screen ----------
+   He asked for notifications and meant his phone, not a card in Chat. On iOS
+   that means exactly one path: a home-screen app, a service worker, and Web
+   Push with a VAPID key -- there is no other way in, and none of it works from
+   a Safari tab, which is why the banner says so rather than silently doing
+   nothing.
+
+   The relay is the sender, because it is the only part of this that is awake
+   when a nudge is written. The push itself carries no payload: sw.js wakes and
+   asks the relay what to say, so the note text never passes through Apple. */
+var swReg=null, pushSubbed=false;
+
+/* iOS exposes PushManager only inside the installed app, so "can I even ask"
+   and "is he in the right place to be asked" are two different questions. */
+function pushOK(){ return "serviceWorker" in navigator && "Notification" in window && "PushManager" in window; }
+function standalone(){
+  return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+}
+function iOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent); }
+
+function syncPush(){
+  var el=document.getElementById("pbn"), t=document.getElementById("pbnT"), b=document.getElementById("pbnB");
+  if(!el) return;
+  var show=function(txt,btn,quiet){
+    t.textContent=txt; b.textContent=btn||"";
+    el.classList.toggle("quiet",!!quiet); el.classList.remove("off");
+  };
+  var hide=function(){ el.classList.add("off"); };
+  if(!RELAY) return hide();                      /* nothing to subscribe to */
+  /* An iPhone in Safari cannot be asked at all. Saying why beats a button that
+     does nothing, which is how he would read silence here. */
+  if(iOS() && !standalone() && !pushOK())
+    return show("Add this to your Home Screen to get nudges on your lock screen.","",true);
+  if(!pushOK()) return hide();
+  if(Notification.permission==="denied")
+    return show("Notifications are blocked. Turn them back on in Settings, under Notifications.","",true);
+  /* a subscription cannot exist without the permission behind it, so the
+     subscription alone is the honest test of "already on" */
+  if(pushSubbed) return hide();
+  show("Get nudges on your lock screen, not just here.","Turn on");
+}
+
+function regSW(){
+  if(!("serviceWorker" in navigator)) return;
+  navigator.serviceWorker.register("sw.js").then(function(r){
+    swReg=r;
+    return r.pushManager && r.pushManager.getSubscription();
+  }).then(function(sub){
+    pushSubbed=!!sub; syncPush();
+  }).catch(function(){ syncPush(); });
+  /* a tap on the notification lands here when the app was already open */
+  navigator.serviceWorker.addEventListener("message",function(e){
+    var d=e.data||{}; if(d.t!=="notif") return;
+    if(d.go && items[d.go]) openItem(d.go); else setView("chat");
+  });
+}
+
+/* The VAPID key is the relay's own, generated there and served here, so there
+   is no key to keep in step by hand at either end. */
+function b64uBytes(s){
+  var pad="=".repeat((4-s.length%4)%4);
+  var raw=atob((s+pad).replace(/-/g,"+").replace(/_/g,"/"));
+  var a=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++) a[i]=raw.charCodeAt(i);
+  return a;
+}
+function askPush(){
+  if(!pushOK()||!RELAY) return;
+  Notification.requestPermission().then(function(perm){
+    if(perm!=="granted"){ syncPush(); return; }
+    return navigator.serviceWorker.ready.then(function(r){
+      swReg=r;
+      return fetch(RELAY+"/push/key").then(function(x){ return x.json(); }).then(function(k){
+        return r.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64uBytes(k.key)});
+      });
+    }).then(function(sub){
+      return fetch(RELAY+"/push/sub",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(sub)});
+    }).then(function(){
+      pushSubbed=true; syncPush(); toast("Notifications on. Nudges will reach your lock screen.");
+    });
+  }).catch(function(){ toast("Could not turn notifications on."); syncPush(); });
+}
+document.getElementById("pbnB").addEventListener("click",askPush);
+
 /* ---------- boot ---------- */
 load();
 render();
@@ -3273,6 +3376,13 @@ checkBuild(false);
 setView("over");
 pullFromRepo(false);   /* catch up with whatever another device published */
 openWS();              /* and stay caught up without asking again */
+regSW();               /* the only way a nudge reaches a lock screen */
+/* a notification tapped from cold opens the thing it was about */
+(function(){
+  var g=new URLSearchParams(location.search).get("go");
+  if(g && items[g]) openItem(g);
+  else if(location.search.indexOf("v=chat")>=0) setView("chat");
+})();
 
 </script>
 </body>
