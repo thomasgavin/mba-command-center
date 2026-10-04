@@ -58,7 +58,8 @@ bridge is `claude-inbox/`:
   notes stay unread until the relay confirms. Over 6000 URL characters the
   manual route falls back to a download; shift-click always downloads the full
   snapshot.
-- **Pull:** on load, and again whenever the page returns to the foreground, the
+- **Pull:** on load, whenever the page returns to the foreground, and on a
+  timer while it is open, the
   app lists `claude-inbox/` through GitHub's contents API (public repo,
   CORS-allowed, no token) and folds in the newest `PULL_FILES` (12) files,
   oldest first by the `exportedAt` inside each file rather than by filename.
@@ -70,6 +71,15 @@ bridge is `claude-inbox/`:
   file — the one actually holding the change — was skipped forever and no reload
   could recover it. Per-item clocks already make a re-read harmless, so there is
   nothing for a timestamp gate to protect.
+
+  The timer exists because a reply he can only see by reloading is not a
+  conversation. `pollGap()` decides the cadence each tick: **10s on the Chat
+  view, 90s on every other view, and nothing at all while the page is hidden**,
+  since `visibilitychange` already pulls on the way back. One slow 4s ticker
+  that re-decides beats restarting a timer on every view change, and
+  `checkBuild()` keeps its own 10-minute clock inside it rather than riding the
+  chat cadence — the inbox listing is small JSON, but a build check re-fetches
+  this whole page with `no-store`.
 
 Board state merges **per item**, not per board. Each item carries `at`, the
 moment that device last changed it (kept in `touched`), and an incoming change
