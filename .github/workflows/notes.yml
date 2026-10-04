@@ -1,0 +1,47 @@
+# Answer a note the moment it lands, instead of waiting for the twice-daily
+# Routine. The board's relay commits into claude-inbox/, that push runs this,
+# and Claude's reply is committed back as a patch the board folds in on its
+# next load. Typical end to end: under a minute.
+#
+# Needs one repository secret, CLAUDE_CODE_OAUTH_TOKEN, generated on the Mac
+# with `claude setup-token`. Without it the job fails on the first run and
+# nothing else breaks: the Routine still picks the notes up on its schedule.
+name: Answer notes
+
+on:
+  push:
+    branches: [main]
+    paths: ["claude-inbox/**"]
+
+# A burst of notes is one conversation, not three. Let a run finish and start
+# at most one more behind it, so two sessions never write patches over
+# each other.
+concurrency:
+  group: answer-notes
+  cancel-in-progress: false
+
+jobs:
+  answer:
+    # Claude's own patch commits land in the same folder, so without this the
+    # reply would wake another run, which would reply to itself. The commit
+    # message is the marker; `[skip ci]` alone is not enough, because it is
+    # easy to forget and the loop it allows is not cheap.
+    if: >-
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !startsWith(github.event.head_commit.message, 'Claude:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/answer-notes"
+          claude_args: |
+            --max-turns 30
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep"

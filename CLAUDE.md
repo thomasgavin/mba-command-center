@@ -86,6 +86,28 @@ before `at` existed still merge: no `at` falls back to the file's `exportedAt`.
 A note's full picture needs `SEED` + `changed[]`. Do not expect a complete board
 in an export — only the deltas travel.
 
+## The Chat view, and answering a note
+
+The board has a **Chat** view: the thread of what he wrote and what Claude wrote
+back, oldest first, with a composer at the bottom for a message that belongs to
+no task. Notes were only ever half a conversation before it — he could write and
+Claude could reply in a patch, but nothing put the two together, so a reply
+arrived as an unread badge on a drawer he had no reason to open.
+
+- Authorship is `from:"claude"` on anything Claude writes, with an id starting
+  `claude-` as the fallback for files written before that field existed.
+- A Claude note may carry `acted:["…","…"]`, one short line per change. It
+  renders under the message as the receipt: the reply is the claim, and a claim
+  without the receipt is the drift this board exists to prevent.
+- **`CHAT_DAYS` is 7.** Notes older than that are dropped on load *and* on merge
+  — both, or the other device would keep re-importing what this one aged out.
+  The `answer-notes` skill deletes inbox files past the same window.
+- The thread scrolls inside the view and the composer does not. It was sticky in
+  the page scroller first, which looks right until the thread is taller than a
+  screen and the messages render straight over the top of it.
+- It only follows the newest message when the thread actually grew. A publish or
+  a pull repaints every few seconds and would otherwise drag him back down mid-read.
+
 ## Answering a note
 
 A note is a question for Claude, and until it is answered it is outstanding. A
@@ -98,6 +120,24 @@ session cannot tell what is new and will redo the work.
 
 A patch that changes a status should also set `manual:true` on those items,
 otherwise the dependency cascade quietly reverts it on his next edit.
+
+## Instant replies: the Answer notes workflow
+
+`.github/workflows/notes.yml` runs on every push that touches `claude-inbox/`
+and invokes the `answer-notes` skill, so a note is answered in under a minute
+instead of waiting for the Routine. The skill holds the whole procedure; the
+workflow is only the trigger.
+
+Three things keep it from eating itself or his subscription:
+
+- **It must not answer its own reply.** Claude's patch lands in the same folder,
+  so the job skips any head commit whose message starts `Claude:` (the skill
+  commits with that prefix) or contains `[skip ci]`.
+- `concurrency: answer-notes` so a burst of notes is one conversation, with
+  `--max-turns 30` and a 12-minute timeout as the ceiling on a single run.
+- It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`, generated with
+  `claude setup-token`. Without it the job fails on the first run and nothing
+  else breaks — the Routine still picks the notes up on its schedule.
 
 ## The twice-daily Routine
 

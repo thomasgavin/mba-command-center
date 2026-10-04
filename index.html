@@ -617,6 +617,47 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 .tip{font-size:11.5px;color:var(--ink4);line-height:1.5;margin-top:14px;padding:0 2px}
 .tip b{color:var(--ink3);font-weight:700}
 
+/* ---------- chat ----------
+   The one view that is a conversation rather than a board, so it is laid out
+   as one: his messages right, Claude's left, oldest at the top, newest where
+   the eye already is. The composer is pinned under it because the alternative
+   -- scrolling to the bottom to type -- is wrong on a phone. */
+/* The thread scrolls, the composer does not. It was sticky inside the page
+   scroller first, which looks right until the thread is longer than a screen:
+   sticky pins it to the viewport but the rest of the messages keep rendering
+   underneath it. So the view owns the height and the thread owns the scroll. */
+.stage.chatmode{padding-bottom:0;overflow:hidden}
+#v-chat.on{display:flex;flex-direction:column;height:100%}
+.chatw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;
+  display:flex;flex-direction:column;gap:12px;padding:4px 2px 10px}
+.cday{align-self:center;font-size:11px;font-weight:600;color:var(--ink4);
+  background:var(--wash);border:1px solid var(--line);border-radius:999px;padding:3px 11px;margin:6px 0 2px}
+.cmsg{display:flex;flex-direction:column;max-width:76%}
+.cmsg.cme{align-self:flex-end;align-items:flex-end}
+.cmsg.cyou{align-self:flex-start;align-items:flex-start}
+.cbub{padding:9px 13px;border-radius:15px;font-size:13.5px;line-height:1.48;white-space:pre-wrap;word-break:break-word}
+.cme .cbub{background:var(--orange);color:#fff;border-bottom-right-radius:5px}
+.cyou .cbub{background:var(--wash);border:1px solid var(--line);border-bottom-left-radius:5px}
+.cmeta{font-size:10.5px;color:var(--ink4);margin-top:4px;padding:0 4px}
+.cmeta b{font-weight:600;color:var(--ink3)}
+/* what Claude actually changed, under its message: the reply is the claim and
+   this is the receipt, so one is never shown without the other */
+.cdid{margin-top:7px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:8px 11px;font-size:12px}
+.cdid b{display:block;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink4);margin-bottom:5px}
+.cdid div{color:var(--ink2);padding:2px 0 2px 13px;position:relative;line-height:1.45}
+.cdid div::before{content:"";position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--green)}
+.cbox{display:flex;gap:8px;align-items:flex-end;flex:0 0 auto;
+  background:var(--page);padding:10px 0 4px;border-top:1px solid var(--line)}
+.cbox textarea{flex:1;min-height:40px;max-height:140px;resize:none;padding:10px 13px;
+  border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
+  font:inherit;font-size:13.5px;line-height:1.45}
+.cbox textarea:focus{outline:none;border-color:var(--orange)}
+.csend{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--orange);color:#fff;font-size:17px;line-height:1;transition:opacity .14s}
+.csend:disabled{opacity:.35;cursor:default}
+.cempty{text-align:center;color:var(--ink4);font-size:13px;padding:38px 18px;line-height:1.55}
+
 /* ---------- responsive ---------- */
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
@@ -654,6 +695,13 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
      pinch. 16px is the threshold; nothing else prevents it short of banning
      pinch-zoom outright, which is worse. */
   input[type=date],textarea,.pal-box input{font-size:16px}
+  /* .cbox textarea sets its own size, which beats the rule above on
+     specificity, so the composer needs saying again or the chat box is the one
+     control on the board that still zooms the page */
+  .cbox textarea{font-size:16px}
+  /* the composer sits above the home bar, and a bubble can have the width */
+  .cbox{padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  .cmsg{max-width:86%}
   /* the drawer is the full screen here, so it has to respect the notch and the
      home bar, and the close button has to be a thumb-sized target */
   .drawer{height:100dvh}
@@ -686,6 +734,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     <button class="vt" role="tab" data-v="cal" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3" width="12.4" height="11" rx="1.6"/><path d="M1.8 6.6h12.4M5 1.6v2.6M11 1.6v2.6"/></svg>Calendar</button>
     <button class="vt" role="tab" data-v="graph" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.8"/><circle cx="8" cy="3.4" r="1.8"/><circle cx="8" cy="12.6" r="1.8"/><circle cx="13" cy="8" r="1.8"/><path d="M4.5 7 6.6 4.6M4.5 9l2.1 2.4M9.5 4.4 11.6 6.8M9.5 11.6 11.6 9.2"/></svg>Dependencies</button>
     <button class="vt" role="tab" data-v="list" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4h9M5.5 8h9M5.5 12h9"/><circle cx="2.2" cy="4" r="1"/><circle cx="2.2" cy="8" r="1"/><circle cx="2.2" cy="12" r="1"/></svg>List<small id="nList">0</small></button>
+    <button class="vt" role="tab" data-v="chat" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9.5a2 2 0 0 1-2 2H6l-3.5 2.6V4.5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2z"/><path d="M5.5 6h5M5.5 8.4h3"/></svg>Chat<small id="nChat">0</small></button>
   </nav>
 
   <nav class="subs" id="subs" role="tablist" aria-label="Filter by category"></nav>
@@ -723,6 +772,15 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
     </section>
 
     <section class="view" id="v-list"><div id="lviews"></div></section>
+
+    <section class="view" id="v-chat">
+      <div class="chatw" id="chatw"></div>
+      <div class="cbox">
+        <textarea id="cin" rows="1" placeholder="Message Claude…"></textarea>
+        <button class="csend" id="csend" aria-label="Send">&#8593;</button>
+      </div>
+      <p class="tip" id="chatTip" style="margin:6px 0 0"></p>
+    </section>
   </main>
 </div>
 
@@ -889,6 +947,16 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 /* ---------- state ---------- */
 var KEY="mbacc_v3";
 var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
+/* How much of the conversation is kept. Every note rides along in the files the
+   board publishes and in both devices' localStorage, so an unbounded thread is
+   an unbounded cost for a planning board nobody reads back a month later.
+   Pruning happens on load and on merge, so a device cannot re-import what
+   another device has already aged out. */
+var CHAT_DAYS=7;
+function freshNotes(list){
+  var cut=new Date(Date.now()-CHAT_DAYS*86400000).toISOString();
+  return (list||[]).filter(function(n){ return n && (n.createdAt||"")>cut; });
+}
 /* which category the lists are filtered to; "all" or a CATS key. Not persisted
    on purpose: a filter you forgot you set is a board that looks empty. */
 var cat="all";
@@ -921,7 +989,7 @@ function load(){
     var p=st.items[k];
     Object.keys(p).forEach(function(f){ items[k][f]=p[f]; });
   });
-  notes=(st&&st.notes)||[];
+  notes=freshNotes((st&&st.notes)||[]);
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
@@ -1062,7 +1130,7 @@ function snooze(id,n){
 function addNote(itemId,text){
   notes.unshift({id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
-    createdAt:new Date().toISOString(),state:"new"});
+    createdAt:new Date().toISOString(),state:"new",from:"me"});
   save(); render();
   autoSend();
   toast(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.");
@@ -1094,7 +1162,9 @@ function render(){
      commit. Shift-click to download is still there when it is. */
   var needs = !!pending || autoTries>0 || !RELAY;
   document.getElementById("exportBtn").classList.toggle("off",!needs);
-  renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList();
+  document.getElementById("nChat").textContent=unreadReplies();
+  document.getElementById("nChat").parentNode.classList.toggle("hot",unreadReplies()>0);
+  renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList(); renderChat();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
 }
@@ -1513,6 +1583,74 @@ function drawEdges(){
 }
 
 /* ---------- list ---------- */
+/* ---------- chat ----------
+   Notes were only ever half a conversation: he could write, and Claude could
+   write back in a patch, but nothing put the two in the same place, so a reply
+   arrived as an unread badge on a drawer he had no reason to open. This view is
+   the thread -- what he asked, what came back, and what it actually changed.
+
+   Authorship: anything Claude writes carries from:"claude". Files written
+   before that field existed are recognised by their "claude-" id prefix, which
+   is how the routine has always named them. */
+var chatN=-1;
+function isClaude(n){ return n.from==="claude" || /^claude-/.test(n.id||""); }
+function unreadReplies(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
+
+function renderChat(){
+  var w=document.getElementById("chatw");
+  var msgs=notes.slice().sort(function(a,b){ return (a.createdAt||"").localeCompare(b.createdAt||""); });
+  if(!msgs.length){
+    w.innerHTML='<div class="cempty">Nothing here yet.<br>Write below, or leave a note on any task, and it reaches Claude on its own.</div>';
+  }else{
+    var h="", lastDay="";
+    msgs.forEach(function(n){
+      var day=(n.createdAt||"").slice(0,10);
+      if(day && day!==lastDay){ lastDay=day; h+='<div class="cday">'+esc(dayLabel(day))+'</div>'; }
+      var mine=!isClaude(n);
+      h+='<div class="cmsg '+(mine?"cme":"cyou")+'">'+
+         '<div class="cbub">'+esc(n.text||"")+'</div>';
+      /* what Claude changed on the board because of this message */
+      if(!mine && n.acted && n.acted.length){
+        h+='<div class="cdid"><b>What I changed</b>'+
+           n.acted.map(function(a){ return '<div>'+esc(a)+'</div>'; }).join("")+'</div>';
+      }
+      h+='<div class="cmeta">'+esc(hhmm(n.createdAt))+
+         (n.itemTitle?' &middot; <b>'+esc(n.itemTitle)+'</b>':"")+
+         (mine && n.state!=="read" ? ' &middot; sending\u2026' : "")+
+         '</div></div>';
+    });
+    w.innerHTML=h;
+  }
+  var tip=document.getElementById("chatTip");
+  tip.textContent=msgs.length
+    ? "Replies arrive on their own. Older than "+CHAT_DAYS+" days is cleared automatically."
+    : "";
+  /* reading the thread is reading the replies */
+  if(view==="chat" && unreadReplies()){
+    notes.forEach(function(n){ if(isClaude(n)) n.state="read"; });
+    setTimeout(function(){ save(); render(); },0);
+  }
+  /* Only follow the thread when it actually grew, or when he has just opened
+     it. A publish or a pull repaints the board every few seconds, and each one
+     would otherwise drag him back down while he was reading something older. */
+  if(view==="chat" && msgs.length!==chatN){
+    chatN=msgs.length;
+    setTimeout(function(){ w.scrollTop=w.scrollHeight; },0);
+  }
+}
+function dayLabel(d){
+  var t=iso(todayD());
+  if(d===t) return "Today";
+  if(d===shift(t,-1)) return "Yesterday";
+  return fmtD(d);
+}
+function hhmm(isoStr){
+  if(!isoStr) return "";
+  var d=new Date(isoStr); if(isNaN(d)) return "";
+  var h=d.getHours(), m=d.getMinutes();
+  return (h<10?"0":"")+h+":"+(m<10?"0":"")+m;
+}
+
 function renderList(){
   var h="", P=pool();
   TORDER.forEach(function(k){
@@ -1739,7 +1877,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-03-2055";
+var BUILD="2026-10-04-0215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -1942,7 +2080,9 @@ stage.addEventListener("dblclick",function(e){
    and a filter would quietly make it wrong, so it never filters. */
 function renderSubs(){
   var el=document.getElementById("subs");
-  if(view==="over"){ el.classList.remove("on"); el.innerHTML=""; return; }
+  /* Overview answers "where do I stand" and Chat is a conversation; neither is
+     a list of tasks, so a category filter on either is meaningless. */
+  if(view==="over"||view==="chat"){ el.classList.remove("on"); el.innerHTML=""; return; }
   el.classList.add("on");
   var mk=function(k,label){
     var n=(k==="all"?all():all().filter(function(i){return TRACK_CAT[i.track]===k;}));
@@ -1962,6 +2102,25 @@ document.getElementById("subs").addEventListener("click",function(e){
   document.getElementById("stage").scrollTop=0;
 });
 
+/* --- chat composer ---
+   Enter sends, shift-Enter is a newline: this is a chat box, and on a phone the
+   return key should not be the only way to make a paragraph. */
+(function(){
+  var ta=document.getElementById("cin"), btn=document.getElementById("csend");
+  var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; btn.disabled=!ta.value.trim(); };
+  var send=function(){
+    var t=ta.value.trim(); if(!t) return;
+    addNote(null,t);
+    ta.value=""; grow(); ta.focus();
+  };
+  ta.addEventListener("input",grow);
+  ta.addEventListener("keydown",function(e){
+    if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+  btn.addEventListener("click",send);
+  grow();
+})();
+
 /* --- views --- */
 Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
   b.addEventListener("click",function(){ setView(b.dataset.v); });
@@ -1969,9 +2128,14 @@ Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
 function setView(v){
   view=v;
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
-  ["over","board","time","cal","graph","list"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
+  ["over","board","time","cal","graph","list","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
   renderSubs();
+  /* render() paints the chat while another view is still current, so entering
+     it has to repaint: that is when its replies count as read and when the
+     thread scrolls to the newest message. */
+  document.getElementById("stage").classList.toggle("chatmode",v==="chat");
+  if(v==="chat") renderChat();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
@@ -2143,7 +2307,7 @@ document.addEventListener("visibilitychange",function(){ if(document.hidden) end
 /* ===========================================================
    COMMAND PALETTE
    =========================================================== */
-var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Timeline"},{v:"cal",n:"Calendar"},{v:"graph",n:"Dependencies"},{v:"list",n:"List"}];
+var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Timeline"},{v:"cal",n:"Calendar"},{v:"graph",n:"Dependencies"},{v:"list",n:"List"},{v:"chat",n:"Chat"}];
 var palSel=0, palRows=[];
 function openPal(){
   document.getElementById("pal").classList.add("on");
@@ -2213,7 +2377,10 @@ var API="https://api.github.com/repos/"+REPO+"/contents/"+INBOX;
 function mergeNotes(incoming){
   var seen={}, added=0;
   notes.forEach(function(n){ seen[n.id]=true; });
-  (incoming||[]).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; added++; } });
+  /* an incoming note older than the window is one this device has already aged
+     out, or would age out on the next load: re-adding it would make the thread
+     grow back every time the other device published */
+  freshNotes(incoming).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; added++; } });
   notes.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
   return added;
 }
