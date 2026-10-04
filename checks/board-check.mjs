@@ -29,7 +29,7 @@ var CHROMIUM = process.env.PW_CHROMIUM || "/opt/pw-browsers/chromium";
 var PORT     = Number(process.env.PORT || 8391);
 var ROOT     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 var WIDTHS   = [390, 768, 1280];
-var VIEWS    = ["over", "board", "time", "cal", "graph", "list", "chat"];
+var VIEWS    = ["over", "board", "time", "cal", "graph", "chat"];
 
 var out = [], bad = 0;
 function ok(name, pass, detail) {
@@ -145,7 +145,7 @@ for (var w of WIDTHS) {
 /* ---- 2. the drawer fits the screen, for every task ---- */
 for (var w2 of [390, 1280]) {
   var s2 = await open(w2);
-  await s2.p.click('.vt[data-v="list"]');
+  await s2.p.click('.vt[data-v="time"]');
   await s2.p.waitForTimeout(250);
   var ids = await s2.p.evaluate(function () { return Object.keys(items); });
   var over = [];
@@ -264,7 +264,7 @@ for (var w2 of [390, 1280]) {
   await s5.ctx.close();
 }
 
-/* ---- 6. a deleted task leaves every view except the list ---- */
+/* ---- 6. a deleted task leaves every view except Tasks ---- */
 {
   /* the Visa tile read items[] directly and kept showing a deleted step */
   var sv = await open(390);
@@ -280,10 +280,12 @@ for (var w2 of [390, 1280]) {
     delItem(k);
     return { id: k, board: board(k), list: list(k), alive: alive().length, gone: gone().length };
     function board(x) { return !!document.querySelector('.card[data-id="' + x + '"]'); }
-    function list(x) { return !!document.querySelector('.lrow[data-id="' + x + '"]'); }
+    /* Tasks is where a deleted task is still reachable; it inherited that job
+       from the list when the two views merged. */
+    function list(x) { return !!document.querySelector('.grow.dl[data-id="' + x + '"]'); }
   });
   ok("a deleted task is out of the board", !k6.board, JSON.stringify(k6));
-  ok("a deleted task is still in the list", k6.list, JSON.stringify(k6));
+  ok("a deleted task is still in Tasks", k6.list, JSON.stringify(k6));
   ok("a deleted task is out of alive()", k6.gone === 1, JSON.stringify(k6));
   /* the whole point of deleting being a field rather than a removal */
   var back = await s6.p.evaluate(function (id) {
@@ -396,7 +398,7 @@ for (var w2 of [390, 1280]) {
       var was = i[f];
       i[f] = (f === "due" ? "2099-01-01" : f === "effort" ? "multi"
             : f === "status" ? "doing" : f === "priority" ? "Low"
-            : f === "dateType" ? "Awaiting" : true);
+            : f === "title" ? "A renamed task" : true);
       if (diffOf(i)[f] === undefined) out.push(f);
       i[f] = was;
     });
@@ -545,8 +547,8 @@ for (var w2 of [390, 1280]) {
              add: !!document.querySelector("#dBody .nadd"),
              segs: document.querySelectorAll("#dBody .seg").length };
   });
-  ok("a card opens closed: four rows, nothing expanded",
-     shut.rows === 4 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
+  ok("a card opens closed: every row collapsed, nothing expanded",
+     shut.rows === 5 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
   ok("and the composer is one line until he asks for it",
      !shut.nt && shut.add, JSON.stringify(shut));
 
@@ -556,8 +558,15 @@ for (var w2 of [390, 1280]) {
       return r.querySelector(".pkey").textContent + "=" + r.querySelector(".pval").textContent;
     });
   });
+  /* by name, not by index: the row order is a design decision that moves, and
+     an index here turns adding a row into a failing check about nothing */
+  function val(k){ var v=vals.find(function(x){ return x.indexOf(k+"=")===0; }); return v?v.slice(k.length+1):null; }
   ok("every row states the value it holds",
-     vals[0] === "Status=To do" && vals[2] === "Priority=High", JSON.stringify(vals));
+     val("Status") === "To do" && val("Priority") === "High", JSON.stringify(vals));
+  /* Title is the exception on purpose: the drawer header is the title, so the
+     row offers the action instead of printing the same string twice. */
+  ok("and the title row offers the rename rather than repeating the header",
+     val("Title") === "Rename", JSON.stringify(vals));
 
   var one = await s16.p.evaluate(function () {
     document.querySelector('#dBody .prow[data-row="status"]').click();
@@ -810,6 +819,111 @@ for (var cw of [390, 1280]) {
   if (cw < 720) ok("and the agenda row does not pretend to be a drag handle",
      opened.grab !== "grab", JSON.stringify(opened.grab));
   await s22.ctx.close();
+}
+
+/* ---- 23. a title is his to change, and it has to survive a reload ----
+   `deleted` shipped in DFIELDS alone and came back on the next load while
+   every in-memory assertion passed, so a new field is checked through
+   localStorage and a real reload, not in memory. */
+{
+  var s23 = await open(390);
+  var id23 = await s23.p.evaluate(function () { return Object.keys(items)[0]; });
+  var ren = await s23.p.evaluate(async function (id) {
+    openItem(id);
+    document.querySelector('#dBody .prow[data-row="title"]').click();
+    var el = document.getElementById("tt");
+    el.value = "Renamed from the card";
+    document.querySelector('#dBody [data-tsave]').click();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    return { live: items[id].title, head: document.getElementById("dTitle").textContent,
+             stored: JSON.parse(localStorage.getItem("mbacc_v3") || "{}").items[id].title };
+  }, id23);
+  ok("a rename lands on the task and in the drawer header",
+     ren.live === "Renamed from the card" && ren.head === "Renamed from the card", JSON.stringify(ren));
+  ok("and save() actually wrote it", ren.stored === "Renamed from the card", JSON.stringify(ren));
+  await s23.p.reload({ waitUntil: "load" });
+  await s23.p.waitForTimeout(500);
+  var after = await s23.p.evaluate(function (id) {
+    return { title: items[id].title, inView: (document.querySelector('.grow[data-id="' + id + '"] .gt') || {}).textContent };
+  }, id23);
+  ok("and it is still there after a reload", after.title === "Renamed from the card", JSON.stringify(after));
+  /* an empty name is refused: a task with no title cannot be found again */
+  var blank = await s23.p.evaluate(async function (id) {
+    openItem(id);
+    document.querySelector('#dBody .prow[data-row="title"]').click();
+    document.getElementById("tt").value = "   ";
+    document.querySelector('#dBody [data-tsave]').click();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    return items[id].title;
+  }, id23);
+  ok("an empty title is refused", blank === "Renamed from the card", String(blank));
+  await s23.ctx.close();
+}
+
+/* ---- 24. the words on screen are the words he uses ----
+   "Blocked" was the board's word, not his; "Target" was on every open task and
+   told him nothing, so the whole dateType field went with it. Checked as text
+   he can read, because a label is only ever wrong on screen. */
+{
+  var s24 = await open(1280);
+  var words = await s24.p.evaluate(function () {
+    var seen = { blocked: 0, target: 0, upcoming: 0 };
+    ["over", "board", "time", "cal", "graph", "chat"].forEach(function (v) {
+      setView(v);
+      var t = document.getElementById("v-" + v).innerText || "";
+      if (/\bBlocked\b/.test(t)) seen.blocked++;
+      if (/\bTarget\b/.test(t)) seen.target++;
+      if (/\bUpcoming\b/.test(t)) seen.upcoming++;
+    });
+    openItem(Object.keys(items)[0]);
+    var d = document.getElementById("dBody").innerText || "";
+    return { seen: seen, drawerBlocked: /\bBlocked\b/.test(d), drawerTarget: /\bTarget\b/.test(d),
+             statusLabels: STATUS.map(function (x) { return x.label; }),
+             dfields: DFIELDS.join(","), seedDt: SEED.filter(function (x) { return x.dt; }).length };
+  });
+  ok("nothing on screen says Blocked any more",
+     words.seen.blocked === 0 && !words.drawerBlocked, JSON.stringify(words.seen));
+  ok("and the state he reads is Upcoming", words.seen.upcoming > 0 &&
+     words.statusLabels.indexOf("Upcoming") >= 0, JSON.stringify(words.statusLabels));
+  ok("the Target field is gone from the data, not just hidden",
+     words.dfields.indexOf("dateType") < 0 && words.seedDt === 0, words.dfields);
+  ok("and no view or card prints Target",
+     words.seen.target === 0 && !words.drawerTarget, JSON.stringify(words.seen));
+  await s24.ctx.close();
+}
+
+/* ---- 25. Tasks is one view, not two ----
+   The list and the timeline were two tabs over the same rows grouped the same
+   way. One row now carries both halves: if they ever come apart, a state and
+   the date it moved would be a tab apart again. */
+for (var tw of [390, 1280]) {
+  var s25 = await open(tw);
+  var k25 = await s25.p.evaluate(function () {
+    setView("time");
+    var rows = document.querySelectorAll("#gantt .grow");
+    var first = rows[0];
+    var done = null;
+    Array.prototype.forEach.call(rows, function (r) { if (!done && r.classList.contains("done")) done = r; });
+    return {
+      tabs: Array.prototype.map.call(document.querySelectorAll(".vt"), function (b) { return b.dataset.v; }),
+      rows: rows.length, items: pool().length,
+      bothHalves: !!(first && first.querySelector(".gl") && first.querySelector(".gtrack")),
+      state: first ? (first.querySelector(".gst") || {}).textContent : null,
+      tick: !!(first && first.querySelector(".tick")),
+      note: !!(first && first.querySelector('[data-act="note"]')),
+      doneTick: done ? getComputedStyle(done.querySelector(".tick")).backgroundColor : null,
+      donePoint: done ? (done.querySelector(".gpt") || {}).style.background : null
+    };
+  });
+  ok(tw + "px: there is one Tasks tab and no List tab",
+     k25.tabs.indexOf("list") < 0 && k25.tabs.indexOf("time") >= 0, JSON.stringify(k25.tabs));
+  ok(tw + "px: every task is a row", k25.rows === k25.items && k25.rows > 0, JSON.stringify(k25));
+  ok(tw + "px: a row carries the list and the timeline together",
+     k25.bothHalves && !!k25.state && k25.tick && k25.note, JSON.stringify(k25));
+  /* green, not grey: done is the one state worth spotting down a column of 35 */
+  ok(tw + "px: a done task is green on both halves",
+     k25.doneTick === "rgb(0, 169, 143)" && k25.donePoint === "rgb(0, 169, 143)", JSON.stringify(k25));
+  await s25.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

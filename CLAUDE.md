@@ -390,18 +390,75 @@ unknown keys, `save()` only stores seed ids) and published files mentioning it
 merge as no-ops. Notes survive regardless, since they carry their own
 `itemTitle`. Check `claude-inbox/` for edits on an id before retiring it.
 
+## One view for the tasks, not two
+
+Timeline and List were two tabs over the same 35 rows, grouped the same way by
+track and sorted the same way by date. What each added beside a title was a
+handful of fields -- the list had the state, the tick and the notes, the
+timeline had the date in time -- and he said so: *"Redundancy with only a few
+unique fields between these 2."* They are one view now, called **Tasks**,
+rendered by `renderPlan()`: `.grow` is one row holding the list entry in `.gl`
+and the same task's bar in `.gtrack`, so a state and the date it moves can
+never be a tab apart again.
+
+- **Done is green**, on the tick, the title and the marker. It was grey, which
+  says "ignore me" -- wrong for the one state worth spotting down a column
+  of 35.
+- The label column width is **`--lw`, one value in CSS**, and the today line is
+  placed off it with `calc(var(--lw) + ...)`. It used to be a number in the
+  stylesheet *and* a `LW` constant in JS, and the phone breakpoint changed only
+  the first, so "today" sat in the wrong place on a phone for as long as that
+  breakpoint existed.
+- At 720px the column is 270px, not the 124px the old timeline used: the row
+  carries the whole list entry now, and at 124px a title wraps one letter to a
+  line.
+- `renderPlan` reads `pool()`, so the sub-tab filter applies. A category with
+  no dated task still has to draw: a zero-width axis divides by zero, so the
+  month range falls back to the current month.
+
 ## Deleting a task, and the one place it still shows
 
 A task is deleted by a field, not by removal: `deleted` is part of `DFIELDS`,
 so it merges per item like a date, travels to his other device, and can be put
 back. `alive()` is what every view reads; `gone()` is the deleted ones, and the
-**list is the only view that renders them** — everywhere else deleting it has
+**Tasks is the only view that renders them** — everywhere else deleting it has
 to actually mean gone, and the undo toast is long over by the time he changes
 his mind. `depsOpen()` ignores a deleted task, so deleting one unblocks what it
 was gating. `delItem` patches with `derived`, or the deletion would read as him
 setting a status by hand and the cascade would skip the task for ever after.
 `changedItems()` deliberately still reads `all()`, not `alive()`, or the
 deletion itself would never travel.
+
+## Renaming a task
+
+A title is his to change: `title` is in `DFIELDS` **and** `diffOf`, so a rename
+saves, survives a reload and reaches his other device like a date does. It is a
+property row on the card like everything else -- a pencil hidden on the header
+would make the one field he asked for the one he has to hunt for -- and its
+collapsed value reads **"Rename"**, not the title, because the drawer header
+two lines above is the title and printing it twice forty pixels apart is not a
+summary. Enter commits; an empty name is refused, since a task with no name
+cannot be found again. Notes already on the task keep the `itemTitle` they were
+written under, which is what they were: the name at the time.
+
+`HIST_FIELDS` in the relay logs it too. A rename is exactly the change the
+audit log is for, since every other row in that file names its task by title.
+
+## The Target field, and why it is gone
+
+`dateType` (Confirmed / Target / Awaiting) is removed, field and all. Every open
+task on the board said "Target", which is a word that distinguishes nothing, and
+it cost a chip on two views, a line on the card and a three-button segment in
+the Due row. Overview's "Next hard deadline" was the only thing reading it; it
+is now **"Next deadline"**, the soonest open task, which is what he thought it
+meant anyway.
+
+## Status, and the word for a task that cannot start yet
+
+The status key is still `blocked` -- every stored diff and merge payload in the
+wild carries it, and renaming the key would silently drop them -- but the label
+he reads is **Upcoming**. `STATUS_LABEL` in `relay/worker.js` says the same, or
+the audit log would be the one place still saying Blocked.
 
 ## The task card: a summary first, a form only when asked
 
@@ -524,7 +581,7 @@ A task's status is his to set, and the dependency cascade is only a default.
 `patch()` marks an item `manual` the moment he sets its status by hand, and the
 cascade skips every manual item from then on. Without that flag, setting a
 blocked task to In progress looked like it did nothing: the cascade re-ran on the
-next edit, saw an open dependency and put it straight back to Blocked. `manual`
+next edit, saw an open dependency and put it straight back to Upcoming. `manual`
 is part of the diff (`DFIELDS`), so it travels between his devices like any
 other field, and a revert to the SEED value clears it.
 
@@ -631,7 +688,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 94 invariants, three widths, a real browser. Every one of them was a
+that runs: 108 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

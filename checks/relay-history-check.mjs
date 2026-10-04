@@ -68,10 +68,15 @@ await b.fold({exportedAt:"2026-10-04T12:00:00.000Z", changed:[
 
 var h = await b.ctx.storage.get("hist");
 ok("only the fields worth auditing are logged",
-   h.every(x=>["Status","Due","Priority","Date is","Effort","Deleted"].indexOf(x.f)>=0),
+   h.every(x=>["Title","Status","Due","Priority","Effort","Deleted"].indexOf(x.f)>=0),
    JSON.stringify(h.map(x=>x.f)));
+/* The first time the relay sees an item it holds no previous value, so every
+   field in that payload reads as a change from nothing. Picked by name rather
+   than by position: HIST_FIELDS decides the order within one payload, and a
+   check that encodes that order breaks every time a field is added. */
+var h0 = h.find(x=>x.f==="Status");
 ok("a first value reads as a change from nothing",
-   h[0].f==="Status" && h[0].a==="—" && h[0].b==="In progress", JSON.stringify(h[0]));
+   !!h0 && h0.a==="—" && h0.b==="In progress", JSON.stringify(h0||h[0]));
 ok("only what moved is recorded, not the whole row",
    h.filter(x=>x.at==="2026-11-20"||false).length===0 &&
    h.filter(x=>x.at.startsWith("2026-10-04T11:30")).map(x=>x.f).sort().join(",")==="Due,Effort",
@@ -102,7 +107,7 @@ ok("a second write that day keeps the first entries",
    /09:00/.test(md2) && /15:00/.test(md2), JSON.stringify(md2.split("\n").filter(l=>/^\| \d/.test(l))));
 ok("and does not duplicate them", (function(){
      var rows=md2.split("\n").filter(l=>/^\| \d{2}:\d{2}/.test(l));
-     return new Set(rows).size===rows.length && rows.length===6;
+     return new Set(rows).size===rows.length && rows.length===9;
    })(), JSON.stringify(md2.split("\n").filter(l=>/^\| \d{2}:\d{2}/.test(l)).length));
 ok("rows stay in time order",
    (function(){ var t=md2.split("\n").filter(l=>/^\| \d{2}:\d{2}/.test(l)).map(l=>l.slice(2,7));
@@ -126,8 +131,10 @@ await b2.fold({exportedAt:"2026-10-04T09:00:00.000Z", changed:[
 var threw=false;
 try{ await b2.writeHistory(); await b2.pruneHistory(); }catch(e){ threw=true; }
 ok("a GitHub outage does not throw", !threw);
+/* two entries now, not one: a first sighting logs the title as well as the
+   status, and a rename is exactly what this log is for */
 ok("and the unwritten entries are kept for the next run",
-   (await b2.ctx.storage.get("hist")).length===1);
+   (await b2.ctx.storage.get("hist")).length===2);
 
 console.log("\n"+bad+" failing");
 process.exit(bad?1:0);
