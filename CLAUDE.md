@@ -401,17 +401,30 @@ rendered by `renderPlan()`: `.grow` is one row holding the list entry in `.gl`
 and the same task's bar in `.gtrack`, so a state and the date it moves can
 never be a tab apart again.
 
-- **Done is green**, on the tick, the title and the marker. It was grey, which
-  says "ignore me" -- wrong for the one state worth spotting down a column
-  of 35.
+- **The marker's colour is the status**, and that is the whole reason the row
+  carries no state pill: *"Too cluttered, remove statuses - the colour coding
+  on the timeline chart should do it. Add a legend on top."* `statusColour()`
+  is the one place a status becomes a colour, so the key and the bars cannot
+  drift; `renderLegend()` builds the key from `STATUS`, so a status added or
+  renamed appears in it by itself. **Late overrides** -- an open task past its
+  date is the thing worth seeing first -- and the key says so, which is why it
+  has five swatches for four states.
+- **The row is a tick, the title and the priority.** The date chip went because
+  the marker's position already is the date (and a second copy could drift),
+  the note button because the card is one tap away, and the note count with
+  them. Row height is a mobile budget: three lines per row meant five tasks on
+  his screen.
+- **At least six weeks of timeline has to be on screen** beside the list at
+  390px, and the check measures it rather than trusting the two CSS numbers
+  that decide it (`--lw` and the month width). It is 3.4 months now.
 - The label column width is **`--lw`, one value in CSS**, and the today line is
   placed off it with `calc(var(--lw) + ...)`. It used to be a number in the
   stylesheet *and* a `LW` constant in JS, and the phone breakpoint changed only
   the first, so "today" sat in the wrong place on a phone for as long as that
   breakpoint existed.
-- At 720px the column is 270px, not the 124px the old timeline used: the row
-  carries the whole list entry now, and at 124px a title wraps one letter to a
-  line.
+- At 720px the column is 186px. The tick is `flex:none` and the title and
+  priority share a `.gtx` that wraps inside it: letting the tick wrap is what
+  turned a one-line row into a three-line one.
 - `renderPlan` reads `pool()`, so the sub-tab filter applies. A category with
   no dated task still has to draw: a zero-width axis divides by zero, so the
   month range falls back to the current month.
@@ -688,7 +701,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 108 invariants, three widths, a real browser. Every one of them was a
+that runs: 114 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

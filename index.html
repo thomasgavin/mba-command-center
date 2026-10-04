@@ -407,6 +407,11 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .tick:hover{border-color:var(--green)}
 
 /* ---------- tasks: list and timeline in one row ---------- */
+/* The key is what lets every row drop its state pill: the colour carries the
+   state, so something on screen has to say what the colours mean. */
+.glg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:9px;padding:0 3px}
+.lgi{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--ink3)}
+.lgi i{width:8px;height:8px;border-radius:50%;flex:none}
 .gwrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .gscroll{overflow-x:auto}
 /* --lw is the label column, and the today line is placed off it in CSS: the
@@ -421,20 +426,20 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .gsec{display:flex;align-items:center;gap:7px;padding:7px 12px;background:var(--wash2);border-bottom:1px solid var(--line2);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
 .gsec i{width:7px;height:7px;border-radius:50%;flex:none}
 .gsec em{font-style:normal;font-weight:700;letter-spacing:.04em;text-transform:none;color:var(--ink4);opacity:.85}
-.grow{display:flex;border-bottom:1px solid var(--line2);min-height:46px;cursor:pointer;transition:background .12s}
+.grow{display:flex;border-bottom:1px solid var(--line2);min-height:34px;cursor:pointer;transition:background .12s}
 .grow:hover{background:var(--wash2)}
 .grow:last-child{border-bottom:0}
-/* The left column is the whole list row: tick, state, title, then the chips on
-   their own line so none of them has to fight the title for width. */
-.grow .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;
-  justify-content:center;gap:5px;padding:8px 11px;min-width:0}
-.glr{display:flex;align-items:flex-start;gap:8px;min-width:0}
-.gst{flex:none;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
-  padding:3px 6px;border-radius:5px;line-height:1.1;margin-top:1px;white-space:nowrap}
+/* One line: tick, title, priority. The state is the marker's colour and the
+   date is where the marker sits, so neither is repeated here -- a second copy
+   of the date was both clutter and something that could drift. */
+.grow .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);display:flex;
+  align-items:center;gap:8px;padding:6px 10px;min-width:0}
+/* the tick never wraps: it is the one fixed thing in the row, and letting it
+   drop to a line of its own is what turned a one-line row into three */
+.gtx{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 /* wrap rather than clip: a cut-off title is useless for telling two tasks
    apart, and the rows can afford the height */
-.gt{flex:1;min-width:0;font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
-.gmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-left:27px;min-width:0}
+.gt{flex:1 1 auto;min-width:0;font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
 .gtrack{flex:1;position:relative}
 .gtrack .gg{position:absolute;inset:0;display:flex;pointer-events:none}
 .gtrack .gg div{flex:1;border-left:1px solid var(--line2)}
@@ -871,9 +876,11 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   .mline{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:7px}
   .mstone{min-width:0}
   /* the timeline label column cannot take 186px of a 390px screen */
-  /* the row carries the whole list entry now, so the label column cannot go
-     back to 124px: at that width a title wraps one letter to a line */
-  .ginner{--lw:270px;min-width:900px}
+  /* Wide enough for a title and its priority, narrow enough that the next six
+     weeks of the timeline are on screen beside it rather than a scroll away.
+     The months are tighter here too, for the same reason. */
+  .ginner{--lw:186px;min-width:760px}
+  .glg{gap:5px 11px}
 
   /* iOS zooms the whole page the moment a focused control is under 16px, and
      the zoom stays after the keyboard closes -- which is what pushed the
@@ -943,8 +950,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     </section>
 
     <section class="view" id="v-time">
+      <div class="glg" id="glg"></div>
       <div class="gwrap"><div class="gscroll"><div class="ginner" id="gantt"></div></div></div>
-      <p class="tip">Every task, grouped by track, with its state on the left and its date on the timeline. The orange line is today, green is done, and a marker left of the line that is not green is late. Tap a row to open it, <b>&#10003;</b> to close it, <b>&#9998;</b> to leave a note.</p>
+      <p class="tip">Every task, grouped by track. The colour of its marker is its state, per the key above; the orange line is today. Tap a row to open it, or <b>&#10003;</b> to close it.</p>
     </section>
 
     <section class="view" id="v-cal">
@@ -1854,7 +1862,25 @@ function renderBoard(){
 
    Done is green here rather than grey. Grey said "ignore me", which is wrong
    for the one state worth spotting down a column of 35. */
+/* One function decides what colour a task is, so the legend and the bars can
+   never drift apart -- a legend that lies is worse than no legend. */
+function statusColour(i,late){
+  if(i.deleted) return "#bdb6c6";
+  if(i.status==="done") return "#00a98f";
+  if(late) return "#e0263c";
+  var c=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) c=x.c; });
+  return c||"#8b8095";
+}
+/* The legend is the whole reason the rows can drop their state pills. It is
+   built from STATUS, so a status added or renamed appears here by itself. */
+function renderLegend(){
+  var h=STATUS.map(function(x){
+    return '<span class="lgi"><i style="background:'+x.c+'"></i>'+esc(x.label)+'</span>';
+  }).join("")+'<span class="lgi"><i style="background:#e0263c"></i>Late</span>';
+  document.getElementById("glg").innerHTML=h;
+}
 function renderPlan(){
+  renderLegend();
   var P=pool(), t=todayD();
   var ds=P.map(function(i){return i.due;}).filter(Boolean).sort();
   var A,B;
@@ -1880,25 +1906,19 @@ function renderPlan(){
   /* one task: as the list drew it, then the same task in time */
   function row(i){
     var n=dleft(i.due), done=i.status==="done", late=!done&&!i.deleted&&n!==null&&n<0;
-    var col=done?"#00a98f":(late?"#e0263c":tc(i.track));
-    var st=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) st=x; });
-    var sc=i.deleted?"#8b8095":(st?st.c:"#8b8095"), nn=notesFor(i.id).length;
+    /* The bar's colour IS the status, which is why the row no longer carries a
+       state pill: one of them had to go, and a pill repeated on 35 rows is the
+       clutter. Late overrides, because an open task past its date is the thing
+       worth seeing first, and the legend says so. */
+    var col=statusColour(i,late);
     var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+'" data-id="'+i.id+'">'+
-      '<div class="gl"><div class="glr">'+
+      '<div class="gl">'+
         (i.deleted
           ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
           : '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>')+
-        '<span class="gst" style="color:'+sc+';background:'+sc+'1a">'+
-          esc(i.deleted?"Deleted":(st?st.label:"To do"))+'</span>'+
-        '<span class="gt">'+esc(i.title)+'</span>'+
-      '</div><div class="gmeta">'+
-        (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
-        '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-        (done||i.deleted||n===null
-          ? '<span class="chip d">'+esc(i.due?fmtD(i.due):"No date")+'</span>'
-          : '<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>')+
-        '<button class="mini" data-act="note" title="Note">&#9998;</button>'+
-      '</div></div><div class="gtrack"><div class="gg">'+grid+'</div>';
+        '<span class="gtx"><span class="gt">'+esc(i.title)+'</span>'+
+          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></span>'+
+      '</div><div class="gtrack"><div class="gg">'+grid+'</div>';
     if(i.due){
       var x=pos(i.due);
       o+='<div class="gbar" style="left:0;width:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
@@ -2543,7 +2563,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1700";
+var BUILD="2026-10-04-1810";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

@@ -259,6 +259,21 @@ checked as text he can read -- the innerText of every view and of an open card
 `blocked`, and must stay: every stored diff and merge payload in the wild
 carries it.
 
+### The key and the colours are one decision
+
+Rows carry no state pill: the marker's colour is the state. So `statusColour()`
+is the only place a status becomes a colour and `renderLegend()` builds the key
+from `STATUS` -- a key that lies is worse than no key. *Checked: the key holds
+every `STATUS` label plus Late, and no row renders a state pill, a date chip, a
+note button or a note count.*
+
+### Six weeks of the timeline fits beside the list on a phone
+
+Two CSS numbers decide how much of the timeline he can see at 390px -- `--lw`
+and the month width -- and either can quietly eat it. The check measures the
+scroller, divides by a month column, and requires 1.5 months. *Checked: `at
+least six weeks of the timeline is on screen beside the list`.*
+
 ### Tasks is one view, not two
 
 The list and the timeline were two tabs over the same rows. One `.grow` now
