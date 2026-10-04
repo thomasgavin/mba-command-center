@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs      # 36 checks, three widths, a real browser
+node checks/board-check.mjs      # 54 checks, three widths, a real browser
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -89,6 +89,32 @@ compares the stamp and reloads via `?v=<build>`. Forgetting it fails safe — th
 board simply never reloads itself — which is exactly why it is easy to forget
 and why it is checked.
 *Checked: `BUILD is a datestamp`.*
+
+### A deleted task is gone everywhere but the list
+`deleted` is a field in the diff, not a removal, so it merges per item and can
+be undone. Every view reads `alive()`; only the list renders `gone()`, with a
+Restore button, because the undo toast does not last until he changes his mind.
+*Checked: `a deleted task is out of the board`, `a deleted task is still in the
+list`, `and it comes back`, `deleting does not mark the task manual`.*
+
+### A badge counts what is new, not what exists
+The Notes badge read 34 for weeks. A notification you cannot act on is noise;
+at zero it is worse, so it hides.
+*Checked: `the badge is hidden when nothing is new`, `and shows the new count`.*
+
+### A note he kept to himself never travels
+The composer's "Send to Claude" tick is the whole difference. Unticked, the
+note saves, syncs to his other device and sits in the task's thread —
+`outNotes()` drops it and it is written `state:"read"`, or it would wear a
+sending badge for ever.
+*Checked: `an unticked note is not sent`, `an unticked note is not
+outstanding`, `but it is still in the task's thread`.*
+
+### Never claim a change that did not happen
+A run with nothing to do still writes `acted[]`, and "No board changes: …"
+rendered under **What I changed**. `actedOf()` filters those, and an empty
+result renders no box at all.
+*Checked: `a no-change receipt renders no box`.*
 
 ### No console errors
 A page that throws on load has already lost the state he was looking at. The

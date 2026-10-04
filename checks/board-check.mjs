@@ -228,7 +228,101 @@ for (var w2 of [390, 1280]) {
   await s5.ctx.close();
 }
 
-/* ---- 6. the build stamp moved with the page ---- */
+/* ---- 6. a deleted task leaves every view except the list ---- */
+{
+  var s6 = await open(390);
+  var k6 = await s6.p.evaluate(function () {
+    var k = Object.keys(items)[0];
+    delItem(k);
+    return { id: k, board: board(k), list: list(k), alive: alive().length, gone: gone().length };
+    function board(x) { return !!document.querySelector('.card[data-id="' + x + '"]'); }
+    function list(x) { return !!document.querySelector('.lrow[data-id="' + x + '"]'); }
+  });
+  ok("a deleted task is out of the board", !k6.board, JSON.stringify(k6));
+  ok("a deleted task is still in the list", k6.list, JSON.stringify(k6));
+  ok("a deleted task is out of alive()", k6.gone === 1, JSON.stringify(k6));
+  /* the whole point of deleting being a field rather than a removal */
+  var back = await s6.p.evaluate(function (id) {
+    undelItem(id);
+    return { gone: gone().length, board: !!document.querySelector('.card[data-id="' + id + '"]') };
+  }, k6.id);
+  ok("and it comes back", back.gone === 0 && back.board, JSON.stringify(back));
+  /* a task deleted and restored must not take the dependency cascade with it:
+     patch() is called with derived, so nothing is marked manual by a delete */
+  var man = await s6.p.evaluate(function (id) { return !!items[id].manual; }, k6.id);
+  ok("deleting does not mark the task manual", !man);
+  await s6.ctx.close();
+}
+
+/* ---- 7. the notes badge is a notification, not an inventory ---- */
+{
+  var s7 = await open(390, [
+    { id: "nr", from: "me", text: "already delivered", createdAt: new Date().toISOString(), state: "read" }
+  ]);
+  var b1 = await s7.p.evaluate(function () {
+    var n = document.getElementById("notesN");
+    return { txt: n.textContent, off: n.classList.contains("off"), total: notes.length };
+  });
+  ok("the badge is hidden when nothing is new", b1.off && b1.txt === "0" && b1.total === 1, JSON.stringify(b1));
+  var b2 = await s7.p.evaluate(function () {
+    addNote(Object.keys(items)[0], "something new", true);
+    var n = document.getElementById("notesN");
+    return { txt: n.textContent, off: n.classList.contains("off"), total: notes.length };
+  });
+  ok("and shows the new count, not the total", !b2.off && b2.txt === "1" && b2.total === 2, JSON.stringify(b2));
+  await s7.ctx.close();
+}
+
+/* ---- 8. a note he keeps to himself does not travel ---- */
+{
+  var s8 = await open(390);
+  var keep = await s8.p.evaluate(function () {
+    var k = Object.keys(items)[0];
+    addNote(k, "mine only", true, false);
+    addNote(k, "for Claude", true, true);
+    return { out: outNotes().map(function (n) { return n.text; }),
+             unread: unread(), thread: notesFor(k).length };
+  });
+  ok("an unticked note is not sent", keep.out.length === 1 && keep.out[0] === "for Claude", JSON.stringify(keep));
+  ok("an unticked note is not outstanding", keep.unread === 1, JSON.stringify(keep));
+  ok("but it is still in the task's thread", keep.thread === 2, JSON.stringify(keep));
+  await s8.ctx.close();
+}
+
+/* ---- 9. "What I changed" never claims a change that did not happen ---- */
+{
+  var now9 = new Date().toISOString();
+  var s9 = await open(390, [
+    { id: "claude-none", from: "claude", text: "nothing needed doing", state: "read", createdAt: now9,
+      acted: ["No board changes: the flight being Done is what ticks the milestone"] },
+    { id: "claude-did", from: "claude", text: "moved it", state: "read", createdAt: now9,
+      acted: ["Pushed the visa appointment to 12 Nov"] }
+  ]);
+  var boxes = await s9.p.evaluate(function () {
+    return { shown: document.querySelectorAll("#chatw .cdid").length,
+             none: actedOf({ acted: ["No board changes: nothing to do"] }).length,
+             did:  actedOf({ acted: ["Pushed the visa appointment"] }).length };
+  });
+  ok("a no-change receipt renders no box", boxes.none === 0 && boxes.did === 1, JSON.stringify(boxes));
+  ok("and only the real one is on the thread", boxes.shown === 1, JSON.stringify(boxes));
+  await s9.ctx.close();
+}
+
+/* ---- 10. the things a tap has to still do ---- */
+{
+  var s10 = await open(390);
+  await s10.p.click(".brand");
+  await s10.p.waitForTimeout(250);
+  var v = await s10.p.evaluate(function () { return view; });
+  ok("the logo goes back to Overview", v === "over", String(v));
+  /* the swipe between sections is gone: it fired on the gestures that belong
+     to the cards and the sideways rails */
+  var swipe = await s10.p.evaluate(function () { return typeof scrollableX; });
+  ok("no swipe-between-views handler is left", swipe === "undefined", swipe);
+  await s10.ctx.close();
+}
+
+/* ---- 11. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];

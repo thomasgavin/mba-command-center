@@ -116,6 +116,8 @@ body::before{
   background:rgba(255,255,255,.26);border-radius:20px;padding:0 6px;font-size:11px;font-weight:700;
 }
 .tbtn:not(.hot) .n{background:var(--wash);color:var(--ink3)}
+/* nothing new, nothing to say: a badge reading 0 is a badge asking to be read */
+.tbtn .n.off{display:none}
 /* the manual send is a fallback; it only shows when there is something to retry */
 .tbtn.off{display:none}
 
@@ -618,6 +620,50 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 .nitem .nx{font-size:12.5px;line-height:1.5;margin-top:5px;white-space:pre-wrap;color:var(--ink2);overflow-wrap:anywhere}
 .nitem .nf{font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:5px}
 .tagnew{background:var(--blue);color:#fff;border-radius:20px;padding:0 5px;font-size:9px;letter-spacing:.04em}
+
+/* ---------- task details: the note feed ---------- */
+/* Every flex child here can shrink below its longest word, because the drawer
+   is the full width of the phone and .db only hides the overflow -- it does not
+   make it fit. */
+.nrow{display:flex;align-items:center;gap:10px;margin-top:8px;min-width:0;flex-wrap:wrap}
+.nrow .btn{margin-left:auto}
+.ck{display:flex;align-items:center;gap:7px;min-width:0;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer}
+.ck input{width:19px;height:19px;flex:none;accent-color:var(--orange);margin:0}
+.ck span{min-width:0;overflow-wrap:anywhere}
+/* the thread. A left rule rather than a bubble per note: these are his own
+   working notes on one task, not a conversation with two sides. */
+.ntl{margin-top:13px;border-left:2px solid var(--line2);padding-left:12px;display:flex;flex-direction:column;gap:13px}
+.tli{position:relative;min-width:0}
+.tli::before{content:"";position:absolute;left:-17px;top:4px;width:8px;height:8px;border-radius:50%;
+  background:var(--line);box-shadow:0 0 0 3px #fff}
+.tli.claude::before{background:var(--blue)}
+.tlm{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10.5px;font-weight:700;
+  color:var(--ink4);letter-spacing:.02em}
+.tlm b{color:var(--blue)}
+.tlo{color:var(--ink4);font-weight:600}
+.tlx{font-size:12.5px;line-height:1.55;margin-top:4px;white-space:pre-wrap;color:var(--ink2);overflow-wrap:anywhere}
+.tld{margin-top:6px;padding:7px 9px;border-radius:var(--r3);background:rgba(50,100,255,.07);
+  font-size:11.5px;line-height:1.5;color:var(--ink2)}
+.tld div{overflow-wrap:anywhere}
+.tld div+div{margin-top:3px}
+/* the date and the four ways he moves it, on one line instead of two fields */
+.drow{display:flex;align-items:center;gap:6px;min-width:0}
+.drow input[type=date]{flex:1 1 auto;min-width:0}
+.pch{flex:none;border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;
+  padding:0 9px;font:inherit;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;
+  font-variant-numeric:tabular-nums}
+.pch:hover{background:var(--wash);color:var(--ink2)}
+/* Deleting is undoable, so it is not dressed as a hazard -- it turns red only
+   under the pointer, which is the moment the warning is worth anything. */
+.btn.del{color:var(--red);border-color:rgba(224,38,60,.3)}
+.btn.del:hover{background:rgba(224,38,60,.08)}
+.dgone{background:rgba(224,38,60,.07);border:1px solid rgba(224,38,60,.2);border-radius:var(--r3);
+  padding:11px 13px;margin-bottom:16px;font-size:12px;line-height:1.5;color:var(--ink2)}
+.dgone b{display:block;margin-bottom:3px}
+/* a deleted row still reads, it just stops competing with the live ones */
+.lrow.dl .lt{color:var(--ink4);text-decoration:line-through}
+.lrow.dl{opacity:.72}
+.dlgrp .lgh b{color:var(--ink3)}
 .dep{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 0;border-top:1px solid var(--line2);cursor:pointer;min-width:0}
 /* the title was a bare text node, which is an anonymous flex item and cannot
    be told to shrink. A long one set the row's min-content width and the row
@@ -758,7 +804,9 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
      drawer's close button off the right edge and left no way back but a manual
      pinch. 16px is the threshold; nothing else prevents it short of banning
      pinch-zoom outright, which is worse. */
-  input[type=date],textarea,.pal-box input{font-size:16px}
+  /* every input inside the drawer, not just the date one: a checkbox is a
+     focusable control too, and the rule is about the whole class of them */
+  input[type=date],textarea,.pal-box input,.db input{font-size:16px}
   /* .cbox textarea sets its own size, which beats the rule above on
      specificity, so the composer needs saying again or the chat box is the one
      control on the board that still zooms the page */
@@ -1086,7 +1134,7 @@ var touched={};
 function load(){
   SEED.forEach(function(s){
     items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,dateType:s.dt,
-                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false};
+                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false,deleted:false};
   });
   var st=null; try{ st=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
   if(st&&st.items) Object.keys(st.items).forEach(function(k){
@@ -1119,7 +1167,13 @@ function load(){
     if(st&&st.items) Object.keys(st.items).forEach(function(k){ touched[k]=when; });
   }
 }
-var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual"];
+/* `deleted` is in here on purpose. A deletion is an edit, not an absence: it
+   has to merge per item like a date does, or deleting on the phone and
+   changing the same task on the laptop would resolve by whichever published
+   last. It also means a deleted task is never really gone -- the SEED row
+   stays and the diff says "hidden" -- which is what makes Restore possible and
+   what stops a delete from taking its notes with it. */
+var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual","deleted"];
 /* id -> the timestamp a merge just applied, consumed by the next save(). Without
    it save() sees a brand new diff and dates it "now", so taking the other
    device's change would make this device claim it as its own later edit. */
@@ -1193,17 +1247,37 @@ function eur(n){ return "€"+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
 
 /* ---------- derived ---------- */
+/* all() is every row including the deleted ones, because the drawer, the merge
+   and the List view all need to reach them. Everything else works from here:
+   a deleted task is not on the board, not in a count, and not gating anything.
+   The List view is the one place it still shows, which is where he asked for
+   it and is also the only place he can put it back. */
 function all(){ return Object.keys(items).map(function(k){return items[k];}); }
-function live(){ return all().filter(function(i){return i.status!=="done";}); }
+function alive(){ return all().filter(function(i){ return !i.deleted; }); }
+function gone(){ return all().filter(function(i){ return i.deleted; }); }
+function live(){ return alive().filter(function(i){return i.status!=="done";}); }
 function inCat(i){ return cat==="all" || TRACK_CAT[i.track]===cat; }
 /* what the list views show. Overview always shows everything: it is the answer
    to "where do I stand", which a filter would quietly make wrong. */
-function pool(){ return all().filter(inCat); }
+function pool(){ return alive().filter(inCat); }
 function catLabel(k){ for(var j=0;j<CATS.length;j++) if(CATS[j].k===k) return CATS[j].label; return "Everything"; }
 function byDue(a,b){ if(!a.due) return 1; if(!b.due) return -1; return a.due<b.due?-1:a.due>b.due?1:0; }
-function depsOpen(i){ return (i.deps||[]).filter(function(d){ return items[d]&&items[d].status!=="done"; }); }
+/* a deleted dependency is not an open one: leaving it blocking would make a
+   task impossible to unblock without undeleting the thing he just removed */
+function depsOpen(i){ return (i.deps||[]).filter(function(d){ return items[d]&&!items[d].deleted&&items[d].status!=="done"; }); }
 function isNow(i){ return i.status!=="done" && depsOpen(i).length===0; }
 function notesFor(id){ return notes.filter(function(n){return n.itemId===id;}); }
+/* The receipt under a reply, minus the lines that are not receipts. A run with
+   nothing to change still has to say so, and it says so in `acted` -- "No board
+   changes: the flight task being Done is what ticks the milestone". Rendered as
+   "What I changed" that reads as a change that did not happen. */
+function actedOf(n){
+  return (n.acted||[]).filter(function(a){
+    return a && !/^\s*(no|none)\b[^:]{0,24}(change|edit|update)/i.test(a);
+  });
+}
+/* remembered between notes, because the answer is the same most of the time */
+var sendDefault=true;
 function unread(){ return notes.filter(function(n){return n.state!=="read";}).length; }
 function tc(k){ return (TRACKS[k]||{c:"#8b8095"}).c; }
 function tl(k){ return (TRACKS[k]||{label:k}).label; }
@@ -1221,7 +1295,7 @@ function patch(id,p,label,derived){
   if(!i.manual && i.status!=="done" && i.status!=="doing"){
     i.status = depsOpen(i).length ? "blocked" : (i.status==="blocked" ? "todo" : i.status);
   }
-  all().forEach(function(o){
+  alive().forEach(function(o){
     if(o.manual) return;                       /* his call, not ours */
     if(o.status==="blocked" && depsOpen(o).length===0) o.status="todo";
     else if(o.status==="todo" && depsOpen(o).length) o.status="blocked";
@@ -1243,14 +1317,36 @@ function snooze(id,n){
 /* quiet: the chat composer passes it, because the message is already on screen
    with its own sending/delivered state under it and a toast on top of that is
    one notice too many. A note left on a task still says so, since that drawer
-   gives no other sign it was taken. */
-function addNote(itemId,text,quiet){
+   gives no other sign it was taken.
+
+   forClaude false is a note he is keeping for himself. It still saves, still
+   syncs to his other device and still sits in the task's thread -- it just is
+   not a question, so it never travels to Claude and never counts as
+   outstanding. `state:"read"` is what makes that true: "new" means "written
+   here and not yet delivered", and a note nobody is delivering would have worn
+   a sending badge for ever. */
+function addNote(itemId,text,quiet,forClaude){
+  var ask = forClaude!==false;
   notes.unshift({id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
-    createdAt:new Date().toISOString(),state:"new",from:"me"});
+    createdAt:new Date().toISOString(),state:ask?"new":"read",from:"me",forClaude:ask});
   save(); render();
-  autoSend();
-  if(!quiet) toast(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.");
+  if(ask) autoSend();
+  if(!quiet) toast(ask?(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.")
+                     :"Note saved on your board. Not sent to Claude.");
+}
+
+/* Deleting is reversible and is a field like any other, so it travels between
+   his devices through the same per-item merge as a date. `derived` is passed so
+   the cascade does not read the deletion as him setting a status by hand. */
+function delItem(id){
+  var i=items[id]; if(!i||i.deleted) return;
+  patch(id,{deleted:true},null,true);
+  toast("Deleted “"+i.title+"”. It stays in the list.", function(){ undelItem(id); });
+}
+function undelItem(id){
+  var i=items[id]; if(!i) return;
+  patch(id,{deleted:false},"Put “"+i.title+"” back",true);
 }
 
 /* ---------- toast ---------- */
@@ -1271,8 +1367,11 @@ function render(){
   document.getElementById("nBoard").textContent=pool().filter(function(i){return i.status!=="done";}).length;
   document.getElementById("nList").textContent=pool().length;
   renderSubs();
+  /* The badge is a notification, not an inventory. It read 34 for weeks, which
+     is a number nobody can act on; what he wants to know is whether there is
+     anything he has not dealt with. Zero hides it entirely. */
   var u=unread(); var nb=document.getElementById("notesN");
-  nb.textContent=notes.length; nb.parentNode.classList.toggle("hot",u>0);
+  nb.textContent=u; nb.classList.toggle("off",!u); nb.parentNode.classList.toggle("hot",u>0);
   /* Sending is automatic, so a permanent "For Claude" button is a question
      about why it is there. It appears only when there is genuinely something
      to retry: a send the relay refused, or the GitHub route waiting on a
@@ -1426,7 +1525,7 @@ function renderOverview(){
   var moveD=mileState(moveM).due;
   var dMove=dleft(moveD), admit=D("2026-06-25"), mv=D(moveD);
   var elapsed=(todayD()-admit)/(mv-admit);
-  var done=all().filter(function(i){return i.status==="done";}).length, tot=all().length;
+  var done=alive().filter(function(i){return i.status==="done";}).length, tot=alive().length;
   h+='<div class="mstack">'+
      '<div class="tile">'+ring(elapsed,"#b066ff",dMove)+
        '<div class="mx"><div class="v">'+dMove+' days</div><div class="k">to Fontainebleau<br>'+fmtD(moveD)+'</div></div></div>'+
@@ -1465,7 +1564,7 @@ function renderOverview(){
   /* track progress */
   h+='<div class="tile trk"><h3><span class="pin" style="background:#00a98f"></span>Progress by track</h3><div class="tbars">';
   TORDER.forEach(function(k){
-    var ti=all().filter(function(i){return i.track===k;});
+    var ti=alive().filter(function(i){return i.track===k;});
     if(!ti.length) return;
     var dn=ti.filter(function(i){return i.status==="done";}).length;
     var pct=Math.round(dn/ti.length*100);
@@ -1559,7 +1658,7 @@ function renderGantt(){
   var grid=""; for(var g=0;g<mcount;g++) grid+='<div></div>';
 
   TORDER.forEach(function(k){
-    var rows=all().filter(function(i){return i.track===k;}).sort(byDue);
+    var rows=alive().filter(function(i){return i.track===k;}).sort(byDue);
     if(!rows.length) return;
     h+='<div class="gsec"><i style="background:'+tc(k)+'"></i>'+esc(tl(k))+'</div>';
     rows.forEach(function(i){
@@ -1649,18 +1748,18 @@ function renderGraph(){
   }
   /* only items that gate something, or are gated: the rest are not dependencies */
   var linked={};
-  all().forEach(function(i){
+  alive().forEach(function(i){
     if((i.deps||[]).length){ linked[i.id]=1; i.deps.forEach(function(d){ if(items[d]) linked[d]=1; }); }
   });
   /* depth is computed over every item, so a chain that crosses categories keeps
      its real shape; the filter only decides what is drawn */
-  var graphPool=all().filter(function(i){ return linked[i.id]; });
+  var graphPool=alive().filter(function(i){ return linked[i.id]; });
   var maxD=0;
   graphPool.forEach(function(i){ maxD=Math.max(maxD,dep(i.id)); });
   var shown=graphPool.filter(inCat);
   var layers=[];
   for(var l=0;l<=maxD;l++) layers.push(shown.filter(function(i){return depth[i.id]===l;}).sort(byDue));
-  var hidden=all().length-graphPool.length;
+  var hidden=alive().length-graphPool.length;
   var h='<svg class="fsvg" id="fsvg"></svg>';
   layers.forEach(function(g,ix){
     h+='<div class="layer"><div class="lhd">'+(ix===0?"No prerequisites":"Stage "+(ix+1))+'</div>';
@@ -1684,7 +1783,7 @@ function drawEdges(){
   svg.setAttribute("width",hr.width); svg.setAttribute("height",hr.height);
   svg.setAttribute("viewBox","0 0 "+hr.width+" "+hr.height);
   var p="";
-  all().forEach(function(i){
+  alive().forEach(function(i){
     (i.deps||[]).forEach(function(d){
       var a=host.querySelector('[data-nid="'+d+'"]'), b=host.querySelector('[data-nid="'+i.id+'"]');
       if(!a||!b) return;
@@ -1758,10 +1857,12 @@ function renderChat(){
       var mine=!isClaude(n);
       h+='<div class="cmsg '+(mine?"cme":"cyou")+'">'+
          '<div class="cbub">'+esc(n.text||"")+'</div>';
-      /* what Claude changed on the board because of this message */
-      if(!mine && n.acted && n.acted.length){
+      /* what Claude changed on the board because of this message -- and
+         nothing at all when the honest answer was that nothing changed */
+      var did=mine?[]:actedOf(n);
+      if(did.length){
         h+='<div class="cdid"><b>What I changed</b>'+
-           n.acted.map(function(a){ return '<div>'+esc(a)+'</div>'; }).join("")+'</div>';
+           did.map(function(a){ return '<div>'+esc(a)+'</div>'; }).join("")+'</div>';
       }
       h+='<div class="cmeta">'+esc(hhmm(n.createdAt))+
          (n.itemTitle?' &middot; <b>'+esc(n.itemTitle)+'</b>':"")+
@@ -1812,26 +1913,42 @@ function hhmm(isoStr){
 }
 
 function renderList(){
-  var h="", P=pool();
+  var h="", P=pool(), rows=function(g){
+    var o="";
+    g.forEach(function(i){
+      var n=dleft(i.due), nn=notesFor(i.id).length;
+      o+='<div class="lrow'+(i.status==="done"?" done":"")+(i.deleted?" dl":"")+'" data-id="'+i.id+'">'+
+        (i.deleted
+          ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
+          : '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>')+
+        '<span class="lt">'+esc(i.title)+'</span><span class="lmeta">'+
+        (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
+        (i.dateType!=="Confirmed"?'<span class="chip dt">'+esc(i.dateType)+'</span>':'')+
+        '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
+        (i.status==="done"||i.deleted?'<span class="chip d">'+fmtD(i.due)+'</span>'
+                          :'<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>')+
+        '<button class="mini" data-act="note" title="Note">&#9998;</button></span></div>';
+    });
+    return o;
+  };
   TORDER.forEach(function(k){
     var g=P.filter(function(i){return i.track===k;}).sort(byDue);
     if(!g.length) return;
     var dn=g.filter(function(i){return i.status==="done";}).length;
     h+='<div class="lgrp"><div class="lgh"><i style="background:'+tc(k)+'"></i><b>'+esc(tl(k))+'</b><em>'+dn+' of '+g.length+' done</em></div><div class="lwrap">';
-    g.forEach(function(i){
-      var n=dleft(i.due), nn=notesFor(i.id).length;
-      h+='<div class="lrow'+(i.status==="done"?" done":"")+'" data-id="'+i.id+'">'+
-        '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>'+
-        '<span class="lt">'+esc(i.title)+'</span><span class="lmeta">'+
-        (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
-        (i.dateType!=="Confirmed"?'<span class="chip dt">'+esc(i.dateType)+'</span>':'')+
-        '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-        (i.status==="done"?'<span class="chip d">'+fmtD(i.due)+'</span>'
-                          :'<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>')+
-        '<button class="mini" data-act="note" title="Note">&#9998;</button></span></div>';
-    });
+    h+=rows(g);
     h+='</div></div>';
   });
+  /* The list is deliberately the only view that shows a deleted task. Everywhere
+     else it is gone, which is the point of deleting it; here it is still
+     reachable, because the undo toast is long gone by the time he changes his
+     mind. The sub-tab filter applies, so this follows `inCat` like the rest. */
+  var dgone=gone().filter(inCat).sort(byDue);
+  if(dgone.length){
+    h+='<div class="lgrp dlgrp"><div class="lgh"><i style="background:var(--ink3)"></i><b>Deleted</b>'+
+       '<em>'+dgone.length+' task'+(dgone.length>1?"s":"")+'</em></div><div class="lwrap">'+
+       rows(dgone)+'</div></div>';
+  }
   document.getElementById("lviews").innerHTML=h;
 }
 
@@ -1870,13 +1987,29 @@ function openItem(id,focusNote){
   renderDrawer(false); showDrawer();
   if(focusNote) setTimeout(function(){ var t=document.getElementById("nt"); if(t){t.focus();} },300);
 }
+/* The task details page.
+   Order is the argument: what he came to do is read the thread and add to it,
+   so the note timeline and its composer sit directly under the title. The
+   controls that change the task are below them, and the dates are one row of
+   chips rather than two full-width fields -- "Push the date" plus a date
+   picker took a third of a phone screen to move something by a day. */
 function renderDrawer(keepDraft){
   var i=items[openId]; if(!i) return;
   var ta=document.getElementById("nt");
   if(keepDraft&&ta) noteDraft=ta.value;
   document.getElementById("dTitle").textContent=i.title;
-  var n=dleft(i.due), mine=notesFor(i.id);
+  var n=dleft(i.due), mine=notesFor(i.id).slice().sort(function(a,b){
+    return (b.createdAt||"").localeCompare(a.createdAt||"");   /* newest first */
+  });
   var h='';
+
+  if(i.deleted){
+    h+='<div class="dgone"><b>This task is deleted.</b>'+
+       '<div>It is out of every view except the list, and it is gating nothing. '+
+       'Its notes are kept.</div>'+
+       '<div class="row-b" style="margin-top:9px"><button class="btn" data-undel="1">Put it back</button></div></div>';
+  }
+
   h+='<div class="fld"><div class="row-b">'+
      '<span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+esc(tl(i.track))+'</span>'+
      '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
@@ -1884,45 +2017,90 @@ function renderDrawer(keepDraft){
      (i.snoozes?'<span class="chip dt">pushed '+i.snoozes+'&times;'+(i.origDue?' from '+fmtD(i.origDue):'')+'</span>':'')+
      '</div>'+(i.brief?'<p class="hint" style="margin-top:10px;font-size:12.5px;color:var(--ink2)">'+esc(i.brief)+'</p>':'')+'</div>';
 
+  /* --- the feed: composer first, then the thread, newest at the top --- */
+  h+='<div class="fld"><label>Notes</label>'+
+     '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
+     '<div class="nrow">'+
+       '<label class="ck"><input type="checkbox" id="ntc"'+(sendDefault?' checked':'')+'>'+
+       '<span>Send to Claude</span></label>'+
+       '<button class="btn o" data-save="1">Add note</button>'+
+     '</div>'+
+     '<div class="hint">Unticked it stays on your board and syncs to your other device. '+
+     'Ticked it also goes to Claude, who answers in Chat. The repo is public, so keep '+
+     'account and document numbers out of it.</div>';
+  h+= mine.length
+    ? '<div class="ntl">'+mine.map(function(p){ return noteRow(p); }).join("")+'</div>'
+    : '<div class="hint" style="margin-top:12px">Nothing on this task yet.</div>';
+  h+='</div>';
+
+  /* --- the controls --- */
+  h+='<div class="fld"><label>State</label><div class="seg">'+
+     STATUS.map(function(s){return '<button data-st="'+s.k+'" aria-pressed="'+((i.status||"todo")===s.k)+'">'+s.label+'</button>';}).join("")+'</div></div>';
+
+  /* one row: the date, and the four ways he actually moves it */
+  h+='<div class="fld"><label>Due</label><div class="drow">'+
+     '<input type="date" id="dd" value="'+esc(i.due||"")+'">'+
+     [1,3,5,14].map(function(d){return '<button class="pch" data-sn="'+d+'">+'+d+'</button>';}).join("")+
+     '</div>'+
+     '<div class="seg" style="margin-top:7px">'+
+     ["Confirmed","Target","Awaiting"].map(function(x){return '<button data-ty="'+x+'" aria-pressed="'+(i.dateType===x)+'">'+x+'</button>';}).join("")+
+     '</div></div>';
+
+  h+='<div class="fld"><label>Priority</label><div class="seg">'+
+     ["Critical","High","Medium","Low"].map(function(x){return '<button data-pr="'+x+'" aria-pressed="'+(i.priority===x)+'">'+x+'</button>';}).join("")+'</div></div>';
+
   if((i.deps||[]).length){
     h+='<div class="fld"><label>Waiting on</label>';
-    i.deps.forEach(function(d){ var o=items[d]; if(!o) return;
+    i.deps.forEach(function(d){ var o=items[d]; if(!o||o.deleted) return;
       h+='<div class="dep" data-go="'+d+'"><span class="dd" style="background:'+(o.status==="done"?"#00a98f":tc(o.track))+'"></span>'+
          '<span class="dt-t">'+esc(o.title)+'</span><span class="chip d">'+esc(o.status==="done"?"done":fmtD(o.due))+'</span></div>';
     });
     h+='</div>';
   }
-  var blocks=all().filter(function(o){return (o.deps||[]).indexOf(i.id)>=0;});
+  var blocks=alive().filter(function(o){return (o.deps||[]).indexOf(i.id)>=0;});
   if(blocks.length){
     h+='<div class="fld"><label>Blocks</label>';
     blocks.forEach(function(o){ h+='<div class="dep" data-go="'+o.id+'"><span class="dd" style="background:'+tc(o.track)+'"></span><span class="dt-t">'+esc(o.title)+'</span></div>'; });
     h+='</div>';
   }
-  h+='<div class="fld"><label>Push the date</label><div class="row-b">'+
-     [1,3,5,14].map(function(d){return '<button class="btn" data-sn="'+d+'">+'+d+(d>7?" days":"d")+'</button>';}).join("")+'</div></div>';
-  h+='<div class="fld"><label>Exact date</label><input type="date" id="dd" value="'+esc(i.due||"")+'"></div>';
-  h+='<div class="fld"><label>State</label><div class="seg">'+
-     STATUS.map(function(s){return '<button data-st="'+s.k+'" aria-pressed="'+((i.status||"todo")===s.k)+'">'+s.label+'</button>';}).join("")+'</div></div>';
-  h+='<div class="fld"><label>Priority</label><div class="seg">'+
-     ["Critical","High","Medium","Low"].map(function(p){return '<button data-pr="'+p+'" aria-pressed="'+(i.priority===p)+'">'+p+'</button>';}).join("")+'</div></div>';
-  h+='<div class="fld"><label>The date is</label><div class="seg">'+
-     ["Confirmed","Target","Awaiting"].map(function(p){return '<button data-ty="'+p+'" aria-pressed="'+(i.dateType===p)+'">'+p+'</button>';}).join("")+'</div></div>';
-  h+='<div class="fld"><label>Note for Claude</label>'+
-     '<textarea id="nt" placeholder="What changed, what you decided, what you want picked up next time."></textarea>'+
-     '<div class="row-b" style="margin-top:8px"><button class="btn" data-save="1">Add note</button></div>'+
-     '<div class="hint">Claude picks this up on its own, within a few seconds. The repo is public, so keep account and document numbers out of it.</div></div>';
+
   /* He looked for a save button and found only "Leave note". Every control
      above writes immediately, so what was missing was a way to say "done",
-     not a way to save. */
+     not a way to save. Delete sits beside it, quiet and not red-by-default:
+     it is reversible, and dressing it as a hazard would be a lie. */
   h+='<div class="fld dsave"><button class="btn o wide" data-done="1">Done</button>'+
-     '<div class="hint">Every change above is already saved and on its way to your other device. A note is optional.</div></div>';
-  if(mine.length){
-    h+='<div class="fld"><label>'+mine.length+' note'+(mine.length>1?"s":"")+' on this item</label>'+
-       mine.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
-         (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+esc(p.text)+'</div></div>'; }).join("")+'</div>';
-  }
+     (i.deleted?'':'<div class="row-b" style="margin-top:8px"><button class="btn del" data-del="1">Delete this task</button></div>')+
+     '<div class="hint">Every change above is already saved and on its way to your other device.'+
+     (i.deleted?'':' Deleting keeps the notes and can be undone from the list.')+'</div></div>';
+
   document.getElementById("dBody").innerHTML=h;
   var t2=document.getElementById("nt"); if(t2&&noteDraft) t2.value=noteDraft;
+}
+/* one entry in a note thread. The timestamp is never typed: it is the moment
+   the note was written, which is the only thing that makes the thread readable
+   a week later. */
+function noteRow(p){
+  var who=isClaude(p)?"claude":"me";
+  return '<div class="tli '+who+'">'+
+    '<div class="tlm">'+esc(noteWhen(p.createdAt))+
+      (isClaude(p)?' &middot; <b>Claude</b>':'')+
+      (p.forClaude===false?' &middot; <span class="tlo">yours only</span>':'')+
+      (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
+    '</div>'+
+    '<div class="tlx">'+esc(p.text||"")+'</div>'+
+    (isClaude(p)&&actedOf(p).length
+      ? '<div class="tld">'+actedOf(p).map(function(a){return '<div>'+esc(a)+'</div>';}).join("")+'</div>'
+      : '')+
+  '</div>';
+}
+function noteWhen(isoStr){
+  var d=new Date(isoStr||""); if(isNaN(d)) return "";
+  var t=iso(todayD());
+  var day=(isoStr||"").slice(0,10);
+  var hm=hhmm(isoStr);
+  if(day===t) return "Today "+hm;
+  if(day===shift(t,-1)) return "Yesterday "+hm;
+  return fmtD(day)+" "+hm;
 }
 function openNotes(){
   dMode="notes"; openId=null;
@@ -1995,7 +2173,7 @@ function fullPayload(){
    Claude answers, and it should still get the note it never saw. */
 function outNotes(){
   var cut=new Date(Date.now()-172800000).toISOString();
-  return notes.filter(function(n){ return !n.answered || (n.createdAt||"")>cut; });
+  return notes.filter(function(n){ return n.forClaude!==false && (!n.answered || (n.createdAt||"")>cut); });
 }
 function leanPayload(){
   return {v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
@@ -2038,7 +2216,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-0935";
+var BUILD="2026-10-04-1045";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2173,6 +2351,7 @@ document.addEventListener("click",function(e){
     if(host){
       var id=host.dataset.id;
       if(act.dataset.act==="note"){ openItem(id,true); return; }
+      if(act.dataset.act==="undel"){ undelItem(id); return; }
       if(act.dataset.act==="tick"){
         var c=items[id];
         patch(id,{status:c.status==="done"?"todo":"done"}, c.status==="done"?"Reopened":"Closed: "+c.title);
@@ -2196,9 +2375,14 @@ document.getElementById("dBody").addEventListener("click",function(e){
   var b=e.target.closest("button"); if(!b) return;
   if(b.dataset.save){
     var ta=document.getElementById("nt"), v=(ta.value||"").trim();
-    if(v&&openId){ addNote(openId,v); noteDraft=""; renderDrawer(false); }
+    var ck=document.getElementById("ntc"), ask=!ck||ck.checked;
+    if(ck) sendDefault=ask;                     /* his last answer is the next default */
+    if(v&&openId){ addNote(openId,v,true,ask); noteDraft=""; renderDrawer(false);
+      toast(ask?"Note added and sent to Claude.":"Note added to this task."); }
     return;
   }
+  if(b.dataset.del){ var dz=openId; hideDrawer(); delItem(dz); return; }
+  if(b.dataset.undel){ undelItem(openId); return; }
   if(b.dataset.gsave){
     var tg=document.getElementById("gn"), vg=(tg.value||"").trim();
     if(vg){ addNote(null,vg); openNotes(); }
@@ -2223,6 +2407,9 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
     var s=document.querySelector("[data-save],[data-gsave]"); if(s) s.click();
   }
 });
+/* A logo that does nothing is a logo he taps anyway. Overview is the only
+   answer to "where am I", so that is where it goes. */
+document.querySelector(".brand").addEventListener("click",function(){ setView("over"); });
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
@@ -2252,7 +2439,7 @@ function renderSubs(){
   if(view==="over"||view==="chat"){ el.classList.remove("on"); el.innerHTML=""; return; }
   el.classList.add("on");
   var mk=function(k,label){
-    var n=(k==="all"?all():all().filter(function(i){return TRACK_CAT[i.track]===k;}));
+    var n=(k==="all"?alive():alive().filter(function(i){return TRACK_CAT[i.track]===k;}));
     var open=n.filter(function(i){return i.status!=="done";}).length;
     return '<button class="st" role="tab" data-c="'+k+'" aria-selected="'+(cat===k)+'">'+
       esc(label)+'<small>'+open+'</small></button>';
@@ -2314,44 +2501,10 @@ function setView(v){
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
-/* --- swipe between sections ---
-   Deliberately narrow, because this page is full of competing gestures: cards
-   are dragged with touch, the gantt and the milestone rail scroll sideways, and
-   the drawer is its own surface. So a swipe only counts when it starts on
-   nothing draggable, outside any sideways-scrolling box, travels more than
-   64px, and is clearly more horizontal than vertical. */
-var swX=0, swY=0, swOk=false;
-function scrollableX(el){
-  for(var n=el; n && n!==document.body; n=n.parentNode){
-    if(n.nodeType!==1) continue;
-    var ov=getComputedStyle(n).overflowX;
-    if((ov==="auto"||ov==="scroll") && n.scrollWidth>n.clientWidth+4) return true;
-  }
-  return false;
-}
-document.getElementById("stage").addEventListener("touchstart",function(e){
-  swOk=false;
-  if(e.touches.length!==1) return;
-  if(drag) return;                                  /* a card is being dragged */
-  var t=e.target;
-  if(t.closest&&(t.closest("[data-id]")||t.closest("input,textarea,button,select"))) return;
-  if(scrollableX(t)) return;
-  swX=e.touches[0].clientX; swY=e.touches[0].clientY; swOk=true;
-},{passive:true});
-document.getElementById("stage").addEventListener("touchend",function(e){
-  if(!swOk||drag) return;
-  swOk=false;
-  var t=e.changedTouches[0];
-  var dx=t.clientX-swX, dy=t.clientY-swY;
-  if(Math.abs(dx)<64 || Math.abs(dx)<Math.abs(dy)*1.6) return;
-  var ix=0; VIEWS.forEach(function(v,j){ if(v.v===view) ix=j; });
-  var nx=ix+(dx<0?1:-1);
-  if(nx<0||nx>=VIEWS.length) return;
-  setView(VIEWS[nx].v);
-  /* the tab for the new section may be off the end of the strip */
-  var tab=document.querySelector('.vt[data-v="'+VIEWS[nx].v+'"]');
-  if(tab&&tab.scrollIntoView) tab.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
-},{passive:true});
+/* The swipe between sections is gone. It was a deliberately narrow gesture and
+   still wrong: on a board full of competing gestures -- cards dragged by touch,
+   the gantt and the milestone rail scrolling sideways -- the one that moves the
+   whole section is the one you trigger by accident. The tabs are the way. */
 
 document.getElementById("calPrev").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCal(); });
 document.getElementById("calNext").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()+1,1); renderCal(); });
@@ -2497,7 +2650,7 @@ function palFill(q){
   q=(q||"").toLowerCase().trim();
   palRows=[];
   VIEWS.forEach(function(v){ if(!q||v.n.toLowerCase().indexOf(q)>=0) palRows.push({k:"view",n:v.n,v:v.v,c:"#8b8095"}); });
-  all().sort(byDue).forEach(function(i){
+  alive().sort(byDue).forEach(function(i){
     if(!q || i.title.toLowerCase().indexOf(q)>=0 || tl(i.track).toLowerCase().indexOf(q)>=0)
       palRows.push({k:i.status==="done"?"done":tl(i.track),n:i.title,id:i.id,c:tc(i.track)});
   });
@@ -2597,7 +2750,7 @@ function mergePayload(pay){
     if(!isPatch && mine && theirs <= mine) return;
 
     if(c.seed){
-      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false;
+      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false;
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }

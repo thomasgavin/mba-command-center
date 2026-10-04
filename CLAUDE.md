@@ -294,6 +294,37 @@ unknown keys, `save()` only stores seed ids) and published files mentioning it
 merge as no-ops. Notes survive regardless, since they carry their own
 `itemTitle`. Check `claude-inbox/` for edits on an id before retiring it.
 
+## Deleting a task, and the one place it still shows
+
+A task is deleted by a field, not by removal: `deleted` is part of `DFIELDS`,
+so it merges per item like a date, travels to his other device, and can be put
+back. `alive()` is what every view reads; `gone()` is the deleted ones, and the
+**list is the only view that renders them** — everywhere else deleting it has
+to actually mean gone, and the undo toast is long over by the time he changes
+his mind. `depsOpen()` ignores a deleted task, so deleting one unblocks what it
+was gating. `delItem` patches with `derived`, or the deletion would read as him
+setting a status by hand and the cascade would skip the task for ever after.
+`changedItems()` deliberately still reads `all()`, not `alive()`, or the
+deletion itself would never travel.
+
+## A note is his first, and Claude's only if he says so
+
+The task details page is the drawer: the note composer and the thread sit
+directly under the title, because reading the thread and adding to it is what
+he opened it for; the controls are below. A note carries `forClaude`. Unticked
+it saves, syncs and sits in the task's thread and nothing else — `outNotes()`
+drops it, so it never travels, and it is written `state:"read"` because "new"
+means "not yet delivered" and nobody is delivering it. `sendDefault` remembers
+his last answer. Timestamps are never typed; `noteWhen()` reads `createdAt`.
+
+The Notes badge counts what is **new**, not what exists. It read 34 for weeks,
+which is a number nobody can act on, and at zero it hides entirely.
+
+`actedOf()` is the receipt filter. A run with nothing to change still says so,
+and it said so in `acted[]` — "No board changes: the flight task being Done is
+what ticks the milestone" — which rendered under **What I changed** as a change
+that did not happen. The box now appears only when something did.
+
 ## Status, and who decides it
 
 A task's status is his to set, and the dependency cascade is only a default.
@@ -385,11 +416,11 @@ The board is used on an iPhone, mostly from the home screen.
   works on both.
 - Timeline labels wrap (`white-space:normal`); a truncated title cannot tell two
   tasks apart.
-- **A horizontal swipe on `#stage` moves between views**, and it has to stand
-  down for anything else that wants the gesture: a card (`[data-id]`, which is a
-  drag handle), a form control, and any ancestor that actually scrolls sideways
-  (`scrollableX()`). It needs 64px and must be 1.6x more horizontal than
-  vertical, or scrolling the board would change section.
+- **There is no swipe between views.** There was, with a careful set of
+  stand-downs — a card is a drag handle, a form control owns its gesture, an
+  ancestor that scrolls sideways wins — and it was still the gesture you fired
+  by accident. On a board of competing horizontal gestures the one that moves
+  the whole section is the one you never meant. The tabs are the way.
 
 ## Before adding a CSS class
 
@@ -402,7 +433,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 36 invariants, three widths, a real browser. Every one of them was a
+that runs: 54 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
