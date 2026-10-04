@@ -25,9 +25,6 @@ jobs:
         with:
           node-version: "22"
 
-      # The Worker's own secrets (GH_TOKEN, AGENT_KEY) are set on the Worker and
-      # a deploy leaves them alone, so nothing secret needs to be here beyond
-      # the token that performs the deploy itself.
       - name: Deploy
         working-directory: relay
         env:
@@ -44,3 +41,31 @@ jobs:
             exit 0
           fi
           npx --yes wrangler@4 deploy
+
+      # The Worker's own secrets live here too, not only in the dashboard.
+      # GH_TOKEN was added by hand and then came back 401 "Bad credentials"
+      # after the first deploy from CI, which cost an evening to find because a
+      # relay that cannot reach GitHub looks identical to one that can. Pushing
+      # them on every deploy makes the Worker reproducible from this repository
+      # and means a deploy can never leave it half configured again.
+      # Each is skipped when its repository secret is empty, so this never
+      # clears a value that only exists on the Worker.
+      - name: Sync the Worker's secrets
+        working-directory: relay
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GH_TOKEN: ${{ secrets.RELAY_GH_TOKEN }}
+          AGENT_KEY: ${{ secrets.RELAY_AGENT_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then exit 0; fi
+          for name in GH_TOKEN AGENT_KEY; do
+            value="${!name:-}"
+            if [ -z "$value" ]; then
+              echo "No repository secret for $name, leaving the Worker's copy alone."
+              continue
+            fi
+            printf '%s' "$value" | npx --yes wrangler@4 secret put "$name"
+            echo "$name pushed."
+          done
