@@ -121,6 +121,15 @@ Write `text` as a reply to a person, not a report: what you did and why, in a
 couple of sentences. Put the mechanical detail in `acted[]`, one short line per
 change — that renders under your message as the receipt.
 
+## 3b. A reply to a nudge
+
+Claude also speaks first on this board — see `.claude/skills/nudge/SKILL.md`.
+A nudge is a note with `kind:"nudge"`, and like any note of yours you never
+answer it. But **his reply to one usually carries a status**: *"branch said
+Tuesday"*, *"already done"*, *"not happening, move it"*. Patch what it tells
+you, `manual:true` on any status you set, and `ack` his reply. A nudge that got
+an answer and changed nothing on the board is the loop failing quietly.
+
 ## 4. Age out the thread
 
 He asked for a week of history and no more. On the relay route it prunes

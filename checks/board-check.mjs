@@ -322,7 +322,102 @@ for (var w2 of [390, 1280]) {
   await s10.ctx.close();
 }
 
-/* ---- 11. the build stamp moved with the page ---- */
+/* ---- 11. what save() writes is what DFIELDS says it merges ---- */
+{
+  /* This is the check that would have caught the deletion never persisting:
+     `deleted` was in DFIELDS from the first day and diffOf never produced it,
+     so a deleted task came back on the next load and never reached the other
+     device. An in-memory assertion cannot see it -- only a reload can. */
+  var s11 = await open(390);
+  var id11 = await s11.p.evaluate(function () {
+    var k = Object.keys(items)[0];
+    delItem(k); hideToast();
+    patch(Object.keys(items)[1], { effort: "wait" });
+    return k;
+  });
+  await s11.p.waitForTimeout(300);
+  await s11.p.reload({ waitUntil: "load" });
+  await s11.p.waitForTimeout(600);
+  var kept = await s11.p.evaluate(function (k) {
+    return { deleted: !!items[k].deleted, gone: gone().length,
+             effort: items[Object.keys(items)[1]].effort };
+  }, id11);
+  ok("a deletion survives a reload", kept.deleted && kept.gone === 1, JSON.stringify(kept));
+  ok("and so does effort", kept.effort === "wait", JSON.stringify(kept));
+  /* every field the merge knows about has to be a field save() can write */
+  var holes = await s11.p.evaluate(function () {
+    var k = Object.keys(items)[0], i = items[k], s = seedOf(k), out = [];
+    DFIELDS.forEach(function (f) {
+      if (f === "snoozes" || f === "origDue") return;    /* only set by snoozing */
+      var was = i[f];
+      i[f] = (f === "due" ? "2099-01-01" : f === "effort" ? "multi"
+            : f === "status" ? "doing" : f === "priority" ? "Low"
+            : f === "dateType" ? "Awaiting" : true);
+      if (diffOf(i)[f] === undefined) out.push(f);
+      i[f] = was;
+    });
+    return out;
+  });
+  ok("every DFIELD is one diffOf actually emits", holes.length === 0, JSON.stringify(holes));
+  await s11.ctx.close();
+}
+
+/* ---- 12. effort is what turns a due date into a start date ---- */
+{
+  var s12 = await open(390);
+  var lead = await s12.p.evaluate(function () {
+    var k = Object.keys(items)[0], i = items[k];
+    i.due = "2026-12-01";
+    i.effort = "wait";   var w = startBy(i);
+    i.effort = "quick";  var q = startBy(i);
+    i.effort = null;     var n = startBy(i);
+    return { wait: w, quick: q, none: n };
+  });
+  /* 21 days of runway for something that is mostly waiting on a bank, 1 for
+     something that takes an hour -- the whole point of the field */
+  ok("a long lead starts earlier than a short one",
+     lead.wait === "2026-11-10" && lead.quick === "2026-11-30", JSON.stringify(lead));
+  ok("and no effort means no claim about when to start", lead.none === null, JSON.stringify(lead));
+  await s12.ctx.close();
+}
+
+/* ---- 13. a nudge does not look like a reply ---- */
+{
+  var now13 = new Date().toISOString();
+  var s13 = await open(390, [
+    { id: "claude-r", from: "claude", text: "an ordinary reply", state: "read", createdAt: now13 },
+    { id: "claude-n1", from: "claude", kind: "nudge", about: "deposit",
+      itemTitle: "EUR 12,000 tuition deposit paid", text: "start this now",
+      state: "read", createdAt: now13, round: 1, was: { status: "todo", due: "2026-08-01" } },
+    { id: "claude-n2", from: "claude", kind: "nudge", about: "deposit",
+      itemTitle: "EUR 12,000 tuition deposit paid", text: "still nothing on this",
+      state: "read", createdAt: now13, round: 2, was: { status: "todo", due: "2026-08-01" } }
+  ]);
+  var n13 = await s13.p.evaluate(function () {
+    var heads = [].map.call(document.querySelectorAll("#chatw .cnh"), function (e) {
+      return e.textContent.replace(/\s+/g, " ").trim();
+    });
+    return { nudges: document.querySelectorAll("#chatw .cnud").length,
+             plain: document.querySelectorAll("#chatw .cmsg:not(.cnud)").length,
+             heads: heads,
+             linked: document.querySelectorAll('#chatw .cnh[data-go="deposit"]').length };
+  });
+  ok("a nudge renders as a nudge and a reply does not", n13.nudges === 2 && n13.plain === 1,
+     JSON.stringify(n13));
+  ok("the first ask and the second read differently",
+     /^.?\s*Nudge/.test(n13.heads[0]) && /Following up/.test(n13.heads[1]), JSON.stringify(n13.heads));
+  /* the only useful response to a nudge is to go to the task */
+  ok("and it is a way back to the task", n13.linked === 2, JSON.stringify(n13));
+  await s13.p.evaluate(function () { setView("chat"); });
+  await s13.p.waitForTimeout(400);
+  await s13.p.click('#chatw .cnh[data-go="deposit"]');
+  await s13.p.waitForTimeout(400);
+  var opened = await s13.p.evaluate(function () { return openId; });
+  ok("tapping the nudge opens that task", opened === "deposit", String(opened));
+  await s13.ctx.close();
+}
+
+/* ---- 14. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];
