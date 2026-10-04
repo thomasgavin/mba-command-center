@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "exportedAt": "2026-10-04T02:27:06.000Z",
+  "source": "MBA Command Center",
+  "stamp": "2026-10-04-0927",
+  "note": "Baseline is SEED in index.html; apply changed[] over it.",
+  "notes": [
+    {
+      "id": "n-pipetest-20261004022706",
+      "from": "me",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Pipeline test, no action needed. Just reply so I know the instant answers are working.",
+      "createdAt": "2026-10-04T02:27:06.000Z",
+      "state": "new"
+    }
+  ],
+  "changed": []
+}
