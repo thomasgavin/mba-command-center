@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs      # 54 checks, three widths, a real browser
+node checks/board-check.mjs      # 63 checks, three widths, a real browser
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -115,6 +115,25 @@ A run with nothing to do still writes `acted[]`, and "No board changes: …"
 rendered under **What I changed**. `actedOf()` filters those, and an empty
 result renders no box at all.
 *Checked: `a no-change receipt renders no box`.*
+
+### A field the merge knows about is a field `save()` writes
+`DFIELDS` governs the merge; `diffOf` governs what is ever persisted. `deleted`
+was in the first and not the second, so deleting a task looked right until the
+next load. An in-memory assertion cannot see this — the check reloads.
+*Checked: `a deletion survives a reload`, `and so does effort`, `every DFIELD is
+one diffOf actually emits`.*
+
+### Effort is what turns a due date into a start date
+`lead` days of runway per effort level, and start-by is derived from it. No
+effort means no claim about when to start, rather than a guessed one.
+*Checked: `a long lead starts earlier than a short one`, `and no effort means no
+claim about when to start`.*
+
+### A nudge does not look like a reply
+It arrives unprompted, so it names its task before he reads it and the header
+is the way back to that task. A second ask reads as a second ask.
+*Checked: `a nudge renders as a nudge and a reply does not`, `the first ask and
+the second read differently`, `tapping the nudge opens that task`.*
 
 ### No console errors
 A page that throws on load has already lost the state he was looking at. The

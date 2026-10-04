@@ -664,6 +664,33 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 .lrow.dl .lt{color:var(--ink4);text-decoration:line-through}
 .lrow.dl{opacity:.72}
 .dlgrp .lgh b{color:var(--ink3)}
+
+/* ---------- effort, and the start-by it implies ---------- */
+/* five options do not fit one row on a phone, and a segmented control that
+   scrolls sideways is one he will never see the end of */
+.seg.wrp{flex-wrap:wrap}
+.seg.wrp button{flex:1 1 auto;min-width:88px}
+.chip.ef{background:rgba(50,100,255,.1);color:var(--blue)}
+.sby{margin-top:8px;font-size:12px;color:var(--ink3);font-weight:600}
+.sby b{color:var(--ink2)}
+.sbl{color:var(--red)}
+
+/* ---------- a nudge ---------- */
+/* Claude speaking first. It is the same note object as a reply, but a bubble
+   that appears with no question above it has to say what it is and what it is
+   about, or it reads as the app glitching. */
+.cnb{border-left:3px solid var(--orange);background:#fff;border:1px solid rgba(255,100,41,.3);
+  border-left:3px solid var(--orange)}
+.cnh{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10.5px;font-weight:800;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.cnh b{color:var(--ink2);text-transform:none;letter-spacing:0;font-size:11.5px}
+.cnh[data-go]{cursor:pointer}
+.cnh[data-go]:hover b{text-decoration:underline}
+.cni{font-size:8px;line-height:1}
+/* the second ask has to read as a second ask, or it is just a repeat */
+.cnr{background:var(--orange);color:#fff;border-radius:20px;padding:0 5px;font-size:9px;letter-spacing:.04em}
+.tli.nud::before{background:var(--orange)}
+.tli.nud .tlm b{color:var(--orange)}
 .dep{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 0;border-top:1px solid var(--line2);cursor:pointer;min-width:0}
 /* the title was a bare text node, which is an anonymous flex item and cannot
    be told to shrink. A long one set the row's min-content width and the row
@@ -980,6 +1007,34 @@ var STATUS=[
   {k:"done",   label:"Done",       c:"#00a98f"}
 ];
 var PRI={Critical:"#e0263c",High:"#ff6429",Medium:"#ff9f00",Low:"#8b8095"};
+/* How long a task actually takes, and therefore how far ahead it has to be
+   started. A due date alone cannot tell a ten-minute upload apart from a trip
+   to a bank branch, so a reminder built on the date alone is either too early
+   for one or far too late for the other. `lead` is days of runway, and the
+   board derives "start by" from it rather than storing a second date that
+   could drift away from the first.
+
+   "Mostly waiting" has the longest lead and the least work in it: an SBI
+   sanction needs almost nothing from him and three weeks from them, which is
+   exactly the case a date-based reminder gets wrong.
+
+   Nothing in SEED carries one yet, on purpose: inventing 34 estimates and
+   shipping them as fact is the drift this board exists to prevent. They get
+   filled in as they are learned -- by him in the drawer, or by Claude, which
+   has to ask before it claims one. */
+var EFFORT=[
+  {k:"quick", label:"Under an hour", lead:1},
+  {k:"hours", label:"A few hours",   lead:3},
+  {k:"day",   label:"A full day",    lead:5},
+  {k:"multi", label:"Several days",  lead:10},
+  {k:"wait",  label:"Mostly waiting",lead:21}
+];
+function effOf(k){ for(var j=0;j<EFFORT.length;j++) if(EFFORT[j].k===k) return EFFORT[j]; return null; }
+/* the date he has to have started by, derived and never stored */
+function startBy(i){
+  var e=effOf(i&&i.effort); if(!e||!i.due) return null;
+  return shift(i.due,-e.lead);
+}
 var CHAIN=["scholarship-r3","sbi-sanction","cf-interview","cf-validation","vfs-appt","flight"];
 
 /* ---------- milestones ----------
@@ -1134,7 +1189,8 @@ var touched={};
 function load(){
   SEED.forEach(function(s){
     items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,dateType:s.dt,
-                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false,deleted:false};
+                 deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false,deleted:false,
+                 effort:s.ef||null};
   });
   var st=null; try{ st=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
   if(st&&st.items) Object.keys(st.items).forEach(function(k){
@@ -1173,7 +1229,7 @@ function load(){
    last. It also means a deleted task is never really gone -- the SEED row
    stays and the diff says "hidden" -- which is what makes Restore possible and
    what stops a delete from taking its notes with it. */
-var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual","deleted"];
+var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual","deleted","effort"];
 /* id -> the timestamp a merge just applied, consumed by the next save(). Without
    it save() sees a brand new diff and dates it "now", so taking the other
    device's change would make this device claim it as its own later edit. */
@@ -1190,6 +1246,13 @@ function diffOf(i){
   if(i.snoozes) d.snoozes=i.snoozes;
   if(i.origDue) d.origDue=i.origDue;
   if(i.manual) d.manual=true;
+  /* DFIELDS listed `deleted` from the first day and this did not produce it,
+     so a deleted task came back on the next load and never reached the other
+     device: DFIELDS governs the merge, diffOf governs what is ever saved, and
+     a field has to be in both. The check for it reloads the page, because an
+     in-memory assertion cannot see this at all. */
+  if(i.deleted) d.deleted=true;
+  if(i.effort!==(s.ef||null)) d.effort=i.effort;
   return d;
 }
 function sameDiff(a,b){
@@ -1811,6 +1874,15 @@ function drawEdges(){
    is how the routine has always named them. */
 var chatN=-1;
 function isClaude(n){ return n.from==="claude" || /^claude-/.test(n.id||""); }
+/* A nudge is a note Claude wrote on its own initiative rather than in answer
+   to one of his -- "the SBI sanction needs three weeks and you have eighteen
+   days". It is the same object as every other note, which is the point: it
+   merges by id, pushes down the socket, ages out at 7 days and lands in the
+   task's own thread without a single new path through the code.
+   `about` is the task it concerns, and `round` is how many times this has now
+   been raised, because the second ask has to read as a second ask. */
+function isNudge(n){ return !!n && n.kind==="nudge" && isClaude(n); }
+function nudgeRound(n){ return Math.max(1, +(n&&n.round)||1); }
 function unreadReplies(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
 
 /* The floating button is the Chat tab within reach of a thumb, so it has the
@@ -1854,9 +1926,24 @@ function renderChat(){
     msgs.forEach(function(n){
       var day=(n.createdAt||"").slice(0,10);
       if(day && day!==lastDay){ lastDay=day; h+='<div class="cday">'+esc(dayLabel(day))+'</div>'; }
-      var mine=!isClaude(n);
-      h+='<div class="cmsg '+(mine?"cme":"cyou")+'">'+
-         '<div class="cbub">'+esc(n.text||"")+'</div>';
+      var mine=!isClaude(n), nud=isNudge(n);
+      h+='<div class="cmsg '+(mine?"cme":"cyou")+(nud?" cnud":"")+'">';
+      /* A nudge arrives unprompted, so it has to say what it is about before
+         he reads it -- a bubble appearing out of nowhere with no question
+         above it reads as a glitch. The header is the way back to the task,
+         because the only useful response to a nudge is to go and do the thing. */
+      if(nud){
+        var rd=nudgeRound(n);
+        h+='<div class="cbub cnb">'+
+           '<div class="cnh"'+(n.about?' data-go="'+esc(n.about)+'"':'')+'>'+
+             '<span class="cni">&#9650;</span>'+
+             esc(rd>1?"Following up":"Nudge")+
+             (n.itemTitle?' &middot; <b>'+esc(n.itemTitle)+'</b>':'')+
+             (rd>1?' <span class="cnr">'+rd+'&times;</span>':'')+
+           '</div>'+esc(n.text||"")+'</div>';
+      }else{
+        h+='<div class="cbub">'+esc(n.text||"")+'</div>';
+      }
       /* what Claude changed on the board because of this message -- and
          nothing at all when the honest answer was that nothing changed */
       var did=mine?[]:actedOf(n);
@@ -1865,7 +1952,9 @@ function renderChat(){
            did.map(function(a){ return '<div>'+esc(a)+'</div>'; }).join("")+'</div>';
       }
       h+='<div class="cmeta">'+esc(hhmm(n.createdAt))+
-         (n.itemTitle?' &middot; <b>'+esc(n.itemTitle)+'</b>':"")+
+         /* a nudge already names its task in the header; saying it again
+            under the bubble is the same line twice on a 390px screen */
+         (n.itemTitle&&!nud?' &middot; <b>'+esc(n.itemTitle)+'</b>':"")+
          (mine && n.state!=="read" ? ' &middot; sending\u2026' : "")+
          '</div></div>';
     });
@@ -2015,6 +2104,7 @@ function renderDrawer(keepDraft){
      '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
      '<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>'+
      (i.snoozes?'<span class="chip dt">pushed '+i.snoozes+'&times;'+(i.origDue?' from '+fmtD(i.origDue):'')+'</span>':'')+
+     (effOf(i.effort)?'<span class="chip ef">'+esc(effOf(i.effort).label)+'</span>':'')+
      '</div>'+(i.brief?'<p class="hint" style="margin-top:10px;font-size:12.5px;color:var(--ink2)">'+esc(i.brief)+'</p>':'')+'</div>';
 
   /* --- the feed: composer first, then the thread, newest at the top --- */
@@ -2049,6 +2139,18 @@ function renderDrawer(keepDraft){
   h+='<div class="fld"><label>Priority</label><div class="seg">'+
      ["Critical","High","Medium","Low"].map(function(x){return '<button data-pr="'+x+'" aria-pressed="'+(i.priority===x)+'">'+x+'</button>';}).join("")+'</div></div>';
 
+  /* The one thing a due date cannot tell you. Claude reads it to decide how
+     early to say anything, so the "start by" line under it is not decoration:
+     it is the number the nudge is built on, shown so he can argue with it. */
+  var sb=startBy(i);
+  h+='<div class="fld"><label>How long it takes</label><div class="seg wrp">'+
+     EFFORT.map(function(e){return '<button data-ef="'+e.k+'" aria-pressed="'+(i.effort===e.k)+'">'+esc(e.label)+'</button>';}).join("")+'</div>'+
+     (sb?'<div class="sby">Start by <b>'+fmtD(sb)+'</b>'+
+         (dleft(sb)!==null&&dleft(sb)<0?' &middot; <span class="sbl">that was '+Math.abs(dleft(sb))+'d ago</span>':'')+
+         '</div>'
+        :'<div class="hint">Unset. Claude reminds you off the due date alone until it knows, which is too late for anything that takes real time.</div>')+
+     '</div>';
+
   if((i.deps||[]).length){
     h+='<div class="fld"><label>Waiting on</label>';
     i.deps.forEach(function(d){ var o=items[d]; if(!o||o.deleted) return;
@@ -2081,9 +2183,10 @@ function renderDrawer(keepDraft){
    a week later. */
 function noteRow(p){
   var who=isClaude(p)?"claude":"me";
-  return '<div class="tli '+who+'">'+
+  return '<div class="tli '+who+(isNudge(p)?" nud":"")+'">'+
     '<div class="tlm">'+esc(noteWhen(p.createdAt))+
-      (isClaude(p)?' &middot; <b>Claude</b>':'')+
+      (isNudge(p)?' &middot; <b>'+esc(nudgeRound(p)>1?"Following up":"Nudge")+'</b>'
+                 :(isClaude(p)?' &middot; <b>Claude</b>':''))+
       (p.forClaude===false?' &middot; <span class="tlo">yours only</span>':'')+
       (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
     '</div>'+
@@ -2153,7 +2256,8 @@ function changedItems(){
     var d=diffOf(i);
     if(Object.keys(d).length){
       out.push({id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,
-                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,at:touched[i.id]||null});
+                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,
+                effort:i.effort||null,deleted:!!i.deleted,at:touched[i.id]||null});
     }else if(touched[i.id]){
       out.push({id:i.id,title:i.title,at:touched[i.id],seed:true});
     }
@@ -2216,7 +2320,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1045";
+var BUILD="2026-10-04-1115";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2397,6 +2501,8 @@ document.getElementById("dBody").addEventListener("click",function(e){
     patch(openId,{status:b.dataset.st},"Saved: "+(sl||b.dataset.st)); return; }
   if(b.dataset.pr){ patch(openId,{priority:b.dataset.pr},"Saved: "+b.dataset.pr+" priority"); return; }
   if(b.dataset.ty){ patch(openId,{dateType:b.dataset.ty},"Saved: date is "+b.dataset.ty); return; }
+  if(b.dataset.ef){ var ef=effOf(b.dataset.ef);
+    patch(openId,{effort:b.dataset.ef},"Saved: "+(ef?ef.label.toLowerCase():b.dataset.ef)); return; }
 });
 document.getElementById("dBody").addEventListener("change",function(e){
   if(e.target.id==="dd"&&openId) patch(openId,{due:e.target.value||null},
@@ -2750,7 +2856,7 @@ function mergePayload(pay){
     if(!isPatch && mine && theirs <= mine) return;
 
     if(c.seed){
-      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false;
+      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null;
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }

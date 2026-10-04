@@ -325,6 +325,57 @@ and it said so in `acted[]` — "No board changes: the flight task being Done is
 what ticks the milestone" — which rendered under **What I changed** as a change
 that did not happen. The box now appears only when something did.
 
+## Nudges: Claude speaking first
+
+Everything else on this board reacts to him. A nudge does not: it is Claude
+looking at the whole board twice a day and deciding whether anything is worth
+interrupting him for. He asked for it in these words — *"the notifications
+should be from you, as a productivity manager ensuring I stay on track"*.
+
+**A nudge is an ordinary note** with `kind:"nudge"`, `about:<itemId>`, `round`
+and `was:{status,due}`. That is the whole design, and it is deliberate: a note
+already merges by id, pushes down the socket, ages out at seven days and lands
+in the task's own thread, so a nudge needed no new path through the code. It
+renders as a card with the task name as a link rather than a bubble, because a
+message appearing with no question above it has to say what it is about.
+
+**`was` is the follow-up mechanism.** It records the task's state at the moment
+the nudge went out, so the next run can tell whether anything happened. Nothing
+moved after 48 hours is a follow-up at `round+1`, which renders as "Following
+up". Three rounds and it says so and stops: nagging past three is how a person
+learns to ignore everything you send.
+
+**The judgement lives in `.claude/skills/nudge/SKILL.md`, not in JS.** What
+deserves an interruption is not an if-tree, and the volume caps are in there
+too — at most two a run, one per task per 48 hours, and silence as the normal
+outcome. A board that speaks twice a day about everything is a board he mutes.
+
+## How long a task takes, and when to start it
+
+`effort` is one of `quick`/`hours`/`day`/`multi`/`wait`, each carrying a `lead`
+in days (1/3/5/10/21), and **start-by = due − lead**, derived and never stored
+— a second date would drift away from the first. It is in `DFIELDS`, so it
+travels like any other field, and the task page shows the start-by so he can
+argue with it.
+
+It exists because a due date cannot tell a ten-minute upload from a trip to a
+bank branch, so a reminder built on the date alone is too early for one and far
+too late for the other. `wait` has the longest lead and the least work in it —
+an SBI sanction needs almost nothing from him and three weeks from them, which
+is exactly the case a date-based reminder gets wrong.
+
+**Nothing in `SEED` carries one.** Inventing 34 estimates and shipping them as
+fact is the drift this board exists to prevent; they get filled in as they are
+learned, and the nudge skill has to ask rather than guess.
+
+## `DFIELDS` and `diffOf` are one decision in two places
+
+`DFIELDS` governs what a merge applies; `diffOf` governs what `save()` ever
+writes. A field in one and not the other fails silently and completely:
+`deleted` shipped in `DFIELDS` alone, so a deleted task came back on the next
+load and never reached the other device, and the in-memory check passed the
+whole time. Any new field goes in both, and the check for it reloads the page.
+
 ## Status, and who decides it
 
 A task's status is his to set, and the dependency cascade is only a default.
@@ -433,7 +484,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 54 invariants, three widths, a real browser. Every one of them was a
+that runs: 63 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
