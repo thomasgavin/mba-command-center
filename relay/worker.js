@@ -51,6 +51,9 @@ var MAX_RUNS   = 20;            /* Claude runs an hour, from every caller togeth
 var ARCHIVE_MS = 24*3600*1000;  /* one snapshot commit a day, not one per message */
 var MAX_BACK   = 400;           /* events a catch-up will hand back at once */
 var PUSH_MAX   = 8;             /* devices on the push list; he has two */
+/* How old a nudge may be and still ring a phone. Anything past this is a
+   replay of something he has already seen, which is worse than silence. */
+var NOTIFY_FRESH = 10 * 60 * 1000;
 /* VAPID wants a way to contact the sender. It is the board, not an address:
    this repository is public and an email written into it is a line in a
    scraper's list. */
@@ -316,16 +319,32 @@ export class Board {
   /* What the worker will read back. Only Claude's own notes ring a phone: his
      own edits are the thing he just did, and a device buzzing at its owner for
      typing is the fastest way to have notifications turned off. */
-  async maybeNotify(payload){
+  /* Three gates, and the first two are each enough on their own. It shipped
+     with none of them and rang his phone with a reply from the day before:
+
+     - `by` must be "claude". The board's own /send carries `outNotes()`, which
+       deliberately includes Claude's notes so they merge across his devices --
+       so every edit he made re-sent old replies, and each one looked like news.
+       A board payload can never be the origin of a Claude message.
+     - A nudge is the only thing worth a lock screen. A reply is an answer to
+       something he just asked, and he is already looking at the thread; he
+       said so: "I don't need notifications about replies anyway."
+     - And it has to be new. Picking the last element of an array assumes an
+       order nothing guarantees, so the newest is chosen by `createdAt`, and
+       anything older than NOTIFY_FRESH is a replay rather than news. */
+  async maybeNotify(payload, by){
+    if(by !== "claude") return;
     var ns = (payload && payload.notes) || [];
-    var mine = ns.filter(function(n){ return n && n.from === "claude"; });
+    var mine = ns.filter(function(n){ return n && n.from === "claude" && n.kind === "nudge"; });
     if(!mine.length) return;
+    mine.sort(function(a,b){ return String(a.createdAt||"").localeCompare(String(b.createdAt||"")); });
     var n = mine[mine.length-1];
-    var nudge = n.kind === "nudge";
+    var age = Date.now() - Date.parse(n.createdAt || "");
+    if(!(age >= 0) || age > NOTIFY_FRESH) return;
     await this.ctx.storage.put("latest", {
-      title: nudge ? (n.itemTitle || "Worth a look") : "Claude replied",
+      title: n.itemTitle || "Worth a look",
       body: String(n.text || "").slice(0, 180),
-      tag: nudge ? ("nudge-"+(n.about||"board")) : "reply",
+      tag: "nudge-" + (n.about || "board"),
       about: n.about || n.itemId || null,
       at: new Date().toISOString()
     });
@@ -611,7 +630,7 @@ export class Board {
       this.push(ev);
       /* the socket reaches a board that is open; this reaches the phone in his
          pocket, which is the whole point of a nudge */
-      try{ await this.maybeNotify(payload); }catch(e){}
+      try{ await this.maybeNotify(payload, who); }catch(e){}
       await this.armArchive();
       var started = null;
       /* only a note of his starts a run; a date moved on its own is not a

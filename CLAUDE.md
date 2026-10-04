@@ -328,13 +328,31 @@ exactly one way in, and every part of it is required:
   the note text out of Apple's push service entirely. Every path through the
   push handler ends in `showNotification`, the failed fetch included: **iOS
   revokes the permission of a worker that takes a push and shows nothing.**
-- **Only Claude's notes ring the phone.** His own edits are the thing he just
-  did, and a device that buzzes at its owner for typing is a device with
-  notifications turned off by the weekend.
+- **Only a fresh nudge, posted by Claude, rings the phone.** Three gates, and
+  the first two are each enough on their own. It shipped with none of them and
+  rang him with a reply from the day before:
+  - the event must have come in on `/agent/reply`. The board's own `/send`
+    carries `outNotes()`, which **deliberately includes Claude's notes** so they
+    merge across his devices — so every edit he made re-sent old replies and
+    each one looked like news. A board payload can never be the origin of a
+    Claude message.
+  - it must be a **nudge**. A reply answers something he just asked and he is
+    already looking at the thread: *"I don't need notifications about replies
+    anyway."*
+  - it must be **new**. The newest is chosen by `createdAt`, never by position
+    in the array, and anything older than `NOTIFY_FRESH` (10 minutes) is a
+    replay rather than news.
 - A notification is **tagged per task**, so a second nudge about the same task
   replaces the first rather than stacking.
 - A 404 or 410 from the push service drops that device; **any other failure
   keeps it**, because a transient error must not silently unsubscribe his phone.
+
+**An automatic send that worked says nothing.** It toasted "Saved and sent to
+Claude." after every edit and every message typed in Chat — announcing the
+expected case over the top of what he was reading, when the thread already
+shows a message going from "sending…" to sent and the board already shows the
+change he just made. A **failed** send still speaks, because that is the one
+case he cannot see.
 
 `checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
 board is handed, the same way the push service will. A signature that is subtly
@@ -608,7 +626,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 87 invariants, three widths, a real browser. Every one of them was a
+that runs: 90 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

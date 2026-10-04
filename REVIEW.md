@@ -13,9 +13,9 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 87 checks, three widths, a real browser
+node checks/board-check.mjs          # 90 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
-node checks/relay-push-check.mjs     # 17 checks on VAPID and Web Push
+node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -196,6 +196,23 @@ to say -- and the path where that fetch fails still has to end in a
 notification.
 *Checked: `a push shows the nudge it was about`,
 `a push whose fetch fails still shows something`, `a nudge notification is tagged`.*
+
+### Only a fresh nudge from Claude rings his phone
+The board's `/send` carries `outNotes()`, which includes Claude's own notes so
+they merge across devices — so anything that notifies on "a Claude note in the
+payload" fires on every edit he makes, replaying old messages as news. It did.
+The origin must be `/agent/reply`, the note must be a nudge, and it must be
+newer than `NOTIFY_FRESH`, chosen by `createdAt` rather than array position.
+*Checked: `a nudge echoed back by the board does not ring it either`,
+`a plain reply does not ring it`, `an old nudge replayed is not news`,
+`and it is the newest one, whatever order they arrived in`.*
+
+### A successful automatic send is silent
+The toast fired on every edit and every chat message and said only what the
+screen already showed. A failure still toasts: that is the case he cannot
+otherwise see.
+*Checked: `a successful automatic send raises no toast`,
+`a send that failed says so`.*
 
 ### The VAPID signature is verified, not assumed
 A wrong signature is a 403 at the push service and silence on his phone hours

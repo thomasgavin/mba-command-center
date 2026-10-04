@@ -79,12 +79,40 @@ function b64uBytes(s) {
   var { b, st } = mkBoard(async (url, init) => { sent.push({ url, init }); return { ok: true, status: 201 }; });
   await st.put("subs", { "https://web.push.apple.com/one": { at: "x" } });
 
-  await b.maybeNotify({ notes: [{ id: "n1", from: "me", text: "I just typed this" }] });
+  var now = () => new Date().toISOString();
+  var nudge = (extra) => Object.assign({ id: "c1", from: "claude", kind: "nudge",
+    about: "sbi-sanction", itemTitle: "SBI sanction", text: "Where does it stand?",
+    createdAt: now() }, extra || {});
+
+  await b.maybeNotify({ notes: [{ id: "n1", from: "me", text: "I just typed this", createdAt: now() }] }, "board");
   ok("his own note does not ring his own phone", sent.length === 0, JSON.stringify(sent.length));
 
-  await b.maybeNotify({ notes: [{ id: "c1", from: "claude", kind: "nudge",
-    about: "sbi-sanction", itemTitle: "SBI sanction", text: "Where does it stand?" }] });
-  ok("a nudge does", sent.length === 1, JSON.stringify(sent.length));
+  /* The board's own /send carries outNotes(), which includes Claude's notes so
+     they merge across his devices -- so without this gate every edit he made
+     re-sent old replies and each one rang his phone as news. It did. */
+  await b.maybeNotify({ notes: [nudge()] }, "board");
+  ok("a nudge echoed back by the board does not ring it either",
+     sent.length === 0, "outNotes() re-sends Claude's own notes on every edit");
+
+  /* he asked for this in these words: "I don't need notifications about
+     replies anyway" */
+  await b.maybeNotify({ notes: [{ id: "c2", from: "claude", text: "answering your question",
+    createdAt: now() }] }, "claude");
+  ok("a plain reply does not ring it", sent.length === 0, JSON.stringify(sent.length));
+
+  /* "Why am I getting this notification? This was ages back." */
+  await b.maybeNotify({ notes: [nudge({ createdAt: new Date(Date.now() - 36e5).toISOString() })] }, "claude");
+  ok("an old nudge replayed is not news", sent.length === 0, "an hour-old nudge must not ring");
+
+  /* the newest is the newest by its clock, not by where it sits in an array */
+  await b.maybeNotify({ notes: [
+    nudge({ id: "new", itemTitle: "SBI sanction", text: "the new one", createdAt: now() }),
+    nudge({ id: "old", itemTitle: "Something else", text: "the old one",
+            createdAt: new Date(Date.now() - 72e5).toISOString() })
+  ] }, "claude");
+  ok("a nudge does ring it", sent.length === 1, JSON.stringify(sent.length));
+  ok("and it is the newest one, whatever order they arrived in",
+     (await st.get("latest")).body === "the new one", JSON.stringify(await st.get("latest")));
   ok("with a VAPID header and no body",
      /^vapid t=/.test(sent[0].init.headers.Authorization) && !sent[0].init.body,
      JSON.stringify(sent[0].init.headers));
