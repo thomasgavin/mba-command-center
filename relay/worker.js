@@ -145,13 +145,16 @@ function stampFrom(payload, d){
    a day that actually mean something. */
 var EFFORT_LABEL = {quick:"under an hour", hours:"a few hours", day:"a full day",
                     multi:"several days", wait:"mostly waiting"};
-var STATUS_LABEL = {doing:"In progress", todo:"To do", blocked:"Blocked", done:"Done"};
+/* `blocked` is the stored key; "Upcoming" is what the board calls it now. */
+var STATUS_LABEL = {doing:"In progress", todo:"To do", blocked:"Upcoming", done:"Done"};
 function plain(v){ return (v===null||v===undefined||v==="") ? "\u2014" : String(v); }
 var HIST_FIELDS = [
+  /* a rename is a board change like any other, and the one the log is most
+     useful for: a title is how every other row in the file names its task */
+  {k:"title",    label:"Title",    show:plain},
   {k:"status",   label:"Status",   show:function(v){ return plain(STATUS_LABEL[v]||v); }},
   {k:"due",      label:"Due",      show:plain},
   {k:"priority", label:"Priority", show:plain},
-  {k:"dateType", label:"Date is",  show:plain},
   {k:"effort",   label:"Effort",   show:function(v){ return plain(EFFORT_LABEL[v]||v); }},
   {k:"deleted",  label:"Deleted",  show:function(v){ return v ? "yes" : "no"; }}
 ];

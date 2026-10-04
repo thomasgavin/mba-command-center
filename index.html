@@ -367,7 +367,6 @@ body::before{
 .chip.d.soon{background:rgba(255,100,41,.12);color:#d8450f}
 .chip.d.near{background:rgba(255,159,0,.15);color:#8a5a00}
 .chip.p{border:1px solid currentColor;background:none}
-.chip.dt{background:none;border:1px dashed var(--line);color:var(--ink4)}
 .chip.nt{background:rgba(50,100,255,.1);color:var(--blue)}
 .cact{position:absolute;top:8px;right:8px;display:flex;gap:4px}
 .mini{
@@ -401,45 +400,41 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .btn.wide{width:100%;height:40px;font-size:13.5px}
 .dsave{margin-top:4px}
 
-/* ---------- list ---------- */
-.lgrp{margin-bottom:22px}
-.lgh{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding:0 2px}
-.lgh i{width:9px;height:9px;border-radius:3px;flex:none}
-.lgh b{font-size:12.5px;font-weight:700}
-.lgh em{font-style:normal;font-size:11px;color:var(--ink4);font-weight:600}
-.lwrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
-.lrow{display:flex;align-items:center;gap:11px;padding:10px 14px;border-top:1px solid var(--line2);cursor:pointer;transition:background .12s}
-.lrow:first-child{border-top:0}
-.lrow:hover{background:var(--wash2)}
 .tick{
   width:19px;height:19px;border-radius:50%;border:1.8px solid var(--line);background:#fff;flex:none;
   display:grid;place-items:center;font-size:10px;color:transparent;cursor:pointer;transition:all .14s;
 }
 .tick:hover{border-color:var(--green)}
-.lrow.done .tick{background:var(--green);border-color:var(--green);color:#fff}
-.lrow.done .lt{color:var(--ink4);text-decoration:line-through}
-.lt{flex:1;min-width:0;font-size:12.5px;font-weight:600;letter-spacing:-.01em}
-.lmeta{display:flex;align-items:center;gap:6px;flex:none}
 
-/* ---------- timeline / gantt ---------- */
+/* ---------- tasks: list and timeline in one row ---------- */
 .gwrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .gscroll{overflow-x:auto}
-.ginner{min-width:1060px;position:relative}
+/* --lw is the label column, and the today line is placed off it in CSS: the
+   width used to live in both the stylesheet and the JS, and the phone
+   breakpoint changed only one of them, so the "today" line sat in the
+   wrong place on a phone for as long as that breakpoint existed. */
+.ginner{--lw:340px;min-width:1180px;position:relative}
 .gax{display:flex;border-bottom:1px solid var(--line);background:var(--wash2);position:sticky;top:0;z-index:4}
-.gax .gl{width:186px;flex:none;border-right:1px solid var(--line)}
+.gax .gl{width:var(--lw);flex:none;border-right:1px solid var(--line)}
 .gax .gm{flex:1;display:flex}
 .gax .gm div{flex:1;font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;padding:8px 0 8px 8px;border-left:1px solid var(--line2)}
 .gsec{display:flex;align-items:center;gap:7px;padding:7px 12px;background:var(--wash2);border-bottom:1px solid var(--line2);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
 .gsec i{width:7px;height:7px;border-radius:50%;flex:none}
-.grow{display:flex;border-bottom:1px solid var(--line2);min-height:32px;cursor:pointer;transition:background .12s}
+.gsec em{font-style:normal;font-weight:700;letter-spacing:.04em;text-transform:none;color:var(--ink4);opacity:.85}
+.grow{display:flex;border-bottom:1px solid var(--line2);min-height:46px;cursor:pointer;transition:background .12s}
 .grow:hover{background:var(--wash2)}
 .grow:last-child{border-bottom:0}
-.grow .gl{width:186px;flex:none;border-right:1px solid var(--line);display:flex;gap:7px;min-width:0}
-.grow .gl i{width:6px;height:6px;border-radius:50%;flex:none}
+/* The left column is the whole list row: tick, state, title, then the chips on
+   their own line so none of them has to fight the title for width. */
+.grow .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);display:flex;flex-direction:column;
+  justify-content:center;gap:5px;padding:8px 11px;min-width:0}
+.glr{display:flex;align-items:flex-start;gap:8px;min-width:0}
+.gst{flex:none;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 6px;border-radius:5px;line-height:1.1;margin-top:1px;white-space:nowrap}
 /* wrap rather than clip: a cut-off title is useless for telling two tasks
    apart, and the rows can afford the height */
-.grow .gl span{font-size:11.5px;font-weight:600;white-space:normal;overflow-wrap:anywhere;line-height:1.25}
-.grow .gl{padding:6px 11px;align-items:center}
+.gt{flex:1;min-width:0;font-size:12px;font-weight:600;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
+.gmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-left:27px;min-width:0}
 .gtrack{flex:1;position:relative}
 .gtrack .gg{position:absolute;inset:0;display:flex;pointer-events:none}
 .gtrack .gg div{flex:1;border-left:1px solid var(--line2)}
@@ -450,8 +445,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .glab.rgt{transform:translate(11px,-50%)}
 .glab.lft{transform:translate(calc(-100% - 11px),-50%)}
 .glab.late{color:var(--red)}
-.grow.done .gl span{color:var(--ink4)}
-.grow.done .glab{color:var(--ink4)}
+.grow.done .tick{background:var(--green);border-color:var(--green);color:#fff}
+.grow.done .gt{color:var(--ink4);text-decoration:line-through}
+.grow.done .glab{color:var(--green)}
 .gnow{position:absolute;top:0;bottom:0;width:2px;background:var(--orange);z-index:5;pointer-events:none}
 .gnow::before{content:"";position:absolute;top:0;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--orange)}
 .gnow::after{content:"today";position:absolute;top:10px;left:6px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)}
@@ -632,13 +628,13 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .nadd:hover{background:var(--wash);color:var(--ink2)}
 .nadd b{font-size:15px;line-height:1;color:var(--ink4);font-weight:700;flex:none}
 .dsub{font-size:12px;color:var(--ink3);line-height:1.5;margin:-6px 0 15px;overflow-wrap:anywhere}
-input[type=date],textarea{
+input[type=date],input[type=text],textarea{
   width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
   font:inherit;font-size:13px;color:var(--ink);padding:9px 11px;
 }
 input[type=date]{-webkit-appearance:none;appearance:none}
 textarea{min-height:92px;resize:vertical;line-height:1.5}
-input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.13)}
+input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.13)}
 .btn{
   border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;padding:0 13px;
   font:inherit;font-size:12.5px;font-weight:650;color:var(--ink2);cursor:pointer;transition:all .13s;
@@ -682,6 +678,9 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 /* the date and the four ways he moves it, on one line instead of two fields */
 .drow{display:flex;align-items:center;gap:6px;min-width:0}
 .drow input[type=date]{flex:1 1 auto;min-width:0}
+/* the rename field: full width, and it may not push the drawer sideways */
+.trow{display:flex;min-width:0}
+.trow input[type=text]{flex:1 1 auto;min-width:0}
 .pch{flex:none;border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;
   padding:0 9px;font:inherit;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;
   font-variant-numeric:tabular-nums}
@@ -694,9 +693,8 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   padding:11px 13px;margin-bottom:16px;font-size:12px;line-height:1.5;color:var(--ink2)}
 .dgone b{display:block;margin-bottom:3px}
 /* a deleted row still reads, it just stops competing with the live ones */
-.lrow.dl .lt{color:var(--ink4);text-decoration:line-through}
-.lrow.dl{opacity:.72}
-.dlgrp .lgh b{color:var(--ink3)}
+.grow.dl{opacity:.72}
+.grow.dl .gt{color:var(--ink4);text-decoration:line-through}
 
 /* ---------- effort, and the start-by it implies ---------- */
 /* five options do not fit one row on a phone, and a segmented control that
@@ -873,8 +871,9 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   .mline{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:7px}
   .mstone{min-width:0}
   /* the timeline label column cannot take 186px of a 390px screen */
-  .gax .gl,.grow .gl{width:124px}
-  .ginner{min-width:760px}
+  /* the row carries the whole list entry now, so the label column cannot go
+     back to 124px: at that width a title wraps one letter to a line */
+  .ginner{--lw:270px;min-width:900px}
 
   /* iOS zooms the whole page the moment a focused control is under 16px, and
      the zoom stays after the keyboard closes -- which is what pushed the
@@ -883,7 +882,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
      pinch-zoom outright, which is worse. */
   /* every input inside the drawer, not just the date one: a checkbox is a
      focusable control too, and the rule is about the whole class of them */
-  input[type=date],textarea,.pal-box input,.db input{font-size:16px}
+  input[type=date],input[type=text],textarea,.pal-box input,.db input{font-size:16px}
   /* .cbox textarea sets its own size, which beats the rule above on
      specificity, so the composer needs saying again or the chat box is the one
      control on the board that still zooms the page */
@@ -927,10 +926,9 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   <nav class="views" role="tablist">
     <button class="vt" role="tab" data-v="over" aria-selected="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="5.5" height="6.5" rx="1.5"/><rect x="9" y="1.5" width="5.5" height="4" rx="1.5"/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1.5"/><rect x="9" y="7" width="5.5" height="7.5" rx="1.5"/></svg>Overview</button>
     <button class="vt" role="tab" data-v="board" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4" height="12" rx="1.3"/><rect x="6.8" y="2" width="4" height="8" rx="1.3"/><rect x="12" y="2" width="2.5" height="10" rx="1.2"/></svg>Board<small id="nBoard">0</small></button>
-    <button class="vt" role="tab" data-v="time" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h7M2 8h11M2 12h5"/><circle cx="12.5" cy="4" r="1.4"/><circle cx="7.5" cy="12" r="1.4"/></svg>Timeline</button>
+    <button class="vt" role="tab" data-v="time" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h7M2 8h11M2 12h5"/><circle cx="12.5" cy="4" r="1.4"/><circle cx="7.5" cy="12" r="1.4"/></svg>Tasks<small id="nList">0</small></button>
     <button class="vt" role="tab" data-v="cal" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3" width="12.4" height="11" rx="1.6"/><path d="M1.8 6.6h12.4M5 1.6v2.6M11 1.6v2.6"/></svg>Calendar</button>
     <button class="vt" role="tab" data-v="graph" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.8"/><circle cx="8" cy="3.4" r="1.8"/><circle cx="8" cy="12.6" r="1.8"/><circle cx="13" cy="8" r="1.8"/><path d="M4.5 7 6.6 4.6M4.5 9l2.1 2.4M9.5 4.4 11.6 6.8M9.5 11.6 11.6 9.2"/></svg>Dependencies</button>
-    <button class="vt" role="tab" data-v="list" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4h9M5.5 8h9M5.5 12h9"/><circle cx="2.2" cy="4" r="1"/><circle cx="2.2" cy="8" r="1"/><circle cx="2.2" cy="12" r="1"/></svg>List<small id="nList">0</small></button>
     <button class="vt" role="tab" data-v="chat" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9.5a2 2 0 0 1-2 2H6l-3.5 2.6V4.5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2z"/><path d="M5.5 6h5M5.5 8.4h3"/></svg>Chat<small id="nChat">0</small></button>
   </nav>
 
@@ -946,7 +944,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 
     <section class="view" id="v-time">
       <div class="gwrap"><div class="gscroll"><div class="ginner" id="gantt"></div></div></div>
-      <p class="tip">Every item on one axis, grouped by track. The orange line is today. Bars left of it that are not green are late.</p>
+      <p class="tip">Every task, grouped by track, with its state on the left and its date on the timeline. The orange line is today, green is done, and a marker left of the line that is not green is late. Tap a row to open it, <b>&#10003;</b> to close it, <b>&#9998;</b> to leave a note.</p>
     </section>
 
     <section class="view" id="v-cal">
@@ -967,8 +965,6 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
       <p class="tip" id="gfxNote"></p>
       <p class="tip">What gates what. A box is <b>dashed</b> while something upstream is still open, <b>orange</b> when it is the next thing you can actually move, <b>green</b> when done.</p>
     </section>
-
-    <section class="view" id="v-list"><div id="lviews"></div></section>
 
     <section class="view" id="v-chat">
       <div class="pbn off" id="pbn"><span id="pbnT"></span><button id="pbnB"></button></div>
@@ -1054,7 +1050,10 @@ CATS.forEach(function(c){ c.tracks.forEach(function(t){ TRACK_CAT[t]=c.k; }); })
 var STATUS=[
   {k:"doing",  label:"In progress",c:"#3264ff"},
   {k:"todo",   label:"To do",      c:"#8b8095"},
-  {k:"blocked",label:"Blocked",    c:"#b066ff"},
+  /* "Upcoming", not "Blocked": the key stays `blocked` because every merge
+     payload and stored diff in the wild carries it, and renaming the key
+     would silently drop those. Only the label he reads changed. */
+  {k:"blocked",label:"Upcoming",   c:"#b066ff"},
   {k:"done",   label:"Done",       c:"#00a98f"}
 ];
 var PRI={Critical:"#e0263c",High:"#ff6429",Medium:"#ff9f00",Low:"#8b8095"};
@@ -1122,64 +1121,64 @@ var HOUSING={from:"2027-01-03", to:"2027-07-03", end:"2027-12-15",
 /* ---------- seed, from the vault ---------- */
 var SEED=[
  /* done, so progress is real */
- {id:"deposit",     t:"EUR 12,000 tuition deposit paid",              k:"fin",   s:"done", p:"Critical", d:"2026-08-01", dt:"Confirmed"},
- {id:"eef-init",    t:"Campus France EEF application initiated",      k:"visa",  s:"done", p:"High",     d:"2026-09-01", dt:"Confirmed"},
- {id:"attest",      t:"INSEAD French-language attestation uploaded",  k:"visa",  s:"done", p:"Medium",   d:"2026-09-05", dt:"Confirmed"},
- {id:"hec-out",     t:"HEC Paris admission withdrawn",                k:"admin", s:"done", p:"High",     d:"2026-07-10", dt:"Confirmed"},
- {id:"insead-mail", t:"INSEAD email provisioned",                     k:"admin", s:"done", p:"Low",      d:"2026-06-25", dt:"Confirmed"},
- {id:"club8-book",  t:"Club 8 housing booked, 6 months",              k:"move",  s:"done", p:"Critical", d:"2026-09-20", dt:"Confirmed"},
- {id:"poa-draft",   t:"Power of Attorney drafted for mother",          k:"fin",   s:"done", p:"High",     d:"2026-09-15", dt:"Confirmed"},
- {id:"vidya",       t:"PM Vidyalakshmi application submitted",        k:"fin",   s:"done", p:"Medium",   d:"2026-09-10", dt:"Confirmed"},
+ {id:"deposit",     t:"EUR 12,000 tuition deposit paid",              k:"fin",   s:"done", p:"Critical", d:"2026-08-01",},
+ {id:"eef-init",    t:"Campus France EEF application initiated",      k:"visa",  s:"done", p:"High",     d:"2026-09-01",},
+ {id:"attest",      t:"INSEAD French-language attestation uploaded",  k:"visa",  s:"done", p:"Medium",   d:"2026-09-05",},
+ {id:"hec-out",     t:"HEC Paris admission withdrawn",                k:"admin", s:"done", p:"High",     d:"2026-07-10",},
+ {id:"insead-mail", t:"INSEAD email provisioned",                     k:"admin", s:"done", p:"Low",      d:"2026-06-25",},
+ {id:"club8-book",  t:"Club 8 housing booked, 6 months",              k:"move",  s:"done", p:"Critical", d:"2026-09-20",},
+ {id:"poa-draft",   t:"Power of Attorney drafted for mother",          k:"fin",   s:"done", p:"High",     d:"2026-09-15",},
+ {id:"vidya",       t:"PM Vidyalakshmi application submitted",        k:"fin",   s:"done", p:"Medium",   d:"2026-09-10",},
 
  /* financing */
- {id:"tuition-oct", t:"Pay EUR 53,000 tuition instalment",            k:"fin",   s:"doing",p:"Critical", d:"2026-10-05", dt:"Confirmed", amt:53000,
+ {id:"tuition-oct", t:"Pay EUR 53,000 tuition instalment",            k:"fin",   s:"doing",p:"Critical", d:"2026-10-05", amt:53000,
    n:"Hard institutional deadline. Confirm the funding source if the SBI loan has not disbursed."},
- {id:"scholarship-r3",t:"Chase Round 3 scholarship decision",         k:"fin",   s:"todo", p:"Critical", d:"2026-09-11", dt:"Awaiting",
+ {id:"scholarship-r3",t:"Chase Round 3 scholarship decision",         k:"fin",   s:"todo", p:"Critical", d:"2026-09-11",
    n:"Decision was expected 2026-09-11 and is not recorded. It changes the loan quantum, so this gates the sanction."},
- {id:"poa-exec",    t:"Execute PoA at SBI Hindon branch",             k:"fin",   s:"todo", p:"High",     d:"2026-10-10", dt:"Target", dep:["poa-draft"]},
- {id:"sbi-sanction",t:"SBI Global Ed-Vantage sanction letter",        k:"fin",   s:"blocked",p:"Critical",d:"2026-10-24",dt:"Target", dep:["scholarship-r3","poa-exec"]},
- {id:"forex",       t:"Open EUR account for fees and living costs",   k:"fin",   s:"todo", p:"Medium",   d:"2026-11-30", dt:"Target"},
- {id:"tuition-apr", t:"Pay EUR 44,860 final instalment",              k:"fin",   s:"todo", p:"Critical", d:"2027-04-15", dt:"Confirmed", amt:44860, dep:["sbi-sanction"]},
+ {id:"poa-exec",    t:"Execute PoA at SBI Hindon branch",             k:"fin",   s:"todo", p:"High",     d:"2026-10-10", dep:["poa-draft"]},
+ {id:"sbi-sanction",t:"SBI Global Ed-Vantage sanction letter",        k:"fin",   s:"blocked",p:"Critical",d:"2026-10-24", dep:["scholarship-r3","poa-exec"]},
+ {id:"forex",       t:"Open EUR account for fees and living costs",   k:"fin",   s:"todo", p:"Medium",   d:"2026-11-30",},
+ {id:"tuition-apr", t:"Pay EUR 44,860 final instalment",              k:"fin",   s:"todo", p:"Critical", d:"2027-04-15", amt:44860, dep:["sbi-sanction"]},
 
  /* visa */
- {id:"cf-interview",t:"Book Campus France interview",                 k:"visa",  s:"todo", p:"Critical", d:"2026-10-10", dt:"Target", dep:["eef-init"],
+ {id:"cf-interview",t:"Book Campus France interview",                 k:"visa",  s:"todo", p:"Critical", d:"2026-10-10", dep:["eef-init"],
    n:"Target was October 2026. Nothing is scheduled on record, and everything downstream waits on it."},
- {id:"docs-apost",  t:"Apostille and attest academic documents",      k:"visa",  s:"todo", p:"High",     d:"2026-10-18", dt:"Target"},
- {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25",dt:"Target", dep:["cf-interview","docs-apost"]},
- {id:"cf-indonesia",t:"Follow up with Campus France Indonesia team",  k:"visa",  s:"todo", p:"High",     d:"2026-10-14", dt:"Target",
+ {id:"docs-apost",  t:"Apostille and attest academic documents",      k:"visa",  s:"todo", p:"High",     d:"2026-10-18",},
+ {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25", dep:["cf-interview","docs-apost"]},
+ {id:"cf-indonesia",t:"Follow up with Campus France Indonesia team",  k:"visa",  s:"todo", p:"High",     d:"2026-10-14",
    n:"Check where the EEF validation stands. Added from Chat; the date is a placeholder to move."},
- {id:"vfs-appt",    t:"VFS appointment during India trip",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10",dt:"Target", dep:["cf-validation"]},
- {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", dt:"Target"},
+ {id:"vfs-appt",    t:"VFS appointment during India trip",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", dep:["cf-validation"]},
+ {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10",},
 
  /* housing and move */
- {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", dt:"Target", dep:["vfs-appt"],
+ {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", dep:["vfs-appt"],
    n:"The visa has to be issued first, which is what the VFS appointment starts."},
- {id:"club8-movein", t:"Move in to Club 8",                            k:"move",  s:"blocked",p:"High",   d:"2027-01-03", dt:"Target", dep:["flight","club8-book"],
+ {id:"club8-movein", t:"Move in to Club 8",                            k:"move",  s:"blocked",p:"High",   d:"2027-01-03", dep:["flight","club8-book"],
    n:"Reached on arrival, not when the flight is booked: this is what the move milestone waits for."},
- {id:"club8-detail",t:"Confirm Club 8 inventory and move-in window",  k:"move",  s:"todo", p:"Medium",   d:"2026-11-15", dt:"Target", dep:["club8-book"]},
- {id:"shipping",    t:"Shipping and baggage plan",                    k:"move",  s:"todo", p:"Medium",   d:"2026-12-15", dt:"Target"},
- {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"todo", p:"Medium",  d:"2027-01-10", dt:"Target",
+ {id:"club8-detail",t:"Confirm Club 8 inventory and move-in window",  k:"move",  s:"todo", p:"Medium",   d:"2026-11-15", dep:["club8-book"]},
+ {id:"shipping",    t:"Shipping and baggage plan",                    k:"move",  s:"todo", p:"Medium",   d:"2026-12-15",},
+ {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"todo", p:"Medium",  d:"2027-01-10",
    n:"After arriving in Fontainebleau."},
- {id:"housing-h2",  t:"Solve housing after 3 July 2027",              k:"move",  s:"todo", p:"High",     d:"2027-03-01", dt:"Target",
+ {id:"housing-h2",  t:"Solve housing after 3 July 2027",              k:"move",  s:"todo", p:"High",     d:"2027-03-01",
    n:"Club 8 covers 2027-01-03 to roughly 2027-07-03. The programme runs to 2027-12-15, so five months are uncovered."},
 
  /* admin and exit */
- {id:"portal",      t:"Clear INSEAD onboarding portal tasks",         k:"admin", s:"todo", p:"High",     d:"2026-11-01", dt:"Target"},
- {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15", dt:"Target",
+ {id:"portal",      t:"Clear INSEAD onboarding portal tasks",         k:"admin", s:"todo", p:"High",     d:"2026-11-01",},
+ {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15",
    n:"Nothing on record: no resignation date, notice period or last working day."},
- {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", dt:"Target", dep:["locus-exit"]},
+ {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", dep:["locus-exit"]},
 
  /* academics */
- {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20", dt:"Target"},
- {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31", dt:"Target"},
- {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28", dt:"Awaiting",
+ {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20",},
+ {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31",},
+ {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28",
    n:"Required for graduation. What Gavin is using for it is not recorded."},
 
  /* career */
- {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31", dt:"Target",
+ {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31",
    n:"Shapes elective choice, exchange decision and recruiting timing. Not recorded anywhere yet."},
- {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", dt:"Target"},
- {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", dt:"Target"}
+ {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10",},
+ {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30",}
 ];
 
 var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
@@ -1245,7 +1244,7 @@ var touched={};
 
 function load(){
   SEED.forEach(function(s){
-    items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,dateType:s.dt,
+    items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,
                  deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false,deleted:false,
                  effort:s.ef||null};
   });
@@ -1286,7 +1285,10 @@ function load(){
    last. It also means a deleted task is never really gone -- the SEED row
    stays and the diff says "hidden" -- which is what makes Restore possible and
    what stops a delete from taking its notes with it. */
-var DFIELDS=["status","due","priority","dateType","snoozes","origDue","manual","deleted","effort"];
+/* `title` is in here and in diffOf together, which is the whole rule: a
+   rename that merged but never saved, or saved but never merged, would look
+   like the board forgetting what he typed. */
+var DFIELDS=["title","status","due","priority","snoozes","origDue","manual","deleted","effort"];
 /* id -> the timestamp a merge just applied, consumed by the next save(). Without
    it save() sees a brand new diff and dates it "now", so taking the other
    device's change would make this device claim it as its own later edit. */
@@ -1296,10 +1298,10 @@ function seedOf(id){ for(var j=0;j<SEED.length;j++) if(SEED[j].id===id) return S
 function diffOf(i){
   var s=seedOf(i.id), d={};
   if(!s) return d;
+  if(i.title!==s.t) d.title=i.title;
   if(i.status!==s.s) d.status=i.status;
   if(i.due!==s.d) d.due=i.due;
   if(i.priority!==s.p) d.priority=i.priority;
-  if(i.dateType!==s.dt) d.dateType=i.dateType;
   if(i.snoozes) d.snoozes=i.snoozes;
   if(i.origDue) d.origDue=i.origDue;
   if(i.manual) d.manual=true;
@@ -1322,7 +1324,7 @@ function sameDiff(a,b){
    item has to be reset first or a field the other tab cleared would survive. */
 function applyStored(k,d){
   var sd=seedOf(k), i=items[k]; if(!sd||!i) return;
-  i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt;
+  i.title=sd.t; i.status=sd.s; i.due=sd.d; i.priority=sd.p;
   i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null;
   DFIELDS.forEach(function(f){ if(d && d[f]!==undefined) i[f]=d[f]; });
 }
@@ -1447,10 +1449,10 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){retur
 
 /* ---------- derived ---------- */
 /* all() is every row including the deleted ones, because the drawer, the merge
-   and the List view all need to reach them. Everything else works from here:
+   and the Tasks view all need to reach them. Everything else works from here:
    a deleted task is not on the board, not in a count, and not gating anything.
-   The List view is the one place it still shows, which is where he asked for
-   it and is also the only place he can put it back. */
+   Tasks is the one place it still shows, which is where he asked for it and is
+   also the only place he can put it back. */
 function all(){ return Object.keys(items).map(function(k){return items[k];}); }
 function alive(){ return all().filter(function(i){ return !i.deleted; }); }
 function gone(){ return all().filter(function(i){ return i.deleted; }); }
@@ -1483,8 +1485,8 @@ function tl(k){ return (TRACKS[k]||{label:k}).label; }
 
 /* ---------- mutations ---------- */
 /* The cascade used to overwrite the status the owner had just chosen: picking
-   "To do" on a gated item snapped straight back to Blocked, and picking
-   "Blocked" on an ungated one snapped to To do, so those buttons looked dead.
+   "To do" on a gated item snapped straight back to Upcoming, and picking
+   "Upcoming" on an ungated one snapped to To do, so those buttons looked dead.
    An explicit choice now wins and is remembered in `manual`; the cascade still
    derives a state for every item he has not ruled on himself. */
 function patch(id,p,label,derived){
@@ -1508,9 +1510,8 @@ function patch(id,p,label,derived){
 }
 function snooze(id,n){
   var i=items[id]; if(!i) return;
-  var before={due:i.due,dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue};
-  patch(id,{due:shift(i.due,n), origDue:i.origDue||i.due||null, snoozes:(i.snoozes||0)+1,
-            dateType:i.dateType==="Confirmed"?"Target":i.dateType});
+  var before={due:i.due,snoozes:i.snoozes,origDue:i.origDue};
+  patch(id,{due:shift(i.due,n), origDue:i.origDue||i.due||null, snoozes:(i.snoozes||0)+1});
   toast("Pushed "+n+" day"+(n>1?"s":"")+" to "+fmtD(items[id].due), function(){ patch(id,before); });
 }
 /* quiet: the chat composer passes it, because the message is already on screen
@@ -1541,7 +1542,7 @@ function addNote(itemId,text,quiet,forClaude){
 function delItem(id){
   var i=items[id]; if(!i||i.deleted) return;
   patch(id,{deleted:true},null,true);
-  toast("Deleted “"+i.title+"”. It stays in the list.", function(){ undelItem(id); });
+  toast("Deleted “"+i.title+"”. It stays in Tasks.", function(){ undelItem(id); });
 }
 function undelItem(id){
   var i=items[id]; if(!i) return;
@@ -1579,7 +1580,7 @@ function render(){
   document.getElementById("exportBtn").classList.toggle("off",!needs);
   document.getElementById("nChat").textContent=unreadReplies();
   document.getElementById("nChat").parentNode.classList.toggle("hot",unreadReplies()>0);
-  renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList(); renderChat();
+  renderOverview(); renderBoard(); renderPlan(); renderCal(); renderGraph(); renderChat();
   syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
@@ -1598,7 +1599,7 @@ function ring(pct,colour,inner){
 function mileState(m){
   var it=m.item?items[m.item]:null;
   var g=m.gate?items[m.gate]:null;
-  if(it&&it.deleted) it=null;  /* a deleted task is gone from every tile, not only the list */
+  if(it&&it.deleted) it=null;  /* a deleted task is gone from every tile, not only Tasks */
   if(g&&g.deleted) g=null;
   return {
     due: it?it.due:(m.d||null),
@@ -1675,8 +1676,10 @@ function renderHousing(){
 
 function renderOverview(){
   var L=live().slice().sort(byDue);
-  var hard=L.filter(function(i){return i.dateType==="Confirmed"&&i.due;});
-  var next=(hard[0]||L[0]||null);
+  /* There is no Confirmed/Target/Awaiting field to pick a "hard" date out of
+     any more -- every open task said Target, which told him nothing -- so the
+     next deadline is simply the soonest one still open. */
+  var next=(L.filter(function(i){return i.due&&i.status!=="done";})[0]||L[0]||null);
   var h="";
 
   /* he asked for this first, and he was right: it is the only tile that answers
@@ -1701,10 +1704,10 @@ function renderOverview(){
     var n=dleft(next.due);
     var big = n<0 ? Math.abs(n)+'<sup>d late</sup>' : (n===0?'today':n+'<sup>day'+(n===1?'':'s')+'</sup>');
     h+='<div class="tile hero a" data-id="'+next.id+'">'+
-       '<h3><span class="pin" style="background:#fff"></span>Next hard deadline</h3>'+
+       '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
        '<div class="big">'+big+'</div>'+
        '<div class="sub">'+esc(next.title)+'</div>'+
-       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.dateType)+'</div>'+
+       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div>'+
        '<div class="foot"><button class="hbtn solid" data-go="'+next.id+'">Open</button>'+
        '<button class="hbtn" data-sn3="'+next.id+'">Push 3 days</button>'+
        '<button class="hbtn" data-dn="'+next.id+'">Mark done</button></div></div>';
@@ -1823,7 +1826,6 @@ function cardHTML(i){
       dueChip(i)+
       '<span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+esc(tl(i.track))+'</span>'+
       '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-      (i.dateType!=="Confirmed"?'<span class="chip dt">'+esc(i.dateType)+'</span>':'')+
       (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
     '</div>'+
     '<div class="cact"><button class="mini g" data-act="grip" title="Drag" aria-label="Drag">&#8942;&#8942;</button>'+
@@ -1841,43 +1843,96 @@ function renderBoard(){
 }
 
 /* ---------- gantt ---------- */
-function renderGantt(){
-  var P=pool();
+/* ---------- tasks: the list and the timeline, one view ----------
+   They were two tabs over the same 35 rows, grouped the same way by track and
+   sorted the same way by date, differing only in what each put beside a title:
+   the list had the state, the tick and the notes, the timeline had the date in
+   time. Two views whose unique content is a few fields each is one view with a
+   scroll, and he said so. The left column is the list, the right is the
+   timeline, and they are one row -- so a state and the date it moves are never
+   a tab apart.
+
+   Done is green here rather than grey. Grey said "ignore me", which is wrong
+   for the one state worth spotting down a column of 35. */
+function renderPlan(){
+  var P=pool(), t=todayD();
   var ds=P.map(function(i){return i.due;}).filter(Boolean).sort();
-  if(!ds.length){ document.getElementById("gantt").innerHTML=""; return; }
-  var s=D(ds[0]), e=D(ds[ds.length-1]), t=todayD();
-  if(t<s) s=t; if(t>e) e=t;
-  var A=new Date(s.getFullYear(),s.getMonth(),1), B=new Date(e.getFullYear(),e.getMonth()+1,1);
+  var A,B;
+  if(ds.length){
+    var s0=D(ds[0]), e0=D(ds[ds.length-1]);
+    if(t<s0) s0=t; if(t>e0) e0=t;
+    A=new Date(s0.getFullYear(),s0.getMonth(),1); B=new Date(e0.getFullYear(),e0.getMonth()+1,1);
+  }else{
+    /* a category can be filtered down to nothing with a date, and a zero-width
+       axis divides by zero rather than drawing an empty month */
+    A=new Date(t.getFullYear(),t.getMonth(),1); B=new Date(t.getFullYear(),t.getMonth()+1,1);
+  }
   var span=B-A, mcount=(B.getFullYear()-A.getFullYear())*12+(B.getMonth()-A.getMonth());
   function pos(d){ return (D(d)-A)/span*100; }
-  var MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  var LW=186;
+  var MNS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
   var h='<div class="gax"><div class="gl"></div><div class="gm">';
   for(var m=0;m<mcount;m++){ var md=new Date(A.getFullYear(),A.getMonth()+m,1);
-    h+='<div>'+MN[md.getMonth()]+(md.getMonth()===0||m===0?" "+String(md.getFullYear()).slice(2):"")+'</div>'; }
+    h+='<div>'+MNS[md.getMonth()]+(md.getMonth()===0||m===0?" "+String(md.getFullYear()).slice(2):"")+'</div>'; }
   h+='</div></div>';
-
   var grid=""; for(var g=0;g<mcount;g++) grid+='<div></div>';
 
-  TORDER.forEach(function(k){
-    var rows=alive().filter(function(i){return i.track===k;}).sort(byDue);
-    if(!rows.length) return;
-    h+='<div class="gsec"><i style="background:'+tc(k)+'"></i>'+esc(tl(k))+'</div>';
-    rows.forEach(function(i){
-      var x=pos(i.due), done=i.status==="done", late=!done&&dleft(i.due)<0;
-      var col=done?"#bdb6c6":(late?"#e0263c":tc(i.track));
-      h+='<div class="grow'+(done?" done":"")+'" data-go="'+i.id+'">'+
-         '<div class="gl"><i style="background:'+col+'"></i><span>'+esc(i.title)+'</span></div>'+
-         '<div class="gtrack"><div class="gg">'+grid+'</div>'+
-         '<div class="gbar" style="left:0;width:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
+  /* one task: as the list drew it, then the same task in time */
+  function row(i){
+    var n=dleft(i.due), done=i.status==="done", late=!done&&!i.deleted&&n!==null&&n<0;
+    var col=done?"#00a98f":(late?"#e0263c":tc(i.track));
+    var st=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) st=x; });
+    var sc=i.deleted?"#8b8095":(st?st.c:"#8b8095"), nn=notesFor(i.id).length;
+    var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+'" data-id="'+i.id+'">'+
+      '<div class="gl"><div class="glr">'+
+        (i.deleted
+          ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
+          : '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>')+
+        '<span class="gst" style="color:'+sc+';background:'+sc+'1a">'+
+          esc(i.deleted?"Deleted":(st?st.label:"To do"))+'</span>'+
+        '<span class="gt">'+esc(i.title)+'</span>'+
+      '</div><div class="gmeta">'+
+        (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
+        '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
+        (done||i.deleted||n===null
+          ? '<span class="chip d">'+esc(i.due?fmtD(i.due):"No date")+'</span>'
+          : '<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>')+
+        '<button class="mini" data-act="note" title="Note">&#9998;</button>'+
+      '</div></div><div class="gtrack"><div class="gg">'+grid+'</div>';
+    if(i.due){
+      var x=pos(i.due);
+      o+='<div class="gbar" style="left:0;width:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
          '<div class="gpt" style="left:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
          '<div class="glab '+(x>60?"lft":"rgt")+(late?" late":"")+'" style="left:'+x.toFixed(2)+'%">'+
-            fmtD(i.due)+(late?" \u00b7 late":"")+'</div>'+
-         '</div></div>';
-    });
+            fmtD(i.due)+(late?" · late":"")+'</div>';
+    }
+    return o+'</div></div>';
+  }
+
+  TORDER.forEach(function(k){
+    var rows=P.filter(function(i){return i.track===k;}).sort(byDue);
+    if(!rows.length) return;
+    var dn=rows.filter(function(i){return i.status==="done";}).length;
+    h+='<div class="gsec"><i style="background:'+tc(k)+'"></i>'+esc(tl(k))+
+       '<em>'+dn+' of '+rows.length+' done</em></div>';
+    rows.forEach(function(i){ h+=row(i); });
   });
-  h+='<div class="gnow" style="left:calc('+LW+'px + (100% - '+LW+'px) * '+(pos(iso(todayD()))/100).toFixed(4)+')"></div>';
+
+  /* This view inherits the list's one job nothing else does: a deleted task is
+     gone from every other view, and this is where it is still reachable, long
+     after the undo toast. The sub-tab filter applies here as everywhere. */
+  var dgone=gone().filter(inCat).sort(byDue);
+  if(dgone.length){
+    h+='<div class="gsec"><i style="background:var(--ink3)"></i>Deleted'+
+       '<em>'+dgone.length+' task'+(dgone.length>1?"s":"")+'</em></div>';
+    dgone.forEach(function(i){ h+=row(i); });
+  }
+
+  if(!P.length&&!dgone.length){
+    document.getElementById("gantt").innerHTML='<p class="tip" style="padding:16px">Nothing in this category.</p>';
+    return;
+  }
+  h+='<div class="gnow" style="left:calc(var(--lw) + (100% - var(--lw)) * '+(pos(iso(todayD()))/100).toFixed(4)+')"></div>';
   document.getElementById("gantt").innerHTML=h;
 }
 
@@ -2141,46 +2196,6 @@ function hhmm(isoStr){
   return (h<10?"0":"")+h+":"+(m<10?"0":"")+m;
 }
 
-function renderList(){
-  var h="", P=pool(), rows=function(g){
-    var o="";
-    g.forEach(function(i){
-      var n=dleft(i.due), nn=notesFor(i.id).length;
-      o+='<div class="lrow'+(i.status==="done"?" done":"")+(i.deleted?" dl":"")+'" data-id="'+i.id+'">'+
-        (i.deleted
-          ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
-          : '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>')+
-        '<span class="lt">'+esc(i.title)+'</span><span class="lmeta">'+
-        (nn?'<span class="chip nt">&#9998; '+nn+'</span>':'')+
-        (i.dateType!=="Confirmed"?'<span class="chip dt">'+esc(i.dateType)+'</span>':'')+
-        '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-        (i.status==="done"||i.deleted?'<span class="chip d">'+fmtD(i.due)+'</span>'
-                          :'<span class="chip d '+cCls(n)+'">'+fmtD(i.due)+' &middot; '+cTxt(n)+'</span>')+
-        '<button class="mini" data-act="note" title="Note">&#9998;</button></span></div>';
-    });
-    return o;
-  };
-  TORDER.forEach(function(k){
-    var g=P.filter(function(i){return i.track===k;}).sort(byDue);
-    if(!g.length) return;
-    var dn=g.filter(function(i){return i.status==="done";}).length;
-    h+='<div class="lgrp"><div class="lgh"><i style="background:'+tc(k)+'"></i><b>'+esc(tl(k))+'</b><em>'+dn+' of '+g.length+' done</em></div><div class="lwrap">';
-    h+=rows(g);
-    h+='</div></div>';
-  });
-  /* The list is deliberately the only view that shows a deleted task. Everywhere
-     else it is gone, which is the point of deleting it; here it is still
-     reachable, because the undo toast is long gone by the time he changes his
-     mind. The sub-tab filter applies, so this follows `inCat` like the rest. */
-  var dgone=gone().filter(inCat).sort(byDue);
-  if(dgone.length){
-    h+='<div class="lgrp dlgrp"><div class="lgh"><i style="background:var(--ink3)"></i><b>Deleted</b>'+
-       '<em>'+dgone.length+' task'+(dgone.length>1?"s":"")+'</em></div><div class="lwrap">'+
-       rows(dgone)+'</div></div>';
-  }
-  document.getElementById("lviews").innerHTML=h;
-}
-
 /* ===========================================================
    DRAWER
    =========================================================== */
@@ -2242,7 +2257,7 @@ function renderDrawer(keepDraft){
 
   if(i.deleted){
     h+='<div class="dgone"><b>This task is deleted.</b>'+
-       '<div>It is out of every view except the list, and it is gating nothing. '+
+       '<div>It is out of every view except Tasks, and it is gating nothing. '+
        'Its notes are kept.</div>'+
        '<div class="row-b" style="margin-top:9px"><button class="btn" data-undel="1">Put it back</button></div></div>';
   }
@@ -2255,7 +2270,13 @@ function renderDrawer(keepDraft){
   if(i.brief) h+='<div class="dsub">'+esc(i.brief)+'</div>';
 
   /* --- the four things that can change, one row each --- */
+  /* Title is a row like the rest, not a pencil tucked onto the header: every
+     other editable field on this card is a row, and the one he asked to be
+     able to change should not be the exception he has to hunt for. Its value
+     reads "Rename" rather than the title, because the header two lines above
+     IS the title and printing it twice forty pixels apart is not a summary. */
   h+='<div class="pgrp">'+
+     prow("title","Title",{t:"Rename"})+
      prow("status","Status",statusVal(i))+
      prow("due","Due",dueVal(i,n))+
      prow("priority","Priority",priVal(i))+
@@ -2304,7 +2325,7 @@ function renderDrawer(keepDraft){
   h+='<div class="fld dsave"><button class="btn wide" data-done="1">Close</button>'+
      (i.deleted?'':'<div class="row-b" style="margin-top:8px"><button class="btn del" data-del="1">Delete this task</button></div>')+
      '<div class="hint">Every change above is already saved and on its way to your other device.'+
-     (i.deleted?'':' Deleting keeps the notes and can be undone from the list.')+'</div></div>';
+     (i.deleted?'':' Deleting keeps the notes and can be undone from Tasks.')+'</div></div>';
 
   document.getElementById("dBody").innerHTML=h;
   var t2=document.getElementById("nt"); if(t2&&noteDraft) t2.value=noteDraft;
@@ -2331,7 +2352,6 @@ function statusVal(i){
 function dueVal(i,n){
   if(!i.due) return {t:"Not set",un:true};
   var m=[];
-  if(i.dateType) m.push(esc(i.dateType));
   /* a finished task is not late. The countdown is advice about what is left to
      do, and on a Done task there is none -- it only ever read as the board
      being wrong about something he had already closed. */
@@ -2360,12 +2380,14 @@ function pexOf(k){
     /* the date, the four ways he actually moves it, and what kind of date it is */
     return '<div class="drow"><input type="date" id="dd" value="'+esc(i.due||"")+'">'+
       [1,3,5,14].map(function(d){return '<button class="pch" data-sn="'+d+'">+'+d+'</button>';}).join("")+
-      '</div><div class="seg" style="margin-top:7px">'+
-      ["Confirmed","Target","Awaiting"].map(function(x){
-        return '<button data-ty="'+x+'" aria-pressed="'+(i.dateType===x)+'">'+x+'</button>'; }).join("")+
       '</div>'+
       (i.snoozes?'<div class="hint">Pushed '+i.snoozes+' time'+(i.snoozes>1?"s":"")+
         (i.origDue?', from '+esc(fmtD(i.origDue)):'')+'.</div>':'');
+  if(k==="title")
+    return '<div class="trow"><input type="text" id="tt" maxlength="120" value="'+esc(i.title||"")+'" '+
+      'placeholder="What is this task" autocomplete="off"></div>'+
+      '<div class="row-b" style="margin-top:7px"><button class="btn o" data-tsave="1">Save title</button></div>'+
+      '<div class="hint">This is the name everywhere on the board. Notes already on the task keep the name they were written under.</div>';
   if(k==="effort"){
     /* The one thing a due date cannot tell you, so the start-by under it is not
        decoration: it is the number the nudge is built on, shown so he can
@@ -2457,7 +2479,7 @@ function changedItems(){
     var d=diffOf(i);
     if(Object.keys(d).length){
       out.push({id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,
-                dateType:i.dateType,snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,
+                snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,
                 effort:i.effort||null,deleted:!!i.deleted,at:touched[i.id]||null});
     }else if(touched[i.id]){
       out.push({id:i.id,title:i.title,at:touched[i.id],seed:true});
@@ -2468,7 +2490,7 @@ function changedItems(){
 function fullPayload(){
   return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
     notes:notes, changed:changedItems(),
-    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,dateType:i.dateType,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
+    open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
 }
 /* lean on purpose: the baseline task list already lives in SEED in this file,
    so Claude rebuilds the full picture from SEED + changed. Only the deltas travel. */
@@ -2521,7 +2543,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1620";
+var BUILD="2026-10-04-1700";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2673,15 +2695,30 @@ document.addEventListener("click",function(e){
   var sn3=t.closest("[data-sn3]"); if(sn3){ snooze(sn3.dataset.sn3,3); return; }
   var dn=t.closest("[data-dn]"); if(dn){ var q=items[dn.dataset.dn]; patch(dn.dataset.dn,{status:"done"},"Closed: "+q.title); return; }
 
-  /* .calrow is the narrow calendar's agenda row. It was left out of this list
+  /* .grow is a Tasks row, .calrow the narrow calendar's agenda row. .calrow
+     was left out of this list
      and styled cursor:grab, so a tap on a task in Calendar on the phone did
      nothing at all -- the one view where opening the task was unreachable.
      It is not a drag handle: pointerdown only picks up .card and .ev, and
      drag-to-a-day is a desktop gesture anyway. */
-  var row=t.closest(".lrow,.card,.ev,.calrow");
+  var row=t.closest(".grow,.card,.ev,.calrow");
   if(row&&row.dataset.id&&!t.closest("[data-act]")){ openItem(row.dataset.id); return; }
 });
 
+/* A rename is a one-field form, so Enter commits it: a text input that only
+   saves from a button reads as broken to anyone who types. An empty one is
+   refused rather than accepted -- a nameless task cannot be found again. */
+function saveTitle(){
+  var el=document.getElementById("tt"); if(!el||!openId) return;
+  var v=(el.value||"").trim();
+  if(!v){ toast("A task needs a name."); el.focus(); return; }
+  if(v===items[openId].title){ dRow=null; renderDrawer(true); return; }
+  dRow=null;
+  patch(openId,{title:v},"Renamed");
+}
+document.getElementById("dBody").addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&e.target&&e.target.id==="tt"){ e.preventDefault(); saveTitle(); }
+});
 /* --- drawer body --- */
 document.getElementById("dBody").addEventListener("click",function(e){
   var b=e.target.closest("button"); if(!b) return;
@@ -2695,6 +2732,7 @@ document.getElementById("dBody").addEventListener("click",function(e){
   }
   /* one row open at a time: the card is a summary, and two open rows is the
      stack of controls this replaced. Nothing is saved by opening one. */
+  if(b.dataset.tsave){ saveTitle(); return; }
   if(b.dataset.row){ dRow=(dRow===b.dataset.row?null:b.dataset.row); renderDrawer(true); return; }
   if(b.dataset.nadd){ dNote=true; renderDrawer(true);
     var nt=document.getElementById("nt"); if(nt) nt.focus();
@@ -2714,7 +2752,6 @@ document.getElementById("dBody").addEventListener("click",function(e){
   if(b.dataset.st){ var sl=null; STATUS.forEach(function(x){ if(x.k===b.dataset.st) sl=x.label; });
     dRow=null; patch(openId,{status:b.dataset.st},"Saved: "+(sl||b.dataset.st)); return; }
   if(b.dataset.pr){ dRow=null; patch(openId,{priority:b.dataset.pr},"Saved: "+b.dataset.pr+" priority"); return; }
-  if(b.dataset.ty){ patch(openId,{dateType:b.dataset.ty},"Saved: date is "+b.dataset.ty); return; }
   if(b.dataset.ef){ var ef=effOf(b.dataset.ef); dRow=null;
     patch(openId,{effort:b.dataset.ef},"Saved: "+(ef?ef.label.toLowerCase():b.dataset.ef)); return; }
 });
@@ -2745,7 +2782,7 @@ document.getElementById("exportBtn").addEventListener("click",function(e){
 
 /* --- double click to annotate --- */
 stage.addEventListener("dblclick",function(e){
-  var c=e.target.closest(".card,.lrow,.ev,.calrow,.fnode,.gb"); if(!c) return;
+  var c=e.target.closest(".card,.grow,.ev,.calrow,.fnode,.gb"); if(!c) return;
   var id=c.dataset.id||c.dataset.go; if(id) openItem(id,true);
 });
 
@@ -2809,7 +2846,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
 function setView(v){
   view=v;
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
-  ["over","board","time","cal","graph","list","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
+  ["over","board","time","cal","graph","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
   renderSubs();
   /* render() paints the chat while another view is still current, so entering
@@ -2957,7 +2994,7 @@ document.addEventListener("visibilitychange",function(){ if(document.hidden) end
 /* ===========================================================
    COMMAND PALETTE
    =========================================================== */
-var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Timeline"},{v:"cal",n:"Calendar"},{v:"graph",n:"Dependencies"},{v:"list",n:"List"},{v:"chat",n:"Chat"}];
+var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Tasks"},{v:"cal",n:"Calendar"},{v:"graph",n:"Dependencies"},{v:"chat",n:"Chat"}];
 var palSel=0, palRows=[];
 function openPal(){
   document.getElementById("pal").classList.add("on");
@@ -3070,7 +3107,7 @@ function mergePayload(pay){
     if(!isPatch && mine && theirs <= mine) return;
 
     if(c.seed){
-      i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.dateType=sd.dt; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null;
+      i.title=sd.t; i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null;
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }

@@ -112,12 +112,13 @@ board simply never reloads itself — which is exactly why it is easy to forget
 and why it is checked.
 *Checked: `BUILD is a datestamp`.*
 
-### A deleted task is gone everywhere but the list
+### A deleted task is gone everywhere but Tasks
 `deleted` is a field in the diff, not a removal, so it merges per item and can
-be undone. Every view reads `alive()`; only the list renders `gone()`, with a
+be undone. Every view reads `alive()`; only Tasks renders `gone()`, with a
 Restore button, because the undo toast does not last until he changes his mind.
-*Checked: `a deleted task is out of the board`, `a deleted task is still in the
-list`, `and it comes back`, `deleting does not mark the task manual`.*
+(That job came over from the List view when the two merged.)
+*Checked: `a deleted task is out of the board`, `a deleted task is still in
+Tasks`, `and it comes back`, `deleting does not mark the task manual`.*
 
 ### A badge counts what is new, not what exists
 The Notes badge read 34 for weeks. A notification you cannot act on is noise;
@@ -239,6 +240,32 @@ look deliberate, and it was not even draggable.
 A view that draws a task in a shape of its own has to be added to that
 selector by hand. The check taps a Calendar task at 390 and 1280 and asserts
 the drawer opens on the tapped id.
+
+### A renamed task is still renamed after a reload
+
+`title` is in `DFIELDS` and in `diffOf`. A field in one and not the other fails
+silently and completely -- `deleted` proved it -- so the check types a new name
+into the card, reads it back out of `localStorage`, **reloads the page**, and
+reads it again. An in-memory assertion cannot see this class of bug at all.
+
+An empty name is refused rather than saved: a task with no name cannot be found
+again.
+
+### The words on screen are his words
+
+"Blocked" is now "Upcoming" and the Target field is gone entirely. Both are
+checked as text he can read -- the innerText of every view and of an open card
+-- because a label is only ever wrong on screen. The status *key* is still
+`blocked`, and must stay: every stored diff and merge payload in the wild
+carries it.
+
+### Tasks is one view, not two
+
+The list and the timeline were two tabs over the same rows. One `.grow` now
+holds both halves, `.gl` and `.gtrack`. The check asserts, at 390 and 1280,
+that there is no List tab, that every task in `pool()` is a row, that a row
+carries the state, the tick, the note button and the timeline together, and
+that a done task is green on both halves.
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can
