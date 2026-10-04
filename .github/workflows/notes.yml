@@ -6,6 +6,11 @@
 # Needs one repository secret, CLAUDE_CODE_OAUTH_TOKEN, generated on the Mac
 # with `claude setup-token`. Without it the job fails on the first run and
 # nothing else breaks: the Routine still picks the notes up on its schedule.
+#
+# This runs the Claude Code CLI rather than anthropics/claude-code-action,
+# which rejects this trigger outright: "Unsupported event type: push". The
+# action is built for issue and pull request events. The CLI takes the same
+# subscription token in CLAUDE_CODE_OAUTH_TOKEN and has no such restriction.
 name: Answer notes
 
 on:
@@ -33,15 +38,24 @@ jobs:
     timeout-minutes: 12
     permissions:
       contents: write
-      id-token: write
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
-      - uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: "/answer-notes"
-          claude_args: |
+
+      - name: Install Claude Code
+        run: curl -fsSL https://claude.ai/install.sh | bash
+
+      - name: Answer the notes
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          # the commit is Claude's, and its author is what the loop guard above
+          # reads, so it is set here rather than left to the runner's default
+          git config user.name  "Claude"
+          git config user.email "noreply@anthropic.com"
+          claude -p "/answer-notes" \
+            --dangerously-skip-permissions \
             --max-turns 30
-            --allowedTools "Bash,Read,Write,Edit,Glob,Grep"
