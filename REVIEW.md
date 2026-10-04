@@ -117,8 +117,20 @@ These need a person, and a person reading the diff.
 
 ## Shipping
 
-Branch, PR, merge — never commit code straight to `main`. The one sanctioned
-exception is a data-only patch file into `claude-inbox/`.
+**A small change goes straight to `main`.** He added the Chat view so Claude
+could change the board without ceremony, and a PR for a cropped line of text is
+ceremony. Small means: confined to `index.html`, covered by the checks above,
+and reversible by reading one commit. Verify it, bump `BUILD`, commit, push.
+
+**A large change still gets a branch and a PR.** Large means any of: the data
+model or the merge rules, `relay/`, `.github/workflows/`, anything touching a
+secret, a new view or a redesign of one, or a change you cannot describe in a
+sentence. If you are unsure which it is, it is large.
+
+Either way the checks pass first. The shortcut is on the paperwork, not on the
+verification — that is the whole bargain.
+
+A data-only patch file into `claude-inbox/` is small by definition.
 
 **If a code change also touches `claude-inbox/`, put `[skip ci]` in the commit
 message.** The Answer notes workflow fires on any push to that folder, so

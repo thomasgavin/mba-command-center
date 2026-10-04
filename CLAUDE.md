@@ -408,4 +408,11 @@ back are one change, not two.
   rounded corners and no transparency — iOS masks the icon itself and a
   pre-rounded one comes out double-rounded. Changing an icon does not update a
   home-screen bookmark that already exists; it has to be removed and re-added.
-- Branch for work, never commit straight to `main`; merge through a PR.
+- **Small changes go straight to `main`.** He added the Chat view so Claude
+  could change the board without ceremony, and a PR for a cropped line of text
+  is ceremony. Small means confined to `index.html`, covered by
+  `checks/board-check.mjs`, and reversible by reading one commit. A large
+  change — the data model, `relay/`, a workflow, a secret, a new view, or
+  anything you cannot describe in a sentence — still gets a branch and a PR.
+  If you are unsure which it is, it is large. The checks pass either way: the
+  shortcut is on the paperwork, never on the verification.

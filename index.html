@@ -697,8 +697,14 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   text-transform:uppercase;color:var(--ink4);margin-bottom:5px}
 .cdid div{color:var(--ink2);padding:2px 0 2px 13px;position:relative;line-height:1.45}
 .cdid div::before{content:"";position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--green)}
-.cbox{display:flex;gap:8px;align-items:flex-end;flex:0 0 auto;
-  background:var(--page);padding:10px 0 4px;border-top:1px solid var(--line)}
+/* The composer and the line under it are one block that never shrinks. The
+   tip was a bare flex child of the column, so flex-shrink squeezed it to zero
+   height and it read as cropped text at the very bottom of the screen. The
+   block also carries the home-bar inset, rather than the composer carrying it
+   and the tip hanging below it. */
+.cfoot{flex:0 0 auto;background:var(--page);border-top:1px solid var(--line);padding-bottom:4px}
+.cfoot .tip{margin:6px 0 0}
+.cbox{display:flex;gap:8px;align-items:flex-end;padding:10px 0 4px}
 .cbox textarea{flex:1;min-height:40px;max-height:140px;resize:none;padding:10px 13px;
   border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
   font:inherit;font-size:13.5px;line-height:1.45}
@@ -758,7 +764,7 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
      control on the board that still zooms the page */
   .cbox textarea{font-size:16px}
   /* the composer sits above the home bar, and a bubble can have the width */
-  .cbox{padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  .cfoot{padding-bottom:max(6px,env(safe-area-inset-bottom))}
   .cmsg{max-width:86%}
   /* the drawer is the full screen here, so it has to respect the notch and the
      home bar, and the close button has to be a thumb-sized target */
@@ -841,11 +847,13 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 
     <section class="view" id="v-chat">
       <div class="chatw" id="chatw"></div>
-      <div class="cbox">
-        <textarea id="cin" rows="1" placeholder="Message Claude…"></textarea>
-        <button class="csend" id="csend" aria-label="Send">&#8593;</button>
+      <div class="cfoot">
+        <div class="cbox">
+          <textarea id="cin" rows="1" placeholder="Message Claude…"></textarea>
+          <button class="csend" id="csend" aria-label="Send">&#8593;</button>
+        </div>
+        <p class="tip" id="chatTip"></p>
       </div>
-      <p class="tip" id="chatTip" style="margin:6px 0 0"></p>
     </section>
   </main>
 </div>
@@ -1230,13 +1238,17 @@ function snooze(id,n){
             dateType:i.dateType==="Confirmed"?"Target":i.dateType});
   toast("Pushed "+n+" day"+(n>1?"s":"")+" to "+fmtD(items[id].due), function(){ patch(id,before); });
 }
-function addNote(itemId,text){
+/* quiet: the chat composer passes it, because the message is already on screen
+   with its own sending/delivered state under it and a toast on top of that is
+   one notice too many. A note left on a task still says so, since that drawer
+   gives no other sign it was taken. */
+function addNote(itemId,text,quiet){
   notes.unshift({id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
     createdAt:new Date().toISOString(),state:"new",from:"me"});
   save(); render();
   autoSend();
-  toast(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.");
+  if(!quiet) toast(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.");
 }
 
 /* ---------- toast ---------- */
@@ -2024,7 +2036,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-0630";
+var BUILD="2026-10-04-0650";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2263,7 +2275,7 @@ document.getElementById("subs").addEventListener("click",function(e){
   var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; btn.disabled=!ta.value.trim(); };
   var send=function(){
     var t=ta.value.trim(); if(!t) return;
-    addNote(null,t);
+    addNote(null,t,true);
     ta.value=""; grow(); ta.focus();
   };
   ta.addEventListener("input",grow);
@@ -2274,9 +2286,11 @@ document.getElementById("subs").addEventListener("click",function(e){
   grow();
 })();
 
+/* opens the view and nothing else. Focusing the composer here raised the
+   keyboard over half the thread before he had read any of it; he taps the box
+   himself when he wants to type. */
 document.getElementById("fab").addEventListener("click",function(){
   setView("chat");
-  var ta=document.getElementById("cin"); if(ta) ta.focus();
 });
 
 /* --- views --- */

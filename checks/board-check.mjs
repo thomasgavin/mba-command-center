@@ -182,7 +182,41 @@ for (var w2 of [390, 1280]) {
   await s4.ctx.close();
 }
 
-/* ---- 5. the build stamp moved with the page ---- */
+/* ---- 5. the chat view opens to be read, and shows all of itself ---- */
+{
+  var s5 = await open(390, [{ id: "n1", from: "me", text: "a message, so the tip has text",
+                              createdAt: new Date().toISOString(), state: "read" }]);
+  await s5.p.click("#fab");
+  await s5.p.waitForTimeout(400);
+  var focused = await s5.p.evaluate(function () {
+    return document.activeElement && document.activeElement.id;
+  });
+  ok("the chat button does not raise the keyboard", focused !== "cin",
+     "focus is on " + focused + "; focusing the composer covers half the thread before he has read it");
+  var tip = await s5.p.evaluate(function () {
+    var t = document.getElementById("chatTip"), r = t.getBoundingClientRect();
+    return { h: r.height, sh: t.scrollHeight, bottom: r.bottom, win: innerHeight };
+  });
+  ok("the line under the composer is whole, not squeezed",
+     tip.h > 0 && tip.h + 1 >= tip.sh && tip.bottom <= tip.win + 1, JSON.stringify(tip));
+  /* a message typed in Chat is already on screen with its own state under it */
+  await s5.p.fill("#cin", "typed in the chat window");
+  await s5.p.click("#csend");
+  await s5.p.waitForTimeout(350);
+  var toasted = await s5.p.evaluate(function () {
+    return document.getElementById("toast").classList.contains("on");
+  });
+  ok("no toast for a message typed in Chat", !toasted);
+  await s5.p.evaluate(function () { addNote(Object.keys(items)[0], "left on a task"); });
+  await s5.p.waitForTimeout(300);
+  var toasted2 = await s5.p.evaluate(function () {
+    return document.getElementById("toast").classList.contains("on");
+  });
+  ok("a note left on a task still says so", toasted2, "the drawer gives no other sign it was taken");
+  await s5.ctx.close();
+}
+
+/* ---- 6. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];
