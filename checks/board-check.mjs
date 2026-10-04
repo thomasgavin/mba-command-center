@@ -771,6 +771,39 @@ for (var w2 of [390, 1280]) {
   await s19.ctx.close();
 }
 
+/* ---- 22. a task in Calendar opens, at every width ----
+   The narrow agenda renders .calrow, which was missing from the click
+   handler's list, so Calendar on the phone was the one view where a task
+   could not be opened at all. Both widths, because the two render different
+   elements and a fix for one says nothing about the other. */
+for (var cw of [390, 1280]) {
+  var s22 = await open(cw);
+  var opened = await s22.p.evaluate(async function () {
+    var a = alive().filter(function (i) { return i.due; })
+                   .sort(function (x, y) { return x.due < y.due ? -1 : 1; });
+    if (!a.length) return { skip: true };
+    setView("cal");
+    calCur = new Date(+a[0].due.slice(0, 4), +a[0].due.slice(5, 7) - 1, 1);
+    render();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    var row = document.querySelector("#cgrid .calrow,#cgrid .ev");
+    if (!row) return { none: true };
+    row.click();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    return { want: row.dataset.id, got: openId,
+             shown: document.getElementById("drawer").classList.contains("on"),
+             grab: getComputedStyle(row).cursor };
+  });
+  ok("a tap on a Calendar task opens it at " + cw,
+     opened.got && opened.got === opened.want && opened.shown, JSON.stringify(opened));
+  /* cursor:grab on something that is not draggable promises a gesture the
+     page does not have, and that is what hid the missing handler. The wide
+     .ev really is draggable (drag-to-a-day), so this is the narrow row only. */
+  if (cw < 720) ok("and the agenda row does not pretend to be a drag handle",
+     opened.grab !== "grab", JSON.stringify(opened.grab));
+  await s22.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

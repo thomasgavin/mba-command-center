@@ -606,7 +606,12 @@ The board is used on an iPhone, mostly from the home screen.
 - **The calendar is a vertical agenda below 720px** (`narrow()`), one row per
   day that has something on it. Seven columns in 390px gives each day ~50px,
   which read as broken. Drag-to-a-day is a desktop gesture; the snooze rail
-  works on both.
+  works on both. The agenda row is `.calrow`, a **different element from the
+  grid's `.ev`**, and it shipped missing from the click handler's list and
+  styled `cursor:grab` -- so Calendar on the phone was the one view where
+  tapping a task opened nothing, and the cursor explained the silence as a
+  drag. Anything that renders a task in a second shape has to be added to that
+  list by hand; the check now taps a Calendar task at both widths.
 - Timeline labels wrap (`white-space:normal`); a truncated title cannot tell two
   tasks apart.
 - **There is no swipe between views.** There was, with a careful set of
@@ -626,7 +631,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 90 invariants, three widths, a real browser. Every one of them was a
+that runs: 93 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

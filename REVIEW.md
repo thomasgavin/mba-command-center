@@ -228,6 +228,18 @@ a sentence saying to install it, not a button that does nothing.
 *Checked: `no relay, no offer`, `and goes away once he is subscribed`,
 `on an iPhone in Safari it says to install, and offers no dead button`.*
 
+### A task opens from every view that draws one
+
+Calendar renders a task two ways: `.ev` in the desktop grid and `.calrow` in
+the narrow agenda. Only the first was in the click handler's selector, so on
+the phone -- the way he actually uses the board -- Calendar was the one view
+where tapping a task did nothing. `cursor:grab` on the row made the silence
+look deliberate, and it was not even draggable.
+
+A view that draws a task in a shape of its own has to be added to that
+selector by hand. The check taps a Calendar task at 390 and 1280 and asserts
+the drawer opens on the tapped id.
+
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can
 see is missing -- that happened to the Overview check. New sections go above
