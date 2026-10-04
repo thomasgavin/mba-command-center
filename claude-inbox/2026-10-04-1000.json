@@ -1,0 +1,15 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-04T10:00:00.000Z",
+  "source": "Claude",
+  "why": "Why Move to Fontainebleau shows done",
+  "changed": [],
+  "ack": ["n1791081138224668"],
+  "notes": [
+    {"id": "claude-1791108000000", "from": "claude", "itemId": null, "itemTitle": null,
+     "text": "That milestone is gated on the 'Book flight to Paris for 3 January' task, and you marked that task Done last night (20:44 on 3 Oct). The milestone counts as reached whenever its gate task is done, so it flipped. It is really showing 'flight booked', not 'moved', which is misleading, since the 3 Jan date is still three months away. If the flight is booked, nothing is wrong with your data. I have not changed anything. The fix is in the board's code (gate the milestone on something that happens at arrival, or relabel it), so I'd do that on a branch rather than from this workflow.",
+     "createdAt": "2026-10-04T10:00:00.000Z", "state": "new",
+     "acted": ["No board changes: the flight task being Done is what ticks the milestone"]}
+  ]
+}
