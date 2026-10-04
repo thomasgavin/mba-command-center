@@ -255,13 +255,54 @@ Three things keep it from eating itself or his subscription:
 ## The twice-daily Routine
 
 `MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
-17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session that
-reads `claude-inbox/` and acts on notes from roughly the last 14 hours. It polls;
-it is not woken by a commit.
+17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session on
+this repo. It polls; it is not woken by a commit.
+
+**Its job is `/nudge`, not notes.** It used to poll `claude-inbox/` for anything
+unanswered, and that has been dead weight since the relay started asking for a
+run the moment a note lands: by the time the Routine fires, the note was
+answered hours ago. It still answers an outstanding note if `/nudge` happens to
+see one, which is the whole fallback for a relay that is down — one line in the
+prompt rather than a second pass over the folder.
+
+**Only the owner can change it.** `update_trigger` refuses it — it was created
+through the API by him, not by an agent — so a run that wants it changed writes
+the replacement prompt out and asks. Same for adding a scheduled workflow that
+runs Claude on a timer: creating one is blocked, and the Routine is the way.
+
 Claude cannot write to the owner's `localStorage`, so a run never changes what
-is on screen at the time. It commits a patch into `claude-inbox/` instead, and
-the board applies it on the owner's next page load. So a date does move, just
-one page load later, not during the run.
+is on screen at the time. On the relay route a nudge or a reply reaches the
+board on its open socket in the same second; on the file route it commits into
+`claude-inbox/` and the board applies it on the next page load. So a date does
+move, just one page load later, not during the run.
+
+## The audit log
+
+`history/YYYY-MM-DD.md` is a readable table of every board change that day:
+the time, the task, the field with its old and new value, and whether it was
+him or Claude. **Kept for 30 days** (`HIST_DAYS` in `relay/worker.js`), then
+the file is deleted. He asked for it on 2026-10-04 — nothing recorded history
+before it. `claude-inbox/` looked like one and is not: those are raw sync
+payloads, they expire at 7 days, and a file per edit burst is not something a
+person reads.
+
+It is written by the **relay**, in `fold()`, because that is the one place
+every change passes through — both devices and Claude alike — and the one
+place that still holds the previous value to diff against. The daily archive
+alarm writes the day out and prunes anything past the window; it runs after
+the snapshot and inside a `try`, because the archive is what keeps the GitHub
+fallback alive and bookkeeping must never be able to cost it. A write that
+fails leaves the entries pending for the next run rather than dropping them.
+
+`HIST_FIELDS` is deliberately not every field in the diff. `manual`, `snoozes`
+and `origDue` are bookkeeping the board keeps about itself — a snooze already
+shows up as the due date it moved — and logging them would bury the three or
+four lines a day that mean something.
+
+A task title is his text going into a markdown table cell, so `md()` escapes
+pipes and flattens newlines: a row that silently splits is a log that cannot
+be trusted. A day already on disk is **merged, not replaced**, since a
+redeploy re-arms the alarm and a second firing that day must add to it.
 
 ## Privacy
 
