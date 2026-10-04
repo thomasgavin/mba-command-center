@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 68 checks, three widths, a real browser
+node checks/board-check.mjs          # 76 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 ```
 
@@ -62,7 +62,26 @@ allowed to shrink below its longest word (`min-width:0`, and a `<span>` around
 any text that would otherwise be a bare, unshrinkable flex item).
 A Safari `input[type=date]` takes its own intrinsic width and ignores
 `width:100%`, which is why it carries `appearance:none` and `max-width:100%`.
+Most of the width now lives inside an expanded property row — the date input is
+in one of them — so every row is opened on every task before it is measured, not
+just the collapsed card.
 *Checked: `the drawer fits, for every task`.*
+
+### The task card states values; it does not lay out the option space
+Four stacked segmented controls put every option of every field on screen at
+once: seventeen buttons to describe four values, with no hierarchy between them
+and an empty composer above. Status, due, priority and effort are one row each
+now, showing the value they hold and opening on tap, one at a time; choosing a
+value closes the row. The composer is one line until he asks for it, and the
+button that ends the visit is secondary and says Close — an orange full-width
+button that only closed the card was the loudest thing on it doing the least,
+and it said "Done" under a status button of the same word.
+A Done task is never late: the countdown is advice about what is left to do.
+*Checked: `a card opens closed: four rows, nothing expanded`,
+`every row states the value it holds`, `one row is open at a time`,
+`choosing a value closes the row and shows it`, `a Done task is never late`,
+`tapping Add a note opens the composer`,
+`the close button is not the primary action, and is not called Done`.*
 
 ### No focusable control on a phone is under 16px
 iOS zooms the whole page when a focused input is smaller, and the zoom *stays*
@@ -70,7 +89,8 @@ after the keyboard closes. That is what once pushed the drawer's close button
 off the right edge with no way back but a pinch. Banning pinch-zoom in the
 viewport tag would also stop it and is worse. Watch for specificity: `.cbox
 textarea` sets its own size and beats the blanket rule, so it has to say 16px
-again.
+again. The date input and the note composer only exist while their row is open,
+so the check opens them first — one that never does cannot see them.
 *Checked: `every focusable control is 16px or more`.*
 
 ### Nothing is dated in the future
