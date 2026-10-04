@@ -128,6 +128,13 @@ and invokes the `answer-notes` skill, so a note is answered in under a minute
 instead of waiting for the Routine. The skill holds the whole procedure; the
 workflow is only the trigger.
 
+It runs the **Claude Code CLI**, not `anthropics/claude-code-action`. The
+action refuses this trigger outright -- `Unsupported event type: push` -- as it
+is built for issue and pull request events. The CLI takes the same subscription
+token in `CLAUDE_CODE_OAUTH_TOKEN` and has no such restriction. Do not "simplify"
+the workflow back to the action without checking that, because it fails in
+eleven seconds and looks like a bad secret.
+
 Three things keep it from eating itself or his subscription:
 
 - **It must not answer its own reply.** Claude's patch lands in the same folder,
