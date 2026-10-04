@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs      # 63 checks, three widths, a real browser
+node checks/board-check.mjs      # 68 checks, three widths, a real browser
 ```
 
 It exits non-zero on the first broken invariant and prints what it saw. It needs
@@ -115,6 +115,18 @@ A run with nothing to do still writes `acted[]`, and "No board changes: …"
 rendered under **What I changed**. `actedOf()` filters those, and an empty
 result renders no box at all.
 *Checked: `a no-change receipt renders no box`.*
+
+### Two tabs on one device do not eat each other's edits
+`localStorage` is shared, and `save()` used to write the whole blob — so a
+second tab's first ordinary save wrote its stale state over the other tab's
+edit, and the item showed its SEED value again on the next load. `save()` now
+merges on the same per-item clocks that govern device-to-device sync, and a
+`storage` listener repaints the other tab. That listener must never call
+`save()`.
+*Checked: `a stale tab's save does not wipe the other tab's edit`, `and it is
+still there on the next page load`, `the other tab picks up the edit without
+being reloaded`, `a revert survives a stale tab too`, `neither tab drops the
+other's note`.*
 
 ### A field the merge knows about is a field `save()` writes
 `DFIELDS` governs the merge; `diffOf` governs what is ever persisted. `deleted`
