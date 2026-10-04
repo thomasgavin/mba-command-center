@@ -896,6 +896,7 @@ for (var cw of [390, 1280]) {
    The list and the timeline were two tabs over the same rows grouped the same
    way. One row now carries both halves: if they ever come apart, a state and
    the date it moved would be a tab apart again. */
+var STATUS_LABELS = ["In progress", "To do", "Upcoming", "Done"];
 for (var tw of [390, 1280]) {
   var s25 = await open(tw);
   var k25 = await s25.p.evaluate(function () {
@@ -908,9 +909,15 @@ for (var tw of [390, 1280]) {
       tabs: Array.prototype.map.call(document.querySelectorAll(".vt"), function (b) { return b.dataset.v; }),
       rows: rows.length, items: pool().length,
       bothHalves: !!(first && first.querySelector(".gl") && first.querySelector(".gtrack")),
-      state: first ? (first.querySelector(".gst") || {}).textContent : null,
       tick: !!(first && first.querySelector(".tick")),
-      note: !!(first && first.querySelector('[data-act="note"]')),
+      /* the three things he asked off the row: the state pill, the date chip
+         and the note button. The colour and the marker's position carry the
+         first two; the third is one tap away inside the card. */
+      pill: !!document.querySelector("#gantt .gst"),
+      dateChip: !!document.querySelector("#gantt .chip.d"),
+      noteBtn: !!document.querySelector('#gantt [data-act="note"]'),
+      noteCount: !!document.querySelector("#gantt .chip.nt"),
+      legend: Array.prototype.map.call(document.querySelectorAll("#glg .lgi"), function (e) { return e.textContent; }),
       doneTick: done ? getComputedStyle(done.querySelector(".tick")).backgroundColor : null,
       donePoint: done ? (done.querySelector(".gpt") || {}).style.background : null
     };
@@ -919,10 +926,33 @@ for (var tw of [390, 1280]) {
      k25.tabs.indexOf("list") < 0 && k25.tabs.indexOf("time") >= 0, JSON.stringify(k25.tabs));
   ok(tw + "px: every task is a row", k25.rows === k25.items && k25.rows > 0, JSON.stringify(k25));
   ok(tw + "px: a row carries the list and the timeline together",
-     k25.bothHalves && !!k25.state && k25.tick && k25.note, JSON.stringify(k25));
+     k25.bothHalves && k25.tick, JSON.stringify(k25));
+  /* "Too cluttered, remove statuses ... Remove date ... Remove edit button and
+     note count" -- all four, and the key is what makes that readable. */
+  ok(tw + "px: the row is the title and nothing it already shows elsewhere",
+     !k25.pill && !k25.dateChip && !k25.noteBtn && !k25.noteCount, JSON.stringify(k25));
+  ok(tw + "px: a key maps every state to its colour",
+     k25.legend.length === STATUS_LABELS.length + 1 &&
+     STATUS_LABELS.every(function (l) { return k25.legend.indexOf(l) >= 0; }) &&
+     k25.legend.indexOf("Late") >= 0, JSON.stringify(k25.legend));
   /* green, not grey: done is the one state worth spotting down a column of 35 */
   ok(tw + "px: a done task is green on both halves",
      k25.doneTick === "rgb(0, 169, 143)" && k25.donePoint === "rgb(0, 169, 143)", JSON.stringify(k25));
+  /* "make the timeline more condensed so it fits more (at least the next 1.5
+     months) in the mobile screen". Measured, not assumed: the label column and
+     the month width are two numbers in CSS and either one can quietly eat the
+     part of the timeline he can actually see. */
+  var fit = await s25.p.evaluate(function () {
+    var sc = document.querySelector("#v-time .gscroll");
+    var gl = document.querySelector("#gantt .gax .gl");
+    var mo = document.querySelector("#gantt .gax .gm div");
+    if (!sc || !gl || !mo) return null;
+    return { visible: sc.clientWidth - gl.getBoundingClientRect().width,
+             month: mo.getBoundingClientRect().width };
+  });
+  ok(tw + "px: at least six weeks of the timeline is on screen beside the list",
+     !!fit && fit.month > 0 && fit.visible / fit.month >= 1.5,
+     JSON.stringify(fit) + (fit ? " = " + (fit.visible / fit.month).toFixed(2) + " months" : ""));
   await s25.ctx.close();
 }
 
