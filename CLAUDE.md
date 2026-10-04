@@ -368,6 +368,27 @@ is exactly the case a date-based reminder gets wrong.
 fact is the drift this board exists to prevent; they get filled in as they are
 learned, and the nudge skill has to ask rather than guess.
 
+## Two tabs are two devices
+
+`localStorage` is shared by every tab on a device, and `save()` wrote the whole
+blob. So the board left open in a second tab held the state it loaded with, and
+the first ordinary save it made — a poll, a socket event, the clock repair; it
+saves on nearly everything — wrote that stale state straight over an edit made
+in the other tab. The edit did not lose a race: the item vanished from the diff
+and the board showed its SEED value again on the next load. From the owner's
+side it looked like status and date changes were simply not recorded.
+
+The per-item clocks that already stop one device overwriting another are the
+whole answer; they were never applied to this device's own store. `save()` now
+re-reads what is there, keeps whichever side's item has the newer `touched`
+(including a revert, which is a clock with no diff behind it), unions the notes
+and the `seen` set, and takes the higher `relaySeq`. A `storage` listener folds
+the other tab's newer items into memory and repaints — **it must never save**,
+or two tabs would write to each other for ever.
+
+**Any new whole-blob field needs a rule here**, not just in `DFIELDS`: last
+write wins is wrong for every one of them.
+
 ## `DFIELDS` and `diffOf` are one decision in two places
 
 `DFIELDS` governs what a merge applies; `diffOf` governs what `save()` ever
@@ -484,7 +505,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 63 invariants, three widths, a real browser. Every one of them was a
+that runs: 68 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

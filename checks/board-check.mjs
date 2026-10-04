@@ -417,7 +417,71 @@ for (var w2 of [390, 1280]) {
   await s13.ctx.close();
 }
 
-/* ---- 14. the build stamp moved with the page ---- */
+/* ---- 14. two tabs on one device do not eat each other's edits ---- */
+{
+  /* The board saves on nearly everything -- a poll, a socket event, the clock
+     repair -- and save() wrote the whole blob. So the board left open in a
+     second tab held the state it loaded with and wrote it straight over an
+     edit made in the first: the item did not lose a race, it vanished from the
+     diff and showed its SEED value again on the next load. */
+  var ctx14 = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  var A = await ctx14.newPage(), B = await ctx14.newPage();
+  await A.goto(URL_, { waitUntil: "load" });
+  await B.goto(URL_, { waitUntil: "load" });
+  await A.waitForTimeout(700);
+  var K = "sbi-sanction";
+
+  await A.evaluate(function (k) { patch(k, { due: "2026-12-25" }); patch(k, { status: "done" }); }, K);
+  await A.waitForTimeout(300);
+  /* B never saw that edit. Any ordinary save in B used to destroy it. */
+  await B.evaluate(function () { save(); });
+  await B.waitForTimeout(300);
+  var stored = await B.evaluate(function (k) {
+    return (JSON.parse(localStorage.getItem("mbacc_v3") || "null").items || {})[k] || null;
+  }, K);
+  ok("a stale tab's save does not wipe the other tab's edit",
+     !!stored && stored.due === "2026-12-25" && stored.status === "done", JSON.stringify(stored));
+
+  await A.reload({ waitUntil: "load" });
+  await A.waitForTimeout(700);
+  var survived = await A.evaluate(function (k) { return { d: items[k].due, s: items[k].status }; }, K);
+  ok("and it is still there on the next page load",
+     survived.d === "2026-12-25" && survived.s === "done", JSON.stringify(survived));
+
+  /* the other half: the tab he is not typing in should show what he just did */
+  var K2 = "poa-exec";
+  await A.evaluate(function (k) { patch(k, { due: "2027-02-02" }); }, K2);
+  await A.waitForTimeout(500);
+  var live = await B.evaluate(function (k) { return items[k].due; }, K2);
+  ok("the other tab picks up the edit without being reloaded", live === "2027-02-02", String(live));
+
+  /* a revert is an edit too, and it has to survive a stale tab the same way */
+  await A.evaluate(function (k) {
+    var sd = seedOf(k); patch(k, { due: sd.d, status: sd.s, manual: false }, null, true);
+  }, K2);
+  await A.waitForTimeout(300);
+  await B.evaluate(function () { save(); });
+  await B.waitForTimeout(300);
+  var rev = await B.evaluate(function (k) {
+    return (JSON.parse(localStorage.getItem("mbacc_v3") || "null").items || {})[k] || null;
+  }, K2);
+  ok("a revert survives a stale tab too", rev === null || rev.due === undefined, JSON.stringify(rev));
+
+  /* notes are append-only, so neither tab may drop the other's */
+  await A.evaluate(function () { addNote(null, "written in tab A", true); });
+  await B.evaluate(function () { addNote(null, "written in tab B", true); });
+  await B.waitForTimeout(400);
+  var both = await B.evaluate(function () {
+    var n = JSON.parse(localStorage.getItem("mbacc_v3") || "null").notes || [];
+    return n.map(function (x) { return x.text; });
+  });
+  ok("neither tab drops the other's note",
+     both.indexOf("written in tab A") >= 0 && both.indexOf("written in tab B") >= 0,
+     JSON.stringify(both));
+  await ctx14.close();
+}
+
+/* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];
