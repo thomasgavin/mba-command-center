@@ -968,6 +968,10 @@ var savedAt=null, syncedAt=null;   /* last local change, newest export seen */
    laptop's older file -- the one holding the moved date -- was skipped forever
    and no amount of reloading could fix it. A file is read once, by name. */
 var seenF=null;
+/* How far down the relay's log this device has read. The socket asks for
+   everything after it, so a reload costs one short catch-up rather than a
+   re-read of the folder. */
+var relaySeq=0;
 /* a send handed to GitHub's editor that we have not yet seen land in the repo */
 var pending=null;
 /* When each item last changed on THIS device, id -> ISO. The board used to sync
@@ -994,6 +998,7 @@ function load(){
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
   seenF=(st&&st.seen)||null;
+  relaySeq=(st&&st.relaySeq)||0;
   /* a board saved before this existed has read nothing by name, so it gets one
      pass over the folder. That is the repair path for a device stuck behind. */
   if(!seenF) seenF={};
@@ -1050,7 +1055,8 @@ function save(){
   });
   fromMerge={};
   try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:notes,
-    saved:now,syncedAt:syncedAt,pending:pending,touched:touched,seen:seenF})); }catch(e){}
+    saved:now,syncedAt:syncedAt,pending:pending,touched:touched,seen:seenF,
+    relaySeq:relaySeq})); }catch(e){}
 }
 
 /* ---------- dates ---------- */
@@ -1877,7 +1883,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-0410";
+var BUILD="2026-10-04-0520";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -1928,7 +1934,13 @@ function relaySend(pay, json, quiet){
   if(!quiet) toast("Sending "+n+" note"+(n===1?"":"s")+"…");
   var hd={"Content-Type":"application/json"};
   if(RELAY_KEY) hd["X-Relay-Key"]=RELAY_KEY;
-  fetch(RELAY,{method:"POST",headers:hd,body:json})
+  /* /send puts the note in the relay's log, which pushes it to the other device
+     and starts Claude without a commit. A relay that has not been upgraded yet
+     answers 404, and then the old route -- commit it into claude-inbox/ -- is
+     still exactly right. Trying both is what makes a half-deployed pair of
+     devices keep working instead of silently failing to send. */
+  fetch(RELAY+"/send",{method:"POST",headers:hd,body:json})
+    .then(function(r){ return r.status===404 ? fetch(RELAY,{method:"POST",headers:hd,body:json}) : r; })
     .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
     .then(function(res){
       if(!res.ok||!res.j.ok) throw res;
@@ -2529,9 +2541,89 @@ function pullFromRepo(announce){
    to pull-to-refresh, so it would otherwise never see another device's changes
    without being force-quit. Re-pull whenever it comes back to the foreground. */
 document.addEventListener("visibilitychange",function(){
-  if(document.visibilityState==="visible"){ pullFromRepo(false); checkBuild(false); }
+  if(document.visibilityState==="visible"){ openWS(); pullFromRepo(false); checkBuild(false); }
 });
-window.addEventListener("focus",function(){ pullFromRepo(false); checkBuild(false); });
+window.addEventListener("focus",function(){ openWS(); pullFromRepo(false); checkBuild(false); });
+
+/* ---------- the open connection ----------
+
+   The poll below is the fallback now. While this socket is up the relay pushes
+   every change the moment it exists: a note typed on the laptop lands on the
+   phone as it is typed, and Claude's reply lands the instant the job writes it.
+
+   Three things make it safe to rely on. The log is numbered, so a device that
+   drops asks for what it missed by number rather than refetching anything. An
+   event is applied through the same `mergePayload` a pulled file goes through,
+   so push and pull cannot disagree about who wins. And a socket that will not
+   come up is not an error state -- the GitHub poll is still there, which is why
+   this could ship without a flag day. */
+var WS=null, wsTries=0, wsT=null, pingT=null;
+var WS_PING=45000;      /* an idle socket through a phone network gets dropped */
+var WS_MAX=60000;       /* backoff ceiling: a relay that is down stays down */
+
+function wsLive(){ return !!WS && WS.readyState===1; }
+
+/* An event is only new if its number is higher. The board can hear the same
+   event twice -- a catch-up overlapping a push -- and a re-merge has to be
+   harmless rather than merely unlikely. */
+function applyEv(ev){
+  if(!ev || typeof ev.seq!=="number" || ev.seq<=relaySeq) return null;
+  relaySeq=ev.seq;
+  return mergePayload(ev.payload||{}) ? (ev.payload||{}) : null;
+}
+function applyEvs(list){
+  var did=false, patch=null;
+  (list||[]).forEach(function(ev){
+    var p=applyEv(ev);
+    if(p){ did=true; if(p.op==="patch") patch=p; }
+  });
+  if(did){
+    save(); render();
+    if(patch) toast("Claude updated your board"+(patch.why?": "+patch.why:"")+".");
+  }else{
+    save();   /* nothing moved, but the sequence number did */
+  }
+  return did;
+}
+
+function openWS(){
+  if(!RELAY || !window.WebSocket || location.protocol==="file:") return;
+  if(WS && (WS.readyState===0 || WS.readyState===1)) return;
+  clearTimeout(wsT); wsT=null;
+  var url=RELAY.replace(/^http/,"ws")+"/ws?since="+relaySeq+
+          (RELAY_KEY?"&key="+encodeURIComponent(RELAY_KEY):"");
+  var w;
+  try{ w=new WebSocket(url); }catch(e){ return retryWS(); }
+  WS=w;
+  w.onopen=function(){
+    wsTries=0;
+    clearInterval(pingT);
+    pingT=setInterval(function(){ if(wsLive()) try{ WS.send('{"t":"ping"}'); }catch(e){} }, WS_PING);
+  };
+  w.onmessage=function(e){
+    var m=null;
+    try{ m=JSON.parse(e.data); }catch(x){ return; }
+    if(!m) return;
+    if(m.t==="catchup"){
+      /* A relay redeployed from scratch starts numbering again. Without this
+         the board would sit on a higher number than the log will ever reach
+         and ignore every event for ever, which no reload could fix. */
+      if(typeof m.seq==="number" && m.seq < relaySeq) relaySeq=0;
+      applyEvs(m.evs);
+    }
+    else if(m.t==="ev") applyEvs([m.ev]);
+  };
+  w.onclose=function(){ if(WS===w){ WS=null; clearInterval(pingT); retryWS(); } };
+  w.onerror=function(){ /* onclose follows and does the retrying */ };
+}
+/* Backoff, and never while the page is hidden: a phone in a pocket would spend
+   the night reconnecting, and coming back to the foreground reconnects anyway. */
+function retryWS(){
+  if(document.visibilityState!=="visible") return;
+  if(wsT) return;
+  var wait=Math.min(WS_MAX, 2000*Math.pow(2, Math.min(5, wsTries++)));
+  wsT=setTimeout(function(){ wsT=null; openWS(); }, wait);
+}
 
 /* Nothing here polled, so a tab left open and focused never saw a reply that
    had landed a minute earlier: reading it meant reloading the page, which is
@@ -2551,6 +2643,14 @@ setInterval(function(){
   /* the inbox is small JSON; the build check re-fetches this whole page with
      no-store, so it keeps its own slow clock rather than riding the chat one */
   if(Date.now()-lastVer > 600000){ lastVer=Date.now(); checkBuild(false); }
+  /* a live socket has already delivered anything the folder could tell us, so
+     polling on top of it is pure noise. This is the whole reason the poll stays
+     in the file: it covers the socket being down, not the normal case. */
+  if(wsLive()) return;
+  /* only when no reconnect is already pending: openWS cancels the backoff, so
+     calling it from a 4-second ticker would turn a minute of patience into
+     four seconds of hammering a relay that is down */
+  if(!WS && !wsT) openWS();
   if(Date.now()-lastPull < g) return;
   pullFromRepo(false);
 },POLL_TICK);
@@ -2561,6 +2661,7 @@ render();
 checkBuild(false);
 setView("over");
 pullFromRepo(false);   /* catch up with whatever another device published */
+openWS();              /* and stay caught up without asking again */
 
 </script>
 </body>

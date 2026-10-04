@@ -14,6 +14,13 @@
 name: Answer notes
 
 on:
+  # The relay asks for a run the moment a note lands in its log. This is the
+  # normal route now: chat does not pass through git at all.
+  repository_dispatch:
+    types: [notes]
+  # And the old route, kept working on purpose. A board that has not picked up
+  # the new version still commits its notes into claude-inbox/, and that must
+  # still reach Claude rather than waiting for the twice-daily Routine.
   push:
     branches: [main]
     paths: ["claude-inbox/**"]
@@ -31,9 +38,14 @@ jobs:
     # reply would wake another run, which would reply to itself. The commit
     # message is the marker; `[skip ci]` alone is not enough, because it is
     # easy to forget and the loop it allows is not cheap.
+    # A dispatch carries no head commit, so these read as false and it runs.
+    # On a push they stop the job answering itself: Claude's own reply commits
+    # start "Claude:", and the relay's once-a-day archive starts "Relay
+    # snapshot" and holds nothing the board has not already seen.
     if: >-
       !contains(github.event.head_commit.message, '[skip ci]') &&
-      !startsWith(github.event.head_commit.message, 'Claude:')
+      !startsWith(github.event.head_commit.message, 'Claude:') &&
+      !startsWith(github.event.head_commit.message, 'Relay snapshot')
     runs-on: ubuntu-latest
     timeout-minutes: 12
     permissions:
@@ -49,6 +61,12 @@ jobs:
       - name: Answer the notes
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # With these set the skill reads the conversation from the relay and
+          # posts the reply back to it, so the board hears it on its open
+          # socket in the same second. Without them it falls back to reading
+          # and committing files, which is what shipped before.
+          RELAY_URL: https://mba-cc-relay.thomasgavin777.workers.dev
+          RELAY_AGENT_KEY: ${{ secrets.RELAY_AGENT_KEY }}
         run: |
           set -euo pipefail
           export PATH="$HOME/.local/bin:$PATH"
