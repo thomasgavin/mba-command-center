@@ -1,0 +1,42 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-04T13:18:00.312Z",
+ "source": "Claude",
+ "why": "Nudge pass",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-1791119880312",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "cf-indonesia",
+   "itemId": "cf-indonesia",
+   "itemTitle": "Follow up with Campus France Indonesia team",
+   "text": "Booking the Campus France interview is Critical and dated 10 Oct, but the only thing that moves it — chasing the Indonesia team — is sitting on a placeholder date of 14 Oct, four days after. Chase them this week, or move the interview date so the board stops saying you are on track.",
+   "createdAt": "2026-10-04T13:18:00.312Z",
+   "state": "new",
+   "round": 1,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-14"
+   }
+  },
+  {
+   "id": "claude-1791119880313",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "sbi-sanction",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "text": "Where does the SBI sanction stand — have they come back, or is it still sitting with the branch? It is dated 24 Oct and the 5 Nov instalment depends on it, and since nothing on your board carries a time estimate yet I am reminding you off the date alone, which is far too late for something that is mostly three weeks of their time.",
+   "createdAt": "2026-10-04T13:18:01.312Z",
+   "state": "new",
+   "round": 1,
+   "was": {
+    "status": "doing",
+    "due": "2026-10-24"
+   }
+  }
+ ]
+}
