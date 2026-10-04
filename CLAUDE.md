@@ -631,7 +631,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 93 invariants, three widths, a real browser. Every one of them was a
+that runs: 94 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
