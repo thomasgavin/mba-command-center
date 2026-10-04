@@ -240,12 +240,22 @@ export class Board {
         },
         body:JSON.stringify({event_type:"notes"})
       });
-      if(r.ok) return {ok:true};
+      if(r.ok) return await this.noteJob({ok:true});
       var t = await r.text();
-      return {ok:false, why:"github "+r.status, detail:t.slice(0,200)};
+      return await this.noteJob({ok:false, why:"github "+r.status, detail:t.slice(0,200)});
     }catch(e){
-      return {ok:false, why:"could not reach github"};
+      return await this.noteJob({ok:false, why:"could not reach github"});
     }
+  }
+
+  /* Remember how the last start went. Without it a failed start is invisible:
+     the board only cares that its note was logged, so a relay that cannot ask
+     GitHub for a run looks exactly like one that can, and the only symptom is
+     a reply that never comes. `/state` prints this. */
+  async noteJob(res){
+    await this.ctx.storage.put("lastJob", {at:new Date().toISOString(),
+      ok:!!res.ok, why:res.why||null, detail:res.detail||null});
+    return res;
   }
 
   async armArchive(){
@@ -307,7 +317,9 @@ export class Board {
 
     if(p === "/state"){
       var s = Math.max(0, parseInt(u.searchParams.get("since")||"0", 10) || 0);
-      return out(200, {seq:(await this.ctx.storage.get("seq"))||0, evs:await this.backlog(s)});
+      return out(200, {seq:(await this.ctx.storage.get("seq"))||0,
+        lastJob:(await this.ctx.storage.get("lastJob"))||null,
+        evs:await this.backlog(s)});
     }
 
     if(p === "/send" || p === "/agent/reply"){
