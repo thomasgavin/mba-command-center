@@ -137,6 +137,23 @@ worst kind: the relay accepted every note, logged it, told the board all was
 well, and never asked GitHub for a run. `/state` now reports the last attempt
 as `lastJob` so that failure is one URL away instead of invisible.
 
+## Time, and the one clock that was wrong
+
+The thread sorts by `createdAt`, and a note carries the clock of whoever wrote
+it. A reply once arrived stamped six hours ahead -- a run had satisfied
+"`exportedAt` later than every file in the folder" by inventing a time rather
+than reading one -- and it pinned itself to the bottom of the thread for the
+rest of the day while every message he wrote after it stacked up above.
+
+Nothing can have been written later than now, so `sane()` treats a future
+`createdAt` as a clock error and pulls it back to the moment this device first
+saw the note, on the way in and on load. The repair is **written back
+immediately**, because `save()` otherwise only runs when he edits something and
+a board he merely reads would re-date the same note on every load -- the
+original bug wearing a hat. Pulling it back rather than sorting around it also
+means the note ages out of the 7-day window like any other; a note dated
+forward would never have aged out at all.
+
 ## The Chat view, and answering a note
 
 The board has a **Chat** view: the thread of what he wrote and what Claude wrote
@@ -153,6 +170,12 @@ arrived as an unread badge on a drawer he had no reason to open.
 - **`CHAT_DAYS` is 7.** Notes older than that are dropped on load *and* on merge
   — both, or the other device would keep re-importing what this one aged out.
   The `answer-notes` skill deletes inbox files past the same window.
+- **A send says so.** After he writes, the thread goes quiet for the forty-odd
+  seconds a run takes, and with no sign of life the only honest reading of that
+  silence is that nothing was sent. `waitingFor()` puts a bubble at the foot of
+  the thread -- "Got your note, working on it", then "Still working on it" -- and
+  takes it away once a reply is in, or after twelve minutes, because past that
+  claiming one is coming would be a guess.
 - The thread scrolls inside the view and the composer does not. It was sticky in
   the page scroller first, which looks right until the thread is taller than a
   screen and the messages render straight over the top of it.
@@ -310,6 +333,23 @@ figure. New tiles follow the same rule: derive from `items`, never restate.
 
 The board is used on an iPhone, mostly from the home screen.
 
+- **The document itself may never scroll.** `body` is `position:fixed; inset:0`
+  and every scrolling surface lives inside `.app`. `overflow:hidden` alone does
+  not hold on iOS: focusing the composer, or the keyboard opening under it,
+  scrolls the document and carries the top bar and the view tabs off the top of
+  the screen -- the "titles scroll away sometimes" that cannot be reproduced on
+  a desktop. A fixed body has no scrollport to move.
+- **The drawer may not scroll sideways.** `.db` is `overflow-x:hidden` as the
+  backstop, and every flex child inside can shrink below its longest word
+  (`min-width:0`, plus a `<span>` around text that would otherwise be a bare,
+  unshrinkable flex item -- which is what the dependency rows were). A Safari
+  `input[type=date]` takes its own intrinsic width and ignores `width:100%`,
+  so it carries `appearance:none` and `max-width:100%`.
+- **Chat has a floating button** (`.fab`, bottom right) because it is the
+  seventh tab in a strip that scrolls sideways, so the thing he does most often
+  sat furthest from his thumb. It reads its own state in `syncFab()` -- off on
+  Chat itself, off under the drawer or the palette -- rather than being told,
+  so a new caller cannot forget to turn it off.
 - **No control may be under 16px.** iOS zooms the whole page when a focused
   input is smaller, and the zoom *stays* after the keyboard closes, which pushed
   the drawer's close button off the right edge with no way back but a pinch. The
@@ -343,6 +383,15 @@ was already the critical-path chevron and `.agr` the Overview agenda row;
 reusing either silently zeroed the new element's box, and `.trk` was already a
 tile whose `grid-column` quietly beat the new one. Grep for `\.<name>\b` in the
 committed file before naming anything.
+
+## Before merging anything
+
+`REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
+that runs: 36 invariants, three widths, a real browser. Every one of them was a
+bug first, which is why they are executable rather than another paragraph here.
+It has to pass before a PR merges, and a fix for something it does not yet cover
+adds the invariant in the same PR -- the fix and the thing that stops it coming
+back are one change, not two.
 
 ## Conventions
 
