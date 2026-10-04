@@ -102,8 +102,14 @@ One file, `claude-inbox/<YYYY-MM-DD-HHMM>.json`:
 
 Four things the board depends on, each of which has already been got wrong once:
 
-- **`exportedAt` must be later than every file in the folder**, or the merge
-  skips the patch entirely.
+- **`exportedAt` and `createdAt` are the real time now**, read off the clock,
+  never invented. A run once satisfied "later than every file in the folder" by
+  writing a time six hours ahead; the thread sorts by `createdAt`, so that
+  reply pinned itself to the bottom for the rest of the day while every message
+  he wrote after it stacked up above. The board now pulls a future stamp back,
+  but it has to guess when the note really arrived. If `date -u` is genuinely
+  not later than the newest file in the folder, that file is the one that is
+  wrong -- say so, do not race it.
 - **`ack[]` is not optional.** Without it the note stays unanswered for ever
   and the next run does this work again.
 - **A `status` change needs `"manual": true`** on that item, or the board's

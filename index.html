@@ -53,6 +53,14 @@ body{
   -webkit-text-size-adjust:100%; text-size-adjust:100%;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   overflow:hidden;
+  /* Every scrolling surface on this board is inside .app, so the document
+     itself has no business moving. overflow:hidden alone does not hold on
+     iOS: focusing the composer, or the keyboard opening under it, still
+     scrolls the document and carries the top bar and the view tabs off the
+     screen -- which is exactly the "titles scroll away sometimes" that is
+     impossible to reproduce on a desktop. A fixed body has no scrollport to
+     move, so there is nothing left for iOS to scroll. */
+  position:fixed; inset:0; width:100%;
 }
 body::before{
   content:""; position:fixed; inset:0 0 auto 0; height:420px; pointer-events:none; z-index:0;
@@ -73,10 +81,14 @@ body::before{
 .brand>div{min-width:0}
 .mark{
   width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
-  background:linear-gradient(145deg,#ff6429,#ff8f4e); color:#fff;
-  font-weight:800;font-size:12px;letter-spacing:-.04em;
-  box-shadow:0 2px 8px rgba(255,100,41,.36);
+  background:linear-gradient(150deg,#3b1051,#280a38); color:#fff;
+  box-shadow:0 2px 8px rgba(40,10,56,.34);
+  overflow:hidden;
 }
+/* the medal he already has on the home screen, drawn rather than fetched: a
+   PNG at 30px is soft, and the page stays one file. The ribbon is the blue,
+   the disc is the orange, and the rising bars are the board. */
+.mark svg{width:27px;height:27px;display:block}
 .brand h1{font-size:14px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand p{font-size:11px;color:var(--ink3);font-weight:500;white-space:nowrap}
 .sp{flex:1;min-width:0}
@@ -527,6 +539,34 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .zone.dz.hot{border-color:var(--green);background:rgba(0,169,143,.1)}
 .zone.dz.hot b,.zone.dz.hot span{color:var(--green)}
 
+/* ---------- floating chat ----------
+   Chat is the seventh tab in a strip that scrolls sideways on a phone, so the
+   thing he does most often sat furthest from his thumb. Same action, in reach,
+   on every view that is not already Chat. It is under the scrim (500) on
+   purpose and is told to stand down whenever a surface opens over the page. */
+.fab{
+  position:fixed;z-index:480;
+  right:max(16px,env(safe-area-inset-right));
+  bottom:max(18px,env(safe-area-inset-bottom));
+  width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
+  background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
+  box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
+  display:grid;place-items:center;
+  transition:transform .24s var(--ease),opacity .18s var(--ease),box-shadow .18s;
+}
+.fab svg{width:25px;height:25px}
+.fab:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(255,100,41,.34),0 20px 38px -12px rgba(255,100,41,.85)}
+.fab:active{transform:translateY(1px)}
+/* unread replies, so the button is also the badge */
+.fab .fn{
+  position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;border-radius:20px;
+  background:var(--blue);border:2px solid var(--page);color:#fff;
+  font-size:10.5px;font-weight:800;line-height:16px;padding:0 4px;display:none;
+}
+.fab.has .fn{display:block}
+/* parked rather than removed, so it slides away instead of blinking out */
+.fab.off{transform:translateY(96px) scale(.86);opacity:0;pointer-events:none}
+
 /* ---------- drawer ---------- */
 .scrim{position:fixed;inset:0;background:rgba(40,10,56,.3);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(1px)}
 .scrim.on{opacity:1;pointer-events:auto}
@@ -539,11 +579,16 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* starts out of the pannable area; showDrawer flips this before it slides in */
 .drawer{visibility:hidden}
 .dh{flex:none;display:flex;align-items:flex-start;gap:10px;padding:16px 16px 13px;border-bottom:1px solid var(--line)}
-.dh h3{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1}
+.dh h3{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1;min-width:0;overflow-wrap:anywhere}
 .x{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
 .x:hover{background:var(--wash);color:var(--ink)}
-.db{flex:1;min-height:0;overflow:auto;padding:16px}
-.fld{margin-bottom:17px}
+.db{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:16px}
+/* overflow-x:hidden above is the backstop; these are why it never has to fire.
+   A Safari date input takes its own intrinsic width and ignores width:100%,
+   which is what pushed the drawer sideways on the phone while the same page
+   sat still on the Mac. Everything else here is a flex child that has to be
+   allowed to shrink below its longest word. */
+.fld{margin-bottom:17px;min-width:0}
 .fld>label{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4);margin-bottom:7px}
 .seg{display:flex;gap:4px;flex-wrap:wrap}
 .seg button{
@@ -553,9 +598,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .seg button:hover{background:var(--wash)}
 .seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 input[type=date],textarea{
-  width:100%;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
+  width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
   font:inherit;font-size:13px;color:var(--ink);padding:9px 11px;
 }
+input[type=date]{-webkit-appearance:none;appearance:none}
 textarea{min-height:92px;resize:vertical;line-height:1.5}
 input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.13)}
 .btn{
@@ -569,10 +615,14 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 .hint{font-size:11.5px;color:var(--ink4);line-height:1.5;margin-top:7px}
 .nitem{background:var(--wash2);border:1px solid var(--line2);border-radius:var(--r3);padding:9px 11px;margin-bottom:7px}
 .nitem .nm{font-size:10px;font-weight:700;color:var(--ink4);letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
-.nitem .nx{font-size:12.5px;line-height:1.5;margin-top:5px;white-space:pre-wrap;color:var(--ink2)}
+.nitem .nx{font-size:12.5px;line-height:1.5;margin-top:5px;white-space:pre-wrap;color:var(--ink2);overflow-wrap:anywhere}
 .nitem .nf{font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:5px}
 .tagnew{background:var(--blue);color:#fff;border-radius:20px;padding:0 5px;font-size:9px;letter-spacing:.04em}
-.dep{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 0;border-top:1px solid var(--line2);cursor:pointer}
+.dep{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 0;border-top:1px solid var(--line2);cursor:pointer;min-width:0}
+/* the title was a bare text node, which is an anonymous flex item and cannot
+   be told to shrink. A long one set the row's min-content width and the row
+   set the drawer's. */
+.dep .dt-t{flex:1;min-width:0;overflow-wrap:anywhere}
 .dep:first-of-type{border-top:0}
 .dep .dd{width:7px;height:7px;border-radius:50%;flex:none}
 
@@ -657,6 +707,14 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   background:var(--orange);color:#fff;font-size:17px;line-height:1;transition:opacity .14s}
 .csend:disabled{opacity:.35;cursor:default}
 .cempty{text-align:center;color:var(--ink4);font-size:13px;padding:38px 18px;line-height:1.55}
+/* the waiting bubble: same shape as a reply, because that is what is coming */
+.cwb{display:flex;align-items:center;gap:4px;color:var(--ink3);font-size:12.5px}
+.cwb span{margin-left:5px}
+.cwb i{width:5px;height:5px;border-radius:50%;background:var(--ink4);display:block;
+  animation:cdot 1.25s var(--ease) infinite}
+.cwb i:nth-child(2){animation-delay:.16s}
+.cwb i:nth-child(3){animation-delay:.32s}
+@keyframes cdot{0%,62%,100%{opacity:.26;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
 /* ---------- responsive ---------- */
 @media (max-width:1180px){
@@ -717,7 +775,15 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
 <div class="app">
   <header class="top">
     <div class="brand">
-      <div class="mark">27D</div>
+      <div class="mark" title="MBA Command Center">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.1 2.2l3.5 5.6M16.9 2.2l-3.5 5.6" stroke="#3f6bff" stroke-width="3.3" stroke-linecap="round" fill="none"/>
+          <circle cx="12" cy="15" r="7.1" fill="#ff6429"/>
+          <rect x="8.2" y="15.6" width="2.3" height="3.3" rx=".7" fill="#280a38"/>
+          <rect x="10.9" y="13.4" width="2.3" height="5.5" rx=".7" fill="#280a38"/>
+          <rect x="13.6" y="11.3" width="2.3" height="7.6" rx=".7" fill="#280a38"/>
+        </svg>
+      </div>
       <div><h1>MBA Command Center</h1><p>INSEAD MBA&#39;27D &middot; Fontainebleau</p></div>
     </div>
     <div class="sp"></div>
@@ -790,6 +856,14 @@ input[type=date]:focus,textarea:focus{outline:0;border-color:var(--orange);box-s
   <div class="zone" data-sn="5"><b>+5</b><span>days</span></div>
   <div class="zone dz" data-done="1"><b>&#10003;</b><span>done</span></div>
 </div>
+
+<button class="fab off" id="fab" aria-label="Chat with Claude" title="Chat with Claude">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 13.1a3.4 3.4 0 0 1-3.4 3.4H9.2L4 20.3V6.9a3.4 3.4 0 0 1 3.4-3.4h10.2A3.4 3.4 0 0 1 21 6.9z"/>
+    <path d="M12.6 7.1l.86 2.26 2.26.86-2.26.86-.86 2.26-.86-2.26-2.26-.86 2.26-.86z" fill="currentColor" stroke-width=".9"/>
+  </svg>
+  <span class="fn" id="fabN"></span>
+</button>
 
 <div class="scrim" id="scrim"></div>
 
@@ -953,6 +1027,23 @@ var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", just
    Pruning happens on load and on merge, so a device cannot re-import what
    another device has already aged out. */
 var CHAT_DAYS=7;
+/* A note carries the clock of whoever wrote it, and one of them was wrong: a
+   reply arrived stamped six hours ahead, because a run had satisfied "later
+   than every file in the folder" by inventing a time rather than reading one.
+   The thread sorts by createdAt, so that reply pinned itself to the bottom for
+   the rest of the day and every message he wrote after it stacked up above.
+   Nothing can have been written later than now, so a future createdAt is a
+   clock error and not a fact: it is pulled back to the moment this device
+   first saw the note. Pulling it back rather than sorting around it also means
+   the note ages out of the 7-day window like any other -- a note dated forward
+   would never have aged out at all. */
+var repaired=false;
+function sane(n){
+  if(!n) return n;
+  var now=new Date().toISOString();
+  if(!n.createdAt || n.createdAt>now){ n.createdAt=now; repaired=true; }
+  return n;
+}
 function freshNotes(list){
   var cut=new Date(Date.now()-CHAT_DAYS*86400000).toISOString();
   return (list||[]).filter(function(n){ return n && (n.createdAt||"")>cut; });
@@ -993,7 +1084,13 @@ function load(){
     var p=st.items[k];
     Object.keys(p).forEach(function(f){ items[k][f]=p[f]; });
   });
-  notes=freshNotes((st&&st.notes)||[]);
+  /* .map(sane) on the way in as well, or a bad timestamp already in
+     localStorage outlives the fix */
+  notes=freshNotes(((st&&st.notes)||[]).map(sane));
+  /* and the repair has to be written back on the spot. save() otherwise only
+     runs when he edits something, so a board he merely reads would re-date the
+     same note to every load -- which is the original bug wearing a hat. */
+  if(repaired){ repaired=false; setTimeout(save,0); }
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
@@ -1171,6 +1268,7 @@ function render(){
   document.getElementById("nChat").textContent=unreadReplies();
   document.getElementById("nChat").parentNode.classList.toggle("hot",unreadReplies()>0);
   renderOverview(); renderBoard(); renderGantt(); renderCal(); renderGraph(); renderList(); renderChat();
+  syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
   if(view==="graph") requestAnimationFrame(drawEdges);
 }
@@ -1602,6 +1700,37 @@ var chatN=-1;
 function isClaude(n){ return n.from==="claude" || /^claude-/.test(n.id||""); }
 function unreadReplies(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
 
+/* The floating button is the Chat tab within reach of a thumb, so it has the
+   tab's badge too. It stands down on Chat itself and under anything opened
+   over the page; it reads that state rather than being told about it, so a new
+   caller cannot forget to turn it off. */
+function syncFab(){
+  var f=document.getElementById("fab"); if(!f) return;
+  var busy=document.getElementById("drawer").classList.contains("on")||
+           document.getElementById("pal").classList.contains("on")||
+           /* the snooze rail rises into the same corner during a drag, and a
+              drop target half-covered by a button reads as a button */
+           document.getElementById("rail").classList.contains("up");
+  f.classList.toggle("off", view==="chat"||busy);
+  var u=unreadReplies();
+  f.classList.toggle("has",u>0);
+  document.getElementById("fabN").textContent=u>9?"9+":String(u);
+}
+
+/* After he sends, the thread goes quiet for the forty-odd seconds a run takes
+   to start, read the note and come back down the socket. With no sign of life
+   the only honest reading of that silence is that nothing was sent. So the
+   thread says what is happening -- and stops saying it once a reply is in, or
+   once enough time has passed that claiming one is coming would be a guess. */
+var WAIT_SLOW=90000, WAIT_GIVEUP=12*60000;
+function waitingFor(msgs){
+  var last=msgs[msgs.length-1];
+  if(!last || isClaude(last)) return null;
+  var age=Date.now()-new Date(last.createdAt||0).getTime();
+  if(age<0 || age>WAIT_GIVEUP) return null;
+  return age<WAIT_SLOW ? "Got your note, working on it" : "Still working on it";
+}
+
 function renderChat(){
   var w=document.getElementById("chatw");
   var msgs=notes.slice().sort(function(a,b){ return (a.createdAt||"").localeCompare(b.createdAt||""); });
@@ -1625,6 +1754,11 @@ function renderChat(){
          (mine && n.state!=="read" ? ' &middot; sending\u2026' : "")+
          '</div></div>';
     });
+    var wait=waitingFor(msgs);
+    if(wait){
+      h+='<div class="cmsg cyou" id="cwait"><div class="cbub cwb">'+
+         '<i></i><i></i><i></i><span>'+esc(wait)+'</span></div></div>';
+    }
     w.innerHTML=h;
   }
   var tip=document.getElementById("chatTip");
@@ -1644,6 +1778,12 @@ function renderChat(){
     setTimeout(function(){ w.scrollTop=w.scrollHeight; },0);
   }
 }
+/* the thread is otherwise only repainted when something arrives, and a silent
+   wait is exactly when nothing does. Cheap: it repaints one view, and only
+   while the indicator is actually on screen. */
+setInterval(function(){
+  if(view==="chat" && document.getElementById("cwait")) renderChat();
+},15000);
 function dayLabel(d){
   var t=iso(todayD());
   if(d===t) return "Today";
@@ -1698,7 +1838,7 @@ function showDrawer(){
   d.style.visibility="visible";
   /* one frame with the drawer visible but still off-screen, so the transform
      has somewhere to animate from */
-  requestAnimationFrame(function(){ d.classList.add("on"); });
+  requestAnimationFrame(function(){ d.classList.add("on"); syncFab(); });
   d.setAttribute("aria-hidden","false");
 }
 function hideDrawer(){
@@ -1708,6 +1848,7 @@ function hideDrawer(){
   /* hide only once it has slid out, or the animation is lost */
   drawerT=setTimeout(function(){ if(!d.classList.contains("on")) d.style.visibility="hidden"; },320);
   openId=null; dMode=null; noteDraft="";
+  syncFab();
 }
 function openItem(id,focusNote){
   var i=items[id]; if(!i) return;
@@ -1733,14 +1874,14 @@ function renderDrawer(keepDraft){
     h+='<div class="fld"><label>Waiting on</label>';
     i.deps.forEach(function(d){ var o=items[d]; if(!o) return;
       h+='<div class="dep" data-go="'+d+'"><span class="dd" style="background:'+(o.status==="done"?"#00a98f":tc(o.track))+'"></span>'+
-         esc(o.title)+' <span class="chip d" style="margin-left:auto">'+esc(o.status==="done"?"done":fmtD(o.due))+'</span></div>';
+         '<span class="dt-t">'+esc(o.title)+'</span><span class="chip d">'+esc(o.status==="done"?"done":fmtD(o.due))+'</span></div>';
     });
     h+='</div>';
   }
   var blocks=all().filter(function(o){return (o.deps||[]).indexOf(i.id)>=0;});
   if(blocks.length){
     h+='<div class="fld"><label>Blocks</label>';
-    blocks.forEach(function(o){ h+='<div class="dep" data-go="'+o.id+'"><span class="dd" style="background:'+tc(o.track)+'"></span>'+esc(o.title)+'</div>'; });
+    blocks.forEach(function(o){ h+='<div class="dep" data-go="'+o.id+'"><span class="dd" style="background:'+tc(o.track)+'"></span><span class="dt-t">'+esc(o.title)+'</span></div>'; });
     h+='</div>';
   }
   h+='<div class="fld"><label>Push the date</label><div class="row-b">'+
@@ -1883,7 +2024,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-0520";
+var BUILD="2026-10-04-0630";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2133,6 +2274,11 @@ document.getElementById("subs").addEventListener("click",function(e){
   grow();
 })();
 
+document.getElementById("fab").addEventListener("click",function(){
+  setView("chat");
+  var ta=document.getElementById("cin"); if(ta) ta.focus();
+});
+
 /* --- views --- */
 Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
   b.addEventListener("click",function(){ setView(b.dataset.v); });
@@ -2148,6 +2294,7 @@ function setView(v){
      thread scrolls to the newest message. */
   document.getElementById("stage").classList.toggle("chatmode",v==="chat");
   if(v==="chat") renderChat();
+  syncFab();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
   if(v==="graph") requestAnimationFrame(drawEdges);
 }
@@ -2216,6 +2363,7 @@ function dragIdle(){
   killGhosts(); clearHot();
   document.body.classList.remove("dragging");
   document.getElementById("rail").classList.remove("up");
+  syncFab();
 }
 
 stage.addEventListener("pointerdown",function(e){
@@ -2251,6 +2399,7 @@ function onMove(e){
     document.body.classList.add("dragging");
     hideToast();
     document.getElementById("rail").classList.add("up");
+    syncFab();
   }
   if(e.cancelable) e.preventDefault();
   drag.ghost.style.left=(e.clientX-drag.gx)+"px";
@@ -2325,8 +2474,9 @@ function openPal(){
   document.getElementById("pal").classList.add("on");
   var inp=document.getElementById("palIn"); inp.value=""; palSel=0; palFill("");
   setTimeout(function(){inp.focus();},30);
+  syncFab();
 }
-function closePal(){ document.getElementById("pal").classList.remove("on"); }
+function closePal(){ document.getElementById("pal").classList.remove("on"); syncFab(); }
 function palFill(q){
   q=(q||"").toLowerCase().trim();
   palRows=[];
@@ -2392,7 +2542,7 @@ function mergeNotes(incoming){
   /* an incoming note older than the window is one this device has already aged
      out, or would age out on the next load: re-adding it would make the thread
      grow back every time the other device published */
-  freshNotes(incoming).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; added++; } });
+  freshNotes((incoming||[]).map(sane)).forEach(function(n){ if(n&&n.id&&!seen[n.id]){ notes.push(n); seen[n.id]=true; added++; } });
   notes.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
   return added;
 }
