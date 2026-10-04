@@ -51,6 +51,9 @@ var server = http.createServer(function (req, res) {
   var u = req.url.split("?")[0];
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (u === "/contents") { res.setHeader("Content-Type", "application/json"); return res.end("[]"); }
+  /* a relay that accepts everything, so the success path of an automatic send
+     can actually be exercised rather than only its failure */
+  if (u === "/send") { res.setHeader("Content-Type", "application/json"); return res.end('{"ok":true,"seq":1}'); }
   /* sw.js is served as a real script or the browser refuses to register it --
      GitHub Pages gets this right, and a harness that does not cannot see the
      service worker at all */
@@ -594,6 +597,52 @@ for (var w2 of [390, 1280]) {
   ok("the close button is not the primary action, and is not called Done",
      !foot.primary && foot.statuses.indexOf(foot.txt) < 0, JSON.stringify(foot));
   await s16.ctx.close();
+}
+
+/* ---- 20. an automatic send that worked says nothing ----
+   It toasted "Saved and sent to Claude." after every edit and every message
+   typed in Chat. The thread already shows a message going from "sending…" to
+   sent, and the board already shows the change he just made, so the toast was
+   announcing the expected case over the top of what he was reading. */
+{
+  var s20 = await open(390);
+  var quiet20 = await s20.p.evaluate(function () {
+    RELAY = location.origin;
+    setView("chat");
+    addNote(null, "a message typed in chat", true);
+    return new Promise(function (done) {
+      /* past the 2.6s debounce and the round trip */
+      setTimeout(function () {
+        done({ toast: document.getElementById("toast").classList.contains("on"),
+               txt: document.getElementById("toast").textContent,
+               sent: notes[0] && notes[0].state });
+      }, 4200);
+    });
+  });
+  ok("a successful automatic send raises no toast",
+     !quiet20.toast, JSON.stringify(quiet20));
+  /* markSent writes "read": delivered, so no longer outstanding */
+  ok("and the note is still marked delivered", quiet20.sent === "read", JSON.stringify(quiet20));
+  await s20.ctx.close();
+}
+
+/* ---- 21. a failed send still speaks ----
+   That is the case he cannot see any other way. */
+{
+  var s21 = await open(390);
+  var loud21 = await s21.p.evaluate(function () {
+    RELAY = location.origin + "/nope";
+    AUTO_RETRY = 60;                        /* so the one retry is not a four-second wait */
+    addNote(null, "this one cannot be delivered", true);
+    return new Promise(function (done) {
+      setTimeout(function () {
+        done({ toast: document.getElementById("toast").classList.contains("on"),
+               txt: document.getElementById("toast").textContent });
+      }, 5200);
+    });
+  });
+  ok("a send that failed says so", loud21.toast && /not sent/i.test(loud21.txt), JSON.stringify(loud21));
+  await s21.ctx.close();
 }
 
 /* ---- 17. Needs attention sits straight under the milestones on Overview ---- */

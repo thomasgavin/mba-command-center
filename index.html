@@ -2518,7 +2518,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-04-1340";
+var BUILD="2026-10-04-1510";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2583,10 +2583,12 @@ function relaySend(pay, json, quiet){
       /* only what we actually sent: a note written while this was in flight
          has not reached the repo */
       markSent(ids);
-      /* an automatic send says it happened and nothing more; the point is that
-         the owner no longer has to think about it */
-      if(quiet) toast(n?("Saved and sent to Claude."):"Saved and synced.");
-      else toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
+      /* An automatic send that worked says nothing at all. It fired on every
+         edit and every message typed in Chat, and announcing the expected case
+         is noise: the thread already shows each message going from "sending…"
+         to sent, and the board already shows the change he just made. Only a
+         failure still speaks, because that is the case he cannot see. */
+      if(!quiet) toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
     })
     .catch(function(err){
       /* notes deliberately stay unread: nothing was delivered */
