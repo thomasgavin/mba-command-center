@@ -24,6 +24,9 @@ on:
   push:
     branches: [main]
     paths: ["claude-inbox/**"]
+  # and by hand, which is the only way to prove the runner can still check out,
+  # install a browser and run the checks without waiting for him to type a note
+  workflow_dispatch:
 
 # A burst of notes is one conversation, not three. Let a run finish and start
 # at most one more behind it, so two sessions never write patches over
@@ -47,13 +50,33 @@ jobs:
       !startsWith(github.event.head_commit.message, 'Claude:') &&
       !startsWith(github.event.head_commit.message, 'Relay snapshot')
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # A note can ask for a code change, and answering one means editing the
+    # page, installing a browser and running the 40 checks before pushing.
+    # Twelve minutes and thirty turns was sized for "read notes, write a
+    # patch" and would cut a real change off halfway.
+    timeout-minutes: 25
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          # a code change is committed and pushed from here, so the branch has
+          # to be real history rather than a single detached commit
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # checks/board-check.mjs drives a real browser, and it is what stands
+      # between a note asking for a change and that change going live. The
+      # install is about a minute and only matters on a run that edits code;
+      # paying it every time is cheaper than a run that cannot verify itself.
+      - name: Install a browser for the checks
+        run: |
+          set -euo pipefail
+          npm i --no-save playwright@1.56.1
+          npx playwright install chromium
 
       - name: Install Claude Code
         run: curl -fsSL https://claude.ai/install.sh | bash
@@ -76,4 +99,4 @@ jobs:
           git config user.email "noreply@anthropic.com"
           claude -p "/answer-notes" \
             --dangerously-skip-permissions \
-            --max-turns 30
+            --max-turns 60

@@ -1,0 +1,6 @@
+# checks/board-check.mjs needs Playwright, and the GitHub runner installs it
+# with `npm i --no-save playwright` into the repo root. It is a test
+# dependency of a page that is still deliberately dependency-free: nothing
+# here is served, and nothing here belongs in the history.
+node_modules/
+package-lock.json

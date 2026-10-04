@@ -11,15 +11,20 @@
    pull path is skipped on file:// by design -- drives a real Chromium at
    three widths, and exits non-zero on the first broken invariant.
 
-   Needs Playwright and a Chromium. In the container those are at the paths
-   below; set PW and PW_CHROMIUM to override. */
+   Needs Playwright and a Chromium, and finds them wherever it is run: the
+   cloud container keeps them at fixed paths, a GitHub runner has them in
+   node_modules after `npm i playwright`, and a Mac has whatever `npm i` put
+   there. PW and PW_CHROMIUM override either. It has to work on the runner,
+   because the board's own chat can ask for a code change and the run that
+   answers must be able to prove the change before it pushes it. */
 
 import http from "http";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-var PW       = process.env.PW || "/opt/node-tools/node_modules/playwright/index.mjs";
+var PW_TRIES = [process.env.PW, "playwright",
+                "/opt/node-tools/node_modules/playwright/index.mjs"].filter(Boolean);
 var CHROMIUM = process.env.PW_CHROMIUM || "/opt/pw-browsers/chromium";
 var PORT     = Number(process.env.PORT || 8391);
 var ROOT     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -52,14 +57,21 @@ var server = http.createServer(function (req, res) {
 await new Promise(function (r) { server.listen(PORT, "127.0.0.1", r); });
 var URL_ = "http://127.0.0.1:" + PORT + "/";
 
-var chromium;
-try {
-  chromium = (await import(PW)).chromium;
-} catch (e) {
-  console.error("No Playwright at " + PW + ". Set PW to its index.mjs.");
+var chromium = null, why = [];
+for (var cand of PW_TRIES) {
+  try { chromium = (await import(cand)).chromium; break; }
+  catch (e) { why.push(cand + ": " + e.code); }
+}
+if (!chromium) {
+  console.error("No Playwright found. Tried " + why.join(", ") +
+                ". Install it (npm i playwright) or set PW to its entry point.");
   process.exit(2);
 }
-var browser = await chromium.launch({ executablePath: CHROMIUM });
+/* an explicit binary when there is one, otherwise Playwright's own download --
+   the runner installs that, the container has the binary at a fixed path */
+var launch = {};
+if (fs.existsSync(CHROMIUM)) launch.executablePath = CHROMIUM;
+var browser = await chromium.launch(launch);
 
 async function open(width, seed) {
   var ctx = await browser.newContext({

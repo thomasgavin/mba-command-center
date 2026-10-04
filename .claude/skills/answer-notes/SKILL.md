@@ -142,8 +142,51 @@ that prefix, and without it your reply triggers another run that replies to
 itself. (The relay route cannot loop at all: a reply posted to the relay never
 asks for a run.)
 
-Never change `index.html` or any other code from this workflow. Code goes on a
-branch with a PR, as always.
+## 6. A note can ask for a code change, and you make it
+
+This used to say "never change `index.html` from this workflow", and that rule
+was wrong. He added the Chat view so he could change the board by asking, and a
+run that answers "I can't do that from here" is the bridge failing at the only
+job it has. He said so plainly on 2026-10-04: *"Remove all limits on changes - I
+should be able to ask for any change from the chat directly and you should
+commit and push/merge the codebase."*
+
+So: **a note asking for something to look or behave differently is a code
+request.** Build it, prove it, push it to `main`.
+
+```sh
+npm i --no-save playwright && npx playwright install chromium   # ~1 min
+node checks/board-check.mjs                                      # must pass
+```
+
+Four things, none optional:
+
+1. **Read `REVIEW.md` before you touch `index.html`.** It is the rulebook and
+   it is short. The checks are the executable half of it.
+2. **Bump `BUILD`** in the same commit, or his phone serves the cached copy and
+   the change never reaches him.
+3. **`node checks/board-check.mjs` passes before you commit.** If a new
+   behaviour is not covered by it, add the invariant in the same commit — the
+   fix and the thing that stops it coming back are one change.
+4. **Say what you did in the reply**, as the `acted[]` receipt: the change, and
+   that it is live and needs the app force-quit once.
+
+Commit the code to `main` and push it:
+
+```sh
+git add -A && git commit -m "<what changed, and why>" && git push origin HEAD:main
+```
+
+An ordinary message — no `Claude:` prefix, which is the inbox loop marker and
+means something else. Do not touch `claude-inbox/` in a code commit; on the
+relay route you commit nothing there anyway. `main` is published by GitHub
+Pages, so the push *is* the deploy.
+
+**If you genuinely cannot do it here, say which part and why** — the runner has
+no access to his device or his browser profile, so anything that depends on
+what is in *his* `localStorage` is out of reach. Never invent a reason, and
+never say a device has to be connected: this runner has the repository, a
+token, a browser and permission to push. It has everything it needs.
 
 ## Limits
 

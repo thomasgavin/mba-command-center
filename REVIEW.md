@@ -117,8 +117,12 @@ These need a person, and a person reading the diff.
 
 ## Shipping
 
-**Every change he asks for ships, whatever its size.** He asks in Chat, Claude
-builds it, verifies it, and pushes it. There is no size at which the answer
+**Every change he asks for ships, whatever its size, and it does not matter
+where he asks.** A message in this thread and a note typed into the board's own
+Chat view reach the same place and get the same answer: Claude builds it,
+verifies it, and pushes it. The GitHub run that answers a board note has the
+repository, a token, a browser and permission to push — it is not a lesser
+Claude, and it never says a device has to be connected. There is no size at which the answer
 becomes "shall I?" — he said so explicitly on 2026-10-04: *"Remove all limits on
 changes — I should be able to ask for any change from the chat directly and you
 should commit and push/merge the codebase."* A question back is for something
