@@ -599,8 +599,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    name never shows twice and the header does not change height */
 .dh #dTin{flex:1;min-width:0;font-size:15px;font-weight:700;letter-spacing:-.02em;padding:6px 9px}
 .dh #dTin.off,.dh h3.off{display:none}
-.x{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
-.x:hover{background:var(--wash);color:var(--ink)}
+.x{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid rgba(224,38,60,.28);
+  background:rgba(224,38,60,.09);cursor:pointer;color:var(--red);font-size:13px;display:grid;place-items:center}
+.x:hover{background:rgba(224,38,60,.17);border-color:rgba(224,38,60,.42);color:var(--red)}
 .db{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:16px}
 /* overflow-x:hidden above is the backstop; these are why it never has to fire.
    A Safari date input takes its own intrinsic width and ignores width:100%,
@@ -919,7 +920,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      home bar, and the close button has to be a thumb-sized target */
   .drawer{height:100dvh}
   .dh{padding-top:max(16px,env(safe-area-inset-top));padding-right:max(16px,env(safe-area-inset-right))}
-  .x{width:40px;height:40px;font-size:15px;border-radius:11px}
+  .x,.pen{width:40px;height:40px;font-size:15px;border-radius:11px}
   .db{padding-bottom:max(20px,env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -2640,7 +2641,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-0745";
+var BUILD="2026-10-05-0800";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

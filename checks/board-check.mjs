@@ -886,6 +886,28 @@ for (var cw of [390, 1280]) {
   ok("Escape abandons the edit", esc.kept === "Renamed from the header", JSON.stringify(esc));
   ok("and the Notes drawer offers no rename", !esc.penOnNotes, JSON.stringify(esc));
   await s23.ctx.close();
+
+  /* The pencil and the close sit side by side in the same header, so a size
+     that differs reads as a mistake. It was one: the phone rule grew the close
+     button to a 40px thumb target and left the pencil at 29px, and the only
+     place that shows is a real layout at 390. Measured at every width. */
+  for (var w23 of [390, 768, 1280]) {
+    var sB = await open(w23);
+    var box = await sB.p.evaluate(function (id) {
+      openItem(id);
+      var r = function (el) { var b = el.getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height)]; };
+      var pen = document.getElementById("dPen"), x = document.getElementById("dClose");
+      var cs = getComputedStyle(x);
+      return { pen: r(pen), x: r(x), bg: cs.backgroundColor, bd: cs.borderTopColor, fg: cs.color };
+    }, id23);
+    ok("pencil and close are the same size at " + w23,
+      box.pen[0] === box.x[0] && box.pen[1] === box.x[1], JSON.stringify(box));
+    /* a tint, not a solid: the close button is still secondary to the content */
+    var red = function (c) { var m = c.match(/\d+/g); return m && +m[0] > 150 && +m[1] < 90 && +m[2] < 90; };
+    ok("close carries a red tint at " + w23,
+      red(box.bg) && red(box.bd) && red(box.fg), JSON.stringify(box));
+    await sB.ctx.close();
+  }
 }
 
 /* ---- 24. the words on screen are the words he uses ----
