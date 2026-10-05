@@ -687,7 +687,10 @@ for (var w2 of [390, 1280]) {
 {
   var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"'), iHero = src.indexOf('class="tile hero a"');
-  ok("Needs attention comes first, then the next deadline", iAtt > 0 && iAtt < iHero && iMiles > iHero, iMiles + "/" + iAtt + "/" + iHero);
+  /* "move next deadline to the top and needs attention second": the one
+     thing with a date outranks the list of seven things that have dates, and
+     the milestone rail is still the last tile on the view. */
+  ok("the next deadline opens the view, then Needs attention", iHero > 0 && iHero < iAtt && iMiles > iAtt, iMiles + "/" + iAtt + "/" + iHero);
 }
 
 /* ---- 17. nudges reach the lock screen, and the worker stays out of the way ----
@@ -2389,6 +2392,93 @@ for (var bw of [390, 1280]) {
 
   ok("the six draw without a console error", s38.errs.length === 0, s38.errs.join(" | "));
   await s38.ctx.close();
+}
+
+/* ---- 39. the seven off the Calendar screenshot, 2026-10-05 ---- */
+{
+  var s39 = await open(390);
+
+  /* "the dates don't align with the boxes on the calendar" */
+  var cal = await s39.p.evaluate(function () {
+    setView("cal");
+    var d = document.querySelector(".ard");
+    if (!d) return { none: true };
+    var h = d.querySelector(".arh").getBoundingClientRect(),
+        l = d.querySelector(".arl").getBoundingClientRect();
+    return { off: Math.round(Math.abs((h.top + h.bottom) / 2 - (l.top + l.bottom) / 2)) };
+  });
+  ok("the agenda date sits level with the box it labels", cal.off <= 2, JSON.stringify(cal));
+
+  /* "the nav bar went up again - stop this happening over and over" -- the
+     bar's own colour is painted over everything between it and the bottom,
+     so a short viewport can no longer show a band of board under it. */
+  var bar = await s39.p.evaluate(function () {
+    var b = document.querySelector(".vbar"), st = getComputedStyle(b, "::after");
+    var app = getComputedStyle(document.querySelector(".app"));
+    return { pad: parseFloat(getComputedStyle(b).paddingBottom),
+             under: parseFloat(st.height), h: Math.round(parseFloat(app.height)),
+             win: innerHeight,
+             gap: Math.round(innerHeight - b.getBoundingClientRect().bottom) };
+  });
+  ok("nothing below the bar is board colour", bar.under >= 40 && bar.pad === 0, JSON.stringify(bar));
+  ok("and the app is as tall as the screen", bar.gap === 0 && bar.h === bar.win, JSON.stringify(bar));
+
+  /* "the pencil icon of all notes is too small" */
+  var pen = await s39.p.evaluate(function () {
+    return [].map.call(document.querySelectorAll(".tbtn svg"), function (g) {
+      return Math.round(g.getBoundingClientRect().width);
+    });
+  });
+  ok("the notes pencil is a drawn icon the size of its neighbours",
+     pen.length >= 2 && pen.every(function (w) { return w === pen[0]; }), JSON.stringify(pen));
+
+  /* "in the task timeline chart when I scroll right, freeze the task names" */
+  var frz = await s39.p.evaluate(function () {
+    setView("time");
+    var sc = document.querySelector(".gscroll"), gl = document.querySelector(".grow .gl");
+    var before = gl.getBoundingClientRect().left;
+    sc.scrollLeft = 420;
+    var after = gl.getBoundingClientRect().left;
+    var pos = getComputedStyle(gl).position, bg = getComputedStyle(gl).backgroundColor;
+    sc.scrollLeft = 0;
+    return { before: Math.round(before), after: Math.round(after), pos: pos, bg: bg };
+  });
+  ok("the task names hold still while the months scroll",
+     frz.pos === "sticky" && Math.abs(frz.after - frz.before) <= 1, JSON.stringify(frz));
+  ok("and the frozen column is opaque, not see-through",
+     !/rgba\(0, 0, 0, 0\)/.test(frz.bg), JSON.stringify(frz));
+
+  /* "add 3 buttons below the actions table ... remove the delete button at
+     the bottom ... similar size as the close and note button" */
+  var qr = await s39.p.evaluate(function () {
+    openItem("locus-exit");
+    var q = document.querySelectorAll(".qrow .qb");
+    var close = document.querySelector('[data-done="1"]');
+    var out = { n: q.length, h: q.length ? Math.round(q[0].getBoundingClientRect().height) : 0,
+                closeH: Math.round(close.getBoundingClientRect().height),
+                cols: [].map.call(q, function (b) { return getComputedStyle(b).color; }),
+                oldDel: !!document.querySelector(".dsave .del") };
+    hideDrawer();
+    return out;
+  });
+  ok("the card carries three coloured quick actions", qr.n === 3 && !qr.oldDel, JSON.stringify(qr));
+  ok("each is its own colour and the size of the Close button",
+     new Set(qr.cols).size === 3 && qr.h >= 40 && qr.h <= qr.closeH, JSON.stringify(qr));
+
+  /* "the how long field is for you to fill" -- every open task in SEED now
+     carries one, and every value is a real EFFORT key. */
+  var ef = await s39.p.evaluate(function () {
+    var open = SEED.filter(function (s) { return s.s !== "done"; });
+    var keys = EFFORT.map(function (e) { return e.k; });
+    return { open: open.length,
+             set: open.filter(function (s) { return keys.indexOf(s.ef) >= 0; }).length,
+             doneWith: SEED.filter(function (s) { return s.s === "done" && s.ef; }).length };
+  });
+  ok("every open task says how long it takes", ef.open === ef.set && ef.open > 30, JSON.stringify(ef));
+  ok("and a closed task carries no estimate nobody made", ef.doneWith === 0, JSON.stringify(ef));
+
+  ok("the seven draw without a console error", s39.errs.length === 0, s39.errs.join(" | "));
+  await s39.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

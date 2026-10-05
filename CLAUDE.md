@@ -648,6 +648,14 @@ thumb's reach.
   the strip vacated: *"The section title should only show up when the section
   is open (perhaps where the section selection lives now)."* It reads its text
   off `VIEWS`, which is why Chat stays in that list despite having no tab.
+- **Whatever is below the bar is the bar.** `.vbar::after` paints the bar's
+  own colour over the 80px beneath it and `.app` is `100dvh` rather than
+  `height:100%`. The band of board colour under the bar was reported three
+  times in one evening and each fix was a different guess at the inset
+  arithmetic; this one does not depend on getting that right, because a short
+  viewport now shows bar rather than board. A fixed body's `100%` is the
+  layout viewport, which on an installed iOS app under a translucent status
+  bar is not reliably the screen.
 - **A tab carries no word and no number.** A count has nowhere to sit on a bare
   icon, and "35 tasks" was never worth a badge; `.vd` is a dot, and it says the
   one thing that is -- something in here is already past its date. Every tab
@@ -883,6 +891,10 @@ never be a tab apart again.
   the note button because the card is one tap away, and the note count with
   them. Row height is a mobile budget: three lines per row meant five tasks on
   his screen.
+- **Column one is frozen.** `.gl` is `position:sticky;left:0` with an opaque
+  background on both the axis row and every task row: scrolling out to
+  December used to carry the task names off the left edge, which leaves a
+  chart of bars against nothing.
 - **At least six weeks of timeline has to be on screen** beside the list at
   390px, and the check measures it rather than trusting the two CSS numbers
   that decide it (`--lw` and the month width). It is 3.4 months now.
@@ -989,6 +1001,13 @@ else, which is the definition of no hierarchy.
 `dRow` (which row is open) and `dNote` (whether the composer is unfolded) are
 drawer state: they reset on close and never reach `localStorage`.
 
+**Three quick actions sit under the property rows** -- done, +2d, delete --
+as icons painted the colour of what they do, because an icon with no word on
+it has only its colour to say which is which. They replaced the full-width
+"Delete this task" at the foot of the card, which was the loudest control on
+it for the rarest action: *"similar size as the close and note button but
+bright coloured"*.
+
 **A Done task is never late.** The countdown is advice about what is left to do,
 so it is suppressed once the status is done -- it only ever read as the board
 being wrong about something he had already closed.
@@ -1081,9 +1100,18 @@ too late for the other. `wait` has the longest lead and the least work in it —
 an SBI sanction needs almost nothing from him and three weeks from them, which
 is exactly the case a date-based reminder gets wrong.
 
-**Nothing in `SEED` carries one.** Inventing 34 estimates and shipping them as
-fact is the drift this board exists to prevent; they get filled in as they are
-learned, and the nudge skill has to ask rather than guess.
+**Every open task in `SEED` carries one, and filling them is Claude's job.**
+He said so on 2026-10-05: *"the how long field is for you to fill - based on
+available info, context, research, etc."* That reverses the original rule,
+which was that inventing estimates was drift and the skills had to ask. It was
+the wrong call for a field nothing else can populate: he does not know how long
+an apostille takes either, and a board where 39 tasks all said "Not set" ranked
+nothing. So Claude estimates from what the task actually is -- a bank sanction
+is `wait`, booking an appointment is `quick`, an apostille run is `multi` --
+and he changes any of them in the drawer in one tap. **A done task still
+carries none**: nobody estimated it and a number invented after the fact says
+nothing. When a new task is created, it is given an effort in the same
+breath.
 
 ## Two tabs are two devices
 
@@ -1227,6 +1255,8 @@ The board is used on an iPhone, mostly from the home screen.
   answer, and it is the same `.calrow`, **struck-through green, not grey** —
   grey says "ignore me", which is wrong for the one row in the month that is
   good news.
+- **The agenda's date sits level with the row it labels.** Top-aligned, a
+  19px number beside a bordered box reads as belonging to nothing.
 - **The calendar is a vertical agenda below 720px** (`narrow()`), one row per
   day that has something on it. Seven columns in 390px gives each day ~50px,
   which read as broken. Drag-to-a-day is a desktop gesture; the snooze rail
@@ -1255,7 +1285,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 287 invariants, three widths, a real browser. Every one of them was a
+that runs: 298 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

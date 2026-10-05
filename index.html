@@ -149,7 +149,14 @@ body::before{
     radial-gradient(900px 340px at 12% -8%, rgba(255,100,41,.10), transparent 62%),
     radial-gradient(820px 320px at 88% -12%, rgba(50,100,255,.10), transparent 62%);
 }
-.app{position:relative;z-index:1;height:100%;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
+/* 100dvh, not 100%: a fixed body's 100% is the layout viewport, and on an
+   installed iOS app under a translucent status bar that is not always the
+   screen -- which is how the section bar kept ending up with a band of page
+   colour under it, three times running. dvh tracks what is actually visible.
+   .vbar::after then paints the bar's own colour over anything below it, so
+   even if the viewport is short by the home-indicator inset, what shows there
+   is bar rather than board. */
+.app{position:relative;z-index:1;height:100dvh;min-height:100%;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 /* The status-bar inset, which is zero everywhere but an installed iOS app. */
 .sbar{flex:none;height:env(safe-area-inset-top);background:var(--sbar)}
 
@@ -239,7 +246,7 @@ body::before{
    already the way in, and a seventh target would be the furthest from the
    thumb again. */
 .vbar{
-  flex:none;display:flex;align-items:stretch;
+  position:relative;flex:none;display:flex;align-items:stretch;
   border-top:1px solid var(--line);background:var(--glass);
   backdrop-filter:saturate(1.6) blur(14px);
   /* The home indicator wants clearance, not the whole 34px it declares: a
@@ -248,6 +255,15 @@ body::before{
      it clears the indicator and gives the board the rest back. */
   padding-bottom:var(--barpad);
   position:relative;z-index:30;
+}
+/* Whatever is below the bar is the bar, never the board. The band of page
+   colour under it has been reported three times; this is the one fix that
+   does not depend on getting the inset arithmetic right, because it paints
+   the bar's own colour over anything between it and the bottom of the
+   screen. */
+.vbar::after{
+  content:"";position:absolute;left:0;right:0;top:100%;height:80px;
+  background:var(--glass);pointer-events:none;
 }
 .vt{
   position:relative;flex:1 1 0;min-width:0;border:0;background:none;font:inherit;
@@ -612,7 +628,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    wrong place on a phone for as long as that breakpoint existed. */
 .ginner{--lw:340px;min-width:1180px;position:relative}
 .gax{display:flex;border-bottom:1px solid var(--line);background:var(--wash2);position:sticky;top:0;z-index:4}
-.gax .gl{width:var(--lw);flex:none;border-right:1px solid var(--line)}
+/* Column one is frozen: scrolling to December used to carry the task names
+   off the left edge, which leaves a chart of bars nobody can read. */
+.gax .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);
+  position:sticky;left:0;z-index:5;background:var(--wash2)}
 .gax .gm{flex:1;display:flex}
 .gax .gm div{flex:1;font-size:10px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.07em;padding:8px 0 8px 8px;border-left:1px solid var(--line2)}
 .gsec{display:flex;align-items:center;gap:7px;padding:7px 12px;background:var(--wash2);border-bottom:1px solid var(--line2);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4)}
@@ -625,7 +644,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    date is where the marker sits, so neither is repeated here -- a second copy
    of the date was both clutter and something that could drift. */
 .grow .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);display:flex;
-  align-items:center;gap:8px;padding:6px 10px;min-width:0}
+  align-items:center;gap:8px;padding:6px 10px;min-width:0;
+  position:sticky;left:0;z-index:3;background:var(--panel)}
+.grow:hover .gl{background:var(--wash2)}
 /* the tick never wraps: it is the one fixed thing in the row, and letting it
    drop to a line of its own is what turned a one-line row into three */
 .gtx{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -688,7 +709,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* month as a vertical agenda, for portrait phones */
 .agenda .dow{display:none}
 .agenda .cgrid{display:block}
-.ard{display:flex;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line2)}
+/* The day sits against the row it labels rather than at the top of the cell:
+   top-aligned, a 19px number next to a bordered box reads as belonging to
+   nothing -- *"the dates don't align with the boxes"*. */
+.ard{display:flex;align-items:center;gap:12px;padding:11px 13px;border-bottom:1px solid var(--line2)}
 .ard:last-child{border-bottom:0}
 .ard.today{background:rgba(255,100,41,.05)}
 .arh{flex:none;width:40px;text-align:center}
@@ -1081,6 +1105,20 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .sby b{color:var(--ink2)}
 .sbl{color:var(--red)}
 
+/* The three quick actions: the same box as a .btn, but each painted the
+   colour of what it does, because an icon with no word on it has only its
+   colour to say which is which. */
+.qrow{display:flex;gap:8px;margin:11px 0 2px}
+.qb{flex:1;height:44px;border-radius:var(--r3);border:1px solid transparent;font:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .12s var(--ease),filter .12s}
+.qb svg{width:17px;height:17px}
+.qb b{font-size:13px;font-weight:800;letter-spacing:-.01em}
+.qb:active{transform:translateY(1px)}
+.qb.ok{background:rgba(0,169,143,.16);color:#00a98f;border-color:rgba(0,169,143,.36)}
+.qb.warn{background:rgba(255,100,41,.16);color:#ff6429;border-color:rgba(255,100,41,.36)}
+.qb.bad{background:rgba(224,38,60,.15);color:#e0263c;border-color:rgba(224,38,60,.34)}
+
 /* ---------- turning on notifications ----------
    It sits at the top of Chat because that is where nudges land, so the offer is
    next to the thing it is offering. It takes a real tap: iOS will not grant
@@ -1361,7 +1399,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       <div><h1>MBA Command Center</h1><p>INSEAD MBA&#39;27D &middot; Fontainebleau</p></div>
     </div>
     <div class="sp"></div>
-    <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
+    <button class="tbtn" id="notesBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:15px;height:15px"><path d="M11.2 1.9a1.6 1.6 0 0 1 2.3 2.3L5.4 12.3 2 13.4l1.1-3.4z"/><path d="M10.2 3l2.3 2.3"/></svg><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
     <button class="tbtn" id="newsBtn" title="Your daily and weekly newsletters."><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" style="width:15px;height:15px"><path d="M2 3.4h8.6v9.2H3.2A1.2 1.2 0 0 1 2 11.4z"/><path d="M10.6 6h2.2a1.2 1.2 0 0 1 1.2 1.2v4.2a1.2 1.2 0 0 1-1.2 1.2h-2.2"/><path d="M3.7 5.6h5.2M3.7 7.7h5.2M3.7 9.8h3.1"/></svg><span class="lbl">Newsletters</span><span class="n" id="newsN">0</span></button>
     <button class="tbtn" id="syncBtn" title="Check the repo for changes from your other device."><span>&#8635;</span><span class="lbl">Sync</span></button>
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
@@ -1600,81 +1638,81 @@ var SEED=[
  {id:"vidya",       t:"PM Vidyalakshmi application submitted",        k:"fin",   s:"done", p:"Medium",   d:"2026-09-10",},
 
  /* financing */
- {id:"tuition-oct", t:"Pay EUR 53,000 tuition instalment",            k:"fin",   s:"doing",p:"Critical", d:"2026-10-05", amt:53000,
+ {id:"tuition-oct", t:"Pay EUR 53,000 tuition instalment",            k:"fin",   s:"doing",p:"Critical", d:"2026-10-05", ef:"day", amt:53000,
    n:"Hard institutional deadline. Confirm the funding source if the SBI loan has not disbursed."},
- {id:"scholarship-r3",t:"Chase Round 3 scholarship decision",         k:"fin",   s:"todo", p:"Critical", d:"2026-09-11",
+ {id:"scholarship-r3",t:"Chase Round 3 scholarship decision",         k:"fin",   s:"todo", p:"Critical", d:"2026-09-11", ef:"wait",
    n:"Decision was expected 2026-09-11 and is not recorded. It changes the loan quantum, so this gates the sanction."},
- {id:"poa-exec",    t:"Execute PoA at SBI Hindon branch",             k:"fin",   s:"todo", p:"High",     d:"2026-10-10", dep:["poa-draft"]},
- {id:"sbi-sanction",t:"SBI Global Ed-Vantage sanction letter",        k:"fin",   s:"blocked",p:"Critical",d:"2026-10-24", dep:["scholarship-r3","poa-exec"]},
- {id:"forex",       t:"Open EUR account for fees and living costs",   k:"fin",   s:"todo", p:"Medium",   d:"2026-11-30",},
- {id:"tuition-apr", t:"Pay EUR 44,860 final instalment",              k:"fin",   s:"todo", p:"Critical", d:"2027-04-15", amt:44860, dep:["sbi-sanction"]},
+ {id:"poa-exec",    t:"Execute PoA at SBI Hindon branch",             k:"fin",   s:"todo", p:"High",     d:"2026-10-10", ef:"day", dep:["poa-draft"]},
+ {id:"sbi-sanction",t:"SBI Global Ed-Vantage sanction letter",        k:"fin",   s:"blocked",p:"Critical",d:"2026-10-24", ef:"wait", dep:["scholarship-r3","poa-exec"]},
+ {id:"forex",       t:"Open EUR account for fees and living costs",   k:"fin",   s:"todo", p:"Medium",   d:"2026-11-30", ef:"day",},
+ {id:"tuition-apr", t:"Pay EUR 44,860 final instalment",              k:"fin",   s:"todo", p:"Critical", d:"2027-04-15", ef:"day", amt:44860, dep:["sbi-sanction"]},
 
  /* visa */
- {id:"cf-interview",t:"Book Campus France interview",                 k:"visa",  s:"todo", p:"Critical", d:"2026-10-10", dep:["eef-init"],
+ {id:"cf-interview",t:"Book Campus France interview",                 k:"visa",  s:"todo", p:"Critical", d:"2026-10-10", ef:"quick", dep:["eef-init"],
    n:"Target was October 2026. Nothing is scheduled on record, and everything downstream waits on it."},
- {id:"docs-apost",  t:"Apostille and attest academic documents",      k:"visa",  s:"todo", p:"High",     d:"2026-10-18",},
- {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25", dep:["cf-interview","docs-apost"]},
- {id:"cf-indonesia",t:"Follow up with Campus France Indonesia team",  k:"visa",  s:"todo", p:"High",     d:"2026-10-14",
+ {id:"docs-apost",  t:"Apostille and attest academic documents",      k:"visa",  s:"todo", p:"High",     d:"2026-10-18", ef:"multi",},
+ {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25", ef:"wait", dep:["cf-interview","docs-apost"]},
+ {id:"cf-indonesia",t:"Follow up with Campus France Indonesia team",  k:"visa",  s:"todo", p:"High",     d:"2026-10-14", ef:"quick",
    n:"Check where the EEF validation stands. Added from Chat; the date is a placeholder to move."},
- {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", dep:["cf-validation"]},
- {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10",},
+ {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", ef:"day", dep:["cf-validation"]},
+ {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", ef:"hours",},
 
  /* housing and move */
- {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", dep:["vfs-appt"],
+ {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", ef:"hours", dep:["vfs-appt"],
    n:"The visa has to be issued first, which is what the VFS appointment starts."},
- {id:"club8-movein", t:"Move in to Club 8",                            k:"move",  s:"blocked",p:"High",   d:"2027-01-03", dep:["flight","club8-book"],
+ {id:"club8-movein", t:"Move in to Club 8",                            k:"move",  s:"blocked",p:"High",   d:"2027-01-03", ef:"day", dep:["flight","club8-book"],
    n:"Reached on arrival, not when the flight is booked: this is what the move milestone waits for."},
- {id:"club8-detail",t:"Confirm Club 8 inventory and move-in window",  k:"move",  s:"todo", p:"Medium",   d:"2026-11-15", dep:["club8-book"]},
- {id:"shipping",    t:"Shipping and baggage plan",                    k:"move",  s:"todo", p:"Medium",   d:"2026-12-15",},
- {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"todo", p:"Medium",  d:"2027-01-10",
+ {id:"club8-detail",t:"Confirm Club 8 inventory and move-in window",  k:"move",  s:"todo", p:"Medium",   d:"2026-11-15", ef:"quick", dep:["club8-book"]},
+ {id:"shipping",    t:"Shipping and baggage plan",                    k:"move",  s:"todo", p:"Medium",   d:"2026-12-15", ef:"multi",},
+ {id:"bank-fr",     t:"Open French bank account",                     k:"move",  s:"todo", p:"Medium",  d:"2027-01-10", ef:"multi",
    n:"After arriving in Fontainebleau."},
- {id:"housing-h2",  t:"Solve housing after 3 July 2027",              k:"move",  s:"todo", p:"High",     d:"2027-03-01",
+ {id:"housing-h2",  t:"Solve housing after 3 July 2027",              k:"move",  s:"todo", p:"High",     d:"2027-03-01", ef:"multi",
    n:"Club 8 covers 2027-01-03 to roughly 2027-07-03. The programme runs to 2027-12-15, so five months are uncovered."},
 
  /* admin and exit */
  {id:"portal",      t:"Complete MyINSEAD profile and practical info",   k:"admin", s:"done", p:"High",     d:"2026-10-22",
    n:"Done ahead of the 22 October deadline: profile created and the INSEAD email is active. From 25 October the Sunday newsletters go only to that address."},
- {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15",
+ {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15", ef:"multi",
    n:"Nothing on record: no resignation date, notice period or last working day."},
- {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", dep:["locus-exit"]},
+ {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", ef:"multi", dep:["locus-exit"]},
 
  /* academics */
- {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20",},
- {id:"lms-start",   t:"Work through the LMS tutorials",                k:"acad",  s:"todo", p:"Medium",   d:"2026-10-26",
+ {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20", ef:"multi",},
+ {id:"lms-start",   t:"Work through the LMS tutorials",                k:"acad",  s:"todo", p:"Medium",   d:"2026-10-26", ef:"hours",
    n:"P0 opens 26 October and the LMS is where every academic and some CDC item is delivered."},
- {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30", dep:["sbi-sanction"],
+ {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30", ef:"hours", dep:["sbi-sanction"],
    n:"Optional one-week quant primer, 16-20 November online. He is holding it until the SBI sanction lands, which leaves six days between the sanction date and the 30 October registration close -- so a late sanction is what makes this urgent, not the course."},
- {id:"pldp-webinar",t:"PLDP webinar",                                  k:"acad",  s:"todo", p:"High",     d:"2026-11-05",
+ {id:"pldp-webinar",t:"PLDP webinar",                                  k:"acad",  s:"todo", p:"High",     d:"2026-11-05", ef:"hours",
    n:"Must do. Zoom. Explains the assignments that run 6 November to 28 December."},
- {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28",
+ {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28", ef:"multi",
    n:"Must do, on the LMS. The coach prepares from what is submitted, so late means a wasted first session."},
- {id:"acad-webinar",t:"Academics overview webinar",                    k:"acad",  s:"todo", p:"Medium",   d:"2026-11-26",},
- {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31",},
- {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28",
+ {id:"acad-webinar",t:"Academics overview webinar",                    k:"acad",  s:"todo", p:"Medium",   d:"2026-11-26", ef:"hours",},
+ {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31", ef:"multi",},
+ {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28", ef:"hours",
    n:"Required for graduation. What Gavin is using for it is not recorded."},
 
  /* career */
- {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31",
+ {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31", ef:"hours",
    n:"Shapes elective choice, exchange decision and recruiting timing. Not recorded anywhere yet."},
- {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", dep:["vmock"],
+ {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", ef:"multi", dep:["vmock"],
    n:"CDC route is VMock first, then the INSEAD CV, which is what gets into the CV Book."},
- {id:"vmock",       t:"Activate VMock CV platform access",             k:"career",s:"todo", p:"High",     d:"2026-10-06",
+ {id:"vmock",       t:"Activate VMock CV platform access",             k:"career",s:"todo", p:"High",     d:"2026-10-06", ef:"quick",
    n:"Invitation has arrived. VMock is step one of the CDC CV process, before the INSEAD CV itself."},
- {id:"casecoach",   t:"Register for Case Coach",                       k:"career",s:"todo", p:"High",     d:"2026-10-06",
+ {id:"casecoach",   t:"Register for Case Coach",                       k:"career",s:"todo", p:"High",     d:"2026-10-06", ef:"quick",
    n:"Invitation has arrived. Date is his: tonight or tomorrow, set to tomorrow to be safe."},
- {id:"careerglobe", t:"Set up CareerGlobe profile",                   k:"career",s:"todo", p:"High",     d:"2026-10-27",
+ {id:"careerglobe", t:"Set up CareerGlobe profile",                   k:"career",s:"todo", p:"High",     d:"2026-10-27", ef:"hours",
    n:"Opens 27 October. Booking a coaching appointment runs through it."},
- {id:"cdc-quests",  t:"Do the CareerLeader and Career Anchors questionnaires", k:"career",s:"todo", p:"High", d:"2026-10-31",
+ {id:"cdc-quests",  t:"Do the CareerLeader and Career Anchors questionnaires", k:"career",s:"todo", p:"High", d:"2026-10-31", ef:"hours",
    n:"Both, plus the workbook questions: together they are the prep for the first coaching session."},
- {id:"cdc-coach1",  t:"Book the first CDC coaching session",          k:"career",s:"todo", p:"High",     d:"2026-11-15", dep:["careerglobe","cdc-quests"],
+ {id:"cdc-coach1",  t:"Book the first CDC coaching session",          k:"career",s:"todo", p:"High",     d:"2026-11-15", ef:"quick", dep:["careerglobe","cdc-quests"],
    n:"Slots from November, 45 minutes, and the coach is allocated by P1 location with no changes later."},
- {id:"cv-webinar",  t:"INSEAD CV and cover letter webinar",           k:"career",s:"todo", p:"High",     d:"2026-11-13",
+ {id:"cv-webinar",  t:"INSEAD CV and cover letter webinar",           k:"career",s:"todo", p:"High",     d:"2026-11-13", ef:"hours",
    n:"Friday 13 November, 13:00 Paris. Needs registering in advance."},
- {id:"summer-webinar",t:"Summer experience webinar",                  k:"career",s:"todo", p:"High",     d:"2026-12-04",
+ {id:"summer-webinar",t:"Summer experience webinar",                  k:"career",s:"todo", p:"High",     d:"2026-12-04", ef:"hours",
    n:"Covers the 8-week summer project, the startup tour and taking the break to recruit."},
- {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31",
+ {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
- {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30",}
+ {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",}
 ];
 
 var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
@@ -2332,6 +2370,24 @@ function renderOverview(){
   var next=(L.filter(function(i){return i.due&&i.status!=="done";})[0]||L[0]||null);
   var h="";
 
+  /* Next deadline leads the view and Needs attention follows it: *"move next
+     deadline to the top and needs attention second"*. The one thing with a
+     date on it outranks the list of seven things that have dates. */
+  /* hero A: the next hard deadline */
+  if(next){
+    var n=dleft(next.due);
+    /* No 60px number and no row of buttons. The countdown reads at the size
+       of a sentence -- *"make the 'd late' normal size again, looks weird"* --
+       and the whole tile opens the task, which is what the Open button did;
+       Push and Mark done are two taps away in the card that opens. Tuition
+       keeps its buttons: he said that one is fine. */
+    h+='<div class="tile hero a" data-go="'+next.id+'">'+
+       '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
+       '<div class="hcd">'+cTxt(n)+'</div>'+
+       '<div class="sub">'+esc(next.title)+'</div>'+
+       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div></div>';
+  }
+
   /* Needs attention opens the view now. Milestones used to, as the tile that
      answers "is this whole thing on track", and he moved them to the foot on
      2026-10-05: the first screen of Overview should answer what to do today,
@@ -2348,21 +2404,6 @@ function renderOverview(){
       }).join("")
       : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>';
   h+='</div>';
-
-  /* hero A: the next hard deadline */
-  if(next){
-    var n=dleft(next.due);
-    /* No 60px number and no row of buttons. The countdown reads at the size
-       of a sentence -- *"make the 'd late' normal size again, looks weird"* --
-       and the whole tile opens the task, which is what the Open button did;
-       Push and Mark done are two taps away in the card that opens. Tuition
-       keeps its buttons: he said that one is fine. */
-    h+='<div class="tile hero a" data-go="'+next.id+'">'+
-       '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
-       '<div class="hcd">'+cTxt(n)+'</div>'+
-       '<div class="sub">'+esc(next.title)+'</div>'+
-       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div></div>';
-  }
 
   /* hero B: money.
      This block used to print "2026-10-05" and "2027-04-15" as literals, so the
@@ -3337,6 +3378,19 @@ function renderDrawer(keepDraft){
      prow("effort","How long",effVal(i))+
      '</div>';
 
+  /* The three things he actually does to a task, as icons under the rows it
+     describes: *"done (tick), move ahead 2 days (+2d) and delete (dustbin)
+     ... similar size as the close and note button but bright coloured"*. The
+     full-width "Delete this task" at the foot is gone -- it was the loudest
+     control on the card for the rarest action. */
+  if(!i.deleted) h+='<div class="qrow">'+
+    '<button class="qb ok" data-qdone="1" aria-label="Mark done" title="Mark done">'+
+      '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg></button>'+
+    '<button class="qb warn" data-q2d="1" aria-label="Push two days" title="Push two days"><b>+2d</b></button>'+
+    '<button class="qb bad" data-del="1" aria-label="Delete task" title="Delete task">'+
+      '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 4.3h10.4M6.3 4.3V2.8h3.4v1.5M4.2 4.3l.6 8.3a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9l.6-8.3"/><path d="M6.6 6.6v4.4M9.4 6.6v4.4"/></svg></button>'+
+    '</div>';
+
   /* --- the thread, and a composer that is one line until he wants it --- */
   h+='<div class="fld"><label>Notes</label>';
   if(dNote){
@@ -3377,7 +3431,7 @@ function renderDrawer(keepDraft){
      made the loudest thing on the card the one that changed the least -- and it
      read "Done" directly under a status button reading "Done". */
   h+='<div class="fld dsave"><button class="btn wide" data-done="1">Close</button>'+
-     (i.deleted?'':'<div class="row-b" style="margin-top:8px"><button class="btn del" data-del="1">Delete this task</button></div>')+
+
      '<div class="hint">Every change above is already saved and on its way to your other device.'+
      (i.deleted?'':' Deleting keeps the notes and can be undone from Tasks.')+'</div></div>';
 
@@ -3674,7 +3728,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2250";
+var BUILD="2026-10-05-2313";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3915,6 +3969,8 @@ document.getElementById("dBody").addEventListener("click",function(e){
   if(b.dataset.nadd){ dNote=true; renderDrawer(true);
     var nt=document.getElementById("nt"); if(nt) nt.focus();
     return; }
+  if(b.dataset.qdone){ var q=items[openId]; patch(openId,{status:"done",manual:true},"Closed: "+q.title); return; }
+  if(b.dataset.q2d){ snooze(openId,2); return; }
   if(b.dataset.del){ var dz=openId; hideDrawer(); delItem(dz); return; }
   if(b.dataset.undel){ undelItem(openId); return; }
   if(b.dataset.gsave){

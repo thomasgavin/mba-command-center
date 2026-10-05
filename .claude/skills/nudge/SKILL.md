@@ -79,10 +79,12 @@ Three cases that override the ranking:
 - **A task that is blocked is not the thing to nudge.** Walk `dep` and nudge
   the open dependency instead — that is the sub-action that is actually in his
   way. Say which task it is unblocking, because that is the reason to care.
-- **A task with no `effort`** cannot be ranked honestly. If it is Critical and
-  within a month, that is worth one nudge of its own: ask how long it takes.
-  Do not invent an estimate and do not patch one in. Inventing a number and
-  showing it to him as fact is exactly the drift this board exists to prevent.
+- **A task with no `effort`** is yours to fill, not his to be asked about.
+  He settled this on 2026-10-05: *"the how long field is for you to fill -
+  based on available info, context, research, etc."* Estimate it from what the
+  task actually is -- a bank sanction is `wait`, booking an appointment is
+  `quick`, an apostille run is `multi` -- patch it in, and say so in `acted[]`.
+  Never nudge him to ask how long something takes.
 - **A `Confirmed` date that has passed** with the task not Done outranks
   everything. That is not a nudge, it is a problem.
 
