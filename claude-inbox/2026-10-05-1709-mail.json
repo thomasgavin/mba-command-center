@@ -1,0 +1,67 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-05T17:09:00.000Z",
+ "source": "Claude",
+ "why": "Evening pass: today's career and Campus France mail, and the three statuses it settles",
+ "changed": [
+  {
+   "id": "vmock",
+   "at": "2026-10-05T17:09:00.000Z",
+   "status": "done",
+   "manual": true,
+   "doneAt": "2026-10-05"
+  },
+  {
+   "id": "casecoach",
+   "at": "2026-10-05T17:09:00.000Z",
+   "status": "done",
+   "manual": true,
+   "doneAt": "2026-10-05"
+  },
+  {
+   "id": "cf-validation",
+   "at": "2026-10-05T17:09:00.000Z",
+   "status": "doing",
+   "manual": true
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-1791222540001",
+   "from": "claude",
+   "itemId": "cf-validation",
+   "itemTitle": "Campus France EEF validated",
+   "text": "\u2709 Soumission de votre dossier pr\u00e9-consulaire (5 Oct, Etudes en France)\n\nEtudes en France confirmed your corrected preconsular file was submitted to Espace Campus France Indon\u00e9sie, and you wrote back to Fitria the same afternoon saying the changes were done and re-submitted, noting you added your current role as a second entry because the Academic/Professional section needs a minimum of two. So the file is with them again and the ball is in their court. Dossier reference left out of this note on purpose.",
+   "createdAt": "2026-10-05T12:38:38.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791222540002",
+   "from": "claude",
+   "itemId": "vmock",
+   "itemTitle": "Activate VMock CV platform access",
+   "text": "\u2709 Welcome to VMock, Gavin (5 Oct, VMock)\n\nThe welcome mail landed on your INSEAD address at 14:29 Paris, so the account is live. Marking this done \u2014 untick it if you only half finished the signup. The CV itself is the next step, and it is already waiting on this one.",
+   "createdAt": "2026-10-05T12:59:26.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791222540003",
+   "from": "claude",
+   "itemId": "casecoach",
+   "itemTitle": "Register for Case Coach",
+   "text": "\u2709 Your interview prep journey starts here (5 Oct, CaseCoach)\n\nCaseCoach confirmed the registration and sent the first onboarding mail from their founder, so the account exists. Marking this done. Their course starts with what to expect from a case interview, which is reading rather than a task.",
+   "createdAt": "2026-10-05T12:55:05.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791222540004",
+   "from": "claude",
+   "itemId": "cdc-quests",
+   "itemTitle": "Do the CareerLeader and Career Anchors questionnaires",
+   "text": "\u2709 [CDC] How to prepare for your first coaching session - Create your Career Reports! (5 Oct, An Cao and Jade Phung, CDC)\n\nThis is the official brief for the two exercises this task already covers: CareerLeader (register at careerleader.com with your INSEAD address and the class registration key, three assessments, then pull the report off the dashboard) and Career Anchors (an Excel from the CDC site). The deadline is \"before your first coaching session\", coaches open from early November, and they push you to do the coaching in P0 because P1 is academically brutal. Registration key left out of this note on purpose. They also link registration for P0 Webinar #2 on 13 November, which is the webinar already on the board.",
+   "createdAt": "2026-10-05T14:09:01.000Z",
+   "state": "new"
+  }
+ ]
+}
