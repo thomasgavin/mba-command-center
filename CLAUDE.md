@@ -252,11 +252,27 @@ Three things keep it from eating itself or his subscription:
   is public, and a run spends his subscription rather than a line in a public
   folder.
 
-## The twice-daily Routine
+## The Routine, three times a day
 
-`MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
-17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session on
-this repo. It polls; it is not woken by a commit.
+`MBA board pass (3x daily)` (`trig_01NzPtMyET8r329X7UCtjeoa`) fires at 09:00,
+15:00 and 19:00 Asia/Jakarta, which is his own clock. It polls; it is not woken
+by a commit, and **the mail scan happens on these three passes and nowhere
+else** — he asked for it that way on 2026-10-05, having started the day on two
+passes at 07:57 and 17:57 Europe/Paris.
+
+Three passes do not raise the nudge ceiling. The caps are still at most two a
+run and one per task per 48 hours, so a third pass makes each individual pass
+likelier to have nothing to say rather than making the board chattier. What it
+does buy is a shorter gap between an email landing and the board knowing about
+it.
+
+It fires **into this project's thread session** rather than spawning a fresh
+one, which is the only reason it can push at all: a spawned routine session has
+an empty authorized-repository set and every push 403s while the run still
+reports SUCCEEDED. The old dashboard routine
+(`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) is that bug, and there is no setting
+anywhere — dashboard, `create_trigger` or `update_trigger` — that adds a
+repository to one.
 
 **Its job is `/nudge`, not notes.** It used to poll `claude-inbox/` for anything
 unanswered, and that has been dead weight since the relay started asking for a
@@ -746,7 +762,8 @@ that did not happen. The box now appears only when something did.
 ## Nudges: Claude speaking first
 
 Everything else on this board reacts to him. A nudge does not: it is Claude
-looking at the whole board twice a day and deciding whether anything is worth
+looking at the whole board three times a day and deciding whether anything is
+worth
 interrupting him for. He asked for it in these words — *"the notifications
 should be from you, as a productivity manager ensuring I stay on track"*.
 
@@ -766,7 +783,8 @@ learns to ignore everything you send.
 **The judgement lives in `.claude/skills/nudge/SKILL.md`, not in JS.** What
 deserves an interruption is not an if-tree, and the volume caps are in there
 too — at most two a run, one per task per 48 hours, and silence as the normal
-outcome. A board that speaks twice a day about everything is a board he mutes.
+outcome. A board that speaks three times a day about everything is a board he
+mutes.
 
 ## How long a task takes, and when to start it
 
