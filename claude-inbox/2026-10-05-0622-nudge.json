@@ -1,0 +1,23 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-05T06:22:50.000Z",
+ "source": "Claude",
+ "why": "Nudge pass",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-1791181370000",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "locus-exit",
+   "itemId": "locus-exit",
+   "itemTitle": "Plan Locus exit: notice, LWD, handover",
+   "text": "The Locus exit is Critical and you pulled it to 7 Oct, two days out, but the board has no resignation date, notice period or last working day on it. Where does it stand, and how long is what is left?",
+   "createdAt": "2026-10-05T06:22:50.000Z",
+   "state": "new",
+   "round": 1,
+   "was": {"status": "doing", "due": "2026-10-07"}
+  }
+ ]
+}
