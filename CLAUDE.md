@@ -422,6 +422,15 @@ refused, or sent and accepted. That separates the three in one tap instead of
 three guesses. The route is capped at one a minute, because its address is
 public like the rest of them.
 
+**It shipped invisible.** `.pbn.quiet button{display:none}` was written when
+every quiet banner was a statement rather than an offer, and it swallowed the
+one button that made the quiet banner worth keeping: the button existed,
+carried its label, answered a click, and nothing was on screen -- he opened
+Chat, read "Notifications are on for this device." and asked what he was
+supposed to tap. A label is not a button, so the check now measures the box
+rather than reading `textContent`, and what hides it is `:empty`, which is the
+thing that was actually being asked.
+
 `checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
 board is handed, the same way the push service will. A signature that is subtly
 wrong is a 403 at Apple and silence on his phone hours later, which is
@@ -1052,7 +1061,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 216 invariants, three widths, a real browser. Every one of them was a
+that runs: 217 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

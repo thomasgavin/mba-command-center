@@ -752,24 +752,35 @@ for (var w2 of [390, 1280]) {
   ok("no relay, no offer", noRelay);
 
   var states = await s18.p.evaluate(function () {
+    /* the banner lives inside the Chat view, so it has no box at all until
+       that view is the open one */
+    setView("chat");
     RELAY = "https://relay.example";
     var el = document.getElementById("pbn"), read = function () {
+      var b = document.getElementById("pbnB");
       return { off: el.classList.contains("off"), quiet: el.classList.contains("quiet"),
                txt: document.getElementById("pbnT").textContent,
-               btn: document.getElementById("pbnB").textContent };
+               btn: b.textContent,
+               /* the label is not the button: it carried one for a whole
+                  release while a CSS rule kept it off the screen */
+               shown: b.getBoundingClientRect().width > 0 && getComputedStyle(b).display !== "none" };
     };
     pushSubbed = false; syncPush(); var offer = read();
     pushSubbed = true;  syncPush(); var done = read();
     return { offer: offer, done: done };
   });
   ok("it offers once, with a button to tap",
-     !states.offer.off && !!states.offer.btn, JSON.stringify(states.offer));
+     !states.offer.off && !!states.offer.btn && states.offer.shown, JSON.stringify(states.offer));
   /* It used to disappear entirely once subscribed, which is the state he was
      in when he said he was getting nothing at all: "on" and "silently broken"
      looked the same, with nothing on screen able to tell them apart. It stays
      quietly now, carrying the one button that can. */
   ok("once subscribed it stays, quietly, offering a test",
      !states.done.off && states.done.quiet && /test/i.test(states.done.btn), JSON.stringify(states.done));
+  /* He opened Chat, read "Notifications are on for this device." and asked what
+     he was supposed to tap: there was nothing there. A button that exists and
+     cannot be seen is worse than no button, because the banner promises one. */
+  ok("and the test button is actually on screen", states.done.shown, JSON.stringify(states.done));
 
   /* An iPhone in a Safari tab cannot be asked at all. A dead button there reads
      as the feature being broken; the sentence is the whole fix. */

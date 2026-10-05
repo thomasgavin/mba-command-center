@@ -904,7 +904,15 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   font-size:12.5px;font-weight:700;cursor:pointer}
 .pbn button:hover{filter:brightness(1.05)}
 .pbn.quiet{background:var(--wash);border-color:var(--line)}
-.pbn.quiet button{display:none}
+/* A quiet banner used to mean "no button", because every quiet message it
+   carried was a statement rather than an offer. Then one of them got the test
+   button and this rule swallowed it: the button existed, carried its label and
+   answered a click, and nothing was on screen. What decides it is whether
+   there is a label, not what colour the box is. */
+.pbn button:empty{display:none}
+/* on the quiet banner it is an action on a statement, not the point of the
+   box, so it reads as a secondary control rather than the orange one */
+.pbn.quiet button{background:var(--panel);color:var(--ink2);border:1px solid var(--line)}
 
 /* ---------- a nudge ---------- */
 /* Claude speaking first. It is the same note object as a reply, but a bubble
@@ -3330,7 +3338,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1810";
+var BUILD="2026-10-05-1830";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
