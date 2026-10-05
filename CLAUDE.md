@@ -482,15 +482,46 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
   sentence, and an answer that returns everything is the rummaging he asked to
   be rid of. Only the best-scoring matches are shown, not everything that
   brushed one word.
-- **Nothing below a group collapses, and a row has no twisty at all.** The
-  title carries the date (`when` to read, `w` the ISO key it sorts by, because
-  "04 Dec" sorts above "05 Nov" on its own) and the body is already on screen
-  under it. That is the whole of his objection to the first version: *"I have
-  to click and go down a hole, avoiding which is the whole point of building
-  this app."* A group header is the one thing that collapses, and it starts
-  open; `mapShut` is view state and never reaches `localStorage`. `parent`
-  still nests one level, drawn inline and always visible; nothing deeper is
-  drawn at all.
+- **Each group draws itself in the shape its content wants.** This is the part
+  he cares about most, and he put it as a principle rather than a request:
+  *"This is a intelligent, self-evolving command center which on-the-go figures
+  out the best way to store, visualize and display information as new
+  information keeps coming. ... each block might be best displayed in a
+  completely different way. The academic schedule might be better displayed as
+  a mini simplied calender infographic. The timelines might be better depicted
+  as a vertical timeline with dots."* So `shape` is a field on the node, read
+  off the first node in the group, and `mapShape()` is the one place a shape
+  name becomes markup:
+  - **`calendar`** pools every `rows[]` in the group onto one month axis, so
+    periods, breaks and single dates share a scale instead of being three lists
+    the reader has to align in his head. A row is `{t,a,b,k}` with `k` one of
+    `period`, `break`, `point`. **The prose still reads under the chart** -- a
+    bar says when and never why, and dropping those nodes would be the "eleven
+    dates in one paragraph" mistake wearing the opposite hat.
+  - **`timeline`** is a vertical rail with a dot each, in date order. A dot
+    whose date has passed is hollow, so where he is in the sequence is derived
+    and nothing had to be stored to say it.
+  - **`cards`** is a grid, for peers where nothing is a sequence.
+  - **`list`** is the default, and **an unrecognised shape falls back to it**,
+    so a future Claude can file a node under a shape this build has not learned
+    without breaking the view.
+- **A row has no twisty at all, and every group starts collapsed.** The title
+  carries the date (`when` to read, `w` the ISO key it sorts by, because
+  "04 Dec" sorts above "05 Nov" on its own) and the body is on screen as soon
+  as the block is open. That is his objection to the first version: *"I have to
+  click and go down a hole, avoiding which is the whole point of building this
+  app."* The group header is the only thing that collapses, and it shuts by
+  default because he asked for that -- nine open blocks is a wall. A shut block
+  still prints **what is next inside it** (`mapHint`), or nine shut headers are
+  an index of headings rather than of answers. `mapOpen` is view state and
+  never reaches `localStorage`. `parent` still nests one level, drawn inline
+  and always visible; nothing deeper is drawn at all.
+- **The tint is the block's position, not its name.** Name-hashing was the
+  first attempt and it put the same colour on two of nine groups, sitting next
+  to each other, which reads as a bug rather than a scheme. Position cannot
+  collide until there are more groups than tints. Either way nobody chooses it
+  and nothing is stored: a group invented next month gets a colour by
+  existing.
 - **A node that is done, or that only restates why something matters, does not
   belong here.** Eight went on 2026-10-05 for that reason — MyINSEAD and the
   newsletters, whose tasks are both `done`, and lines like "P0 tells you to
@@ -870,7 +901,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 159 invariants, three widths, a real browser. Every one of them was a
+that runs: 174 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

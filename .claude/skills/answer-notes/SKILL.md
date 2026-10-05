@@ -176,14 +176,40 @@ A node goes in the patch's `kb[]`, alongside `changed[]` and `notes[]`:
   30 Programme calendar, 40 Platforms and tools, 50 Coaching, 60 The summer
   internship, 70 Courses and exemptions, 80 Clubs and elections, 90 Who to
   contact. A new group picks a number that puts it where it belongs.
+- **`shape` is how the group draws, and choosing it is part of the job.** He
+  asked for this as a principle: *"This is a intelligent, self-evolving command
+  center which on-the-go figures out the best way to store, visualize and
+  display information as new information keeps coming. ... each block might be
+  best displayed in a completely different way."* So do not default to `list`
+  because it is the default. Every node in a group carries the same `shape`;
+  the group takes it from the first.
+  - **`timeline`** — a sequence of dated events: a rail with a dot each, in
+    date order, the past ones hollow. Three or more things with `w` dates that
+    happen one after another want this shape.
+  - **`calendar`** — a schedule: things with a start and an end. The group's
+    `rows[]` are pooled onto one month axis, so give each node
+    `rows:[{t,a,b,k}]` — `t` the chart label (keep it short, the column fits
+    about eleven characters), `a` and `b` ISO dates, `k` one of `period`,
+    `break`, `point` (`point`, or `b` omitted, draws a dot). The body still
+    reads in full under the chart, because a bar says when and never why.
+  - **`cards`** — peers, where nothing is a sequence and nothing outranks its
+    neighbour: platforms, tools, contacts.
+  - **`list`** — prose facts that genuinely are just paragraphs.
+  - An unrecognised shape falls back to `list`, so naming a new one is safe.
+    But a shape nothing renders is a shape that does nothing: add it to
+    `mapShape()` in `index.html` in the same run, with its check.
 - **`label` is the title, and it has to be informative on its own.** "Intro
   Webinar" is what he rejected; "PLDP intro webinar" is the fix. A title that
   only means something once you know which branch it was under is not a title.
 - **`when` and `w`** are the date. `when` is what he reads ("13 November 2026",
   "Mar - May 2027"); `w` is the ISO date it sorts by, and without it a group of
   webinars comes out in day-of-month order. Carry both, or neither.
-- **`body`** is one sentence, and it is **always on screen** under the title —
-  nothing in this view has to be opened. A paragraph is a wall on a phone.
+- **`body` is a paragraph, not a clause.** *"Don't be so brief on the details
+  sub-text"*, said alongside *"feel free to use more vertical space"*. Two or
+  three sentences: what the thing is, when it bites, and what it changes for
+  him. A body that only restates the title is worse than none, and so is one
+  that sends him somewhere else to understand it. It is on screen under the
+  title as soon as the block is open; nothing in this view has to be unfolded.
 - **`cat`** is `money`, `life`, `study`, `work`, or `else`. It does one job
   only: the sub-tab strip. A node with an `item` and no `cat` inherits that
   task's category, so naming the task is enough.
@@ -225,9 +251,11 @@ durable copy he asked for — *"create and maintain one or more .md files in the
 git repo so the context and information is never lost even if this session is
 gone"* — and it is the only copy a future session can read without a browser.
 Its shape is **one `##` per group, in `ord` order, and one bullet per node** —
-label, then `when`, then the body, then the task and the id in backticks. The
-headings in that file are the authoritative list of live groups, which is what
-makes it the thing to read before choosing one. Keep the two in step: the map is
+label, then `when`, then the body, then any `rows[]` spans, then the task and
+the id in backticks. Each heading also names the group's `shape`, so the
+headings are the authoritative list of live groups *and* of how each one draws
+— which is what makes that file the thing to read before choosing either.
+Keep the two in step: the map is
 what he reads, `KNOWLEDGE.md` is what the next Claude reads, and a difference
 between them is a bug.
 
