@@ -384,7 +384,8 @@ export class Board {
      exists only so the daily archive is one coherent file rather than a replay
      of every event. Per item, newest `at` wins, same rule as the board. */
   async fold(payload, by){
-    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}};
+    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}, kb:{}};
+    if(!snap.kb) snap.kb = {};
     var hist = (await this.ctx.storage.get("hist")) || [];
     var who  = by==="claude" ? "Claude" : "you";
     (payload.changed||[]).forEach(function(c){
@@ -413,6 +414,17 @@ export class Board {
       /* a note is immutable except for being answered, so the richer one wins */
       if(had && had.answered && !n.answered) return;
       snap.notes[n.id] = n;
+    });
+    /* The mind map. It is folded here for one reason: the daily archive is what
+       keeps the GitHub pull a working fallback rather than dead code, and a
+       snapshot that carried his tasks and notes but not what he knows would
+       lose the one part of the board that is not rebuildable from SEED.
+       Newest clock wins, exactly as the board itself merges it. */
+    (payload.kb||[]).forEach(function(n){
+      if(!n || !n.id) return;
+      var had = snap.kb[n.id];
+      if(had && (had.at||"") > (n.at||"")) return;
+      snap.kb[n.id] = n;
     });
     await this.ctx.storage.put("snap", snap);
     await this.ctx.storage.put("hist", hist);
@@ -492,7 +504,7 @@ export class Board {
   }
 
   async prune(){
-    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}};
+    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}, kb:{}};
     var dropped = 0;
     Object.keys(snap.notes).forEach(function(k){
       if(olderThan(KEEP_DAYS, snap.notes[k].createdAt)){ delete snap.notes[k]; dropped++; }
@@ -566,14 +578,17 @@ export class Board {
      GitHub pull a working fallback instead of dead code. */
   async alarm(){
     await this.prune();
-    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}};
+    var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}, kb:{}};
     var notes = Object.keys(snap.notes).map(function(k){ return snap.notes[k]; });
     var items = Object.keys(snap.items).map(function(k){ return snap.items[k]; });
-    if(notes.length || items.length){
+    /* the map never expires: a note ages out at 7 days because it is a message,
+       and a fact he wrote down is the opposite of a message */
+    var kb    = Object.keys(snap.kb||{}).map(function(k){ return snap.kb[k]; });
+    if(notes.length || items.length || kb.length){
       var now = new Date();
       var body = JSON.stringify({
         v:3, op:"archive", exportedAt:now.toISOString(),
-        why:"daily snapshot from the relay", notes:notes, changed:items
+        why:"daily snapshot from the relay", notes:notes, changed:items, kb:kb
       }, null, 2)+"\n";
       await writeInbox(this.env, utcStamp(now), body, "Relay snapshot");
     }

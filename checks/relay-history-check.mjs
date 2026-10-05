@@ -12,7 +12,7 @@ function ok(name, pass, detail){
 
 /* a GitHub that remembers files, with real shas and real 422s */
 var repo = {}, calls = [];
-globalThis.fetch = async function(url, init){
+var ghMock = async function(url, init){
   init = init||{};
   var u = String(url), m = /contents\/(.+?)(\?|$)/.exec(u);
   var path = m ? decodeURIComponent(m[1]) : "";
@@ -36,6 +36,7 @@ globalThis.fetch = async function(url, init){
   if(init.method==="DELETE"){ delete repo[path]; return new Response("{}",{status:200}); }
   return new Response("{}", {status:200});
 };
+globalThis.fetch = ghMock;
 
 function mkBoard(){
   var store = new Map();
@@ -135,6 +136,31 @@ ok("a GitHub outage does not throw", !threw);
    status, and a rename is exactly what this log is for */
 ok("and the unwritten entries are kept for the next run",
    (await b2.ctx.storage.get("hist")).length===2);
+
+/* --- the mind map has to survive the Worker being deleted ---
+   The daily archive is the only copy of the map that lives outside a Durable
+   Object. Tasks rebuild from SEED and notes expire at seven days, but what he
+   knows exists nowhere else, so an archive that quietly dropped it would be a
+   backup that backs up everything except the irreplaceable part. */
+globalThis.fetch = ghMock;   /* the outage test above left a throwing fetch behind */
+var b3 = mkBoard();
+await b3.fold({exportedAt:"2026-10-04T09:00:00.000Z", changed:[], notes:[], kb:[
+  {id:"k1", label:"VMock", body:"Scores a CV.", cat:"work", at:"2026-10-04T09:00:00.000Z"}]}, "board");
+await b3.fold({exportedAt:"2026-10-04T10:00:00.000Z", changed:[], notes:[], kb:[
+  {id:"k1", label:"VMock", body:"Scores a CV and says what to fix.", cat:"work", at:"2026-10-04T10:00:00.000Z"},
+  {id:"k2", label:"CDC", cat:"work", at:"2026-10-04T10:00:00.000Z"}]}, "board");
+/* an older copy arriving late must not undo the newer one */
+await b3.fold({exportedAt:"2026-10-04T10:30:00.000Z", changed:[], notes:[], kb:[
+  {id:"k1", label:"VMock", body:"stale", cat:"work", at:"2026-10-04T08:00:00.000Z"}]}, "board");
+var snap3 = await b3.ctx.storage.get("snap");
+ok("the relay folds the mind map", Object.keys(snap3.kb||{}).length===2, JSON.stringify(Object.keys(snap3.kb||{})));
+ok("and newest clock wins, as it does on the board",
+   snap3.kb.k1.body==="Scores a CV and says what to fix.", snap3.kb.k1.body);
+await b3.alarm();
+var arch = Object.keys(repo).filter(function(k){ return /^claude-inbox\/.*\.json$/.test(k); });
+var body = arch.length ? JSON.parse(repo[arch[arch.length-1]]) : {};
+ok("and the daily archive carries it into the repo",
+   (body.kb||[]).length===2, JSON.stringify((body.kb||[]).map(function(n){return n.id;})));
 
 console.log("\n"+bad+" failing");
 process.exit(bad?1:0);

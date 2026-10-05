@@ -29,7 +29,7 @@ var CHROMIUM = process.env.PW_CHROMIUM || "/opt/pw-browsers/chromium";
 var PORT     = Number(process.env.PORT || 8391);
 var ROOT     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 var WIDTHS   = [390, 768, 1280];
-var VIEWS    = ["over", "board", "time", "cal", "graph", "chat"];
+var VIEWS    = ["over", "board", "time", "cal", "map", "chat"];
 
 var out = [], bad = 0;
 function ok(name, pass, detail) {
@@ -918,7 +918,7 @@ for (var cw of [390, 1280]) {
   var s24 = await open(1280);
   var words = await s24.p.evaluate(function () {
     var seen = { blocked: 0, target: 0, upcoming: 0 };
-    ["over", "board", "time", "cal", "graph", "chat"].forEach(function (v) {
+    ["over", "board", "time", "cal", "map", "chat"].forEach(function (v) {
       setView(v);
       var t = document.getElementById("v-" + v).innerText || "";
       if (/\bBlocked\b/.test(t)) seen.blocked++;
@@ -1134,6 +1134,144 @@ for (var tw26 of [390, 1280]) {
   ok("and a task older than that pins to the left edge with its real date",
      k28.oldCount === 0 || k28.allPinned, JSON.stringify(k28));
   await s28.ctx.close();
+}
+
+/* ---- 29. the mind map ----
+   It replaced the dependency view, so the first thing to prove is that the old
+   one is actually gone rather than merely hidden. The rest is the lesson
+   `deleted` taught: a new stored field that merges but never saves, or saves
+   but never merges, fails silently and completely -- so every assertion here
+   goes through a real merge and then a real reload. */
+{
+  var KB = [
+    { id: "k-vmock", label: "VMock", body: "Scores a CV and says what to fix.",
+      cat: "work", item: "vmock", rel: ["k-cv"], at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-cv", label: "INSEAD CV format", body: "One page, their template.",
+      cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-cdc", label: "CDC", body: "The career development centre.",
+      cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-cdc-coach", label: "Coaching sessions", parent: "k-cdc",
+      body: "Booked through CareerGlobe.", cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-orphan", label: "A fact whose topic was deleted", parent: "k-ghost",
+      cat: "money", at: "2026-10-05T09:00:00.000Z", by: "claude" }
+  ];
+  var s29 = await open(390);
+
+  var gone = await s29.p.evaluate(function () {
+    var text = "";
+    ["over", "board", "time", "cal", "map", "chat"].forEach(function (v) {
+      setView(v); text += " " + (document.getElementById("v-" + v).innerText || "");
+    });
+    setView("over");
+    return { tab: !!document.querySelector('.vt[data-v="graph"]'),
+             sec: !!document.getElementById("v-graph"),
+             fn: typeof window.renderGraph, edges: typeof window.drawEdges,
+             word: /Dependencies/.test(text + Array.prototype.map.call(document.querySelectorAll(".vt"), function (e) { return e.innerText; }).join(" ")),
+             mapTab: !!document.querySelector('.vt[data-v="map"]') };
+  });
+  ok("the dependency view is gone, not hidden",
+     !gone.tab && !gone.sec && gone.fn === "undefined" && gone.edges === "undefined", JSON.stringify(gone));
+  ok("and the word Dependencies is nowhere on screen", !gone.word, JSON.stringify(gone));
+  ok("the Mind map tab took its place", gone.mapTab, JSON.stringify(gone));
+
+  /* a patch from Claude is the only way the map is ever filled, so that is the
+     path the check uses -- not a hand-built localStorage blob */
+  var filled = await s29.p.evaluate(async function (nodes) {
+    applyRemote({ exportedAt: new Date().toISOString(), op: "patch", notes: [], changed: [], kb: nodes });
+    setView("map");
+    await new Promise(function (r) { setTimeout(r, 120); });
+    var stored = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
+    return { count: kb.length, stored: (stored.kb || []).length,
+             badge: document.getElementById("nMap").textContent,
+             roots: Array.prototype.map.call(document.querySelectorAll(".mrh"), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); }),
+             labels: Array.prototype.map.call(document.querySelectorAll(".mnl"), function (e) { return e.innerText; }) };
+  }, KB);
+  ok("a patch from Claude fills the map", filled.count === KB.length, JSON.stringify(filled));
+  ok("and it is written to storage, not only held in memory",
+     filled.stored === KB.length, JSON.stringify(filled));
+  ok("the badge counts what is in it", filled.badge === String(KB.length), JSON.stringify(filled));
+  ok("the top of the tree is the categories he already thinks in",
+     filled.roots.some(function (r) { return /career/i.test(r); }), JSON.stringify(filled.roots));
+  /* a node whose parent no longer exists must still be reachable: an orphan at
+     the top of its category, never a node that simply stops being drawn */
+  ok("a fact whose parent is missing is still on screen",
+     filled.labels.indexOf("A fact whose topic was deleted") >= 0, JSON.stringify(filled.labels));
+
+  /* the reload is the point: DFIELDS taught that a field can merge and never
+     save, and pass every in-memory assertion on the way */
+  await s29.p.reload({ waitUntil: "load" });
+  await s29.p.waitForTimeout(500);
+  var kept = await s29.p.evaluate(function () {
+    setView("map");
+    return { count: kb.length, drawn: document.querySelectorAll(".mn").length };
+  });
+  ok("the map survives a reload, so it reaches his other device",
+     kept.count === KB.length && kept.drawn > 0, JSON.stringify(kept));
+
+  /* collapsed by default below the first level, or a map of a hundred facts is
+     unreadable on a phone; the count is the only thing saying there is more */
+  var tw = await s29.p.evaluate(async function () {
+    var head = document.querySelector('[data-kbt="k-cdc"]');
+    var before = !!document.querySelector('[data-kb="k-cdc-coach"]');
+    head.click();
+    await new Promise(function (r) { setTimeout(r, 80); });
+    var after = !!document.querySelector('[data-kb="k-cdc-coach"]');
+    document.querySelector('[data-kbt="k-cdc"]').click();
+    await new Promise(function (r) { setTimeout(r, 80); });
+    return { before: before, after: after, back: !!document.querySelector('[data-kb="k-cdc-coach"]') };
+  });
+  ok("a branch expands and collapses on a tap", tw.before !== tw.after && tw.before === tw.back, JSON.stringify(tw));
+
+  /* "instead of me rummaging through the dashboard": the board answers out of
+     what it already holds, immediately, and says that Claude's answer follows */
+  var ask = await s29.p.evaluate(async function () {
+    document.querySelector('[data-mm="ask"]').click();
+    var ta = document.getElementById("min");
+    ta.value = "what is vmock";
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    document.getElementById("msend").click();
+    await new Promise(function (r) { setTimeout(r, 150); });
+    var box = document.getElementById("mAns");
+    var sent = notes.filter(function (n) { return n.kind === "ask"; });
+    return { shown: !box.classList.contains("off"), text: box.innerText,
+             asks: sent.length, travels: sent.length ? sent[0].forClaude !== false : false,
+             dim: document.querySelectorAll(".mn.dim").length,
+             hit: document.querySelectorAll(".mn.hit").length };
+  });
+  ok("an ask answers out of the map at once", ask.shown && /VMock/.test(ask.text), JSON.stringify(ask));
+  ok("and says Claude's own answer is coming", /Claude/.test(ask.text), JSON.stringify(ask));
+  ok("the ask still travels to Claude as a note", ask.asks === 1 && ask.travels, JSON.stringify(ask));
+  ok("and the tree dims what the question did not touch", ask.hit > 0 && ask.dim > 0, JSON.stringify(ask));
+
+  /* a note is a fact to file, not a question: Claude has to be able to tell
+     them apart, and the note is the only thing that reaches it */
+  var fact = await s29.p.evaluate(async function () {
+    document.querySelector('[data-mm="note"]').click();
+    var ta = document.getElementById("min");
+    ta.value = "Statistics is taught in P1.";
+    ta.dispatchEvent(new Event("input", { bubbles: true }));
+    document.getElementById("msend").click();
+    await new Promise(function (r) { setTimeout(r, 150); });
+    var f = notes.filter(function (n) { return n.kind === "fact"; });
+    return { n: f.length, travels: f.length ? f[0].forClaude !== false : false,
+             cleared: document.getElementById("mAns").classList.contains("off") };
+  });
+  ok("a note is sent as a fact to file", fact.n === 1 && fact.travels, JSON.stringify(fact));
+  ok("and leaving Ask puts the whole tree back", fact.cleared, JSON.stringify(fact));
+
+  /* the link to the task is the point of filing it at all */
+  var jump = await s29.p.evaluate(async function () {
+    setView("map");
+    var chip = document.querySelector('.mtag.mitem[data-go="vmock"]');
+    if (!chip) return { chip: false };
+    chip.click();
+    await new Promise(function (r) { setTimeout(r, 200); });
+    return { chip: true, open: document.getElementById("drawer").classList.contains("on"),
+             title: document.getElementById("dTitle").innerText };
+  });
+  ok("a fact tied to a task opens that task", jump.chip && jump.open && /VMock/i.test(jump.title), JSON.stringify(jump));
+  ok("the map draws without a console error", s29.errs.length === 0, s29.errs.join(" | "));
+  await s29.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */
