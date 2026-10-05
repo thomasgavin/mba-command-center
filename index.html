@@ -58,6 +58,13 @@
      from, not as a stray band. */
   --sbar:#280a38;
 
+  /* How much of the iOS home-bar inset the section bar gives back. Half of
+     it was right while `default` hid the inset; once the page owned it the
+     real 34px came through and the bar grew a band of nothing under it --
+     *"after re-bookmarking the bottom is out of proportion again"*. One
+     value, read by the bar and by the floating button, so the two can never
+     be guessed apart. */
+  --barpad:max(4px, calc(env(safe-area-inset-bottom) - 22px));
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -90,13 +97,19 @@
      panel and #a8aab3 ~7.7:1, so the faintest label on the board still
      clears AA. Hues are untouched: colour is load-bearing here.
      Research: Material 3 surface elevation, WCAG 4.5:1 body text. */
-  --ink:#f7f7f9; --ink2:#d6d7dc; --ink3:#a8aab3; --ink4:#8b8d97;
-  --page:#000000; --panel:#101013; --wash:#1d1d22; --wash2:#15151a;
-  --line:#2b2b33; --line2:#1f1f26;
-  --glass:rgba(0,0,0,.78); --edge:#3c3c47;
+  --ink:#f3f3f4; --ink2:#d4d5d8; --ink3:#a9abb0; --ink4:#93959c;
+  /* Gmail's grey, not the pure black this shipped as: *"don't use pure black
+     for the background, use gmail's dark mode shade"*. Pure black maximises
+     OLED saving and costs the thing the surfaces were doing -- a panel one
+     step up from #000 reads as a glow rather than a card. Google's own dark
+     neutral is around #1b1b1b with containers at #242424, which is what these
+     are, and every ink still clears 4.5:1 on the panel. */
+  --page:#1b1b1b; --panel:#242424; --wash:#303030; --wash2:#202020;
+  --line:#383838; --line2:#2b2b2b;
+  --glass:rgba(27,27,27,.86); --edge:#4a4a4a;
   /* light enough to read white on, dark enough to read as a surface */
-  --inkbg:#2a2a33;
-  --sbar:#000000;
+  --inkbg:#333333;
+  --sbar:#1b1b1b;
   --sh:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -14px rgba(0,0,0,.6);
   --sh2:0 2px 6px rgba(0,0,0,.45), 0 20px 44px -18px rgba(0,0,0,.7);
   color-scheme:dark;
@@ -162,6 +175,11 @@ body::before{
   color:var(--ink3);font:inherit;font-size:12.5px;cursor:pointer;min-width:212px;
   transition:border-color .14s,background .14s;
 }
+/* A real magnifying glass. It was \2315 rotated 45 degrees, which reads as
+   a map pin at 17px -- *"change the search task button on top to
+   magnifying glass icon"*. Hidden on desktop, where the button carries
+   its own words. */
+.cmdk .mg{display:none;flex:none}
 .cmdk:hover{background:var(--panel);border-color:var(--edge)}
 .cmdk kbd{
   margin-left:auto;font:inherit;font-size:10.5px;font-weight:600;color:var(--ink4);
@@ -217,7 +235,7 @@ body::before{
      46px bar under a full inset came to 80px of chrome at the foot of a
      390x844 screen, which is the "lot of space left on the bottom". Half of
      it clears the indicator and gives the board the rest back. */
-  padding-bottom:calc(env(safe-area-inset-bottom) / 2);
+  padding-bottom:var(--barpad);
   position:relative;z-index:30;
 }
 .vt{
@@ -312,7 +330,16 @@ body::before{
 /* ---------- stage ---------- */
 /* the bottom bar is a sibling, not an overlay, so the only thing the
    padding still has to clear is the floating chat button */
-.stage{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 20px 86px;-webkit-overflow-scrolling:touch}
+.stage{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 20px 86px;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+/* Pull down to sync. The Sync button is in the top bar and his thumb is at the
+   foot of a 390px screen, so the gesture every other app on his phone has is
+   the one that actually gets used. Zero height, so it occupies no row in the
+   flex column and hangs over the scroller instead. */
+.ptr{flex:none;height:0;overflow:visible;position:relative;z-index:6;pointer-events:none}
+.ptr i{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;
+  height:38px;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink3);opacity:0;transform:translateY(-38px)}
 .view{display:none}
 .view.on{display:block;animation:fade .22s var(--ease)}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -330,10 +357,17 @@ body::before{
   color:var(--ink4);margin-bottom:12px;display:flex;align-items:center;gap:7px;
 }
 .tile h3 .pin{width:6px;height:6px;border-radius:50%;flex:none}
+.hero h3{margin-bottom:8px}
 .tile h3 .more{margin-left:auto;font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--ink3);font-weight:600}
 
 /* hero tiles */
-.hero{grid-column:span 5;grid-row:span 2;color:#fff;border:0;display:flex;flex-direction:column}
+/* Span 5 and two rows with a 60px number was a tile you could read from
+   across the room, and two of them owned the top of Overview: *"the next
+   deadline and tuition cards are too big - make them still stand out but
+   smaller"*. They keep the gradient, the shadow and the white text, which is
+   what makes them stand out; what shrinks is the number and the dead space
+   under it, so they size to their content like every other tile. */
+.hero{grid-column:span 5;color:#fff;border:0;display:flex;flex-direction:column;padding:14px 15px}
 .hero.a{background:linear-gradient(142deg,#ff5a1f 0%,#ff7a3d 48%,#ff9558 100%);box-shadow:0 2px 8px rgba(255,100,41,.2),0 24px 48px -22px rgba(255,100,41,.65)}
 .hero.b{grid-column:span 4;background:linear-gradient(145deg,#2a0b3a 0%,#431a59 55%,#5a2676 100%);box-shadow:0 2px 8px rgba(40,10,56,.22),0 24px 48px -22px rgba(40,10,56,.7)}
 .hero::after{
@@ -341,14 +375,14 @@ body::before{
   background:radial-gradient(circle,rgba(255,255,255,.22),transparent 68%);pointer-events:none;
 }
 .hero h3{color:rgba(255,255,255,.72)}
-.hero .big{font-size:60px;font-weight:800;letter-spacing:-.046em;line-height:.9;font-variant-numeric:tabular-nums}
-.hero .big sup{font-size:19px;font-weight:600;letter-spacing:-.01em;vertical-align:super;margin-left:5px;opacity:.82}
-.hero .sub{font-size:14.5px;font-weight:650;margin-top:9px;letter-spacing:-.015em;line-height:1.3}
-.hero .met{font-size:12px;color:rgba(255,255,255,.76);margin-top:4px;font-weight:500}
-.hero .foot{margin-top:auto;padding-top:14px;display:flex;gap:7px;flex-wrap:wrap}
+.hero .big{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:.95;font-variant-numeric:tabular-nums}
+.hero .big sup{font-size:14px;font-weight:600;letter-spacing:-.01em;vertical-align:super;margin-left:4px;opacity:.82}
+.hero .sub{font-size:13.5px;font-weight:650;margin-top:6px;letter-spacing:-.015em;line-height:1.3}
+.hero .met{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:500}
+.hero .foot{margin-top:auto;padding-top:11px;display:flex;gap:6px;flex-wrap:wrap}
 .hbtn{
   border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.16);color:#fff;
-  border-radius:7px;height:29px;padding:0 11px;font:inherit;font-size:12px;font-weight:650;cursor:pointer;
+  border-radius:7px;height:27px;padding:0 10px;font:inherit;font-size:11.5px;font-weight:650;cursor:pointer;
   backdrop-filter:blur(6px);transition:background .14s,transform .12s;
 }
 .hbtn:hover{background:rgba(255,255,255,.3)}
@@ -359,9 +393,9 @@ body::before{
 .hbtn.solid{background:#fff;color:var(--inkbg);border-color:#fff}
 
 /* money bar */
-.mbar{height:9px;border-radius:20px;background:rgba(255,255,255,.2);display:flex;overflow:hidden;margin-top:14px}
+.mbar{height:8px;border-radius:20px;background:rgba(255,255,255,.2);display:flex;overflow:hidden;margin-top:11px}
 .mbar i{display:block;height:100%;transition:width .7s var(--ease)}
-.mleg{display:flex;flex-direction:column;gap:7px;margin-top:13px}
+.mleg{display:flex;flex-direction:column;gap:5px;margin-top:10px}
 .mrow{display:flex;align-items:center;gap:8px;font-size:12px}
 .mrow .sw{width:8px;height:8px;border-radius:3px;flex:none}
 .mrow .lb{color:rgba(255,255,255,.78);font-weight:500}
@@ -402,12 +436,25 @@ body::before{
 .arw{flex:none;width:22px;display:grid;place-items:center;color:var(--ink4);font-size:13px}
 
 /* attention list */
-.att{grid-column:span 12}
+/* It is the first thing on Overview and it looked like every other tile:
+   *"the needs attention block doesn't stand out enough - needs more colour"*.
+   A red edge, a red-tinted wash and a red heading, which is the hue the
+   countdown chips inside it already use -- colour that agrees with the
+   content rather than decorating the box. */
+.att{grid-column:span 12;border-left:3px solid var(--red);
+  background:linear-gradient(180deg,rgba(224,38,60,.09),transparent 120px),var(--panel)}
+.att h3{color:var(--red)}
+.att h3 .more{color:var(--ink3)}
 .arow{
   display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line2);cursor:pointer;
 }
 .arow:first-of-type{border-top:0}
 .arow:hover .at{color:var(--orange)}
+/* *"align the statuses across the board - they are a bit left or right to
+   each other in some places"*. A chip sized by its own text puts "today" and
+   "in 5d" and "24d late" at three different left edges down a column of
+   seven rows. One width, centred, so the column is a column. */
+.arow .chip.d,.agr .chip.p{flex:none;min-width:66px;text-align:center}
 .abar{width:3px;align-self:stretch;border-radius:3px;flex:none;min-height:22px}
 .at{font-size:12.5px;font-weight:600;line-height:1.3;flex:1;min-width:0;transition:color .14s}
 .at small{display:block;font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:1px}
@@ -431,6 +478,7 @@ body::before{
   width:46px;flex:none;text-align:center;border-radius:var(--r3);padding:3px 0;background:var(--wash);
 }
 .agd-d b{display:block;font-size:14px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.agd-d .chip.d{display:block;margin-top:3px;font-style:normal;padding:1px 0;background:none;font-size:9.5px}
 .agd-d span{display:block;font-size:9.5px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em}
 .agd-d.hot{background:rgba(255,100,41,.1)} .agd-d.hot b{color:var(--orange)} .agd-d.hot span{color:var(--orange)}
 
@@ -473,6 +521,13 @@ body::before{
 .chip.d.late{background:rgba(224,38,60,.11);color:var(--red)}
 .chip.d.soon{background:rgba(255,100,41,.12);color:#d8450f}
 .chip.d.near{background:rgba(255,159,0,.15);color:#8a5a00}
+/* On a light board a 12% tint under ink-dark text is a quiet chip. On a dark
+   one it is a smudge, and the text colour was picked to be dark on white:
+   *"the 'tomorrow' bubble on due tasks are too dark"*. Both halves flip. */
+:root[data-theme="dark"] .chip.d{background:#32333a;color:var(--ink2)}
+:root[data-theme="dark"] .chip.d.late{background:rgba(224,38,60,.22);color:#ff8795}
+:root[data-theme="dark"] .chip.d.soon{background:rgba(255,100,41,.22);color:#ffa47e}
+:root[data-theme="dark"] .chip.d.near{background:rgba(255,159,0,.22);color:#ffc95f}
 .chip.p{border:1px solid currentColor;background:none}
 .chip.nt{background:rgba(50,100,255,.1);color:var(--blue)}
 .cact{position:absolute;top:8px;right:8px;display:flex;gap:4px}
@@ -792,7 +847,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   right:max(16px,env(safe-area-inset-right));
   /* the bar is 54px plus the home-bar inset and is the last child of .app,
      so the button has to sit clear of it rather than on top of it */
-  bottom:calc(52px + (env(safe-area-inset-bottom) / 2) + 12px);
+  bottom:calc(52px + var(--barpad) + 12px);
   width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
   background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
   box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
@@ -955,6 +1010,17 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   font-size:11.5px;line-height:1.5;color:var(--ink2)}
 .tld div{overflow-wrap:anywhere}
 .tld div+div{margin-top:3px}
+/* the two sections of a receipt, and the bubble a task change renders as */
+.tld b,.cdid b{display:block;font-size:9.5px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+.tld b.gap,.cdid b.gap{margin-top:8px;padding-top:7px;border-top:1px solid var(--line)}
+.acr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px}
+.acn{flex-basis:100%;font-size:11.5px;font-weight:650;color:var(--ink2);overflow-wrap:anywhere}
+.acv{font-size:10.5px;font-weight:750;padding:1.5px 7px;border-radius:20px;
+  background:var(--wash);color:var(--ink3);white-space:nowrap}
+.acv.was{opacity:.7}
+.acr i{font-style:normal;font-size:11px;color:var(--ink4)}
+.acb{font-size:11.5px;line-height:1.5;color:var(--ink2)}
 /* the date and the four ways he moves it, on one line instead of two fields */
 .drow{display:flex;align-items:center;gap:6px;min-width:0}
 .drow input[type=date]{flex:1 1 auto;min-width:0}
@@ -1108,10 +1174,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 /* what Claude actually changed, under its message: the reply is the claim and
    this is the receipt, so one is never shown without the other */
 .cdid{margin-top:7px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:8px 11px;font-size:12px}
-.cdid b{display:block;font-size:10.5px;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;color:var(--ink4);margin-bottom:5px}
-.cdid div{color:var(--ink2);padding:2px 0 2px 13px;position:relative;line-height:1.45}
-.cdid div::before{content:"";position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--green)}
+/* The green-dot bullet list this used to be is gone: a task change renders
+   as a bubble, and a dot in front of one is a second mark saying nothing. */
+.cdid .acb{padding:2px 0}
 /* The composer and the line under it are one block that never shrinks. The
    tip was a bare flex child of the column, so flex-shrink squeezed it to zero
    height and it read as cropped text at the very bottom of the screen. The
@@ -1179,10 +1244,10 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      square footprint rather than stretching across the gap. */
   .cmdk span{display:none} .cmdk kbd{display:none}
   .cmdk{flex:0 0 auto;width:40px;justify-content:center}
-  .cmdk::before{content:"\2315";font-size:17px;color:var(--ink3);transform:rotate(-45deg)}
+  .cmdk .mg{display:block;width:17px;height:17px;color:var(--ink3)}
   .vhead{padding:8px 13px} .vhead h2{font-size:16px} .stage{padding:14px 13px 80px}
   .bento{gap:12px}
-  .hero,.hero.b{grid-column:span 12} .hero .big{font-size:48px}
+  .hero,.hero.b{grid-column:span 12} .hero .big{font-size:34px}
   .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
   .day{min-height:74px} .zone{width:60px;height:54px}
   .tbtn .lbl{display:none}
@@ -1261,11 +1326,14 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   </header>
 
   <div class="vhead"><h2 id="vTitle">Overview</h2>
-    <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
+    <button class="cmdk" id="cmdkBtn"><svg class="mg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
   </div>
 
   <nav class="subs" id="subs" role="tablist" aria-label="Filter by category"></nav>
 
+  <!-- the pull-to-sync label, a zero-height sibling of the scroller so it
+       can hang over the top of it without being a row in the column -->
+  <div class="ptr" id="ptr" aria-hidden="true"><i id="ptrL">Pull to sync</i></div>
   <main class="stage" id="stage">
     <section class="view on" id="v-over"><div class="bento" id="bento"></div></section>
 
@@ -1923,6 +1991,53 @@ function notesFor(id){ return notes.filter(function(n){return n.itemId===id;}); 
    nothing to change still has to say so, and it says so in `acted` -- "No board
    changes: the flight task being Done is what ticks the milestone". Rendered as
    "What I changed" that reads as a change that did not happen. */
+/* A receipt is one of two things and they read differently: a task that moved
+   between two values, and a change to the board itself. He asked for exactly
+   that split -- *"simply 'Locus Exit Plan: To-do -> Done'... unless it is a
+   structure change to the board, then you can send text. But seperate the
+   sections always"*.
+
+   The shape is parsed rather than stored, so every receipt already written
+   renders the new way and nothing had to migrate: "<task>: <from> -> <to>"
+   is a task change and anything else is prose. */
+var ARROW=/\s*(?:->|\u2192|&rarr;)\s*/;
+function actParts(n){
+  var t=[],b=[];
+  actedOf(n).forEach(function(a){
+    var c=String(a).indexOf(":");
+    var m=c>0 ? String(a).slice(c+1).split(ARROW) : null;
+    if(m&&m.length===2&&String(a).slice(0,c).trim()&&m[0].trim()&&m[1].trim())
+      t.push({t:String(a).slice(0,c).trim(),a:m[0].trim(),b:m[1].trim()});
+    else b.push(a);
+  });
+  return {task:t,board:b};
+}
+/* a value's colour is the status colour where the value IS a status, so the
+   bubble agrees with the legend and the bars rather than inventing a scheme */
+function valCol(v){
+  var c=null, k=String(v).toLowerCase();
+  STATUS.forEach(function(x){ if(x.label.toLowerCase()===k||x.k===k) c=x.c; });
+  return c;
+}
+function actedBox(n,cls){
+  var p=actParts(n);
+  if(!p.task.length&&!p.board.length) return "";
+  var h='<div class="'+cls+'">';
+  if(p.task.length){
+    h+='<b>Tasks</b>'+p.task.map(function(r){
+      var ca=valCol(r.a), cb=valCol(r.b);
+      return '<div class="acr"><span class="acn">'+esc(r.t)+'</span>'+
+        '<span class="acv was"'+(ca?' style="color:'+ca+'"':'')+'>'+esc(r.a)+'</span>'+
+        '<i>&rarr;</i>'+
+        '<span class="acv now"'+(cb?' style="color:'+cb+'"':'')+'>'+esc(r.b)+'</span></div>';
+    }).join("");
+  }
+  if(p.board.length){
+    h+='<b'+(p.task.length?' class="gap"':'')+'>Board</b>'+
+       p.board.map(function(a){ return '<div class="acb">'+esc(a)+'</div>'; }).join("");
+  }
+  return h+'</div>';
+}
 function actedOf(n){
   return (n.acted||[]).filter(function(a){
     return a && !/^\s*(no|none)\b[^:]{0,24}(change|edit|update)/i.test(a);
@@ -2049,8 +2164,11 @@ function render(){
      thing worth a badge anyway. The dot says the one thing that is: something
      in here is already past its date. */
   var lateN=alive().filter(function(i){ var n=dleft(i.due); return i.status!=="done" && n!==null && n<0; }).length;
+  /* and it goes out on the section he is looking at: he has seen it, so a
+     dot on the tab under his thumb is telling him about the screen he is
+     already reading -- *"they should go away once I open the section"*. */
   ["board","time","cal"].forEach(function(k){
-    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateN>0);
+    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateN>0&&view!==k);
   });
   renderOverview(); renderBoard(); renderPlan(); renderCal(); renderMap(); renderChat();
   syncFab();
@@ -2256,11 +2374,15 @@ function renderOverview(){
   h+='<div class="tile agd"><h3><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
   h+= ag.length? ag.map(function(i){
         var d=D(i.due), n=dleft(i.due);
+        /* the countdown goes under the date rather than out at the right
+           edge: the row had a date block, a title, and then two chips
+           competing for the same corner, and the empty half of the date
+           block was doing nothing -- "better use of space" */
         return '<div class="agr" data-go="'+i.id+'">'+
-          '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span></div>'+
+          '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
+            '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
           '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
-          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span>'+
-          '<span class="chip d '+cCls(n)+'">'+cTxt(n)+'</span></div>';
+          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
       }).join("")
       : '<p class="hint">Nothing dated in the next three weeks.</p>';
   h+='</div>';
@@ -3009,11 +3131,7 @@ function renderChat(){
       }
       /* what Claude changed on the board because of this message -- and
          nothing at all when the honest answer was that nothing changed */
-      var did=mine?[]:actedOf(n);
-      if(did.length){
-        h+='<div class="cdid"><b>What I changed</b>'+
-           did.map(function(a){ return '<div>'+esc(a)+'</div>'; }).join("")+'</div>';
-      }
+      if(!mine) h+=actedBox(n,"cdid");
       h+='<div class="cmeta">'+esc(hhmm(n.createdAt))+
          /* a nudge already names its task in the header; saying it again
             under the bubble is the same line twice on a 390px screen */
@@ -3284,9 +3402,7 @@ function noteRow(p){
       (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
     '</div>'+
     '<div class="tlx">'+esc(p.text||"")+'</div>'+
-    (isClaude(p)&&actedOf(p).length
-      ? '<div class="tld">'+actedOf(p).map(function(a){return '<div>'+esc(a)+'</div>';}).join("")+'</div>'
-      : '')+
+    (isClaude(p)?actedBox(p,"tld"):'')+
   '</div>';
 }
 function noteWhen(isoStr){
@@ -3497,7 +3613,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2210";
+var BUILD="2026-10-05-2149";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3786,7 +3902,7 @@ function setTheme(t){
   /* the iOS status bar reads this, so a dark board under a white strip is the
      one thing left looking half-done */
   var m=document.querySelector('meta[name="theme-color"]');
-  if(m) m.setAttribute("content", t==="dark" ? "#000000" : "#ff6429");
+  if(m) m.setAttribute("content", t==="dark" ? "#1b1b1b" : "#ff6429");
   try{ localStorage.setItem(THEME_KEY,t); }catch(e){}
 }
 function theme(){ return document.documentElement.getAttribute("data-theme")==="dark" ? "dark" : "light"; }
@@ -3811,9 +3927,50 @@ document.getElementById("notesBtn").addEventListener("click",openNotes);
 document.getElementById("newsBtn").addEventListener("click",openNews);
 /* Sync means "make this screen current", which includes the app itself: a
    stale home-screen copy was the thing that made a shipped fix look missing. */
-document.getElementById("syncBtn").addEventListener("click",function(){
-  pullFromRepo(true); checkBuild(true);
-});
+function syncNow(){ pullFromRepo(true); checkBuild(true); }
+document.getElementById("syncBtn").addEventListener("click",syncNow);
+
+/* Pull-to-sync. It arms only at the very top of the scroller, so it can never
+   take over a scroll already in progress, and it runs the same two calls the
+   Sync button does -- one way in, so the two cannot drift. The label is
+   dragged by the finger rather than animated, which is what makes the gesture
+   feel attached to the hand. */
+(function(){
+  var st=document.getElementById("stage"), lab=document.getElementById("ptrL");
+  var y0=null, dy=0, TRIP=68, busy=false;
+  function at(px,txt){
+    lab.style.transform="translateY("+(px-38)+"px)";
+    lab.style.opacity=Math.min(1,px/30);
+    if(txt) lab.textContent=txt;
+  }
+  function rest(){ y0=null; dy=0; lab.style.transform=""; lab.style.opacity=""; }
+  st.addEventListener("touchstart",function(e){
+    if(busy||e.touches.length!==1||st.scrollTop>0){ y0=null; return; }
+    y0=e.touches[0].clientY; dy=0;
+    lab.textContent="Pull to sync";
+  },{passive:true});
+  st.addEventListener("touchmove",function(e){
+    if(y0===null) return;
+    dy=e.touches[0].clientY-y0;
+    /* an upward drag, or one that began before the top, is an ordinary
+       scroll: hand it straight back rather than half-owning it */
+    if(dy<=0||st.scrollTop>0){ rest(); return; }
+    e.preventDefault();
+    /* resistance, so the label slows as it is pulled rather than tracking
+       the finger all the way down the screen */
+    at(Math.min(56,dy*0.5), dy>TRIP?"Release to sync":"Pull to sync");
+  },{passive:false});
+  st.addEventListener("touchend",function(){
+    if(y0===null) return;
+    if(dy>TRIP){
+      busy=true; at(38,"Syncing\u2026");
+      syncNow();
+      setTimeout(function(){ busy=false; rest(); },900);
+    }else rest();
+    y0=null;
+  },{passive:true});
+  st.addEventListener("touchcancel",rest,{passive:true});
+})();
 document.getElementById("exportBtn").addEventListener("click",function(e){
   if(e.shiftKey){ exportAll(); return; }   /* shift-click still downloads the full snapshot */
   sendToClaude();

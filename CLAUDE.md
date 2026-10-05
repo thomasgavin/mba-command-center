@@ -660,7 +660,19 @@ thumb's reach.
   edge instead of continuing behind it.
 - **The floating button sits clear of the bar**, which is a `calc()` off the
   bar's own height rather than a number guessed twice.
-- **The bar is 52px and takes half the home-bar inset.** It was 46px for an
+- **`--barpad` is how much of the home-bar inset the bar gives back**, and
+  the bar and the floating button both read it, so the two cannot be guessed
+  apart. It was half the inset, which was right only while the status-bar meta
+  was `default` and iOS hid the inset: once the page owned it the real 34px
+  came through and the bar grew a band of nothing under it (*"after
+  re-bookmarking the bottom is out of proportion again"*). It is the inset
+  less 22px now, floored at 4.
+- **A dot goes out on the section he has opened.** It says "something in here
+  is past its date", which is not worth saying about the screen he is already
+  reading: *"they should go away once I open the section"*.
+- **Search is a drawn magnifying glass.** It was `\2315` rotated 45 degrees,
+  which at 17px reads as a map pin.
+- **The bar is 52px and takes `--barpad` of the home-bar inset.** It was 46px for an
   evening and read as a hairline (*"looks a little too thin"*). A 54px bar under the
   full 34px iOS declares came to 88px of chrome at the foot of a 390x844
   screen -- *"a lot of space left on the bottom"*. Half the inset clears the
@@ -694,7 +706,18 @@ screen. Three taps inside 1.5s is a gesture nobody performs by accident, and
 the first two still go to Overview as they always did, so nothing is spent
 waiting to see whether a third is coming.
 
-- **The page is black, and every ink clears 4.5:1 on it.** It shipped as a
+- **The page is Gmail's grey, not pure black.** It went black first and he
+  rejected that too: *"don't use pure black for the background, use gmail's
+  dark mode shade"*. Pure black maximises the OLED saving and costs what the
+  surfaces were doing -- a panel one step up from `#000` reads as a glow
+  rather than a card. Google's own neutral is about `#1b1b1b` with containers
+  at `#242424`, which is what the tokens are.
+- **A tint picked for a light board is a smudge on a dark one, and its text
+  colour is the wrong half.** The countdown chips were a 12% hue under ink-dark
+  text: *"the 'tomorrow' bubble on due tasks are too dark"*. Both halves flip
+  in the dark theme -- 22% behind a light tint of the same hue -- and the check
+  measures the text's luminance rather than reading the hex.
+- **Every ink clears 4.5:1 on the panel.** It shipped as a
   dark purple page with muted purple-grey text and he rejected both halves:
   *"too much grey and it is hard to see"* and *"try using black instead of
   dark purple for background"*. `--ink4` was about 3:1 on `--panel`, which is
@@ -804,6 +827,19 @@ never be a tab apart again.
   and the ramp now reads as a sequence: amber not started, blue running,
   purple waiting on something, green closed, red late. The check asserts no
   swatch in the legend and no bar on the chart is grey.
+- **Overview opens on Needs attention, and the tile carries the red it is
+  about** -- a red left edge, a red-tinted wash and a red heading, the same hue
+  the countdown chips inside it already use: *"the needs attention block
+  doesn't stand out enough - needs more colour"*. The heroes beside it shrank
+  in the same change (*"too big - make them still stand out but smaller"*):
+  they keep the gradient, the shadow and the white text, which is what makes
+  them stand out, and lose the 60px number and the row of dead space under it.
+- **A countdown sits under its date, and a column of chips shares one left
+  edge.** The agenda row had a date block, a title and then two chips
+  competing for the same corner while the lower half of the date block did
+  nothing; and a chip sized by its own text puts "today", "in 5d" and "24d
+  late" at three different left edges down seven rows: *"align the statuses
+  across the board"*.
 - **The marker's colour is the status**, and that is the whole reason the row
   carries no state pill: *"Too cluttered, remove statuses - the colour coding
   on the timeline chart should do it. Add a legend on top."* `statusColour()`
@@ -967,6 +1003,25 @@ on top right doesn't mark read once open - I need to open the chat section to
 mark it as read."* It is marked after the markup is built, so the NEW tags are
 still on the ones that were new when he opened it -- the same order Chat uses.
 
+**A receipt is two sections, and a task change is a bubble.** He asked for it
+exactly: *"use colour bubble to show the changes to tasks. Simply 'Locus Exit
+Plan: To-do -> Done'. Unless it is a structure change to the board, then you
+can send text. But seperate the sections always."* So `acted[]` stays a flat
+array of strings and `actParts()` reads the **shape**: `"<task>: <from> ->
+<to>"` is a task change and renders as two bubbles with an arrow, each taking
+its colour from `STATUS` where the value is a status; anything else is prose
+under **Board**. Parsing rather than storing is what let every receipt already
+written render the new way with nothing to migrate.
+
+**Anything Claude changes on its own carries a note saying why**, on that task,
+with the evidence named: *"whenever there is an action you take yourself on a
+task, add a note under it and mention the reasoning"*. The receipt says what
+changed and the note says why, and the why is the half still worth having in
+three weeks. It matters most on the board pass, which acts while he is asleep:
+a status that moved overnight with nothing attached is indistinguishable from
+the board being wrong. A change he asked for in the message being answered
+needs no such note.
+
 `actedOf()` is the receipt filter. A run with nothing to change still says so,
 and it said so in `acted[]` — "No board changes: the flight task being Done is
 what ticks the milestone" — which rendered under **What I changed** as a change
@@ -1115,6 +1170,14 @@ The board is used on an iPhone, mostly from the home screen.
   unshrinkable flex item -- which is what the dependency rows were). A Safari
   `input[type=date]` takes its own intrinsic width and ignores `width:100%`,
   so it carries `appearance:none` and `max-width:100%`.
+- **Pull down at the top of a view to sync.** The Sync button is in the top
+  bar and his thumb is at the foot of a 390px screen, so the gesture every
+  other app on his phone has is the one that gets used. It arms only at
+  `scrollTop` 0 and hands an upward drag straight back, so it can never take
+  over a scroll already in progress, and it calls the same `syncNow()` the
+  button does -- one way in, so the two cannot drift. `.ptr` is a zero-height
+  sibling of the scroller, which is how the label hangs over the top of it
+  without being a row in the flex column.
 - **Chat has a floating button** (`.fab`, bottom right) because it is the
   seventh tab in a strip that scrolls sideways, so the thing he does most often
   sat furthest from his thumb. It reads its own state in `syncFab()` -- off on
@@ -1175,7 +1238,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 251 invariants, three widths, a real browser. Every one of them was a
+that runs: 266 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

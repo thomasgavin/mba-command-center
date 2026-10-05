@@ -162,6 +162,27 @@ the task's state now against the `was` you recorded:
 
 A task whose state changed and then went quiet again starts over at round 1.
 
+## 5b. Anything you change yourself carries its reason
+
+The board pass reads his mail before it nudges, and a mail scan often settles a
+task outright — the welcome message arrived, so the task is done; the school
+moved a deadline, so the date moves. **Make the change, and put a note on that
+task saying why**, with `itemId` set, in one or two sentences naming the
+evidence: *"Closed this because VMock sent the welcome mail to your INSEAD
+address this morning."*
+
+He asked for it in those words on 2026-10-05 — *"whenever there is an action
+you take yourself on a task, add a note under it and mention the reasoning"* —
+and it matters most here, because this is the pass that acts while he is asleep.
+A status that changed overnight with nothing attached is indistinguishable from
+the board being wrong.
+
+The `acted[]` receipt is the other half and is **not** a substitute: a task that
+moved is written there as `"<task title>: <before> \u2192 <after>"`, which the
+board draws as two coloured bubbles under a **Tasks** heading. Anything that is
+not a task moving between two values is prose, under **Board**. The receipt says
+what changed; the note says why.
+
 ## 6. Report
 
 Say in the run log what you nudged, what you ranked highly and deliberately did

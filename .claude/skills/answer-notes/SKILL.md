@@ -95,7 +95,8 @@ One file, `claude-inbox/<YYYY-MM-DD-HHMM>.json`:
      "itemTitle": "<that item's title, or null>",
      "text": "<the reply he reads in Chat>",
      "createdAt": "<ISO now>", "state": "new",
-     "acted": ["First instalment moved to 5 Nov", "SBI sanction given the same runway"]}
+     "acted": ["Pay EUR 53,000 tuition instalment: 5 Oct \u2192 5 Nov",
+               "SBI Global Ed-Vantage sanction letter: 20 Oct \u2192 20 Nov"]}
   ]
 }
 ```
@@ -120,6 +121,39 @@ Four things the board depends on, each of which has already been got wrong once:
 Write `text` as a reply to a person, not a report: what you did and why, in a
 couple of sentences. Put the mechanical detail in `acted[]`, one short line per
 change — that renders under your message as the receipt.
+
+### The shape of an `acted[]` line
+
+He asked for this on 2026-10-05, and the board renders the two kinds
+differently, so the shape is not cosmetic:
+
+- **A task that moved** is `"<task title>: <before> \u2192 <after>"` — exactly
+  that, with a colon and an arrow (`->` is accepted too). The board splits it
+  into a **Tasks** section and draws the two values as coloured bubbles, with a
+  status taking its colour from the legend. *"Simply 'Locus Exit Plan: To-do ->
+  Done'."* One line per field that moved; a task whose status and date both
+  changed gets two lines.
+- **Anything else** — a new view, a rule, a fix to the page — is prose, and
+  lands under **Board**. *"Unless it is a structure change to the board, then
+  you can send text."*
+
+Do not write a task change as prose and do not write prose with a colon and an
+arrow in it; the parser reads the shape, not your intent.
+
+### Every action you take yourself gets a note saying why
+
+*"Whenever there is an action you take yourself on a task - add a note under it
+and mention the reasoning."* So any change you make that he did not ask for in
+so many words — a status you closed off an email, a date you moved because
+something it depended on slipped, a task you deleted — carries a note on **that
+task** (`itemId` set) giving the reason, not just a line in `acted[]`.
+
+The receipt says what changed; the note says why, and it is the half that is
+still there in three weeks when he is looking at the task and wondering. One or
+two sentences, his vocabulary, the evidence named: *"Closed this because VMock
+sent the welcome mail to your INSEAD address this morning."* A change he asked
+for in the message you are answering needs no such note — he knows why, he just
+said so.
 
 ## 3b. A reply to a nudge
 
@@ -313,7 +347,9 @@ Four things, none optional:
    behaviour is not covered by it, add the invariant in the same commit — the
    fix and the thing that stops it coming back are one change.
 4. **Say what you did in the reply**, as the `acted[]` receipt: the change, and
-   that it is live and needs the app force-quit once.
+   that it is live and needs the app force-quit once. A code change is a
+   **Board** line, so write it as prose, not in the `title: a \u2192 b` shape
+   that the board renders as a task bubble.
 
 Commit the code to `main` and push it:
 

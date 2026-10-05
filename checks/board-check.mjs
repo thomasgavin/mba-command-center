@@ -1773,10 +1773,12 @@ for (var bw of [390, 1280]) {
   ok("one tap does not change the theme", !dark.before && !dark.one, JSON.stringify(dark));
   ok("three taps turn it on, and three more turn it off",
      dark.three === "dark" && !dark.back, JSON.stringify(dark));
-  /* Black, not the dark purple it shipped as: *"Try using black instead of
-     dark purple for background"*. */
-  ok("the page is actually black while it is on",
-     dark.page === "rgb(0, 0, 0)", JSON.stringify(dark.page));
+  /* Not the dark purple it shipped as, and not the pure black that replaced
+     it either: *"don't use pure black for the background, use gmail's dark
+     mode shade"*. A neutral grey a step off black, so the panels on it can
+     read as cards. */
+  ok("the page is a neutral grey, neither purple nor pure black",
+     dark.page === "rgb(27, 27, 27)", JSON.stringify(dark.page));
   ok("the theme is this device's, not the board's",
      dark.stored === "dark" && !dark.inBlob, JSON.stringify(dark));
   ok("the toast is still readable in the dark",
@@ -1826,7 +1828,7 @@ for (var bw of [390, 1280]) {
   });
   ok("the status strip is the first thing in .app and dark in both themes",
      sb && sb.firstChild === "sbar" &&
-     sb.bg === "rgb(0, 0, 0)" && sb.light === "rgb(40, 10, 56)", JSON.stringify(sb));
+     sb.bg === "rgb(27, 27, 27)" && sb.light === "rgb(40, 10, 56)", JSON.stringify(sb));
 
   /* "Too much grey and it is hard to see" -- every ink has to clear 4.5:1 on
      the surface it is actually drawn on, which is what the first dark palette
@@ -1856,7 +1858,8 @@ for (var bw of [390, 1280]) {
     var r = ratio(inks[k], inks.panel);
     ok("dark " + k + " clears 4.5:1 on a panel", r >= 4.5, k + "=" + inks[k] + " ratio=" + r.toFixed(2));
   });
-  ok("the dark page is black", inks.page === "#000000", inks.page);
+  ok("the dark page is Gmail's grey, not pure black",
+     inks.page === "#1b1b1b", inks.page);
 
   /* "Make the navigation bar at the bottom slight bigger" -- and the floating
      button has to move with it, or it sits on top of the bar. */
@@ -2017,6 +2020,182 @@ for (var bw of [390, 1280]) {
 
   ok("the dark pass draws without a console error", s35.errs.length === 0, s35.errs.join(" | "));
   await s35.ctx.close();
+}
+
+/* ---- 36. the eleven off the Gmail-dark screenshots, 2026-10-05 ---- */
+{
+  var s36 = await open(390);
+
+  /* "the next deadline and tuition cards are too big - make them still stand
+     out but smaller" -- smaller, but still the gradient tiles */
+  var hero = await s36.p.evaluate(function () {
+    setView("over");
+    var h = document.querySelector(".tile.hero.a");
+    var t = document.querySelector(".tile.att");
+    return {
+      big: parseFloat(getComputedStyle(h.querySelector(".big")).fontSize),
+      h: h.getBoundingClientRect().height,
+      grad: /gradient/.test(getComputedStyle(h).backgroundImage),
+      attEdge: getComputedStyle(t).borderLeftColor,
+      attW: parseFloat(getComputedStyle(t).borderLeftWidth),
+      attH3: getComputedStyle(t.querySelector("h3")).color
+    };
+  });
+  ok("the hero number is smaller than it shipped", hero.big <= 44 && hero.big >= 30, String(hero.big));
+  ok("and the hero still stands out", hero.grad && hero.h < 300, JSON.stringify(hero));
+  /* "the needs attention block doesn't stand out enough - needs more colour" */
+  ok("Needs attention carries the red it is about",
+     hero.attW >= 3 && hero.attEdge === "rgb(224, 38, 60)" && hero.attH3 === "rgb(224, 38, 60)",
+     JSON.stringify(hero));
+
+  /* "the 'tomorrow' bubble on due tasks are too dark" */
+  var chips = await s36.p.evaluate(function () {
+    document.documentElement.setAttribute("data-theme", "dark");
+    var out = [];
+    Array.prototype.forEach.call(document.querySelectorAll(".tile.att .chip.d"), function (e) {
+      var cs = getComputedStyle(e);
+      out.push({ bg: cs.backgroundColor, fg: cs.color });
+    });
+    document.documentElement.removeAttribute("data-theme");
+    return out;
+  });
+  function lumOf(c) {
+    var m = c.match(/(\d+), (\d+), (\d+)/); if (!m) return 0;
+    return (0.2126 * +m[1] + 0.7152 * +m[2] + 0.0722 * +m[3]) / 255;
+  }
+  ok("a countdown bubble is readable on the dark board",
+     chips.length > 0 && chips.every(function (c) { return lumOf(c.fg) > 0.42; }),
+     JSON.stringify(chips));
+
+  /* "move the in 15d text under the date" + "align the statuses across the
+     board - they are a bit left or right to each other" */
+  var agd = await s36.p.evaluate(function () {
+    var rows = document.querySelectorAll(".agd .agr");
+    if (!rows.length) return { none: true };
+    var inDate = !!rows[0].querySelector(".agd-d .chip.d");
+    var atRight = !!rows[0].querySelector(":scope > .chip.d");
+    var lefts = Array.prototype.map.call(document.querySelectorAll(".tile.att .chip.d"), function (e) {
+      return Math.round(e.getBoundingClientRect().left);
+    });
+    return { inDate: inDate, atRight: atRight, lefts: lefts, n: rows.length };
+  });
+  ok("the countdown sits under the date, not out at the row's edge",
+     !agd.none && agd.inDate && !agd.atRight, JSON.stringify(agd));
+  ok("every status chip in a column shares one left edge",
+     agd.lefts.length > 1 && new Set(agd.lefts).size === 1, JSON.stringify(agd.lefts));
+
+  /* "the nav section icons have dots ... they should go away once I open the
+     section" */
+  var dots = await s36.p.evaluate(async function () {
+    /* make something late so the dots are lit at all */
+    var id = Object.keys(items)[0];
+    patch(id, { due: "2020-01-01", status: "todo" }, null, true);
+    setView("over"); render();
+    var lit = function () {
+      return ["board", "time", "cal"].filter(function (k) {
+        return document.getElementById("vd-" + k).classList.contains("on");
+      });
+    };
+    var before = lit();
+    setView("cal"); render();
+    await new Promise(function (r) { setTimeout(r, 40); });
+    return { before: before, after: lit() };
+  });
+  ok("a dot marks a section with something late in it", dots.before.length === 3, JSON.stringify(dots));
+  ok("and it goes out on the section he has opened",
+     dots.after.length === 2 && dots.after.indexOf("cal") === -1, JSON.stringify(dots));
+
+  /* "change the search task button on top to magnifying glass icon" */
+  var mg = await s36.p.evaluate(function () {
+    var b = document.getElementById("cmdkBtn"), g = b.querySelector("svg.mg");
+    return { has: !!g, shown: g ? g.getBoundingClientRect().width > 0 : false,
+             circle: g ? !!g.querySelector("circle") : false };
+  });
+  ok("search is a drawn magnifying glass on a phone",
+     mg.has && mg.shown && mg.circle, JSON.stringify(mg));
+
+  /* "use colour bubble to show the changes to tasks ... But seperate the
+     sections always, board changes and task changes" */
+  var rec = await s36.p.evaluate(async function () {
+    notes.push({ id: "claude-check-1", from: "claude", text: "Done.",
+      createdAt: new Date().toISOString(), state: "read",
+      acted: ["Plan Locus exit: To do \u2192 Done", "Added a Done section to Calendar"] });
+    setView("chat"); renderChat();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    var box = document.querySelector(".cdid");
+    if (!box) return { none: true };
+    var heads = Array.prototype.map.call(box.querySelectorAll("b"), function (e) { return e.textContent; });
+    var r0 = box.querySelector(".acr");
+    return {
+      heads: heads,
+      name: r0 ? r0.querySelector(".acn").textContent : null,
+      from: r0 ? getComputedStyle(r0.querySelector(".acv.was")).color : null,
+      to: r0 ? getComputedStyle(r0.querySelector(".acv.now")).color : null,
+      prose: (box.querySelector(".acb") || {}).textContent || null
+    };
+  });
+  ok("a task change renders as two coloured bubbles with an arrow",
+     !rec.none && rec.name === "Plan Locus exit" &&
+     rec.from === "rgb(255, 159, 0)" && rec.to === "rgb(0, 169, 143)", JSON.stringify(rec));
+  ok("and board changes are a separate section, still prose",
+     !rec.none && rec.heads.length === 2 && /Task/i.test(rec.heads[0]) && /Board/i.test(rec.heads[1]) &&
+     /Done section/.test(rec.prose || ""), JSON.stringify(rec));
+
+  /* "Add pull down to sync function" */
+  var ptr = await s36.p.evaluate(async function () {
+    setView("over");
+    var st = document.getElementById("stage"), lab = document.getElementById("ptrL");
+    st.scrollTop = 0;
+    var called = 0, real = window.pullFromRepo;
+    window.pullFromRepo = function () { called++; };
+    function t(type, y) {
+      st.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [new Touch({ identifier: 1, target: st, clientY: y, clientX: 60 })]
+      }));
+    }
+    t("touchstart", 200);
+    t("touchmove", 240);
+    var mid = { op: getComputedStyle(lab).opacity, tx: lab.style.transform };
+    t("touchmove", 300);
+    var armed = lab.textContent;
+    t("touchend", 300);
+    await new Promise(function (r) { setTimeout(r, 40); });
+    var out = { called: called, mid: mid, armed: armed, busy: lab.textContent };
+    window.pullFromRepo = real;
+    return out;
+  });
+  ok("a pull at the top of the view drags a label with the finger",
+     parseFloat(ptr.mid.op) > 0 && /translateY/.test(ptr.mid.tx || ""), JSON.stringify(ptr.mid));
+  ok("pulling past the trip point says so and then syncs",
+     /Release/i.test(ptr.armed) && ptr.called === 1, JSON.stringify(ptr));
+
+  /* an ordinary scroll must not be eaten by it. The sync above holds the
+     label up for its settle window, so wait that out first or this measures
+     the previous gesture. */
+  await s36.p.waitForTimeout(1000);
+  var scr = await s36.p.evaluate(function () {
+    var st = document.getElementById("stage"), lab = document.getElementById("ptrL");
+    st.scrollTop = 0;
+    function t(type, y) {
+      st.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [new Touch({ identifier: 1, target: st, clientY: y, clientX: 60 })]
+      }));
+    }
+    t("touchstart", 300);
+    var ev = new TouchEvent("touchmove", { bubbles: true, cancelable: true,
+      touches: [new Touch({ identifier: 1, target: st, clientY: 240, clientX: 60 })] });
+    st.dispatchEvent(ev);
+    var out = { prevented: ev.defaultPrevented, op: getComputedStyle(lab).opacity };
+    t("touchend", 240);
+    return out;
+  });
+  ok("an upward drag is still an ordinary scroll",
+     !scr.prevented && parseFloat(scr.op) === 0, JSON.stringify(scr));
+
+  ok("the eleven draw without a console error", s36.errs.length === 0, s36.errs.join(" | "));
+  await s36.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */
