@@ -673,11 +673,13 @@ for (var w2 of [390, 1280]) {
   await s21.ctx.close();
 }
 
-/* ---- 17. Needs attention sits straight under the milestones on Overview ---- */
+/* ---- 17. Needs attention opens Overview, with the next deadline under it ----
+   It used to sit under the milestone rail; the rail moved to the foot on
+   2026-10-05 (see 35) and Needs attention took the top. */
 {
   var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"'), iHero = src.indexOf('class="tile hero a"');
-  ok("Needs attention comes right after the milestones", iMiles > 0 && iAtt > iMiles && iAtt < iHero, iMiles + "/" + iAtt + "/" + iHero);
+  ok("Needs attention comes first, then the next deadline", iAtt > 0 && iAtt < iHero && iMiles > iHero, iMiles + "/" + iAtt + "/" + iHero);
 }
 
 /* ---- 17. nudges reach the lock screen, and the worker stays out of the way ----
@@ -1720,8 +1722,11 @@ for (var bw of [390, 1280]) {
       searchRight: Math.round(hb.right - cb.right)
     };
   });
-  ok("the section bar is slimmer and its tabs are 46px",
-     trim.tabH === 46 && trim.barH <= 52, JSON.stringify(trim));
+  /* 46px first, then 52 on 2026-10-05: *"make the navigation bar at the bottom
+     slight bigger - looks a little too thin"*. The ceiling is what matters --
+     54 under the full home-bar inset was the 88px of chrome he objected to. */
+  ok("the section bar is a thumb's height and no more",
+     trim.tabH === 52 && trim.barH <= 58, JSON.stringify(trim));
   ok("the composer floats over the thread and paints no band of its own",
      trim.pos === "absolute" && /rgba\(0, 0, 0, 0\)|transparent/.test(trim.footBg), JSON.stringify(trim));
   ok("the bubble is thinner", trim.boxH <= 46 && trim.boxH > 24, JSON.stringify(trim));
@@ -1766,14 +1771,203 @@ for (var bw of [390, 1280]) {
   ok("one tap does not change the theme", !dark.before && !dark.one, JSON.stringify(dark));
   ok("three taps turn it on, and three more turn it off",
      dark.three === "dark" && !dark.back, JSON.stringify(dark));
-  ok("the page is actually dark while it is on",
-     /^rgb\(2[0-9], 1[0-9], 2[0-9]\)$/.test(dark.page) || dark.page === "rgb(20, 16, 25)", JSON.stringify(dark.page));
+  /* Black, not the dark purple it shipped as: *"Try using black instead of
+     dark purple for background"*. */
+  ok("the page is actually black while it is on",
+     dark.page === "rgb(0, 0, 0)", JSON.stringify(dark.page));
   ok("the theme is this device's, not the board's",
      dark.stored === "dark" && !dark.inBlob, JSON.stringify(dark));
   ok("the toast is still readable in the dark",
      dark.toastBg !== dark.toastFg && !/^rgb\(2[34][0-9]/.test(dark.toastBg), JSON.stringify(dark));
   ok("the trim draws without a console error", s34.errs.length === 0, s34.errs.join(" | "));
   await s34.ctx.close();
+}
+
+/* ---- 35. the dark theme he can actually read ----
+   Seven things on 2026-10-05, all of them from three screenshots of the dark
+   board: milestones first on Overview, a white strip above the app, grey text
+   he could not read, a bar that had gone too thin, grey timeline bars, a
+   calendar that could not tell done from pending, and a purple page. */
+{
+  var s35 = await open(390);
+
+  /* "Move the milestone to the bottom of overview page" */
+  var mord = await s35.p.evaluate(function () {
+    setView("over");
+    var t = Array.prototype.map.call(document.querySelectorAll("#bento > .tile"), function (e) {
+      return e.className;
+    });
+    return { n: t.length, first: t[0] || "", last: t[t.length - 1] || "" };
+  });
+  ok("Overview opens on what is due, not on the milestones",
+     mord.n > 2 && !/\bmiles\b/.test(mord.first), JSON.stringify(mord));
+  ok("the milestone rail is the last tile on Overview",
+     /\bmiles\b/.test(mord.last), JSON.stringify(mord));
+
+  /* "Why Is the top section still white?" -- it is the iOS status bar, which
+     `default` paints opaque white and which is read at launch, so the runtime
+     theme-color change could never repaint it. The page owns the inset now. */
+  var html35 = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  ok("the iOS status bar is the page's, not an opaque white strip",
+     /apple-mobile-web-app-status-bar-style" content="black-translucent"/.test(html35) &&
+     /viewport-fit=cover/.test(html35), "meta");
+  var sb = await s35.p.evaluate(function () {
+    var e = document.querySelector(".sbar");
+    if (!e) return null;
+    var dark = {};
+    document.documentElement.setAttribute("data-theme", "dark");
+    dark.bg = getComputedStyle(e).backgroundColor;
+    document.documentElement.removeAttribute("data-theme");
+    dark.light = getComputedStyle(e).backgroundColor;
+    dark.firstChild = document.querySelector(".app").firstElementChild.className;
+    return dark;
+  });
+  ok("the status strip is the first thing in .app and dark in both themes",
+     sb && sb.firstChild === "sbar" &&
+     sb.bg === "rgb(0, 0, 0)" && sb.light === "rgb(40, 10, 56)", JSON.stringify(sb));
+
+  /* "Too much grey and it is hard to see" -- every ink has to clear 4.5:1 on
+     the surface it is actually drawn on, which is what the first dark palette
+     did not do (--ink4 was about 3:1). Measured, not read off a swatch. */
+  var inks = await s35.p.evaluate(function () {
+    document.documentElement.setAttribute("data-theme", "dark");
+    var cs = getComputedStyle(document.documentElement);
+    var o = { panel: cs.getPropertyValue("--panel").trim(), page: cs.getPropertyValue("--page").trim() };
+    ["--ink", "--ink2", "--ink3", "--ink4"].forEach(function (k) { o[k] = cs.getPropertyValue(k).trim(); });
+    document.documentElement.removeAttribute("data-theme");
+    return o;
+  });
+  function lum(hex) {
+    var m = hex.replace("#", "");
+    if (m.length === 3) m = m[0] + m[0] + m[1] + m[1] + m[2] + m[2];
+    var c = [0, 2, 4].map(function (i) {
+      var v = parseInt(m.slice(i, i + 2), 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function ratio(a, b) {
+    var x = lum(a), y = lum(b);
+    return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+  }
+  ["--ink", "--ink2", "--ink3", "--ink4"].forEach(function (k) {
+    var r = ratio(inks[k], inks.panel);
+    ok("dark " + k + " clears 4.5:1 on a panel", r >= 4.5, k + "=" + inks[k] + " ratio=" + r.toFixed(2));
+  });
+  ok("the dark page is black", inks.page === "#000000", inks.page);
+
+  /* "Make the navigation bar at the bottom slight bigger" -- and the floating
+     button has to move with it, or it sits on top of the bar. */
+  var barh = await s35.p.evaluate(function () {
+    setView("over");
+    var t = document.querySelector(".vt").getBoundingClientRect();
+    var f = document.querySelector(".fab").getBoundingClientRect();
+    var b = document.querySelector(".vbar").getBoundingClientRect();
+    return { tab: t.height, gap: b.top - f.bottom };
+  });
+  ok("the section bar is taller than it was and still not thick",
+     barh.tab >= 50 && barh.tab <= 56, JSON.stringify(barh));
+  ok("the floating button still clears the taller bar",
+     barh.gap > 4 && barh.gap < 30, JSON.stringify(barh));
+
+  /* "Why are some timeline chart lines still grey?" -- To do was the one
+     status whose colour said nothing. No status may be grey. */
+  var bars = await s35.p.evaluate(function () {
+    setView("time");
+    var cols = Array.prototype.map.call(document.querySelectorAll(".gbar"), function (e) {
+      return getComputedStyle(e).backgroundColor;
+    });
+    var leg = Array.prototype.map.call(document.querySelectorAll(".lgi i"), function (e) {
+      return getComputedStyle(e).backgroundColor;
+    });
+    return { cols: cols, leg: leg };
+  });
+  function greyish(c) {
+    var m = c.match(/(\d+), (\d+), (\d+)/); if (!m) return false;
+    var r = +m[1], g = +m[2], b = +m[3];
+    return Math.max(r, g, b) - Math.min(r, g, b) < 34;
+  }
+  ok("no status in the legend is grey", bars.leg.length >= 5 && !bars.leg.some(greyish),
+     JSON.stringify(bars.leg));
+  ok("no timeline bar is grey", bars.cols.length > 3 && !bars.cols.some(greyish),
+     JSON.stringify(bars.cols.filter(greyish)));
+  var op = await s35.p.evaluate(function () {
+    setView("time");
+    var b = document.querySelector(".gbar");
+    var light = getComputedStyle(b).opacity;
+    document.documentElement.setAttribute("data-theme", "dark");
+    var dark = getComputedStyle(b).opacity;
+    document.documentElement.removeAttribute("data-theme");
+    return { light: +light, dark: +dark };
+  });
+  ok("a bar is not washed out to nothing on a black page",
+     op.dark > op.light && op.dark >= 0.45, JSON.stringify(op));
+
+  /* "Same problem with calendar view ... colour the box borders or text based
+     on status and white for the date. And use striked out green text for
+     completed ones, not grey." The agenda row is what he sees on a phone. */
+  var cal = await s35.p.evaluate(async function () {
+    setView("cal");
+    await new Promise(function (r) { setTimeout(r, 340); });
+    var rows = document.querySelectorAll(".calrow");
+    if (!rows.length) return { none: true };
+    var byStatus = {}, sameDate = true, first = null;
+    Array.prototype.forEach.call(rows, function (e) {
+      byStatus[getComputedStyle(e).borderLeftColor] = 1;
+    });
+    var d = document.querySelector(".arh b");
+    var dateCol = d ? getComputedStyle(d).color : null;
+    var ink = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+    return {
+      borders: Object.keys(byStatus),
+      lw: getComputedStyle(rows[0]).borderLeftWidth,
+      dateCol: dateCol, ink: ink,
+      title: getComputedStyle(rows[0].querySelector("b")).color
+    };
+  });
+  ok("a calendar row carries its status on its own edge",
+     !cal.none && parseFloat(cal.lw) >= 3 && cal.borders.length >= 1 && !cal.borders.some(greyish),
+     JSON.stringify(cal));
+  /* "white for the date" -- ink, which is near-white in the dark theme. The
+     row for today is deliberately the orange instead, so the invariant is
+     that it is never a muted grey, which is what --ink4 would have made it. */
+  ok("the day number is not a muted grey",
+     !cal.none && !greyish(cal.dateCol), JSON.stringify(cal));
+
+  /* done has to be green and struck through, in both the agenda and the grid */
+  var done = await s35.p.evaluate(async function () {
+    var open = Object.keys(items).filter(function (k) { return items[k].due && items[k].status !== "done"; });
+    var id = open[0];
+    /* give it today's date so it lands in the month on screen, then close it */
+    var t = new Date(); var k = t.toISOString().slice(0, 10);
+    calCur = new Date(t.getFullYear(), t.getMonth(), 1);
+    patch(id, { due: k, status: "done" }, null, true);
+    setView("cal"); renderCal();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    var row = document.querySelector('.calrow[data-id="' + id + '"]');
+    if (!row) return { none: true, id: id };
+    var b = row.querySelector("b"), cs = getComputedStyle(b);
+    return { col: cs.color, line: cs.textDecorationLine, id: id };
+  });
+  ok("a completed task is struck-through green, not grey",
+     !done.none && done.col === "rgb(0, 169, 143)" && /line-through/.test(done.line),
+     JSON.stringify(done));
+
+  /* the white-button-in-the-dark trap, the inverse of the --inkbg one */
+  var solid = await s35.p.evaluate(function () {
+    setView("over");
+    document.documentElement.setAttribute("data-theme", "dark");
+    var b = document.querySelector(".hbtn.solid");
+    var o = b ? { bg: getComputedStyle(b).backgroundColor, fg: getComputedStyle(b).color } : null;
+    document.documentElement.removeAttribute("data-theme");
+    return o;
+  });
+  ok("the hero's solid button is readable in the dark",
+     solid && solid.bg !== solid.fg && !/^rgb\(2[0-9][0-9], 2[0-9][0-9]/.test(solid.fg),
+     JSON.stringify(solid));
+
+  ok("the dark pass draws without a console error", s35.errs.length === 0, s35.errs.join(" | "));
+  await s35.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

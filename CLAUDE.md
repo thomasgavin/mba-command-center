@@ -469,9 +469,12 @@ December 2027 is noise on a board about this month and nobody can tick it.
   move to Fontainebleau, programme start, each tuition instalment, the exchange,
   graduation. A milestone with an `item` reads its date and state off that task,
   so there is never a second copy of a date; one with a fixed `d` is reached
-  when its `gate` task is done. They render as the **first tile on Overview**,
-  which is the only tile answering "is this whole thing on track" rather than
-  "what is due this week".
+  when its `gate` task is done. They render as the **last tile on Overview**.
+  They opened the view at first, as the only tile answering "is this whole
+  thing on track" rather than "what is due this week", and he moved them to
+  the foot on 2026-10-05: the first screen should answer what to do today, and
+  a rail of ten dates running out to graduation is context to scroll down to.
+  Needs attention took the top.
 - **`VISA_STEPS`** — the visa is a sequence, not a checkbox. The tile shows the
   steps in order; "visa in hand" is the milestone that follows them, not a task.
 - **`HOUSING`** — accommodation is coverage, not a checkbox. Club 8 holds
@@ -657,7 +660,8 @@ thumb's reach.
   edge instead of continuing behind it.
 - **The floating button sits clear of the bar**, which is a `calc()` off the
   bar's own height rather than a number guessed twice.
-- **The bar is 46px and takes half the home-bar inset.** A 54px bar under the
+- **The bar is 52px and takes half the home-bar inset.** It was 46px for an
+  evening and read as a hairline (*"looks a little too thin"*). A 54px bar under the
   full 34px iOS declares came to 88px of chrome at the foot of a 390x844
   screen -- *"a lot of space left on the bottom"*. Half the inset clears the
   indicator and gives the board the rest back.
@@ -690,6 +694,33 @@ screen. Three taps inside 1.5s is a gesture nobody performs by accident, and
 the first two still go to Overview as they always did, so nothing is spent
 waiting to see whether a third is coming.
 
+- **The page is black, and every ink clears 4.5:1 on it.** It shipped as a
+  dark purple page with muted purple-grey text and he rejected both halves:
+  *"too much grey and it is hard to see"* and *"try using black instead of
+  dark purple for background"*. `--ink4` was about 3:1 on `--panel`, which is
+  the whole of "hard to see". The palette follows what X's Lights Out,
+  Instagram and YouTube all do: a pure-black page so panels lift off it, each
+  surface a step lighter rather than a shadow (a shadow has nothing to fall on
+  in the dark), and the text ramp compressed upward. **The check measures the
+  contrast rather than eyeballing the swatch**, so a future tweak that dims an
+  ink below AA fails rather than ships.
+- **A tint tuned for white is nearly invisible on black.** `.gbar` at 26%
+  opacity was the other half of *"why are some timeline chart lines still
+  grey?"*; it is 52% in the dark theme. The first half was the `todo` status
+  colour, which was literally grey — see "One view for the tasks".
+- **The iOS status bar is the page's now.**
+  `apple-mobile-web-app-status-bar-style` was `default`, which paints an
+  opaque white strip above the app and **is read at launch**, so the runtime
+  `theme-color` change could never repaint it: a black board under a white
+  bar (*"why is the top section still white?"*). It is `black-translucent`,
+  the inset belongs to the page, and `.sbar` — the first child of `.app`,
+  `env(safe-area-inset-top)` tall, which is zero everywhere but an installed
+  iOS app — fills it from `--sbar`. That token is **dark in both themes**,
+  because iOS letters a translucent bar in white; on the light board it reads
+  as the brand strip the mark is cut from.
+- **A white surface lettered in `--ink` is the `--inkbg` trap inverted.** The
+  hero's solid "Open" button went blank in the dark for exactly that reason.
+  `--inkbg` is the one ink that stays ink in both directions.
 - It is `data-theme="dark"` on `<html>` and **a block of variables, not a
   second stylesheet**. That works only because every surface already reads
   `--panel`, `--page`, `--wash` and `--line`; the literals that were left
@@ -757,6 +788,12 @@ rendered by `renderPlan()`: `.grow` is one row holding the list entry in `.gl`
 and the same task's bar in `.gtrack`, so a state and the date it moves can
 never be a tab apart again.
 
+- **No status is grey.** `todo` was `#8b8095`, the one status colour that
+  said nothing on either theme — a flat smear on white and all but invisible
+  on black (*"why are some timeline chart lines still grey?"*). It is amber,
+  and the ramp now reads as a sequence: amber not started, blue running,
+  purple waiting on something, green closed, red late. The check asserts no
+  swatch in the legend and no bar on the chart is grey.
 - **The marker's colour is the status**, and that is the whole reason the row
   carries no state pill: *"Too cluttered, remove statuses - the colour coding
   on the timeline chart should do it. Add a legend on top."* `statusColour()`
@@ -1087,6 +1124,14 @@ The board is used on an iPhone, mostly from the home screen.
   slide-in.
 - **Horizontal strips are `touch-action:pan-x`** with `overscroll-behavior-x:
   contain`, or a swipe along the view tabs drags the board vertically.
+- **The calendar reads status, not track.** A month of track colours could
+  not tell a closed task from an open one: *"not very good visibility between
+  the completed and pending tasks"*. The grid chip is filled by
+  `statusColour`, the agenda row carries it as a 3px bar down its left edge,
+  and a completed task is **struck-through green, not grey** — his own fix,
+  and right: grey says "ignore me", which is wrong for the one row in the
+  month that is good news. The day number stays ink (the orange of today
+  aside), which is what *"white for the date"* means on a dark board.
 - **The calendar is a vertical agenda below 720px** (`narrow()`), one row per
   day that has something on it. Seven columns in 390px gives each day ~50px,
   which read as broken. Drag-to-a-day is a desktop gesture; the snooze rail
@@ -1115,7 +1160,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 228 invariants, three widths, a real browser. Every one of them was a
+that runs: 247 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
