@@ -1,0 +1,34 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-05T11:00:42.000Z",
+ "source": "Claude",
+ "why": "Twice-daily pass: inbox scan plus nudge",
+ "changed": [
+  {
+   "id": "cf-indonesia",
+   "status": "done",
+   "manual": true,
+   "doneAt": "2026-10-05",
+   "at": "2026-10-05T11:00:42.000Z"
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-1791198042000",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "cf-validation",
+   "itemId": "cf-validation",
+   "itemTitle": "Campus France EEF validated",
+   "text": "Campus France has reviewed your file and sent it back for corrections this morning, asking for them as soon as possible: one fix in the identity section and your bachelor's certificate and transcripts re-uploaded. You have to submit the file again before they will re-check it, and nothing downstream moves until they do. I have left the specifics out of here on purpose, since this board is public - they are in your inbox.",
+   "createdAt": "2026-10-05T11:00:42.000Z",
+   "state": "new",
+   "round": 1,
+   "was": {"status": "blocked", "due": "2026-10-25"},
+   "acted": [
+    "Marked 'Follow up with Campus France Indonesia team' done - they came back to you today, so the chase is over"
+   ]
+  }
+ ]
+}
