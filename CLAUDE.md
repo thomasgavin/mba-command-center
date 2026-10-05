@@ -422,14 +422,18 @@ refused, or sent and accepted. That separates the three in one tap instead of
 three guesses. The route is capped at one a minute, because its address is
 public like the rest of them.
 
-**It shipped invisible.** `.pbn.quiet button{display:none}` was written when
-every quiet banner was a statement rather than an offer, and it swallowed the
-one button that made the quiet banner worth keeping: the button existed,
-carried its label, answered a click, and nothing was on screen -- he opened
-Chat, read "Notifications are on for this device." and asked what he was
-supposed to tap. A label is not a button, so the check now measures the box
-rather than reading `textContent`, and what hides it is `:empty`, which is the
-thing that was actually being asked.
+**It shipped invisible, and then it was removed.** `.pbn.quiet
+button{display:none}` was written when every quiet banner was a statement
+rather than an offer, and it swallowed the button: it existed, carried its
+label, answered a click, and nothing was on screen -- he opened Chat, read
+"Notifications are on for this device." and asked what he was supposed to tap.
+A label is not a button, so the check measures the box now rather than reading
+`textContent`. The banner then did its job in one evening (*"Perfect, now I got
+the notification. Remove the test banner."*) and the subscribed state is silent
+again, because a banner restating a working state at the top of the thread is
+the thing it was never allowed to be. **`/push/test` stays on the relay**: the
+next time this goes quiet the banner comes back for an evening, rather than
+the route being rebuilt from memory.
 
 `checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
 board is handed, the same way the push service will. A signature that is subtly
@@ -653,6 +657,56 @@ thumb's reach.
   edge instead of continuing behind it.
 - **The floating button sits clear of the bar**, which is a `calc()` off the
   bar's own height rather than a number guessed twice.
+- **The bar is 46px and takes half the home-bar inset.** A 54px bar under the
+  full 34px iOS declares came to 88px of chrome at the foot of a 390x844
+  screen -- *"a lot of space left on the bottom"*. Half the inset clears the
+  indicator and gives the board the rest back.
+- **Search moved into the title row**, at its right end: *"Move the find pin
+  icon to the second bar on the right end of the title name."* The top bar was
+  a wordmark and four buttons on a 390px screen, and search was the one of the
+  four that is a verb rather than a drawer.
+- **The composers are `position:absolute` over their view, not a row in it.**
+  A flex child cannot be transparent in any useful sense -- the space it
+  occupies is space nothing else is drawn in -- so "floating" as a flex row
+  still gave it a band of page colour the full width of the screen:
+  *"Remove the grey ractangle background around the text bauble - behind the
+  bauble should be transparent on both chat and map."* The scrollers carry the
+  bottom padding that keeps the last message clear of it.
+- **The bubble is 5px of padding round a 32px row**, and the placeholder is
+  13.5px while the textarea stays 16px. 16px is the iOS zoom threshold and is
+  not negotiable, but the zoom is read off the input's own size, never the
+  placeholder's -- which is how *"message claude placeholder smaller font"*
+  gets done without the page zooming on focus.
+- **`.mline` drops `touch-action:pan-x` on a phone.** At that width it is a
+  two-column grid rather than the sideways rail the rule was written for, and
+  the rule was still refusing every vertical drag that began on a milestone:
+  ten tiles at the top of Overview that the page would not scroll under.
+
+## Dark mode, on three taps of the name
+
+*"Add a dark mode hidden switch - tapping on the logo/name 3 times."* Hidden is
+the point: a switch in a settings screen would be the only thing in a settings
+screen. Three taps inside 1.5s is a gesture nobody performs by accident, and
+the first two still go to Overview as they always did, so nothing is spent
+waiting to see whether a third is coming.
+
+- It is `data-theme="dark"` on `<html>` and **a block of variables, not a
+  second stylesheet**. That works only because every surface already reads
+  `--panel`, `--page`, `--wash` and `--line`; the literals that were left
+  (`#fff` backgrounds, the translucent chrome, the one hover edge) became
+  `var(--panel)`, `var(--glass)` and `var(--edge)` in the same change.
+- **The tracks keep their hues.** Colour is load-bearing on this board and is
+  read before any label; a muted dark palette would cost exactly that.
+- **`--ink` is the text colour and flips to near-white, so anything painted
+  with it and lettered in white vanishes.** The toast, the selected sub-tab
+  and a pressed segment are those three, and they read `--inkbg`, which stays
+  ink. This is the trap for any future surface: painting with `--ink` is only
+  safe where the text on it is `--page`.
+- It is stored under **its own localStorage key** (`mbacc_theme`), never in the
+  board blob: a theme belongs to the screen it is read on, and syncing it would
+  dim his laptop because he dimmed his phone at midnight.
+- The `theme-color` meta moves with it, or a dark board sits under a white iOS
+  status bar.
 
 ## The newsletters
 
@@ -1061,7 +1115,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 217 invariants, three widths, a real browser. Every one of them was a
+that runs: 228 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

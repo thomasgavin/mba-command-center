@@ -771,16 +771,11 @@ for (var w2 of [390, 1280]) {
   });
   ok("it offers once, with a button to tap",
      !states.offer.off && !!states.offer.btn && states.offer.shown, JSON.stringify(states.offer));
-  /* It used to disappear entirely once subscribed, which is the state he was
-     in when he said he was getting nothing at all: "on" and "silently broken"
-     looked the same, with nothing on screen able to tell them apart. It stays
-     quietly now, carrying the one button that can. */
-  ok("once subscribed it stays, quietly, offering a test",
-     !states.done.off && states.done.quiet && /test/i.test(states.done.btn), JSON.stringify(states.done));
-  /* He opened Chat, read "Notifications are on for this device." and asked what
-     he was supposed to tap: there was nothing there. A button that exists and
-     cannot be seen is worse than no button, because the banner promises one. */
-  ok("and the test button is actually on screen", states.done.shown, JSON.stringify(states.done));
+  /* It carried a test button for one evening, which is what proved his phone
+     was reachable; then it was a banner restating a working state at the top
+     of the thread every time he opened Chat. "Perfect, now I got the
+     notification. Remove the test banner." */
+  ok("and goes away once he is subscribed", states.done.off, JSON.stringify(states.done));
 
   /* An iPhone in a Safari tab cannot be asked at all. A dead button there reads
      as the feature being broken; the sentence is the whole fix. */
@@ -1693,6 +1688,92 @@ for (var bw of [390, 1280]) {
   ok("and opening the drawer clears the newsletter badge", opened.badge, JSON.stringify(opened));
   ok("the newsletters draw without a console error", s33.errs.length === 0, s33.errs.join(" | "));
   await s33.ctx.close();
+}
+
+/* ---- 34. the trim: the bar, the composers, the search, dark mode ---- */
+{
+  var s34 = await open(390);
+  var trim = await s34.p.evaluate(function () {
+    setView("chat");
+    var nav = document.querySelector(".vbar"), vt = document.querySelector(".vt"),
+        head = document.querySelector(".vhead"), cmdk = document.getElementById("cmdkBtn"),
+        foot = document.querySelector("#v-chat .cfoot"), box = document.querySelector("#v-chat .cbox"),
+        ta = document.getElementById("cin");
+    var hb = head.getBoundingClientRect(), cb = cmdk.getBoundingClientRect();
+    return {
+      /* "The bottom navigation bar is too thick" */
+      tabH: Math.round(vt.getBoundingClientRect().height),
+      barH: Math.round(nav.getBoundingClientRect().height),
+      /* "behind the bauble should be transparent": the composer is positioned
+         over the thread, so it paints no band of its own */
+      pos: getComputedStyle(foot).position,
+      footBg: getComputedStyle(foot).backgroundColor,
+      /* "Make the bauble thinner" */
+      boxH: Math.round(box.getBoundingClientRect().height),
+      /* 16px is the iOS zoom threshold and stays; the placeholder is not what
+         the zoom is read off, so it is the smaller thing he asked for */
+      taSize: parseFloat(getComputedStyle(ta).fontSize),
+      phSize: parseFloat(getComputedStyle(ta, "::placeholder").fontSize),
+      /* "Move the find pin icon to the second bar on the right end" */
+      searchInHead: head.contains(cmdk),
+      searchInTop: !!document.querySelector(".top #cmdkBtn"),
+      searchRight: Math.round(hb.right - cb.right)
+    };
+  });
+  ok("the section bar is slimmer and its tabs are 46px",
+     trim.tabH === 46 && trim.barH <= 52, JSON.stringify(trim));
+  ok("the composer floats over the thread and paints no band of its own",
+     trim.pos === "absolute" && /rgba\(0, 0, 0, 0\)|transparent/.test(trim.footBg), JSON.stringify(trim));
+  ok("the bubble is thinner", trim.boxH <= 46 && trim.boxH > 24, JSON.stringify(trim));
+  ok("the box stays 16px and only the placeholder shrinks",
+     trim.taSize === 16 && trim.phSize < 16, JSON.stringify(trim));
+  ok("search sits at the right of the title row, not in the top bar",
+     trim.searchInHead && !trim.searchInTop && trim.searchRight <= 22, JSON.stringify(trim));
+
+  /* "In the overview section, I am not able to scroll with finger on any of
+     the milestone items." The rail stops being a rail at this width, and the
+     pan-x that made it one was still refusing every vertical drag on it. */
+  var pan = await s34.p.evaluate(function () {
+    setView("over");
+    var m = document.querySelector(".mline");
+    return { ta: getComputedStyle(m).touchAction, tile: !!document.querySelector(".mstone") };
+  });
+  ok("a finger on a milestone scrolls the page",
+     pan.tile && pan.ta !== "pan-x", JSON.stringify(pan));
+
+  /* "Add a dark mode hidden switch - tapping on the logo/name 3 times" */
+  var dark = await s34.p.evaluate(async function () {
+    var brand = document.querySelector(".brand"), out = {};
+    out.before = document.documentElement.getAttribute("data-theme");
+    brand.click(); out.one = document.documentElement.getAttribute("data-theme");
+    brand.click(); brand.click();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    out.three = document.documentElement.getAttribute("data-theme");
+    out.page = getComputedStyle(document.body).backgroundColor;
+    out.stored = localStorage.getItem("mbacc_theme");
+    /* the board blob must not carry it: a theme is a property of this screen,
+       and syncing it would dim his laptop because he dimmed his phone */
+    out.inBlob = /mbacc_theme|"theme"/.test(localStorage.getItem("mbacc_v3") || "");
+    /* a toast painted with --ink is white on white once --ink is near-white */
+    var t = document.getElementById("toast");
+    out.toastBg = getComputedStyle(t).backgroundColor;
+    out.toastFg = getComputedStyle(t).color;
+    brand.click(); brand.click(); brand.click();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    out.back = document.documentElement.getAttribute("data-theme");
+    return out;
+  });
+  ok("one tap does not change the theme", !dark.before && !dark.one, JSON.stringify(dark));
+  ok("three taps turn it on, and three more turn it off",
+     dark.three === "dark" && !dark.back, JSON.stringify(dark));
+  ok("the page is actually dark while it is on",
+     /^rgb\(2[0-9], 1[0-9], 2[0-9]\)$/.test(dark.page) || dark.page === "rgb(20, 16, 25)", JSON.stringify(dark.page));
+  ok("the theme is this device's, not the board's",
+     dark.stored === "dark" && !dark.inBlob, JSON.stringify(dark));
+  ok("the toast is still readable in the dark",
+     dark.toastBg !== dark.toastFg && !/^rgb\(2[34][0-9]/.test(dark.toastBg), JSON.stringify(dark));
+  ok("the trim draws without a console error", s34.errs.length === 0, s34.errs.join(" | "));
+  await s34.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

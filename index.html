@@ -39,12 +39,48 @@
   --cyan:#14b5f0;   --amber:#ff9f00; --green:#00a98f;
   --pink:#e5457f;   --red:#e0263c;
 
+  /* the translucent chrome (top bar, title row, section bar, snooze rail) and
+     the one hover edge that was a literal everywhere. Both are tokens so the
+     dark theme is a block of variables rather than a second stylesheet. */
+  --glass:rgba(255,255,255,.8); --edge:#d8d1e0;
+  /* --ink is the TEXT colour and flips to near-white in the dark theme, so
+     the three places that paint a surface with it and letter it in white
+     need an ink that stays ink: a toast, a selected sub-tab, a pressed
+     segment. Otherwise they come out white on white. */
+  --inkbg:#280a38;
+
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
   --ease:cubic-bezier(.22,.8,.26,1);
   color-scheme:light;
 }
+
+/* ---------- dark mode ----------
+   Three taps on the name. He asked for it hidden, and hidden is the point: a
+   switch in a settings screen would be the only thing in a settings screen.
+   It is a `data-theme` on <html> and a block of variables, which works because
+   every surface on this board already reads --panel, --page, --wash and
+   --line rather than a literal. The tracks keep their hues: colour is
+   load-bearing here and a muted palette would cost the one thing that is read
+   before any label.
+   It is stored under its own key, not in the board blob: a theme is a property
+   of this screen, and syncing it would flip his laptop because he dimmed his
+   phone at midnight. */
+:root[data-theme="dark"]{
+  --ink:#f3effa; --ink2:#c7bcd6; --ink3:#8e85a0; --ink4:#6f6782;
+  --page:#141019; --panel:#1e1826; --wash:#272030; --wash2:#231c2b;
+  --line:#332a3f; --line2:#2a2333;
+  --glass:rgba(30,24,38,.86); --edge:#443a52;
+  /* light enough to read white on, dark enough to read as a surface */
+  --inkbg:#3b2f4c;
+  --sh:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -14px rgba(0,0,0,.6);
+  --sh2:0 2px 6px rgba(0,0,0,.45), 0 20px 44px -18px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+/* the two wash gradients behind the page are tuned for white and turn into
+   two bright smears on a dark one */
+:root[data-theme="dark"] body::before{opacity:.5}
 html,body{height:100%}
 body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -74,7 +110,7 @@ body::before{
 .top{
   flex:none; display:flex; align-items:center; gap:14px;
   padding:0 20px; height:58px;
-  background:rgba(255,255,255,.78); backdrop-filter:saturate(1.6) blur(14px);
+  background:var(--glass); backdrop-filter:saturate(1.6) blur(14px);
   border-bottom:1px solid var(--line);
 }
 .brand{display:flex;align-items:center;gap:10px;min-width:0;overflow:hidden}
@@ -98,10 +134,10 @@ body::before{
   color:var(--ink3);font:inherit;font-size:12.5px;cursor:pointer;min-width:212px;
   transition:border-color .14s,background .14s;
 }
-.cmdk:hover{background:#fff;border-color:#d8d1e0}
+.cmdk:hover{background:var(--panel);border-color:var(--edge)}
 .cmdk kbd{
   margin-left:auto;font:inherit;font-size:10.5px;font-weight:600;color:var(--ink4);
-  background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;
+  background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;
 }
 .tbtn{
   flex:none;height:34px;padding:0 12px;border:1px solid var(--line);background:var(--panel);
@@ -109,7 +145,7 @@ body::before{
   cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;
   transition:transform .12s var(--ease),box-shadow .12s,border-color .12s;
 }
-.tbtn:hover{border-color:#d8d1e0;box-shadow:0 1px 3px rgba(40,10,56,.07)}
+.tbtn:hover{border-color:var(--edge);box-shadow:0 1px 3px rgba(40,10,56,.07)}
 .tbtn:active{transform:translateY(1px)}
 .tbtn.hot{background:linear-gradient(140deg,#ff6429,#ff8244);border-color:transparent;color:#fff;box-shadow:0 2px 10px rgba(255,100,41,.3)}
 .tbtn .n{
@@ -127,10 +163,16 @@ body::before{
    row the strip vacated is exactly that row. It names only the open section --
    a list of six names is a tab strip, which is the thing that moved. */
 .vhead{
-  flex:none;display:flex;align-items:center;padding:11px 20px 10px;
-  border-bottom:1px solid var(--line);background:rgba(255,255,255,.62);backdrop-filter:blur(10px);
+  flex:none;display:flex;align-items:center;gap:10px;padding:9px 20px;
+  border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);
 }
-.vhead h2{font-size:17px;font-weight:700;letter-spacing:-.025em}
+.vhead h2{font-size:17px;font-weight:700;letter-spacing:-.025em;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Search moved down here off the top bar: *"Move the find pin icon to the
+   second bar on the right end of the title name."* The top bar was four
+   buttons and a wordmark on a 390px screen, and search was the one of the
+   four that is a verb rather than a drawer. */
+.vhead .cmdk{flex:none}
 
 /* ---------- view switcher: the bottom bar ----------
    He asked for the shape every social app uses: icons along the foot of the
@@ -141,17 +183,21 @@ body::before{
    thumb again. */
 .vbar{
   flex:none;display:flex;align-items:stretch;
-  border-top:1px solid var(--line);background:rgba(255,255,255,.93);
+  border-top:1px solid var(--line);background:var(--glass);
   backdrop-filter:saturate(1.6) blur(14px);
-  padding-bottom:env(safe-area-inset-bottom);
+  /* The home indicator wants clearance, not the whole 34px it declares: a
+     46px bar under a full inset came to 80px of chrome at the foot of a
+     390x844 screen, which is the "lot of space left on the bottom". Half of
+     it clears the indicator and gives the board the rest back. */
+  padding-bottom:calc(env(safe-area-inset-bottom) / 2);
   position:relative;z-index:30;
 }
 .vt{
   position:relative;flex:1 1 0;min-width:0;border:0;background:none;font:inherit;
   color:var(--ink4);cursor:pointer;display:flex;align-items:center;justify-content:center;
-  height:54px;transition:color .14s;-webkit-tap-highlight-color:transparent;
+  height:46px;transition:color .14s;-webkit-tap-highlight-color:transparent;
 }
-.vt svg{width:23px;height:23px;transition:transform .16s var(--ease)}
+.vt svg{width:22px;height:22px;transition:transform .16s var(--ease)}
 .vt:hover{color:var(--ink2)}
 .vt[aria-selected="true"]{color:var(--orange)}
 .vt[aria-selected="true"] svg{transform:translateY(-1px) scale(1.06)}
@@ -166,29 +212,29 @@ body::before{
 /* a count has nowhere to go on an icon-only tab, so it is a dot: "there is
    something in here" is the whole of what a number on a tab ever said */
 .vd{
-  display:none;position:absolute;top:11px;left:50%;margin-left:7px;
+  display:none;position:absolute;top:8px;left:50%;margin-left:7px;
   width:7px;height:7px;border-radius:50%;background:var(--orange);
-  box-shadow:0 0 0 2px #fff;
+  box-shadow:0 0 0 2px var(--panel);
 }
 .vd.on{display:block}
 
 /* ---------- category sub-tabs ---------- */
 .subs{
   flex:none;display:none;gap:6px;padding:10px 20px;border-bottom:1px solid var(--line);
-  background:rgba(255,255,255,.5);overflow-x:auto;scrollbar-width:none;
+  background:var(--glass);overflow-x:auto;scrollbar-width:none;
   /* pan-x only, or dragging the strip drags the page with it */
   touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
 }
 .subs.on{display:flex}
 .subs::-webkit-scrollbar{display:none}
 .st{
-  flex:none;border:1px solid var(--line);background:#fff;border-radius:20px;height:30px;padding:0 12px;
+  flex:none;border:1px solid var(--line);background:var(--panel);border-radius:20px;height:30px;padding:0 12px;
   font:inherit;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap;
   display:flex;align-items:center;gap:6px;transition:all .14s;
 }
 .st:hover{background:var(--wash)}
 .st small{font-size:10.5px;font-weight:700;color:var(--ink4);font-variant-numeric:tabular-nums}
-.st[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.st[aria-selected="true"]{background:var(--inkbg);border-color:var(--inkbg);color:#fff}
 .st[aria-selected="true"] small{color:rgba(255,255,255,.7)}
 
 /* ---------- milestones ---------- */
@@ -201,10 +247,10 @@ body::before{
 .mstone i{display:block;width:7px;height:7px;border-radius:50%;margin-bottom:7px}
 .mstone b{display:block;font-size:12px;font-weight:650;line-height:1.3;letter-spacing:-.01em}
 .mstone span{display:block;font-size:10.5px;font-weight:600;color:var(--ink4);margin-top:4px;font-variant-numeric:tabular-nums}
-.mstone:hover{background:#fff;box-shadow:var(--sh);transform:translateY(-1px)}
+.mstone:hover{background:var(--panel);box-shadow:var(--sh);transform:translateY(-1px)}
 .mstone.done{background:rgba(0,169,143,.07);border-color:rgba(0,169,143,.26)}
 .mstone.done b{color:var(--green)}
-.mstone.now{border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(255,100,41,.1)}
+.mstone.now{border-color:var(--orange);background:var(--panel);box-shadow:0 0 0 3px rgba(255,100,41,.1)}
 .mstone.now span{color:var(--orange)}
 
 /* ---------- sequence trackers (visa, housing) ----------
@@ -218,7 +264,7 @@ body::before{
 }
 .step:hover{background:var(--wash2)}
 .step i{
-  width:9px;height:9px;border-radius:50%;flex:none;border:2px solid var(--line);background:#fff;
+  width:9px;height:9px;border-radius:50%;flex:none;border:2px solid var(--line);background:var(--panel);
 }
 .step b{font-size:12px;font-weight:600;letter-spacing:-.01em;min-width:0;flex:1}
 .step span{font-size:10.5px;font-weight:650;color:var(--ink4);flex:none;font-variant-numeric:tabular-nums}
@@ -313,12 +359,12 @@ body::before{
   padding:9px 11px;background:var(--wash2);position:relative;cursor:pointer;
   transition:border-color .14s,background .14s,transform .14s var(--ease);
 }
-.pn:hover{transform:translateY(-2px);background:#fff;border-color:#d8d1e0}
+.pn:hover{transform:translateY(-2px);background:var(--panel);border-color:var(--edge)}
 .pn .pt{font-size:11.5px;font-weight:650;line-height:1.3;margin-bottom:5px}
 .pn .pd{font-size:10.5px;color:var(--ink4);font-weight:600;font-variant-numeric:tabular-nums}
 .pn.done{background:rgba(0,169,143,.07);border-color:rgba(0,169,143,.3)}
 .pn.done .pt{color:var(--green)}
-.pn.now{background:#fff;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.11)}
+.pn.now{background:var(--panel);border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.11)}
 .pn.now .pt{color:var(--orange)}
 .pn.late{background:rgba(224,38,60,.06);border-color:rgba(224,38,60,.35)}
 .pn.late .pt{color:var(--red)}
@@ -397,11 +443,11 @@ body::before{
 .chip.nt{background:rgba(50,100,255,.1);color:var(--blue)}
 .cact{position:absolute;top:8px;right:8px;display:flex;gap:4px}
 .mini{
-  width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:#fff;
+  width:25px;height:25px;border-radius:7px;border:1px solid var(--line);background:var(--panel);
   color:var(--ink3);display:grid;place-items:center;font-size:12px;padding:0;cursor:pointer;
   transition:background .12s,color .12s,border-color .12s;
 }
-.mini:hover{background:var(--wash);color:var(--ink);border-color:#d8d1e0}
+.mini:hover{background:var(--wash);color:var(--ink);border-color:var(--edge)}
 .mini.g{cursor:grab;touch-action:none;letter-spacing:-2px}
 .ghost{
   position:fixed;z-index:400;pointer-events:none;width:248px;box-shadow:var(--sh2);
@@ -412,7 +458,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* ---------- board ---------- */
 .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
 .col{background:var(--wash);border:1px solid transparent;border-radius:var(--r);padding:11px;min-height:190px;transition:background .16s,border-color .16s}
-.col.over{background:#fff;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.1)}
+.col.over{background:var(--panel);border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.1)}
 .col-h{display:flex;align-items:center;gap:7px;margin-bottom:11px;padding:0 2px}
 .col-h i{width:8px;height:8px;border-radius:50%;flex:none}
 .col-h b{font-size:12px;font-weight:700;letter-spacing:-.01em}
@@ -428,7 +474,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .dsave{margin-top:4px}
 
 .tick{
-  width:19px;height:19px;border-radius:50%;border:1.8px solid var(--line);background:#fff;flex:none;
+  width:19px;height:19px;border-radius:50%;border:1.8px solid var(--line);background:var(--panel);flex:none;
   display:grid;place-items:center;font-size:10px;color:transparent;cursor:pointer;transition:all .14s;
 }
 .tick:hover{border-color:var(--green)}
@@ -494,7 +540,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* ---------- calendar ---------- */
 .calh{display:flex;align-items:center;gap:9px;margin-bottom:13px}
 .calh h3{font-size:16px;font-weight:700;letter-spacing:-.02em}
-.nav{width:30px;height:30px;border-radius:var(--r3);border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink2);font-size:14px;display:grid;place-items:center}
+.nav{width:30px;height:30px;border-radius:var(--r3);border:1px solid var(--line);background:var(--panel);cursor:pointer;color:var(--ink2);font-size:14px;display:grid;place-items:center}
 .nav:hover{background:var(--wash)}
 .cal{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
 .dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--wash2);border-bottom:1px solid var(--line)}
@@ -668,7 +714,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* ---------- snooze rail ---------- */
 .rail{
   position:fixed;left:50%;transform:translate(-50%,130%);bottom:22px;z-index:300;
-  display:flex;gap:9px;padding:9px;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);
+  display:flex;gap:9px;padding:9px;background:var(--glass);backdrop-filter:blur(16px);
   border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh2);
   transition:transform .26s var(--ease);
 }
@@ -696,7 +742,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   right:max(16px,env(safe-area-inset-right));
   /* the bar is 54px plus the home-bar inset and is the last child of .app,
      so the button has to sit clear of it rather than on top of it */
-  bottom:calc(54px + env(safe-area-inset-bottom) + 14px);
+  bottom:calc(46px + (env(safe-area-inset-bottom) / 2) + 12px);
   width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
   background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
   box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
@@ -729,7 +775,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .drawer{visibility:hidden}
 .dh{flex:none;display:flex;align-items:flex-start;gap:10px;padding:16px 16px 13px;border-bottom:1px solid var(--line)}
 .dh h3{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1;min-width:0;overflow-wrap:anywhere}
-.pen{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;
+.pen{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:var(--panel);
   cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
 .pen:hover{background:var(--wash);color:var(--ink)}
 .pen.on{background:var(--orange);border-color:var(--orange);color:#fff}
@@ -751,11 +797,11 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .fld>label{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink4);margin-bottom:7px}
 .seg{display:flex;gap:4px;flex-wrap:wrap}
 .seg button{
-  border:1px solid var(--line);background:#fff;border-radius:7px;height:30px;padding:0 11px;
+  border:1px solid var(--line);background:var(--panel);border-radius:7px;height:30px;padding:0 11px;
   font:inherit;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .13s;
 }
 .seg button:hover{background:var(--wash)}
-.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.seg button[aria-pressed="true"]{background:var(--inkbg);border-color:var(--inkbg);color:#fff}
 
 /* ---------- task details: the property rows ----------
    Four stacked segmented controls put every option of every field on screen at
@@ -764,9 +810,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    A row states the value it holds and opens only when he taps it. The value is
    the answer to "what is this task", which is what he opened the card for; the
    options are the answer to "change it", which is a second question. */
-.pgrp{border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;margin-bottom:17px;background:#fff}
+.pgrp{border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;margin-bottom:17px;background:var(--panel)}
 .prow{display:flex;align-items:center;gap:10px;width:100%;min-width:0;text-align:left;
-  border:0;border-top:1px solid var(--line2);background:#fff;font:inherit;cursor:pointer;
+  border:0;border-top:1px solid var(--line2);background:var(--panel);font:inherit;cursor:pointer;
   padding:11px 12px;color:var(--ink2);transition:background .13s}
 .prow:first-child{border-top:0}
 /* the track states a value and offers no action, so it must not look tappable */
@@ -787,20 +833,20 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* An empty composer with a paragraph under it was the first thing on a task
    with no notes, so the card opened on a form rather than on the task. */
 .nadd{display:flex;align-items:center;gap:8px;width:100%;min-width:0;border:1px dashed var(--line);
-  border-radius:var(--r3);background:#fff;font:inherit;font-size:12.5px;font-weight:600;
+  border-radius:var(--r3);background:var(--panel);font:inherit;font-size:12.5px;font-weight:600;
   color:var(--ink3);padding:11px 12px;cursor:pointer;text-align:left}
 .nadd:hover{background:var(--wash);color:var(--ink2)}
 .nadd b{font-size:15px;line-height:1;color:var(--ink4);font-weight:700;flex:none}
 .dsub{font-size:12px;color:var(--ink3);line-height:1.5;margin:0 0 14px;overflow-wrap:anywhere}
 input[type=date],input[type=text],textarea{
-  width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
+  width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:var(--panel);
   font:inherit;font-size:13px;color:var(--ink);padding:9px 11px;
 }
 input[type=date]{-webkit-appearance:none;appearance:none}
 textarea{min-height:92px;resize:vertical;line-height:1.5}
 input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.13)}
 .btn{
-  border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;padding:0 13px;
+  border:1px solid var(--line);background:var(--panel);border-radius:var(--r3);height:33px;padding:0 13px;
   font:inherit;font-size:12.5px;font-weight:650;color:var(--ink2);cursor:pointer;transition:all .13s;
 }
 .btn:hover{background:var(--wash)}
@@ -864,7 +910,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .drow input[type=date]{flex:1 1 auto;min-width:0}
 /* the rename field: full width, and it may not push the drawer sideways */
 
-.pch{flex:none;border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;
+.pch{flex:none;border:1px solid var(--line);background:var(--panel);border-radius:var(--r3);height:33px;
   padding:0 9px;font:inherit;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;
   font-variant-numeric:tabular-nums}
 .pch:hover{background:var(--wash);color:var(--ink2)}
@@ -918,7 +964,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 /* Claude speaking first. It is the same note object as a reply, but a bubble
    that appears with no question above it has to say what it is and what it is
    about, or it reads as the app glitching. */
-.cnb{border-left:3px solid var(--orange);background:#fff;border:1px solid rgba(255,100,41,.3);
+.cnb{border-left:3px solid var(--orange);background:var(--panel);border:1px solid rgba(255,100,41,.3);
   border-left:3px solid var(--orange)}
 .cnh{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10.5px;font-weight:800;
   letter-spacing:.05em;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
@@ -943,7 +989,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .pal.on{display:flex}
 .pal-bg{position:absolute;inset:0;background:rgba(40,10,56,.34);backdrop-filter:blur(3px)}
 .pal-box{
-  position:relative;width:min(560px,100%);background:#fff;border:1px solid var(--line);
+  position:relative;width:min(560px,100%);background:var(--panel);border:1px solid var(--line);
   border-radius:var(--r);box-shadow:0 30px 80px -24px rgba(40,10,56,.55);overflow:hidden;
   animation:pop .18s var(--ease);
 }
@@ -966,7 +1012,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .toast{
   position:fixed;left:50%;bottom:104px;transform:translate(-50%,calc(100% + 170px));z-index:700;
   pointer-events:none;
-  background:var(--ink);color:#fff;border-radius:11px;padding:11px 16px;font-size:12.5px;font-weight:600;
+  background:var(--inkbg);color:#fff;border-radius:11px;padding:11px 16px;font-size:12.5px;font-weight:600;
   box-shadow:var(--sh2);transition:transform .3s var(--ease);max-width:min(420px,92vw);
   display:flex;align-items:center;gap:10px;
 }
@@ -989,14 +1035,16 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    sticky pins it to the viewport but the rest of the messages keep rendering
    underneath it. So the view owns the height and the thread owns the scroll. */
 .stage.chatmode{padding-bottom:0;overflow:hidden}
-#v-chat.on,#v-map.on{display:flex;flex-direction:column;height:100%}
+#v-chat.on,#v-map.on{display:flex;flex-direction:column;height:100%;position:relative}
 /* the map scrolls inside the view and the composer does not, for the same
    reason the chat thread does: a sticky composer in the page scroller looks
    right until the content is taller than a screen and renders over the top of
    it. .mapw is the scroller, .cfoot stays put. */
-#v-map .mapw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:4px}
+/* the composer is absolute over this, so the padding is what stops the last
+   row of the map ending underneath it */
+#v-map .mapw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:60px}
 .chatw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;
-  display:flex;flex-direction:column;gap:12px;padding:4px 2px 10px}
+  display:flex;flex-direction:column;gap:12px;padding:4px 2px 78px}
 .cday{align-self:center;font-size:11px;font-weight:600;color:var(--ink4);
   background:var(--wash);border:1px solid var(--line);border-radius:999px;padding:3px 11px;margin:6px 0 2px}
 .cmsg{display:flex;flex-direction:column;max-width:76%}
@@ -1019,29 +1067,43 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    height and it read as cropped text at the very bottom of the screen. The
    block also carries the home-bar inset, rather than the composer carrying it
    and the tip hanging below it. */
-/* It floats. Welded to the foot of the screen with a full-width rule over
-   it, the composer read as a second bar stacked on the section bar -- two
-   chrome strips and the thread ending at a hard line. A rounded box with a
-   gap under it sits over the thread instead, which is also what says the
-   thread continues behind it. */
-.cfoot{flex:0 0 auto;background:transparent;border-top:0;padding-bottom:10px}
-.cfoot .tip{margin:8px 2px 0}
-.cbox{display:flex;gap:8px;align-items:flex-end;padding:7px;margin:8px 0 0;
-  background:var(--panel);border:1px solid var(--line);border-radius:25px;
-  box-shadow:0 2px 6px rgba(40,10,56,.06),0 14px 30px -18px rgba(40,10,56,.5)}
+/* It floats, and that means OVER the thread rather than under it. It was a
+   flex row in the column first, which still gave it a band of page colour the
+   full width of the screen: *"Remove the grey ractangle background around the
+   text bauble - behind the bauble should be transparent on both chat and
+   map."* A flex child cannot be transparent in any useful sense, because the
+   space it occupies is space nothing else is drawn in. So the view is the
+   positioning context, the composer is absolute at its foot, and the
+   scroller carries the padding that keeps the last message clear of it. */
+.cfoot{position:absolute;left:0;right:0;bottom:0;background:transparent;border-top:0;
+  padding:0 0 8px;pointer-events:none}
+.cfoot>*{pointer-events:auto}
+/* it rides under the floating box, so it needs the page behind it to stay
+   legible over a message scrolling past */
+.cfoot .tip{margin:6px 2px 0;text-shadow:0 1px 3px var(--page),0 0 6px var(--page)}
+/* Thinner: *"Make the bauble thinner."* 5px of padding round a 32px row is a
+   42px pill rather than a 56px one, which is most of the height the chat was
+   losing to its own furniture on a screen where the thread is the point. */
+.cbox{display:flex;gap:6px;align-items:flex-end;padding:5px;
+  background:var(--panel);border:1px solid var(--line);border-radius:21px;
+  box-shadow:0 2px 6px rgba(40,10,56,.07),0 10px 26px -14px rgba(40,10,56,.45)}
 /* the padding is what centres one line of text against the 40px send button
    beside it: 2x9 + 16x1.4 is 40.4. At 10/13.5 the box came out 39.6 against
    the button's 40 and the text sat a hair high -- the half-pixel of
    misalignment that reads as "the alignment is off" without being nameable.
    The size is 16px here rather than only on a phone, because the phone rule
    was already forcing it and two sizes for one control is one too many. */
-.cbox textarea{flex:1;min-width:0;min-height:40px;max-height:140px;resize:none;padding:9px 14px;
-  border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
-  font:inherit;font-size:16px;line-height:1.4}
+/* 16px is not negotiable -- iOS zooms the page under it and stays zoomed --
+   but the PLACEHOLDER is not what the zoom is read off, so it can be the
+   smaller thing he asked for: *"message claude placeholder smaller font."* */
+.cbox textarea{flex:1;min-width:0;min-height:32px;max-height:124px;resize:none;padding:5px 12px;
+  border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);
+  font:inherit;font-size:16px;line-height:1.35}
+.cbox textarea::placeholder{font-size:13.5px;color:var(--ink4)}
 .cbox textarea{border-color:transparent;background:transparent}
 .cbox textarea:focus{outline:none;border-color:transparent}
-.csend{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
-  background:var(--orange);color:#fff;font-size:17px;line-height:1;transition:opacity .14s}
+.csend{flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--orange);color:#fff;font-size:15px;line-height:1;transition:opacity .14s}
 .csend:disabled{opacity:.35;cursor:default}
 .cempty{text-align:center;color:var(--ink4);font-size:13px;padding:38px 18px;line-height:1.55}
 /* the waiting bubble: same shape as a reply, because that is what is coming */
@@ -1061,14 +1123,14 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   .cols{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:720px){
-  .top{padding:0 11px;gap:8px;height:54px} .brand p{display:none} .brand h1{font-size:13px} .cmdk{min-width:0;flex:1;padding:0 9px}
+  .top{padding:0 11px;gap:8px;height:54px} .brand p{display:none} .brand h1{font-size:13px} .cmdk{min-width:0;padding:0 9px}
   /* at this width the label and the shortcut both go, which left a blank box
      in the bar. It is still the search button, so it gets a glyph and a
      square footprint rather than stretching across the gap. */
   .cmdk span{display:none} .cmdk kbd{display:none}
   .cmdk{flex:0 0 auto;width:40px;justify-content:center}
-  .cmdk::before{content:"\2315";font-size:17px;color:#6a6076;transform:rotate(-45deg)}
-  .vhead{padding:10px 13px 9px} .vhead h2{font-size:16px} .stage{padding:14px 13px 86px}
+  .cmdk::before{content:"\2315";font-size:17px;color:var(--ink3);transform:rotate(-45deg)}
+  .vhead{padding:8px 13px} .vhead h2{font-size:16px} .stage{padding:14px 13px 80px}
   .bento{gap:12px}
   .hero,.hero.b{grid-column:span 12} .hero .big{font-size:48px}
   .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
@@ -1078,7 +1140,12 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* every wide tile is full width here, and the trackers stack */
   .miles,.seqt,.pipe{grid-column:span 12}
   /* all of them visible at once: a rail you have to swipe is not an answer */
-  .mline{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:7px}
+  /* and with nothing left to swipe, `touch-action:pan-x` was refusing every
+     vertical drag that began on a milestone -- ten tiles at the top of
+     Overview that the page would not scroll under. The rule was written for
+     the sideways rail this stopped being at this width. */
+  .mline{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:7px;
+    touch-action:auto;overscroll-behavior-x:auto}
   .mstone{min-width:0}
   /* the timeline label column cannot take 186px of a 390px screen */
   /* Wide enough for a title and its priority, narrow enough that the next six
@@ -1107,7 +1174,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* the composer sits above the home bar, and a bubble can have the width */
   /* the bar already carries the home-bar inset, so the composer only needs
      the gap that makes it read as floating over the thread */
-  .cfoot{padding-bottom:8px}
+  .cfoot{padding-bottom:6px}
   .cmsg{max-width:86%}
   /* the drawer is the full screen here, so it has to respect the notch and the
      home bar, and the close button has to be a thumb-sized target */
@@ -1136,14 +1203,15 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       <div><h1>MBA Command Center</h1><p>INSEAD MBA&#39;27D &middot; Fontainebleau</p></div>
     </div>
     <div class="sp"></div>
-    <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
     <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
     <button class="tbtn" id="newsBtn" title="Your daily and weekly newsletters."><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" style="width:15px;height:15px"><path d="M2 3.4h8.6v9.2H3.2A1.2 1.2 0 0 1 2 11.4z"/><path d="M10.6 6h2.2a1.2 1.2 0 0 1 1.2 1.2v4.2a1.2 1.2 0 0 1-1.2 1.2h-2.2"/><path d="M3.7 5.6h5.2M3.7 7.7h5.2M3.7 9.8h3.1"/></svg><span class="lbl">Newsletters</span><span class="n" id="newsN">0</span></button>
     <button class="tbtn" id="syncBtn" title="Check the repo for changes from your other device."><span>&#8635;</span><span class="lbl">Sync</span></button>
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
-  <div class="vhead"><h2 id="vTitle">Overview</h2></div>
+  <div class="vhead"><h2 id="vTitle">Overview</h2>
+    <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
+  </div>
 
   <nav class="subs" id="subs" role="tablist" aria-label="Filter by category"></nav>
 
@@ -3338,7 +3406,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1830";
+var BUILD="2026-10-05-1900";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3610,7 +3678,42 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
 });
 /* A logo that does nothing is a logo he taps anyway. Overview is the only
    answer to "where am I", so that is where it goes. */
-document.querySelector(".brand").addEventListener("click",function(){ setView("over"); });
+/* ---------- dark mode, on three taps of the name ----------
+   *"Add a dark mode hidden switch - tapping on the logo/name 3 times."* The
+   logo already went to Overview on a tap and still does: three taps inside a
+   second and a half is a gesture nobody performs by accident, and the first
+   two still take him home, so nothing is spent waiting to see whether a third
+   is coming.
+   The theme is on <html> rather than <body> so the token block can be
+   `:root[data-theme]`, and it lives under its own localStorage key: a theme
+   belongs to the screen it is read on, and putting it in the board blob would
+   dim his laptop because he dimmed his phone at midnight. */
+var THEME_KEY="mbacc_theme";
+function setTheme(t){
+  if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
+  else document.documentElement.removeAttribute("data-theme");
+  /* the iOS status bar reads this, so a dark board under a white strip is the
+     one thing left looking half-done */
+  var m=document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", t==="dark" ? "#141019" : "#ff6429");
+  try{ localStorage.setItem(THEME_KEY,t); }catch(e){}
+}
+function theme(){ return document.documentElement.getAttribute("data-theme")==="dark" ? "dark" : "light"; }
+try{ setTheme(localStorage.getItem(THEME_KEY)==="dark" ? "dark" : "light"); }catch(e){}
+
+var brandTaps=0, brandT=null;
+document.querySelector(".brand").addEventListener("click",function(){
+  setView("over");
+  brandTaps++;
+  clearTimeout(brandT);
+  if(brandTaps>=3){
+    brandTaps=0;
+    setTheme(theme()==="dark" ? "light" : "dark");
+    toast(theme()==="dark" ? "Dark mode on." : "Dark mode off.");
+    return;
+  }
+  brandT=setTimeout(function(){ brandTaps=0; },1500);
+});
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
@@ -4298,12 +4401,13 @@ function syncPush(){
   if(!pushOK()) return hide();
   if(Notification.permission==="denied")
     return show("Notifications are blocked. Turn them back on in Settings, under Notifications.","",true);
-  /* Already on, and the banner used to vanish entirely at that point -- which
-     is exactly the state he was in when he said he was getting nothing at all.
-     "On" and "silently broken" looked identical, with nothing on screen to
-     tell them apart. So it stays, quietly, with the one button that can: a
-     test push, sent now, through the same path a nudge takes. */
-  if(pushSubbed) return show("Notifications are on for this device.","Send a test",true);
+  /* Already on: nothing to say. It carried a test button for one evening,
+     which is what proved his phone was reachable -- and then it was a banner
+     restating a working state at the top of the thread, every time he opened
+     Chat. *"Perfect, now I got the notification. Remove the test banner."*
+     `/push/test` on the relay stays: the next time this goes quiet, the
+     banner can come back for an evening rather than the route being rebuilt. */
+  if(pushSubbed) return hide();
   show("Get nudges on your lock screen, not just here.","Turn on");
 }
 
@@ -4350,23 +4454,10 @@ function askPush(){
     });
   }).catch(function(){ toast("Could not turn notifications on."); syncPush(); });
 }
-/* The same button does whichever of the two jobs the banner is offering. */
-function testPush(){
-  var b=document.getElementById("pbnB");
-  b.disabled=true;
-  fetch(RELAY+"/push/test").then(function(r){ return r.json().then(function(j){ return {s:r.status,j:j}; }); })
-    .then(function(x){
-      b.disabled=false;
-      if(x.s===429) return toast("Already sent one in the last minute. Give it a moment.");
-      if(!x.j || x.j.ok===false) return toast("This device is not subscribed. Turn notifications on again.");
-      if(!x.j.sent) toast("Sent to "+x.j.devices+" device(s) but none accepted it. Re-add the app to your Home Screen.");
-      else toast("Sent. If nothing appears, iOS is holding it: check Settings \u203a Notifications.");
-    })
-    .catch(function(){ b.disabled=false; toast("Could not reach the relay."); });
-}
-document.getElementById("pbnB").addEventListener("click",function(){
-  if(pushSubbed) testPush(); else askPush();
-});
+/* The banner is the offer to subscribe and nothing else now. The relay keeps
+   `/push/test`, which is how this was proved working; nothing on the board
+   calls it while the board has nothing to diagnose. */
+document.getElementById("pbnB").addEventListener("click",askPush);
 
 /* ---------- boot ---------- */
 load();
