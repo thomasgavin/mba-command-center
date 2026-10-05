@@ -334,6 +334,15 @@ token, a browser and permission to push. It has everything it needs.
 
 ## Limits
 
+- **The board is about his MBA admin, never about the machinery that runs it.**
+  He drew this line himself: the board's notes are *"only for task/on-app query
+  related answers, info or nudges"*. So a note or a chat message never reports
+  on the relay, the Routines, a skill, a workflow, a deploy, a check, a PR or
+  anything from the Claude-app conversation where this board gets built. That
+  belongs in the thread with him, not on the board. The one exception is an
+  answer to a question he asked in the board's own chat: if he asks there how
+  something works, answer there.
+
 - **This repository is public.** Never commit an account, passport, visa or
   loan number even when a note contains one. Refer to it indirectly and say in
   your reply that you have left it out.

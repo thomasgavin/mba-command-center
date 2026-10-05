@@ -40,7 +40,10 @@ self.addEventListener("push", function(e){
           badge: "icon-180.png",
           tag: (d && d.tag) || "mbacc",     /* one nudge replaces the last, never a stack of five */
           renotify: true,
-          data: {go: (d && d.about) || null}
+          /* `go` is a task id for a nudge and the word "news" for a
+             newsletter: the tap has to land on the thing the banner was
+             about, and for a newsletter that is its own drawer. */
+          data: {go: (d && d.go) || (d && d.about) || null}
         });
       })
   );

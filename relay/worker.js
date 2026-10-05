@@ -337,6 +337,32 @@ export class Board {
        anything older than NOTIFY_FRESH is a replay rather than news. */
   async maybeNotify(payload, by){
     if(by !== "claude") return;
+    /* A newsletter is the second thing worth a banner, and the first one he
+       asked for by name: "Gavin, today's command newsletter is ready". It is
+       written by the job on a schedule, so it is news by construction, and it
+       goes out ahead of a nudge in the same payload because it is the thing he
+       is expecting at that hour. */
+    var nw = ((payload && payload.news) || []).filter(function(n){
+      return n && n.id && (n.at || n.createdAt);
+    });
+    if(nw.length){
+      nw.sort(function(a,b){ return String(a.at||a.createdAt||"").localeCompare(String(b.at||b.createdAt||"")); });
+      var w = nw[nw.length-1];
+      var wage = Date.now() - Date.parse(w.at || w.createdAt || "");
+      if(wage >= 0 && wage <= NOTIFY_FRESH){
+        await this.ctx.storage.put("latest", {
+          title: "Gavin, today's command newsletter is ready",
+          body: w.period === "weekly" ? "Your weekly report is in." : "Your daily brief is in.",
+          /* one tag for all of them: a second edition replaces the first on the
+             lock screen rather than stacking up behind it */
+          tag: "newsletter",
+          about: null, go: "news",
+          at: new Date().toISOString()
+        });
+        await this.notify();
+        return;
+      }
+    }
     var ns = (payload && payload.notes) || [];
     var mine = ns.filter(function(n){ return n && n.from === "claude" && n.kind === "nudge"; });
     if(!mine.length) return;
@@ -386,6 +412,7 @@ export class Board {
   async fold(payload, by){
     var snap = (await this.ctx.storage.get("snap")) || {items:{}, notes:{}, kb:{}};
     if(!snap.kb) snap.kb = {};
+    if(!snap.news) snap.news = {};
     var hist = (await this.ctx.storage.get("hist")) || [];
     var who  = by==="claude" ? "Claude" : "you";
     (payload.changed||[]).forEach(function(c){
@@ -425,6 +452,18 @@ export class Board {
       var had = snap.kb[n.id];
       if(had && (had.at||"") > (n.at||"")) return;
       snap.kb[n.id] = n;
+    });
+    /* The newsletters, for the same reason as the map: they are written once
+       by the job and never rebuilt from SEED, so an archive without them is an
+       archive missing the part that cannot be recovered. `read` is a per-device
+       flag and deliberately not folded here -- reading Sunday's report on the
+       laptop says nothing about the phone. */
+    (payload.news||[]).forEach(function(n){
+      if(!n || !n.id) return;
+      var had = snap.news[n.id];
+      if(had && (had.at||"") > (n.at||"")) return;
+      var copy = {}; Object.keys(n).forEach(function(k){ if(k!=="read") copy[k]=n[k]; });
+      snap.news[n.id] = copy;
     });
     await this.ctx.storage.put("snap", snap);
     await this.ctx.storage.put("hist", hist);
@@ -584,11 +623,12 @@ export class Board {
     /* the map never expires: a note ages out at 7 days because it is a message,
        and a fact he wrote down is the opposite of a message */
     var kb    = Object.keys(snap.kb||{}).map(function(k){ return snap.kb[k]; });
-    if(notes.length || items.length || kb.length){
+    var news  = Object.keys(snap.news||{}).map(function(k){ return snap.news[k]; });
+    if(notes.length || items.length || kb.length || news.length){
       var now = new Date();
       var body = JSON.stringify({
         v:3, op:"archive", exportedAt:now.toISOString(),
-        why:"daily snapshot from the relay", notes:notes, changed:items, kb:kb
+        why:"daily snapshot from the relay", notes:notes, changed:items, kb:kb, news:news
       }, null, 2)+"\n";
       await writeInbox(this.env, utcStamp(now), body, "Relay snapshot");
     }
@@ -668,6 +708,28 @@ export class Board {
     if(p === "/push/latest"){
       var l = (await this.ctx.storage.get("latest")) || null;
       return out(200, l || {title:"MBA Command Center", body:"Something new from Claude.", tag:"mbacc", about:null});
+    }
+
+    /* "I am not getting any notification at all" has three possible causes --
+       nothing was sent, the subscription is gone, or iOS is dropping it -- and
+       from his side they are indistinguishable. This sends one, now, and says
+       what the push service answered, which separates the first two from the
+       third in a single tap. Capped to one a minute: the route takes no secret
+       and its address is public. */
+    if(p === "/push/test"){
+      var lastT = (await this.ctx.storage.get("lastTest")) || 0;
+      if(Date.now() - lastT < 60000) return out(429, {error:"one test a minute"});
+      await this.ctx.storage.put("lastTest", Date.now());
+      var subsT = (await this.ctx.storage.get("subs")) || {};
+      if(!Object.keys(subsT).length) return out(200, {ok:false, devices:0, why:"no device is subscribed"});
+      await this.ctx.storage.put("latest", {
+        title: "Test notification",
+        body: "If you can read this, the lock screen works.",
+        tag: "mbacc-test", about: null, at: new Date().toISOString()
+      });
+      await this.notify();
+      var lp = (await this.ctx.storage.get("lastPush")) || {};
+      return out(200, {ok:true, devices:Object.keys(subsT).length, sent:lp.sent||0, dropped:lp.dropped||0});
     }
 
     if(p === "/push/sub" || p === "/push/unsub"){
@@ -752,6 +814,8 @@ export default {
        the POST-only and looksLikeAnExport gates below, because a subscription
        is not a board export. */
     if(p === "/push/key" || p === "/push/latest")
+      return board(env).fetch(new Request("https://do"+p, {method:"GET"}));
+    if(p === "/push/test")
       return board(env).fetch(new Request("https://do"+p, {method:"GET"}));
     if(p === "/push/sub" || p === "/push/unsub"){
       if(request.method !== "POST") return out(405, {error:"POST only"});

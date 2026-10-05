@@ -121,31 +121,56 @@ body::before{
 /* the manual send is a fallback; it only shows when there is something to retry */
 .tbtn.off{display:none}
 
-/* ---------- view switcher ---------- */
-.views{
-  flex:none;display:flex;gap:2px;padding:9px 20px 0;border-bottom:1px solid var(--line);
-  background:rgba(255,255,255,.62);backdrop-filter:blur(10px);overflow-x:auto;
-  scrollbar-width:none;
-  /* the strip scrolls sideways only. Without this a swipe along it dragged the
-     page vertically and rubber-banded the whole board. */
-  touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+/* ---------- the section title, where the tabs used to be ----------
+   The tabs are icons at the foot of the screen now, so the name of the section
+   he is in has to be said somewhere: a phone app puts it at the top, and the
+   row the strip vacated is exactly that row. It names only the open section --
+   a list of six names is a tab strip, which is the thing that moved. */
+.vhead{
+  flex:none;display:flex;align-items:center;padding:11px 20px 10px;
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.62);backdrop-filter:blur(10px);
 }
-.views::-webkit-scrollbar{display:none}
+.vhead h2{font-size:17px;font-weight:700;letter-spacing:-.025em}
+
+/* ---------- view switcher: the bottom bar ----------
+   He asked for the shape every social app uses: icons along the foot of the
+   screen, within a thumb's reach, no labels. It is the last child of .app and
+   never scrolls, so it is always the same five targets in the same five
+   places. Chat is deliberately not one of them -- the floating button is
+   already the way in, and a seventh target would be the furthest from the
+   thumb again. */
+.vbar{
+  flex:none;display:flex;align-items:stretch;
+  border-top:1px solid var(--line);background:rgba(255,255,255,.93);
+  backdrop-filter:saturate(1.6) blur(14px);
+  padding-bottom:env(safe-area-inset-bottom);
+  position:relative;z-index:30;
+}
 .vt{
-  position:relative;border:0;background:none;font:inherit;font-size:13px;font-weight:600;
-  color:var(--ink3);padding:0 13px 11px;cursor:pointer;white-space:nowrap;
-  display:flex;align-items:center;gap:7px;transition:color .14s;
+  position:relative;flex:1 1 0;min-width:0;border:0;background:none;font:inherit;
+  color:var(--ink4);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  height:54px;transition:color .14s;-webkit-tap-highlight-color:transparent;
 }
-.vt svg{width:15px;height:15px;opacity:.75}
+.vt svg{width:23px;height:23px;transition:transform .16s var(--ease)}
 .vt:hover{color:var(--ink2)}
-.vt[aria-selected="true"]{color:var(--ink)}
-.vt[aria-selected="true"] svg{opacity:1}
+.vt[aria-selected="true"]{color:var(--orange)}
+.vt[aria-selected="true"] svg{transform:translateY(-1px) scale(1.06)}
+/* the open section gets a short bar over its icon: on a strip of five bare
+   glyphs the colour alone is a weak signal in daylight */
 .vt::after{
-  content:"";position:absolute;left:11px;right:11px;bottom:-1px;height:2px;border-radius:2px;
-  background:var(--orange);transform:scaleX(0);transition:transform .2s var(--ease);
+  content:"";position:absolute;left:50%;top:0;width:22px;height:2.5px;margin-left:-11px;
+  border-radius:0 0 3px 3px;background:var(--orange);transform:scaleX(0);
+  transition:transform .2s var(--ease);
 }
 .vt[aria-selected="true"]::after{transform:scaleX(1)}
-.vt small{font-size:10.5px;font-weight:700;background:var(--wash);color:var(--ink3);border-radius:20px;padding:1px 5px}
+/* a count has nowhere to go on an icon-only tab, so it is a dot: "there is
+   something in here" is the whole of what a number on a tab ever said */
+.vd{
+  display:none;position:absolute;top:11px;left:50%;margin-left:7px;
+  width:7px;height:7px;border-radius:50%;background:var(--orange);
+  box-shadow:0 0 0 2px #fff;
+}
+.vd.on{display:block}
 
 /* ---------- category sub-tabs ---------- */
 .subs{
@@ -211,7 +236,9 @@ body::before{
 .seqt .hint{margin-top:auto;padding-top:10px}
 
 /* ---------- stage ---------- */
-.stage{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 20px 120px;-webkit-overflow-scrolling:touch}
+/* the bottom bar is a sibling, not an overlay, so the only thing the
+   padding still has to clear is the floating chat button */
+.stage{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 20px 86px;-webkit-overflow-scrolling:touch}
 .view{display:none}
 .view.on{display:block;animation:fade .22s var(--ease)}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -667,7 +694,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .fab{
   position:fixed;z-index:480;
   right:max(16px,env(safe-area-inset-right));
-  bottom:max(18px,env(safe-area-inset-bottom));
+  /* the bar is 54px plus the home-bar inset and is the last child of .app,
+     so the button has to sit clear of it rather than on top of it */
+  bottom:calc(54px + env(safe-area-inset-bottom) + 14px);
   width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
   background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
   box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
@@ -784,6 +813,26 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .nitem .nx{font-size:12.5px;line-height:1.5;margin-top:5px;white-space:pre-wrap;color:var(--ink2);overflow-wrap:anywhere}
 .nitem .nf{font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:5px}
 .tagnew{background:var(--blue);color:#fff;border-radius:20px;padding:0 5px;font-size:9px;letter-spacing:.04em}
+/* ---------- newsletters ----------
+   A list of titles, every one of them shut. The body is the whole point of the
+   thing, so it is a tap away and not a screen away -- the same rule the mind
+   map's groups follow, and for the same reason. */
+.nwi{border:1px solid var(--line);border-radius:var(--r3);background:var(--panel);margin-bottom:8px;overflow:hidden}
+.nwi.new{border-color:rgba(50,100,255,.4)}
+.nwh{
+  width:100%;display:flex;align-items:center;gap:8px;padding:12px 12px;border:0;background:none;
+  font:inherit;text-align:left;cursor:pointer;color:var(--ink);min-width:0;
+}
+.nwh b{font-size:13px;font-weight:650;letter-spacing:-.01em;flex:1;min-width:0;overflow-wrap:anywhere}
+.nwh i{flex:none;font-style:normal;color:var(--ink4);font-size:12px;transition:transform .18s var(--ease)}
+.nwi.open .nwh i{transform:rotate(90deg)}
+.nwi.open .nwh{background:var(--wash2)}
+.nwb{display:none;padding:2px 13px 12px;border-top:1px solid var(--line)}
+.nwi.open .nwb{display:block}
+.nwb p{font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:6px;overflow-wrap:anywhere}
+.nwb h4{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink4);margin-top:13px}
+.nwb h4:first-child{margin-top:9px}
 
 /* ---------- task details: the note feed ---------- */
 /* Every flex child here can shrink below its longest word, because the drawer
@@ -962,9 +1011,16 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    height and it read as cropped text at the very bottom of the screen. The
    block also carries the home-bar inset, rather than the composer carrying it
    and the tip hanging below it. */
-.cfoot{flex:0 0 auto;background:var(--page);border-top:1px solid var(--line);padding-bottom:4px}
-.cfoot .tip{margin:6px 0 0}
-.cbox{display:flex;gap:8px;align-items:flex-end;padding:10px 0 4px}
+/* It floats. Welded to the foot of the screen with a full-width rule over
+   it, the composer read as a second bar stacked on the section bar -- two
+   chrome strips and the thread ending at a hard line. A rounded box with a
+   gap under it sits over the thread instead, which is also what says the
+   thread continues behind it. */
+.cfoot{flex:0 0 auto;background:transparent;border-top:0;padding-bottom:10px}
+.cfoot .tip{margin:8px 2px 0}
+.cbox{display:flex;gap:8px;align-items:flex-end;padding:7px;margin:8px 0 0;
+  background:var(--panel);border:1px solid var(--line);border-radius:25px;
+  box-shadow:0 2px 6px rgba(40,10,56,.06),0 14px 30px -18px rgba(40,10,56,.5)}
 /* the padding is what centres one line of text against the 40px send button
    beside it: 2x9 + 16x1.4 is 40.4. At 10/13.5 the box came out 39.6 against
    the button's 40 and the text sat a hair high -- the half-pixel of
@@ -974,7 +1030,8 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .cbox textarea{flex:1;min-width:0;min-height:40px;max-height:140px;resize:none;padding:9px 14px;
   border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
   font:inherit;font-size:16px;line-height:1.4}
-.cbox textarea:focus{outline:none;border-color:var(--orange)}
+.cbox textarea{border-color:transparent;background:transparent}
+.cbox textarea:focus{outline:none;border-color:transparent}
 .csend{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
   background:var(--orange);color:#fff;font-size:17px;line-height:1;transition:opacity .14s}
 .csend:disabled{opacity:.35;cursor:default}
@@ -1003,7 +1060,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   .cmdk span{display:none} .cmdk kbd{display:none}
   .cmdk{flex:0 0 auto;width:40px;justify-content:center}
   .cmdk::before{content:"\2315";font-size:17px;color:#6a6076;transform:rotate(-45deg)}
-  .views{padding:9px 13px 0} .stage{padding:14px 13px 130px}
+  .vhead{padding:10px 13px 9px} .vhead h2{font-size:16px} .stage{padding:14px 13px 86px}
   .bento{gap:12px}
   .hero,.hero.b{grid-column:span 12} .hero .big{font-size:48px}
   .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
@@ -1040,7 +1097,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      control on the board that still zooms the page */
   .cbox textarea{font-size:16px}
   /* the composer sits above the home bar, and a bubble can have the width */
-  .cfoot{padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  /* the bar already carries the home-bar inset, so the composer only needs
+     the gap that makes it read as floating over the thread */
+  .cfoot{padding-bottom:8px}
   .cmsg{max-width:86%}
   /* the drawer is the full screen here, so it has to respect the notch and the
      home bar, and the close button has to be a thumb-sized target */
@@ -1071,18 +1130,12 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     <div class="sp"></div>
     <button class="cmdk" id="cmdkBtn"><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
     <button class="tbtn" id="notesBtn"><span>&#9998;</span><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
+    <button class="tbtn" id="newsBtn" title="Your daily and weekly newsletters."><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" style="width:15px;height:15px"><path d="M2 3.4h8.6v9.2H3.2A1.2 1.2 0 0 1 2 11.4z"/><path d="M10.6 6h2.2a1.2 1.2 0 0 1 1.2 1.2v4.2a1.2 1.2 0 0 1-1.2 1.2h-2.2"/><path d="M3.7 5.6h5.2M3.7 7.7h5.2M3.7 9.8h3.1"/></svg><span class="lbl">Newsletters</span><span class="n" id="newsN">0</span></button>
     <button class="tbtn" id="syncBtn" title="Check the repo for changes from your other device."><span>&#8635;</span><span class="lbl">Sync</span></button>
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
-  <nav class="views" role="tablist">
-    <button class="vt" role="tab" data-v="over" aria-selected="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="5.5" height="6.5" rx="1.5"/><rect x="9" y="1.5" width="5.5" height="4" rx="1.5"/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1.5"/><rect x="9" y="7" width="5.5" height="7.5" rx="1.5"/></svg>Overview</button>
-    <button class="vt" role="tab" data-v="board" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4" height="12" rx="1.3"/><rect x="6.8" y="2" width="4" height="8" rx="1.3"/><rect x="12" y="2" width="2.5" height="10" rx="1.2"/></svg>Board<small id="nBoard">0</small></button>
-    <button class="vt" role="tab" data-v="time" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h7M2 8h11M2 12h5"/><circle cx="12.5" cy="4" r="1.4"/><circle cx="7.5" cy="12" r="1.4"/></svg>Tasks<small id="nList">0</small></button>
-    <button class="vt" role="tab" data-v="cal" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3" width="12.4" height="11" rx="1.6"/><path d="M1.8 6.6h12.4M5 1.6v2.6M11 1.6v2.6"/></svg>Calendar</button>
-    <button class="vt" role="tab" data-v="map" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.7"/><rect x="10" y="2" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="6.3" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="10.6" width="4.5" height="3.4" rx="1.2"/><path d="M4.7 8h2.1M6.8 8V3.7h3.2M6.8 8h3.2M6.8 8v4.3h3.2"/></svg>Mind map<small id="nMap">0</small></button>
-    <button class="vt" role="tab" data-v="chat" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9.5a2 2 0 0 1-2 2H6l-3.5 2.6V4.5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2z"/><path d="M5.5 6h5M5.5 8.4h3"/></svg>Chat<small id="nChat">0</small></button>
-  </nav>
+  <div class="vhead"><h2 id="vTitle">Overview</h2></div>
 
   <nav class="subs" id="subs" role="tablist" aria-label="Filter by category"></nav>
 
@@ -1139,6 +1192,14 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       </div>
     </section>
   </main>
+
+  <nav class="vbar" role="tablist" aria-label="Sections">
+    <button class="vt" role="tab" data-v="over" aria-selected="true" aria-label="Overview" title="Overview"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="5.5" height="6.5" rx="1.5"/><rect x="9" y="1.5" width="5.5" height="4" rx="1.5"/><rect x="1.5" y="9.5" width="5.5" height="5" rx="1.5"/><rect x="9" y="7" width="5.5" height="7.5" rx="1.5"/></svg><i class="vd" id="vd-over"></i></button>
+    <button class="vt" role="tab" data-v="board" aria-selected="false" aria-label="Board" title="Board"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4" height="12" rx="1.3"/><rect x="6.8" y="2" width="4" height="8" rx="1.3"/><rect x="12" y="2" width="2.5" height="10" rx="1.2"/></svg><i class="vd" id="vd-board"></i></button>
+    <button class="vt" role="tab" data-v="time" aria-selected="false" aria-label="Tasks" title="Tasks"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h7M2 8h11M2 12h5"/><circle cx="12.5" cy="4" r="1.4"/><circle cx="7.5" cy="12" r="1.4"/></svg><i class="vd" id="vd-time"></i></button>
+    <button class="vt" role="tab" data-v="cal" aria-selected="false" aria-label="Calendar" title="Calendar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3" width="12.4" height="11" rx="1.6"/><path d="M1.8 6.6h12.4M5 1.6v2.6M11 1.6v2.6"/></svg><i class="vd" id="vd-cal"></i></button>
+    <button class="vt" role="tab" data-v="map" aria-selected="false" aria-label="Mind map" title="Mind map"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.7"/><rect x="10" y="2" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="6.3" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="10.6" width="4.5" height="3.4" rx="1.2"/><path d="M4.7 8h2.1M6.8 8V3.7h3.2M6.8 8h3.2M6.8 8v4.3h3.2"/></svg><i class="vd" id="vd-map"></i></button>
+  </nav>
 </div>
 
 <div class="rail" id="rail">
@@ -1377,7 +1438,7 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 
 /* ---------- state ---------- */
 var KEY="mbacc_v3";
-var items={}, notes=[], kb=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
+var items={}, notes=[], kb=[], news=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
 /* Which property row is open in the task card, and whether the note composer
    is unfolded. Both are drawer state, not board state: they reset when it
    closes and never reach localStorage. */
@@ -1388,6 +1449,11 @@ var dRow=null, dNote=false;
    Pruning happens on load and on merge, so a device cannot re-import what
    another device has already aged out. */
 var CHAT_DAYS=7;
+/* Newsletters are kept by count, not by age: a daily and a weekly is about
+   eight a week, so 60 is roughly two months of them -- long enough that the
+   weekly report is still there to read back against, short enough that the
+   whole list rides in a payload without thought. */
+var NEWS_KEEP=60;
 /* A note carries the clock of whoever wrote it, and one of them was wrong: a
    reply arrived stamped six hours ahead, because a run had satisfied "later
    than every file in the folder" by inventing a time rather than reading one.
@@ -1457,6 +1523,11 @@ function load(){
      per-item clocks, so nothing about it can disagree with the merge rules the
      rest of the board already runs on. */
   kb=unionKb((st&&st.kb)||[],[]);
+  /* the newsletters. Same shape again: a whole blob carrying its own
+     per-item clocks. They are NOT notes -- a note ages out at seven days
+     because it is a message, and the point of a weekly report is that it
+     is still there in a month to read back against. */
+  news=unionNews((st&&st.news)||[],[]);
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
@@ -1592,7 +1663,8 @@ function save(){
   /* a whole-blob field with no rule of its own is the two-tab bug waiting to
      happen: the other tab's newer nodes have to survive this tab's save */
   kb=unionKb(kb,(prev&&prev.kb)||[]);
-  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:merged,kb:kb,
+  news=unionNews(news,(prev&&prev.news)||[]);
+  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:merged,kb:kb,news:news,
     saved:now,syncedAt:maxOf(syncedAt,prev&&prev.syncedAt),
     pending:pending||(prev&&prev.pending)||null,touched:touched,
     seen:unionSeen(seenF,prev&&prev.seen),
@@ -1616,6 +1688,27 @@ function unionKb(a,b){
   Object.keys(m).forEach(function(k){ out.push(m[k]); });
   return out;
 }
+/* Newsletters merge exactly as the map does -- newest clock per id -- and for
+   the same reason: his phone and his laptop each hold their own copy and the
+   one he has already read must not come back unread. `read` is per device on
+   purpose: reading it on the laptop says nothing about the phone, and a flag
+   that travelled would quietly mark it read on a screen he never opened. */
+function unionNews(a,b){
+  var m={}, out=[];
+  [a||[],b||[]].forEach(function(list){
+    list.forEach(function(n){
+      if(!n||!n.id) return;
+      var cur=m[n.id];
+      if(!cur || (n.at||"")>(cur.at||"")){ m[n.id]=n; if(cur&&cur.read) n.read=true; }
+      else if(cur && n.read) cur.read=true;
+    });
+  });
+  Object.keys(m).forEach(function(k){ out.push(m[k]); });
+  out.sort(function(x,y){ return String(y.date||y.at||"").localeCompare(String(x.date||x.at||"")); });
+  return out.slice(0,NEWS_KEEP);
+}
+function unreadNews(){ return news.filter(function(n){ return !n.read; }).length; }
+
 function unionSeen(a,b){
   var o={}; [a||{},b||{}].forEach(function(m){ Object.keys(m).forEach(function(k){ o[k]=m[k]; }); });
   return o;
@@ -1639,6 +1732,7 @@ window.addEventListener("storage",function(e){
   var before=notes.length, kbWas=kbStamp();
   notes=unionNotes(notes,st.notes||[]);
   kb=unionKb(kb,st.kb||[]);
+  news=unionNews(news,st.news||[]);
   if(st.relaySeq>relaySeq) relaySeq=st.relaySeq;
   if(moved || notes.length!==before || kbStamp()!==kbWas) render();
 });
@@ -1800,22 +1894,29 @@ function hideToast(){ document.getElementById("toast").classList.remove("on"); }
    RENDER
    =========================================================== */
 function render(){
-  document.getElementById("nBoard").textContent=pool().filter(function(i){return i.status!=="done";}).length;
-  document.getElementById("nList").textContent=pool().length;
   renderSubs();
   /* The badge is a notification, not an inventory. It read 34 for weeks, which
      is a number nobody can act on; what he wants to know is whether there is
      anything he has not dealt with. Zero hides it entirely. */
   var u=unread(); var nb=document.getElementById("notesN");
   nb.textContent=u; nb.classList.toggle("off",!u); nb.parentNode.classList.toggle("hot",u>0);
+  var un=unreadNews(), wb=document.getElementById("newsN");
+  wb.textContent=un; wb.classList.toggle("off",!un); wb.parentNode.classList.toggle("hot",un>0);
   /* Sending is automatic, so a permanent "For Claude" button is a question
      about why it is there. It appears only when there is genuinely something
      to retry: a send the relay refused, or the GitHub route waiting on a
      commit. Shift-click to download is still there when it is. */
   var needs = !!pending || autoTries>0 || !RELAY;
   document.getElementById("exportBtn").classList.toggle("off",!needs);
-  document.getElementById("nChat").textContent=unreadReplies();
-  document.getElementById("nChat").parentNode.classList.toggle("hot",unreadReplies()>0);
+  /* Chat has no tab any more -- the floating button is the way in and it
+     carries its own count, so there is nothing else to badge here. */
+  /* A number has nowhere to sit on a bare icon, and "35 tasks" was never the
+     thing worth a badge anyway. The dot says the one thing that is: something
+     in here is already past its date. */
+  var lateN=alive().filter(function(i){ var n=dleft(i.due); return i.status!=="done" && n!==null && n<0; }).length;
+  ["board","time","cal"].forEach(function(k){
+    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateN>0);
+  });
   renderOverview(); renderBoard(); renderPlan(); renderCal(); renderMap(); renderChat();
   syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
@@ -2435,7 +2536,6 @@ function mapHint(g,c){
 function renderMap(){
   var host=document.getElementById("mapw");
   var live=kbAlive();
-  document.getElementById("nMap").textContent=live.length;
   if(!live.length){
     host.innerHTML='<div class="mempty">Your map is empty.<br>'+
       'Write a line below &mdash; &ldquo;VMock scores a CV and says what to fix&rdquo; &mdash; and Claude '+
@@ -3047,8 +3147,79 @@ function openNotes(){
     : '<p class="hint">No notes yet. Double-click any card, or hit the &#9998; on it, to leave one.</p>';
   document.getElementById("dBody").innerHTML=h;
   showDrawer();
+  /* Opening this drawer IS reading them. It used to clear only on the Chat
+     view, so the badge sat there at 3 over a list he had just read, and the
+     only way to put it out was to open a second screen showing the same
+     notes. Marked after the markup is built, so the NEW tags are still on
+     the ones that were new when he opened it -- the same order the thread
+     uses. */
+  if(unread()){
+    notes.forEach(function(n){ n.state="read"; });
+    setTimeout(function(){ save(); render(); },0);
+  }
   setTimeout(function(){ var t=document.getElementById("gn"); if(t) t.focus(); },300);
 }
+
+/* ---------- newsletters ----------
+   The board is a place he looks; a newsletter is a thing that arrives. Daily,
+   every day but Sunday: what is due today, what is overdue, what is waiting on
+   him. Sunday, weekly: what moved, what the risks are, what to put first --
+   the analytical one, not a longer list.
+   They live in their own drawer rather than the chat thread because a thread
+   is read once and a report is read back: eleven dailies between two of his
+   messages would bury the conversation Chat exists to be. */
+/* "Daily Newsletter - 07 October 2026", in his words. The long date, not the
+   board's usual "7 Oct 26": this is the title of an edition, and an edition is
+   named by its date in full. */
+var MONTHF=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function fmtLong(d){
+  var x=D(d); if(!x) return d||"";
+  var dd=x.getDate();
+  return (dd<10?"0":"")+dd+" "+MONTHF[x.getMonth()]+" "+x.getFullYear();
+}
+function newsTitle(n){
+  return (n.period==="weekly" ? "Weekly Report" : "Daily Newsletter")+" \u2014 "+fmtLong(n.date||(n.at||"").slice(0,10));
+}
+/* The body is plain text with one piece of markup: a line beginning "## " is a
+   heading. A brief is three or four sections and a run of equal-weight
+   paragraphs is the "all in one paragraph" he already objected to once. */
+function newsBody(t){
+  return String(t||"").split("\n").map(function(l){
+    l=l.trim(); if(!l) return "";
+    return /^##\s+/.test(l) ? '<h4>'+esc(l.replace(/^##\s+/,""))+'</h4>' : '<p>'+esc(l)+'</p>';
+  }).join("");
+}
+function openNews(){
+  dMode="news"; openId=null;
+  titleEdit(false);
+  document.getElementById("dPen").classList.add("off");
+  document.getElementById("dTitle").textContent="Newsletters";
+  var h;
+  if(!news.length){
+    h='<p class="hint">Nothing yet. A daily brief arrives every morning except Sunday, and a weekly report on Sunday.</p>';
+  }else{
+    /* every one of them shut. He opens the one he wants; an open list of sixty
+       reports is the "wall of text" the collapse is there to prevent. */
+    h=news.map(function(n){
+      return '<div class="nwi'+(n.read?"":" new")+'" data-nw="'+esc(n.id)+'">'+
+        '<button class="nwh" data-nwt="'+esc(n.id)+'"><b>'+esc(newsTitle(n))+'</b>'+
+        (n.read?'':'<span class="tagnew">NEW</span>')+'<i>&#9656;</i></button>'+
+        '<div class="nwb">'+newsBody(n.body)+'</div></div>';
+    }).join("");
+  }
+  document.getElementById("dBody").innerHTML=h;
+  showDrawer();
+  /* opening the drawer is reading them, exactly as the notes drawer now is */
+  if(unreadNews()){
+    news.forEach(function(n){ n.read=true; });
+    setTimeout(function(){ save(); render(); },0);
+  }
+}
+document.getElementById("dBody").addEventListener("click",function(e){
+  var hd=e.target.closest("[data-nwt]"); if(!hd) return;
+  var box=hd.parentNode;
+  box.classList.toggle("open");
+});
 
 /* ---------- export ----------
    Two routes out of this device:
@@ -3094,7 +3265,7 @@ function changedItems(){
 }
 function fullPayload(){
   return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
-    notes:notes, changed:changedItems(), kb:kb,
+    notes:notes, changed:changedItems(), kb:kb, news:news,
     open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
 }
 /* lean on purpose: the baseline task list already lives in SEED in this file,
@@ -3113,7 +3284,7 @@ function leanPayload(){
     /* the relay names the file from this, so both routes stamp in the same zone
        and the newest-file sort on pull stays honest */
     stamp:stamp(),
-    notes:outNotes(), changed:changedItems(), kb:outKb()};
+    notes:outNotes(), changed:changedItems(), kb:outKb(), news:news};
 }
 /* The map travels whole. It is small -- a line of text per fact -- it has no
    baseline in SEED to diff against the way a task does, and half a map on his
@@ -3159,7 +3330,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1705";
+var BUILD="2026-10-05-1810";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3435,6 +3606,7 @@ document.querySelector(".brand").addEventListener("click",function(){ setView("o
 document.getElementById("dClose").addEventListener("click",hideDrawer);
 document.getElementById("scrim").addEventListener("click",hideDrawer);
 document.getElementById("notesBtn").addEventListener("click",openNotes);
+document.getElementById("newsBtn").addEventListener("click",openNews);
 /* Sync means "make this screen current", which includes the app itself: a
    stale home-screen copy was the thing that made a shipped fix look missing. */
 document.getElementById("syncBtn").addEventListener("click",function(){
@@ -3553,6 +3725,11 @@ document.getElementById("fab").addEventListener("click",function(){
   setView("chat");
 });
 
+/* Chat stays in this list even though it has no tab: the palette still jumps
+   to it, the keyboard shortcut still reaches it, and it is where the section
+   title reads its name from. */
+var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Tasks"},{v:"cal",n:"Calendar"},{v:"map",n:"Mind map"},{v:"chat",n:"Chat"}];
+
 /* --- views --- */
 Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
   b.addEventListener("click",function(){ setView(b.dataset.v); });
@@ -3560,6 +3737,10 @@ Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
 function setView(v){
   view=v;
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
+  /* the strip is icons now, so the name of the open section lives in the row
+     the strip used to occupy. Chat has no tab, so its name comes from here. */
+  var vn=VIEWS.filter(function(x){ return x.v===v; })[0];
+  document.getElementById("vTitle").textContent=vn?vn.n:"";
   ["over","board","time","cal","map","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
   renderSubs();
@@ -3707,7 +3888,6 @@ document.addEventListener("visibilitychange",function(){ if(document.hidden) end
 /* ===========================================================
    COMMAND PALETTE
    =========================================================== */
-var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Tasks"},{v:"cal",n:"Calendar"},{v:"map",n:"Mind map"},{v:"chat",n:"Chat"}];
 var palSel=0, palRows=[];
 function openPal(){
   document.getElementById("pal").classList.add("on");
@@ -3856,7 +4036,21 @@ function mergePayload(pay){
     }), kb);
     if(kbStamp()!==was) kbMoved=1;
   }
-  return moved>0 || added>0 || acked>0 || kbMoved>0;
+  /* The newsletters arrive the same way, which is the whole reason they are a
+     list of clocked objects rather than a new kind of thing: a daily written
+     by the job at 10:00 reaches both his devices down the socket that was
+     already there, and the copy he has already read on one of them stays read
+     on it. */
+  var newsMoved=0;
+  if(pay.news && pay.news.length){
+    var nWas=news.length+":"+news.map(function(n){ return n.id+(n.at||""); }).sort().join(",");
+    news=unionNews((pay.news||[]).map(function(n){
+      if(n && !n.at){ n=JSON.parse(JSON.stringify(n)); n.at=pay.exportedAt; }
+      return n;
+    }), news);
+    if(news.length+":"+news.map(function(n){ return n.id+(n.at||""); }).sort().join(",")!==nWas) newsMoved=1;
+  }
+  return moved>0 || added>0 || acked>0 || kbMoved>0 || newsMoved>0;
 }
 
 /* single-payload entry: the guards plus a save and a repaint */
@@ -4096,9 +4290,12 @@ function syncPush(){
   if(!pushOK()) return hide();
   if(Notification.permission==="denied")
     return show("Notifications are blocked. Turn them back on in Settings, under Notifications.","",true);
-  /* a subscription cannot exist without the permission behind it, so the
-     subscription alone is the honest test of "already on" */
-  if(pushSubbed) return hide();
+  /* Already on, and the banner used to vanish entirely at that point -- which
+     is exactly the state he was in when he said he was getting nothing at all.
+     "On" and "silently broken" looked identical, with nothing on screen to
+     tell them apart. So it stays, quietly, with the one button that can: a
+     test push, sent now, through the same path a nudge takes. */
+  if(pushSubbed) return show("Notifications are on for this device.","Send a test",true);
   show("Get nudges on your lock screen, not just here.","Turn on");
 }
 
@@ -4113,7 +4310,9 @@ function regSW(){
   /* a tap on the notification lands here when the app was already open */
   navigator.serviceWorker.addEventListener("message",function(e){
     var d=e.data||{}; if(d.t!=="notif") return;
-    if(d.go && items[d.go]) openItem(d.go); else setView("chat");
+    if(d.go==="news") openNews();
+    else if(d.go && items[d.go]) openItem(d.go);
+    else setView("chat");
   });
 }
 
@@ -4143,7 +4342,23 @@ function askPush(){
     });
   }).catch(function(){ toast("Could not turn notifications on."); syncPush(); });
 }
-document.getElementById("pbnB").addEventListener("click",askPush);
+/* The same button does whichever of the two jobs the banner is offering. */
+function testPush(){
+  var b=document.getElementById("pbnB");
+  b.disabled=true;
+  fetch(RELAY+"/push/test").then(function(r){ return r.json().then(function(j){ return {s:r.status,j:j}; }); })
+    .then(function(x){
+      b.disabled=false;
+      if(x.s===429) return toast("Already sent one in the last minute. Give it a moment.");
+      if(!x.j || x.j.ok===false) return toast("This device is not subscribed. Turn notifications on again.");
+      if(!x.j.sent) toast("Sent to "+x.j.devices+" device(s) but none accepted it. Re-add the app to your Home Screen.");
+      else toast("Sent. If nothing appears, iOS is holding it: check Settings \u203a Notifications.");
+    })
+    .catch(function(){ b.disabled=false; toast("Could not reach the relay."); });
+}
+document.getElementById("pbnB").addEventListener("click",function(){
+  if(pushSubbed) testPush(); else askPush();
+});
 
 /* ---------- boot ---------- */
 load();
@@ -4156,7 +4371,8 @@ regSW();               /* the only way a nudge reaches a lock screen */
 /* a notification tapped from cold opens the thing it was about */
 (function(){
   var g=new URLSearchParams(location.search).get("go");
-  if(g && items[g]) openItem(g);
+  if(g==="news") openNews();
+  else if(g && items[g]) openItem(g);
   else if(location.search.indexOf("v=chat")>=0) setView("chat");
 })();
 

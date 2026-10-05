@@ -25,6 +25,14 @@ mutes, and then the one nudge that mattered never lands either.
 
 So the bar is high and these are not guidelines:
 
+- **The board is about his MBA admin, never about the machinery that runs it.**
+  He drew this line himself: the board's notes are *"only for task/on-app query
+  related answers, info or nudges"*. So a note or a chat message never reports
+  on the relay, the Routines, a skill, a workflow, a deploy, a check, a PR or
+  anything from the Claude-app conversation where this board gets built. That
+  belongs in the thread with him, not on the board. The one exception is an
+  answer to a question he asked in the board's own chat: if he asks there how
+  something works, answer there.
 - **At most two nudges per run.** If three things qualify, send the two that
   matter and let the third wait for the next run.
 - **At most one nudge per task per 48 hours**, follow-ups included.
