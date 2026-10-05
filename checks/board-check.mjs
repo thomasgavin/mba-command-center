@@ -1226,6 +1226,18 @@ for (var tw26 of [390, 1280]) {
              rows: document.querySelectorAll(".mn,.mtli,.mcard,.mcr").length,
              open: document.querySelectorAll(".mroot.open").length,
              hints: Array.prototype.map.call(document.querySelectorAll(".mrn"), txt),
+             /* the name and the date are two lines, not one run-on */
+             hintLines: Array.prototype.map.call(document.querySelectorAll(".mrn"), function (e) {
+               var l = e.querySelector(".mrl"), w = e.querySelector(".mrw");
+               return { l: l ? l.innerText.trim() : "", w: w ? w.innerText.trim() : "",
+                        stacked: !!(l && w) && l.getBoundingClientRect().bottom <= w.getBoundingClientRect().top + 1,
+                        lit: w ? getComputedStyle(w).color : "" };
+             }),
+             /* the whole shut block is the tap target, not only its heading */
+             tapWhole: Array.prototype.every.call(document.querySelectorAll(".mroot"),
+               function (e) { return e.hasAttribute("data-mg"); }),
+             /* and the category strip is off this view entirely */
+             subs: document.getElementById("subs").classList.contains("on"),
              /* the tint is derived from the group name, so two groups cannot
                 share one unless the hash collides -- and every block has one */
              tints: Array.prototype.map.call(document.querySelectorAll(".mroot"),
@@ -1250,6 +1262,19 @@ for (var tw26 of [390, 1280]) {
   ok("and a shut group still says what is next inside it",
      filled.hints.length === filled.roots.length &&
      filled.hints.some(function (t) { return /^Next: /.test(t); }), JSON.stringify(filled.hints));
+  /* "seperate the Next and Date into two seperate lines" -- run together they
+     wrapped into each other and the date was the half that broke mid-word */
+  var dated = filled.hintLines.filter(function (x) { return x.w; });
+  ok("the name and its date are two lines, and the date is lit",
+     dated.length > 0 && dated.every(function (x) { return x.stacked; }) &&
+     dated.every(function (x) { return x.lit && !/128, 128, 128/.test(x.lit); }),
+     JSON.stringify(filled.hintLines));
+  /* "I should be able to tap anywhere on the group blocks to expand" */
+  ok("a shut block is tappable anywhere, not only on its heading",
+     filled.tapWhole, String(filled.tapWhole));
+  /* the groups already answer what the strip was answering, and worse, they cut
+     across it: filtering to Career chopped the Programme calendar in half */
+  ok("and the category strip is off the map entirely", !filled.subs, String(filled.subs));
   /* "Give a light tint colour to each group blocks" -- taken from the block's
      position in JS, so a group invented next month gets one without a palette
      edit. Name-hashing came first and put the same colour on two of nine real
@@ -1270,8 +1295,12 @@ for (var tw26 of [390, 1280]) {
     /* open every group, which is also the tap-to-open check. Each tap
        repaints the whole view, so the next header has to be looked up again --
        a cached NodeList is four detached elements after the first click. */
-    var names = Array.prototype.map.call(document.querySelectorAll("[data-mg]"),
-      function (e) { return e.dataset.mg; });
+    /* a shut block carries data-mg on the block and again on its header, so
+       the names have to be deduped or each group would be toggled twice */
+    var names = [];
+    Array.prototype.forEach.call(document.querySelectorAll("[data-mg]"), function (e) {
+      if (names.indexOf(e.dataset.mg) < 0) names.push(e.dataset.mg);
+    });
     for (var i = 0; i < names.length; i++) {
       document.querySelector('[data-mg="' + names[i] + '"]').click();
       await new Promise(function (r) { setTimeout(r, 40); });
@@ -1316,6 +1345,21 @@ for (var tw26 of [390, 1280]) {
          "Launch Week" ellipsised to "Launch ..." at 78px on a phone */
       cut: cal ? Array.prototype.filter.call(cal.querySelectorAll(".mcl"), function (e) {
         return e.scrollWidth > e.clientWidth; }).map(function (e) { return e.innerText; }) : ["(no chart)"],
+      /* every bar says which days, not just where in the year */
+      dates: cal ? Array.prototype.map.call(cal.querySelectorAll(".mcd"), function (e) {
+        return e.innerText.trim(); }) : [],
+      /* and no label runs off either end of the track */
+      spill: cal ? Array.prototype.filter.call(cal.querySelectorAll(".mcd"), function (e) {
+        var r = e.getBoundingClientRect(), t = e.parentElement.getBoundingClientRect();
+        return r.left < t.left - 0.5 || r.right > t.right + 0.5;
+      }).map(function (e) { return e.innerText; }) : ["(no chart)"],
+      /* the task chip stays; the grey rel[] bubbles are gone from every shape */
+      taskChips: document.querySelectorAll(".mtag.mitem").length,
+      linkChips: document.querySelectorAll(".mtag:not(.mitem), [data-kbg]:not(.mal)").length,
+      /* a date is the block's tint in every shape, never the grey it was in
+         the list while the rail and the cards were colouring it */
+      greyDates: Array.prototype.filter.call(document.querySelectorAll(".mn .mwhen"), function (e) {
+        return !e.style.color; }).length,
       /* an unknown shape degrades to the list rather than drawing nothing */
       unknown: els ? els.querySelectorAll(".mn").length : -1,
       twisties: document.querySelectorAll(".mn .mtw, .mtli .mtw, .mcard .mtw").length
@@ -1343,6 +1387,17 @@ for (var tw26 of [390, 1280]) {
      JSON.stringify(shapes.bars));
   ok("and the prose still reads under the chart", shapes.calProse === 4, JSON.stringify(shapes));
   ok("no chart row label is cut off", shapes.cut.length === 0, JSON.stringify(shapes.cut));
+  /* "use the empty space to add the exact dates ... next to each bar" */
+  ok("every bar says which days, in the empty space beside it",
+     shapes.dates.length === shapes.bars.length &&
+     shapes.dates.every(function (t) { return /^\d\d [A-Z][a-z]{2}/.test(t); }),
+     JSON.stringify(shapes.dates));
+  ok("and no date label runs off the track", shapes.spill.length === 0, JSON.stringify(shapes.spill));
+  /* "Remove the linking grey bubbles. You can keep the linked task bubble." */
+  ok("the task chip stays and the grey link bubbles are gone",
+     shapes.taskChips > 0 && shapes.linkChips === 0, JSON.stringify(shapes));
+  /* "In some sections the dates are grey - use brighter colour" */
+  ok("no date is left grey in any shape", shapes.greyDates === 0, String(shapes.greyDates));
   ok("a set of peers draws as a grid", shapes.grid && shapes.cards === 2, JSON.stringify(shapes));
   ok("a shape this build has never heard of falls back to the list",
      shapes.unknown === 1, JSON.stringify(shapes));
@@ -1358,8 +1413,9 @@ for (var tw26 of [390, 1280]) {
   /* "instead of me rummaging through the dashboard": the board answers out of
      what it already holds, immediately, and says that Claude's answer follows */
   var ask = await s29.p.evaluate(async function () {
-    document.querySelector('[data-mm="ask"]').click();
     var ta = document.getElementById("min");
+    /* no mode button any more: "what is ..." has to read as a question on its
+       own, which is the whole of what he asked for */
     ta.value = "what is vmock";
     ta.dispatchEvent(new Event("input", { bubbles: true }));
     document.getElementById("msend").click();
@@ -1381,8 +1437,8 @@ for (var tw26 of [390, 1280]) {
   /* a note is a fact to file, not a question: Claude has to be able to tell
      them apart, and the note is the only thing that reaches it */
   var fact = await s29.p.evaluate(async function () {
-    document.querySelector('[data-mm="note"]').click();
     var ta = document.getElementById("min");
+    /* and a statement has to read as a fact to file */
     ta.value = "Statistics is taught in P1.";
     ta.dispatchEvent(new Event("input", { bubbles: true }));
     document.getElementById("msend").click();
@@ -1414,6 +1470,62 @@ for (var tw26 of [390, 1280]) {
   ok("a fact tied to a task opens that task", jump.chip && jump.open && /VMock/i.test(jump.title), JSON.stringify(jump));
   ok("the map draws without a console error", s29.errs.length === 0, s29.errs.join(" | "));
   await s29.ctx.close();
+}
+
+/* ---- 30. the composers ----
+   Two boxes, one shape, and one rule he gave for both: *"On all chat/note
+   texboxes, enter on my keyboard should be line break, not send."* It was the
+   other way round, which stole the rest of a paragraph every time a sentence
+   ended with a return. */
+{
+  var s30 = await open(390);
+  var comp = await s30.p.evaluate(async function () {
+    var out = {};
+    for (var v of ["chat", "map"]) {
+      setView(v);
+      await new Promise(function (r) { setTimeout(r, 120); });
+      var ta = document.getElementById(v === "chat" ? "cin" : "min");
+      var btn = ta.parentElement.querySelector(".csend");
+      var before = notes.length;
+      ta.value = "First line";
+      ta.dispatchEvent(new Event("input", { bubbles: true }));
+      ta.focus();
+      ta.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+      await new Promise(function (r) { setTimeout(r, 80); });
+      var tr = ta.getBoundingClientRect(), br = btn.getBoundingClientRect();
+      var box = ta.parentElement.getBoundingClientRect();
+      out[v] = {
+        /* Enter sent nothing and did not wipe what he had typed */
+        sent: notes.length - before, kept: ta.value,
+        /* and the arrow still does send */
+        h: Math.round(tr.height), bh: Math.round(br.height),
+        size: parseFloat(getComputedStyle(ta).fontSize),
+        /* the button sits inside the box, not off its right edge */
+        fits: br.right <= box.right + 0.5 && br.left >= box.left,
+        ph: ta.placeholder, phFits: ta.scrollWidth <= ta.clientWidth + 1
+      };
+      ta.value = ""; ta.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    /* the mode switch is gone: the box works out which job it is doing */
+    out.seg = document.querySelectorAll("[data-mm], .mseg").length;
+    return out;
+  });
+  ["chat", "map"].forEach(function (v) {
+    ok(v + " composer: Enter is a line break, not send",
+       comp[v].sent === 0 && /First line/.test(comp[v].kept), JSON.stringify(comp[v]));
+    /* under 16px iOS zooms the page on focus and stays zoomed */
+    ok(v + " composer: the box is 16px and lines up with its send button",
+       comp[v].size >= 16 && comp[v].h === comp[v].bh, JSON.stringify(comp[v]));
+    ok(v + " composer: the send button is inside the box", comp[v].fits, JSON.stringify(comp[v]));
+  });
+  /* "The tell claude something worth is also too big" -- a placeholder cut off
+     mid-phrase says less than a short one that fits */
+  ok("the map placeholder fits the box it is in", comp.map.phFits, JSON.stringify(comp.map));
+  /* "Don't have different options for add a note and ask - you can figure it
+     out yourself based on input." */
+  ok("there is no add-a-note / ask switch left", comp.seg === 0, String(comp.seg));
+  ok("the composers draw without a console error", s30.errs.length === 0, s30.errs.join(" | "));
+  await s30.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

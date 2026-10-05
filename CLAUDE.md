@@ -461,19 +461,31 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
   aren't all webinars just listed together under one 'webinar' section for
   example? Don't try to follow strict and very generic academic, life, career
   categorization."*
-- **`cat` still exists and does one job: the sub-tab strip.** A node with an
-  `item` and no `cat` inherits the task's category, so Claude can file one by
-  naming the task. It is no longer the shape of the view.
+- **`cat` is now carried and not read.** It was the sub-tab strip's input, and
+  the strip is off this view: *"remove the financial, student life, etc filter
+  on the top from mindmap page."* The groups already answer what it answered,
+  and worse, they cut across it -- filtering to Career chopped the Programme
+  calendar in half. The field stays on the node because it costs nothing and
+  the other views still use `TRACK_CAT`.
 - **A node whose parent is missing is an orphan, not a ghost.** It stands as a
   row of its own in its group rather than vanishing with the node that held it.
-- **`item` is most of the value.** It is how "VMock scores your CV" ends up one
-  tap from the CV task; `rel[]` is the cross-links, and the skill writes both
-  sides or the connection only exists from one end.
-- **The composer does two jobs**, because he asked for exactly that: *"the text
-  box here should not only be to add notes but also to ask you questions based
-  on the existing information instead of me rummaging through the dashboard."*
-  Both end up as a note — `kind:"fact"` or `kind:"ask"` — so it travels the
-  paths that already exist.
+- **`item` is most of the value, and it is the only chip that renders.** It is
+  how "VMock scores your CV" ends up one tap from the CV task. `rel[]` is still
+  written on both sides and still merges, travels, feeds the search and prints
+  in `KNOWLEDGE.md` -- but it no longer draws a row of grey bubbles under every
+  node: *"Remove the linking grey bubbles. You can keep the linked task
+  bubble."* Three or four of them under a paragraph was more chrome than
+  content, and the sideways jump they offered was one nobody was making.
+- **The composer does two jobs and works out which on its own.** He asked for
+  the second job: *"the text box here should not only be to add notes but also
+  to ask you questions based on the existing information instead of me
+  rummaging through the dashboard."* It shipped with a two-button switch and he
+  took that away too: *"Don't have different options for add a note and ask -
+  you can figure it out yourself based on input."* `asks()` is the whole of it
+  — a trailing question mark, or a first word in `ASKW` — and being wrong costs
+  little either way, since the text reaches Claude as a note regardless and
+  Claude answers it properly regardless. Both still travel as `kind:"fact"` or
+  `kind:"ask"`.
 - **An ask answers itself immediately** out of what the map holds, and says so:
   Claude's real answer takes the forty-odd seconds a run takes, and a box that
   sits silent that long reads as a box that did nothing. `STOP` is the reason
@@ -512,10 +524,27 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
   click and go down a hole, avoiding which is the whole point of building this
   app."* The group header is the only thing that collapses, and it shuts by
   default because he asked for that -- nine open blocks is a wall. A shut block
-  still prints **what is next inside it** (`mapHint`), or nine shut headers are
-  an index of headings rather than of answers. `mapOpen` is view state and
-  never reaches `localStorage`. `parent` still nests one level, drawn inline
-  and always visible; nothing deeper is drawn at all.
+  still prints **what is next inside it** (`mapHint`), on two lines, the name
+  then its date: *"seperate the Next and Date into two seperate lines"*, because
+  run together they wrapped into each other and the date broke mid-word.
+  `mapOpen` is view state and never reaches `localStorage`. `parent` still
+  nests one level, drawn inline and always visible; nothing deeper is drawn.
+- **A shut block is tappable anywhere; an open one only on its header.**
+  *"I should be able to tap anywhere on the group blocks to expand not just the
+  heading text."* So `data-mg` goes on the whole `.mroot` while it is shut and
+  on the header alone once it is open -- leaving it on the block would make a
+  tap meant for a row shut the block under his finger.
+- **A date is the block's tint in every shape.** The rail and the cards were
+  already colouring it and the list was not, so one shape disagreed with the
+  other two about whether a date was worth seeing: *"In some sections the dates
+  are grey - use brighter colour like you used in deadlines group and
+  Platforms."* `mapItem` takes the tint as an argument for that reason alone.
+- **Every bar in the calendar prints its own dates** beside it, in the empty
+  half of the row: *"use the empty space to add the exact dates or atleast the
+  months like '07 Jan - 12 Mar' next to each bar."* A chart you have to read
+  off an axis by eye is a chart you cannot quote. The label sits right of the
+  bar while there is room and flips to the left of its start past 58%, since a
+  label running off the right edge is worse than no label.
 - **The tint is the block's position, not its name.** Name-hashing was the
   first attempt and it put the same colour on two of nine groups, sitting next
   to each other, which reads as a bug rather than a scheme. Position cannot
@@ -901,7 +930,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 174 invariants, three widths, a real browser. Every one of them was a
+that runs: 190 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
