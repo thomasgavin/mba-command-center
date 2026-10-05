@@ -409,6 +409,24 @@ never be a tab apart again.
   renamed appears in it by itself. **Late overrides** -- an open task past its
   date is the thing worth seeing first -- and the key says so, which is why it
   has five swatches for four states.
+- **Everything is one list, not six.** On the Everything sub-tab the rows are a
+  single run in due-date order with no track headings: grouping there answered
+  "what kind of thing is this", which the sub-tabs already answer, at the cost
+  of the question the view is for -- what is next. Choosing a category is the
+  one place the track headings still earn their keep, so they stay there.
+- **Done tasks collect at the bottom**, in their own section, in date order,
+  above Deleted. On a board of 35 they were padding out every track with rows
+  he cannot act on, in between the ones he can. The track headings still count
+  them ("2 of 8 done"), which is what says where they went.
+- **A green dot on the bar is the day it was actually closed**, read off
+  `doneAt`. The due marker says when a task was meant to land and the dot says
+  when it did, so closing something three weeks early and closing it a month
+  late stop looking identical. Round, not a diamond, so the two read as
+  different kinds of thing at a glance. The axis is built from both sets of
+  dates, or a task closed before the earliest due date would sit off the left
+  end. `SEED`'s own done tasks carry no `doneAt` and get no dot: nothing
+  recorded when they were closed and inventing it is the drift this board
+  exists to prevent.
 - **The row is a tick, the title and the priority.** The date chip went because
   the marker's position already is the date (and a second copy could drift),
   the note button because the card is one tap away, and the note count with
@@ -583,7 +601,9 @@ write wins is wrong for every one of them.
 ## `DFIELDS` and `diffOf` are one decision in two places
 
 `DFIELDS` governs what a merge applies; `diffOf` governs what `save()` ever
-writes. A field in one and not the other fails silently and completely:
+writes. `doneAt` went into both when the timeline learned to draw the day a
+task was closed; it is stamped by `patch()` rather than typed, and cleared when
+a task reopens, so it is a record of what happened and never an estimate. A field in one and not the other fails silently and completely:
 `deleted` shipped in `DFIELDS` alone, so a deleted task came back on the next
 load and never reached the other device, and the in-memory check passed the
 whole time. Any new field goes in both, and the check for it reloads the page.

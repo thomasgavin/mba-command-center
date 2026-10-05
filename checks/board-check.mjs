@@ -956,6 +956,106 @@ for (var tw of [390, 1280]) {
   await s25.ctx.close();
 }
 
+/* ---- 26. Everything is one date-sorted list, and done tasks collect at the
+   bottom ----
+   "when everything tab is selected, don't segregate by types ... Just show a
+   single list sorted by due dates. Add a section for done at the bottom ... In
+   the timeline chart, add a green dot to show when it was actually marked
+   completed." Three things, and the third one is a stored field, so it is
+   checked across a reload rather than in memory -- `doneAt` had to go into
+   DFIELDS and diffOf together, which is the pair that fails silently. */
+for (var tw26 of [390, 1280]) {
+  var s26 = await open(tw26);
+  var k26 = await s26.p.evaluate(function () {
+    setView("time");
+    function read() {
+      var out = [], sec = null;
+      Array.prototype.forEach.call(document.querySelectorAll("#gantt .gsec,#gantt .grow"), function (e) {
+        if (e.classList.contains("gsec")) { sec = e.textContent; out.push({ sec: sec }); }
+        else out.push({ sec: sec, id: e.dataset.id, done: e.classList.contains("done"),
+                        dot: !!e.querySelector(".gdn") });
+      });
+      return out;
+    }
+    var flat = read();
+    var heads = flat.filter(function (r) { return r.sec !== undefined && r.id === undefined; })
+                    .map(function (r) { return r.sec; });
+    var rows = flat.filter(function (r) { return r.id; });
+    var dues = rows.map(function (r) { return (items[r.id].due || "9999-99-99") + "|" + !!items[r.id].doneAt; });
+    /* open rows in date order, then every done row, also in date order */
+    var openRows = rows.filter(function (r) { return !r.done; });
+    var doneRows = rows.filter(function (r) { return r.done; });
+    function sorted(a) {
+      for (var n = 1; n < a.length; n++) if (a[n - 1] > a[n]) return false;
+      return true;
+    }
+    var openDue = openRows.map(function (r) { return items[r.id].due || "9999-99-99"; });
+    var doneDue = doneRows.map(function (r) { return items[r.id].due || "9999-99-99"; });
+    /* and the same view with a category chosen keeps its track headings */
+    cat = "life"; render(); setView("time");
+    var grouped = Array.prototype.map.call(document.querySelectorAll("#gantt .gsec"),
+      function (e) { return e.textContent; });
+    cat = "all"; render(); setView("time");
+    return {
+      heads: heads, rowCount: rows.length,
+      openSorted: sorted(openDue), doneSorted: sorted(doneDue),
+      openCount: openRows.length, doneCount: doneRows.length,
+      /* every done row sits after every open one */
+      doneLast: rows.every(function (r, n) { return !r.done || rows.slice(n).every(function (q) { return q.done; }); }),
+      doneHead: heads.some(function (h) { return /^Done/.test(h); }),
+      groupedHeads: grouped, dues: dues.length
+    };
+  });
+  /* one list, so the only headings are Open, Done and Deleted -- no track names */
+  ok(tw26 + "px: Everything is not split by track", 
+     k26.heads.every(function (h) { return /^(Open|Done|Deleted)/.test(h); }), JSON.stringify(k26.heads));
+  ok(tw26 + "px: the open tasks are in due-date order", k26.openSorted && k26.openCount > 0, JSON.stringify(k26));
+  ok(tw26 + "px: done tasks are all at the bottom, in a Done section",
+     k26.doneHead && k26.doneLast && k26.doneCount > 0, JSON.stringify(k26));
+  ok(tw26 + "px: the Done section is in due-date order", k26.doneSorted, JSON.stringify(k26));
+  /* choosing a category is the one place the track headings still earn their
+     keep, so flattening Everything must not have taken them with it */
+  ok(tw26 + "px: a chosen category still groups by track",
+     k26.groupedHeads.some(function (h) { return !/^(Open|Done|Deleted)/.test(h); }),
+     JSON.stringify(k26.groupedHeads));
+  await s26.ctx.close();
+}
+
+/* ---- 27. the day a task was closed is recorded, and drawn ---- */
+{
+  var s27 = await open(1280);
+  var before = await s27.p.evaluate(function () {
+    setView("time");
+    var i = alive().filter(function (x) { return x.status !== "done" && x.due; })[0];
+    patch(i.id, { status: "done" });
+    setView("time");
+    var r = document.querySelector('#gantt .grow[data-id="' + i.id + '"]');
+    return { id: i.id, doneAt: items[i.id].doneAt, today: iso(todayD()),
+             dot: !!(r && r.querySelector(".gdn")),
+             dotColour: r && r.querySelector(".gdn") ? getComputedStyle(r.querySelector(".gdn")).backgroundColor : null };
+  });
+  ok("ticking a task records the day it closed", before.doneAt === before.today, JSON.stringify(before));
+  ok("and the timeline draws a green dot for it",
+     before.dot && before.dotColour === "rgb(0, 169, 143)", JSON.stringify(before));
+  /* the DFIELDS / diffOf pair: in memory this passes either way */
+  await s27.p.reload({ waitUntil: "load" });
+  var after = await s27.p.evaluate(function (id) {
+    setView("time");
+    var r = document.querySelector('#gantt .grow[data-id="' + id + '"]');
+    return { doneAt: items[id].doneAt, dot: !!(r && r.querySelector(".gdn")) };
+  }, before.id);
+  ok("and it survives a reload, so it reaches his other device",
+     after.doneAt === before.doneAt && after.dot, JSON.stringify(after));
+  /* reopening it is not a close, so the dot has to go */
+  var re = await s27.p.evaluate(function (id) {
+    patch(id, { status: "todo" }); setView("time");
+    var r = document.querySelector('#gantt .grow[data-id="' + id + '"]');
+    return { doneAt: items[id].doneAt, dot: !!(r && r.querySelector(".gdn")) };
+  }, before.id);
+  ok("reopening a task clears the day it closed", !re.doneAt && !re.dot, JSON.stringify(re));
+  await s27.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
