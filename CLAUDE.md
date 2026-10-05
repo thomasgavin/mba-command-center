@@ -453,12 +453,19 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
 - **It travels whole**, newest 300 nodes in every file. There is no `SEED` to
   diff a fact against the way there is for a task, and half a map on his other
   device would be worse than none.
-- **The top of the tree is `CATS`** — the four buckets he already thinks in —
-  plus Unfiled for anything not placed yet. A node with an `item` and no `cat`
-  inherits the task's category, so Claude can file one by naming the task. The
-  sub-tab strip filters the map like every other view.
-- **A node whose parent is missing is an orphan, not a ghost.** It renders at
-  the top of its category rather than vanishing with the node that held it.
+- **The top of the list is `group`, and a group names what a thing is.** It is
+  free text — Webinars and sessions, Deadlines, Platforms and tools — chosen by
+  Claude as it files, because the kinds of thing he writes down are not known
+  in advance. `ord` sets the order between groups; "Everything else" is always
+  last. It was `CATS` first, four fixed buckets, and he threw that out: *"Why
+  aren't all webinars just listed together under one 'webinar' section for
+  example? Don't try to follow strict and very generic academic, life, career
+  categorization."*
+- **`cat` still exists and does one job: the sub-tab strip.** A node with an
+  `item` and no `cat` inherits the task's category, so Claude can file one by
+  naming the task. It is no longer the shape of the view.
+- **A node whose parent is missing is an orphan, not a ghost.** It stands as a
+  row of its own in its group rather than vanishing with the node that held it.
 - **`item` is most of the value.** It is how "VMock scores your CV" ends up one
   tap from the CV task; `rel[]` is the cross-links, and the skill writes both
   sides or the connection only exists from one end.
@@ -475,9 +482,20 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
   sentence, and an answer that returns everything is the rummaging he asked to
   be rid of. Only the best-scoring matches are shown, not everything that
   brushed one word.
-- Below the first level the tree is **collapsed**, with the count on a node the
-  only thing saying there is more under it. A map of a hundred facts has to be
-  readable on a phone.
+- **Nothing below a group collapses, and a row has no twisty at all.** The
+  title carries the date (`when` to read, `w` the ISO key it sorts by, because
+  "04 Dec" sorts above "05 Nov" on its own) and the body is already on screen
+  under it. That is the whole of his objection to the first version: *"I have
+  to click and go down a hole, avoiding which is the whole point of building
+  this app."* A group header is the one thing that collapses, and it starts
+  open; `mapShut` is view state and never reaches `localStorage`. `parent`
+  still nests one level, drawn inline and always visible; nothing deeper is
+  drawn at all.
+- **A node that is done, or that only restates why something matters, does not
+  belong here.** Eight went on 2026-10-05 for that reason — MyINSEAD and the
+  newsletters, whose tasks are both `done`, and lines like "P0 tells you to
+  start early on visa and housing" when he is already doing it. He named them
+  himself, and a map that fills with them is one he stops reading.
 
 **`KNOWLEDGE.md` is the durable copy**, and the same ask: *"create and maintain
 one or more .md files in the git repo so the context and information is never
