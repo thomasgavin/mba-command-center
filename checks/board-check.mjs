@@ -820,7 +820,9 @@ for (var w2 of [390, 1280]) {
 for (var cw of [390, 1280]) {
   var s22 = await open(cw);
   var opened = await s22.p.evaluate(async function () {
-    var a = alive().filter(function (i) { return i.due; })
+    /* an OPEN task: a month holding only closed ones draws nothing on the
+       grid now, because those live in the Done block under it */
+    var a = alive().filter(function (i) { return i.due && i.status !== "done"; })
                    .sort(function (x, y) { return x.due < y.due ? -1 : 1; });
     if (!a.length) return { skip: true };
     setView("cal");
@@ -1965,6 +1967,53 @@ for (var bw of [390, 1280]) {
   ok("the hero's solid button is readable in the dark",
      solid && solid.bg !== solid.fg && !/^rgb\(2[0-9][0-9], 2[0-9][0-9]/.test(solid.fg),
      JSON.stringify(solid));
+
+  /* "Some items on the board are weirdly white" -- .card.late-i painted a
+     white literal, which the dark pass missed. No surface may do that. */
+  var white = await s35.p.evaluate(function () {
+    setView("board");
+    document.documentElement.setAttribute("data-theme", "dark");
+    var bad = [];
+    Array.prototype.forEach.call(document.querySelectorAll(".card,.tile,.grow,.calrow,.mroot,.nwi"), function (e) {
+      var bg = getComputedStyle(e).backgroundImage + " " + getComputedStyle(e).backgroundColor;
+      if (/rgb\(25[0-5], 25[0-5], 25[0-5]\)/.test(bg)) bad.push(e.className);
+    });
+    document.documentElement.removeAttribute("data-theme");
+    return bad;
+  });
+  ok("nothing on the board is painted white in the dark", white.length === 0, white.join(", "));
+
+  /* "Remove the done tasks from calendar view - just move them to a done
+     section under like we did in the taskmap" */
+  var cd = await s35.p.evaluate(async function () {
+    var open = Object.keys(items).filter(function (k) { return items[k].due && items[k].status !== "done"; });
+    var id = open[0], t = new Date(), k = t.toISOString().slice(0, 10);
+    calCur = new Date(t.getFullYear(), t.getMonth(), 1);
+    patch(id, { due: k, status: "done" }, null, true);
+    setView("cal"); renderCal();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    var box = document.getElementById("caldone");
+    return {
+      inBlock: !!box.querySelector('.calrow[data-id="' + id + '"]'),
+      inGrid: !!document.getElementById("cgrid").querySelector('[data-id="' + id + '"]'),
+      head: (box.querySelector(".gsec") || {}).textContent || "",
+      anyDoneOnGrid: Array.prototype.some.call(
+        document.getElementById("cgrid").querySelectorAll("[data-id]"),
+        function (e) { return items[e.dataset.id] && items[e.dataset.id].status === "done"; })
+    };
+  });
+  ok("a closed task leaves the month for the Done block",
+     cd.inBlock && !cd.inGrid && !cd.anyDoneOnGrid, JSON.stringify(cd));
+  ok("the Done block says how many there are", /Done\d+tasks?$/.test(cd.head.replace(/\s/g, "")), cd.head);
+
+  /* it follows the month arrows like everything else on this view */
+  var cdm = await s35.p.evaluate(async function () {
+    calCur = new Date(calCur.getFullYear(), calCur.getMonth() + 1, 1);
+    renderCal();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    return document.getElementById("caldone").querySelectorAll(".calrow").length;
+  });
+  ok("the Done block is this month's, not the whole board's", cdm === 0, String(cdm));
 
   ok("the dark pass draws without a console error", s35.errs.length === 0, s35.errs.join(" | "));
   await s35.ctx.close();

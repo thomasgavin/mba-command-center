@@ -721,6 +721,12 @@ waiting to see whether a third is coming.
 - **A white surface lettered in `--ink` is the `--inkbg` trap inverted.** The
   hero's solid "Open" button went blank in the dark for exactly that reason.
   `--inkbg` is the one ink that stays ink in both directions.
+- **A gradient hides a literal.** `.card.p-Critical` and `.card.late-i` end
+  their tint in `#fff`, which nothing greps for as a background colour and
+  which came out as a white card on the black board: *"some items on the
+  board are weirdly white"*. The check now walks every card, tile, row and
+  block in the dark theme and fails on any that computes to white — the only
+  way to catch the next one, since a hue in the same declaration is fine.
 - It is `data-theme="dark"` on `<html>` and **a block of variables, not a
   second stylesheet**. That works only because every surface already reads
   `--panel`, `--page`, `--wash` and `--line`; the literals that were left
@@ -1127,11 +1133,16 @@ The board is used on an iPhone, mostly from the home screen.
 - **The calendar reads status, not track.** A month of track colours could
   not tell a closed task from an open one: *"not very good visibility between
   the completed and pending tasks"*. The grid chip is filled by
-  `statusColour`, the agenda row carries it as a 3px bar down its left edge,
-  and a completed task is **struck-through green, not grey** — his own fix,
-  and right: grey says "ignore me", which is wrong for the one row in the
-  month that is good news. The day number stays ink (the orange of today
-  aside), which is what *"white for the date"* means on a dark board.
+  `statusColour` and the agenda row carries it as a 3px bar down its left
+  edge. The day number stays ink (the orange of today aside), which is what
+  *"white for the date"* means on a dark board.
+- **A closed task is not on the month at all.** `calDone()` collects it into a
+  Done block under the grid and under the agenda alike — the same move the
+  Tasks view made, and he asked for it in those words. It follows the month
+  arrows, so "what did I get done in October" is a question this view can now
+  answer, and it is the same `.calrow`, **struck-through green, not grey** —
+  grey says "ignore me", which is wrong for the one row in the month that is
+  good news.
 - **The calendar is a vertical agenda below 720px** (`narrow()`), one row per
   day that has something on it. Seven columns in 390px gives each day ~50px,
   which read as broken. Drag-to-a-day is a desktop gesture; the snooze rail
@@ -1160,7 +1171,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 247 invariants, three widths, a real browser. Every one of them was a
+that runs: 251 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

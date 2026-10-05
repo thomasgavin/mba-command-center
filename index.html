@@ -452,8 +452,11 @@ body::before{
 }
 .card::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--tcol,var(--ink4))}
 .card.p-Critical::before{width:4px;top:0;bottom:0;border-radius:0}
-.card.p-Critical{background:linear-gradient(94deg,rgba(224,38,60,.05),#fff 46%)}
-.card.late-i{background:linear-gradient(94deg,rgba(224,38,60,.1),#fff 52%)}
+.card.p-Critical{background:linear-gradient(94deg,rgba(224,38,60,.05),var(--panel) 46%)}
+/* --panel, not #fff: a literal here is a white card on the black board,
+   which is what *"some items on the board are weirdly white"* was. The tint
+   is the only part of this that may be a literal, because it is a hue. */
+.card.late-i{background:linear-gradient(94deg,rgba(224,38,60,.1),var(--panel) 52%)}
 .card:hover{transform:translateY(-2px);box-shadow:var(--sh);border-color:#ded7e5}
 .card:active{cursor:grabbing}
 .card.hole{opacity:.32;box-shadow:none;transform:none}
@@ -586,14 +589,14 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* The chip is painted by statusColour, not by its track: this view's job is
    "what is left on which day", and a month of track colours could not tell a
    closed task from an open one (*"not very good visibility between the
-   completed and pending tasks"*). Done is struck through as well as green,
-   so it reads as finished without relying on hue alone. */
+   completed and pending tasks"*). A closed task is not drawn here at all --
+   it is in the Done block under the month -- so every chip on the grid is
+   something still to do. */
 .ev{
   font-size:10.5px;font-weight:650;border-radius:6px;padding:3px 6px;margin-bottom:3px;cursor:grab;
   color:#fff;touch-action:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   transition:transform .12s var(--ease);
 }
-.ev.done{text-decoration:line-through;opacity:.85}
 .ev:hover{transform:translateX(1px)}
 .ev.hole{opacity:.3}
 
@@ -625,6 +628,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    completed ones, not grey"*. Grey read as "ignore me", which is wrong for
    the one row in the month that is good news. */
 .calrow.done b{color:#00a98f;text-decoration:line-through}
+/* the Done block under the month: .arl is a bare column of rows everywhere
+   else, and here it is a card's whole contents */
+.caldn{margin-top:13px}
+.caldn .arl{padding:11px 13px;gap:7px}
 
 /* ---------- mind map ----------
    A grouped view, not a tree, and **each group draws itself in the shape its
@@ -1283,6 +1290,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
         <div class="dow"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
         <div class="cgrid" id="cgrid"></div>
       </div>
+      <!-- closed tasks, collected under the month rather than scattered
+           through it: the same move the Tasks view made for the same reason -->
+      <div id="caldone"></div>
       <p class="tip">Drag an item onto another day to reschedule it exactly, or onto the snooze rail to push it by a fixed number of days.</p>
     </section>
 
@@ -2463,12 +2473,17 @@ function renderCal(){
   if(!calCur){ var t=todayD(); calCur=new Date(t.getFullYear(),t.getMonth(),1); }
   document.getElementById("calTitle").textContent=MN[calCur.getMonth()]+" "+calCur.getFullYear();
   var P=pool();
+  /* Open tasks only. A done task on a day he has to plan around is a row he
+     cannot act on sitting between the ones he can -- the same thing the Tasks
+     view fixed by collecting them at the foot, and he asked for it here in
+     those words. They are not dropped: `calDone` draws them under the month. */
   var evOn=function(k){
-    return P.filter(function(i){return i.due===k;})
+    return P.filter(function(i){return i.due===k&&i.status!=="done";})
             .sort(function(a,b){return (PRI[a.priority]?0:1)-(PRI[b.priority]?0:1);});
   };
   var tIso=iso(todayD());
   document.getElementById("v-cal").classList.toggle("agenda",narrow());
+  calDone(P);
   if(narrow()){ renderAgenda(evOn,tIso); return; }
 
   var first=new Date(calCur.getFullYear(),calCur.getMonth(),1);
@@ -2479,12 +2494,33 @@ function renderCal(){
     var k=iso(d), out=d.getMonth()!==calCur.getMonth();
     h+='<div class="day'+(out?" out":"")+(k===tIso?" today":"")+'" data-day="'+k+'"><div class="dn">'+d.getDate()+'</div>'+
        evOn(k).map(function(i){
-         var late=i.status!=="done"&&!i.deleted&&k<tIso;
-         return '<div class="ev'+(i.status==="done"?" done":"")+'" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
+         var late=!i.deleted&&k<tIso;
+         return '<div class="ev" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
            esc(i.title.length>22?i.title.slice(0,21)+"…":i.title)+'</div>';
        }).join("")+'</div>';
   }
   document.getElementById("cgrid").innerHTML=h;
+}
+/* The month's closed tasks, under the grid and under the agenda alike. It
+   follows the month arrows like everything else here, so "what did I get done
+   in October" is a question this view can now answer. The row is the same
+   .calrow the agenda uses -- struck-through green, and still a tap away from
+   the task -- so nothing had to learn a second shape. */
+function calDone(P){
+  var y=calCur.getFullYear(), m=calCur.getMonth();
+  var d=P.filter(function(i){
+    if(i.status!=="done"||!i.due) return false;
+    var x=D(i.due); return x&&x.getFullYear()===y&&x.getMonth()===m;
+  }).sort(byDue);
+  var box=document.getElementById("caldone");
+  if(!d.length){ box.innerHTML=""; return; }
+  box.innerHTML='<div class="cal caldn"><div class="gsec"><i style="background:var(--green)"></i>Done'+
+    '<em>'+d.length+' task'+(d.length===1?"":"s")+'</em></div><div class="arl">'+
+    d.map(function(i){
+      return '<div class="calrow done" data-id="'+i.id+'" style="border-left-color:#00a98f">'+
+        '<i style="background:#00a98f"></i><b>'+esc(i.title)+'</b>'+
+        '<span>'+esc(tl(i.track))+' &middot; '+esc(fmtD(i.due))+'</span></div>';
+    }).join("")+'</div></div>';
 }
 var DOWN=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 function renderAgenda(evOn,tIso){
@@ -3461,7 +3497,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2130";
+var BUILD="2026-10-05-2210";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
