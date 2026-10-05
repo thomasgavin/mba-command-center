@@ -2033,7 +2033,9 @@ for (var bw of [390, 1280]) {
     var h = document.querySelector(".tile.hero.a");
     var t = document.querySelector(".tile.att");
     return {
-      big: parseFloat(getComputedStyle(h.querySelector(".big")).fontSize),
+      big: parseFloat(getComputedStyle(h.querySelector(".hcd")).fontSize),
+      btns: h.querySelectorAll(".hbtn").length,
+      opens: h.dataset.go || "",
       h: h.getBoundingClientRect().height,
       grad: /gradient/.test(getComputedStyle(h).backgroundImage),
       attEdge: getComputedStyle(t).borderLeftColor,
@@ -2041,7 +2043,10 @@ for (var bw of [390, 1280]) {
       attH3: getComputedStyle(t.querySelector("h3")).color
     };
   });
-  ok("the hero number is smaller than it shipped", hero.big <= 44 && hero.big >= 30, String(hero.big));
+  /* "make the 'd late' normal size again - looks weird", and the three action
+     buttons off it; the tile itself opens the task in their place. */
+  ok("the countdown reads at sentence size", hero.big <= 18 && hero.big >= 12, String(hero.big));
+  ok("the deadline hero carries no action buttons", hero.btns === 0 && !!hero.opens, JSON.stringify(hero));
   ok("and the hero still stands out", hero.grad && hero.h < 300, JSON.stringify(hero));
   /* "the needs attention block doesn't stand out enough - needs more colour" */
   ok("Needs attention carries the red it is about",
@@ -2158,17 +2163,24 @@ for (var bw of [390, 1280]) {
     t("touchmove", 240);
     var mid = { op: getComputedStyle(lab).opacity, tx: lab.style.transform };
     t("touchmove", 300);
-    var armed = lab.textContent;
+    /* the arrow is the state now, not a word: it is round by the trip point
+       and spinning once the sync is away */
+    var ico = lab.querySelector("svg");
+    var armed = ico.style.transform;
     t("touchend", 300);
     await new Promise(function (r) { setTimeout(r, 40); });
-    var out = { called: called, mid: mid, armed: armed, busy: lab.textContent };
+    var out = { called: called, mid: mid, armed: armed,
+                busy: document.getElementById("ptr").classList.contains("spin"),
+                words: lab.textContent.trim() };
     window.pullFromRepo = real;
     return out;
   });
   ok("a pull at the top of the view drags a label with the finger",
      parseFloat(ptr.mid.op) > 0 && /translateY/.test(ptr.mid.tx || ""), JSON.stringify(ptr.mid));
-  ok("pulling past the trip point says so and then syncs",
-     /Release/i.test(ptr.armed) && ptr.called === 1, JSON.stringify(ptr));
+  ok("pulling past the trip point turns the arrow round and then syncs",
+     /rotate\(1[0-9]{2}deg\)/.test(ptr.armed) && ptr.called === 1, JSON.stringify(ptr));
+  ok("and it spins while the sync runs, with no words on it",
+     ptr.busy === true && ptr.words === "", JSON.stringify(ptr));
 
   /* an ordinary scroll must not be eaten by it. The sync above holds the
      label up for its settle window, so wait that out first or this measures
@@ -2196,6 +2208,93 @@ for (var bw of [390, 1280]) {
 
   ok("the eleven draw without a console error", s36.errs.length === 0, s36.errs.join(" | "));
   await s36.ctx.close();
+}
+
+/* ---- 37. the nine off the re-bookmarked phone, 2026-10-05 ---- */
+{
+  var s37 = await open(390);
+
+  /* "the bottom nav bar went up now" -- the bar adds nothing under itself any
+     more, so there is no band of page colour below the icons. */
+  var bar = await s37.p.evaluate(function () {
+    var b = document.querySelector(".vbar");
+    return {
+      pad: parseFloat(getComputedStyle(b).paddingBottom),
+      h: b.getBoundingClientRect().height,
+      gap: Math.round(innerHeight - b.getBoundingClientRect().bottom)
+    };
+  });
+  ok("the section bar keeps none of the home-bar inset", bar.pad === 0 && bar.h <= 53, JSON.stringify(bar));
+  ok("and it sits on the bottom of the screen", bar.gap === 0, JSON.stringify(bar));
+
+  /* "the nav icon dots still don't go away after opening" -- setView alone has
+     to put it out; it used to wait for the next render, which is a poll or an
+     edit away. */
+  var dots = await s37.p.evaluate(function () {
+    setView("over"); render();
+    var before = [].map.call(document.querySelectorAll(".vd.on"), function (d) { return d.id; });
+    setView("cal");   /* no render() -- that is the whole point */
+    var after = [].map.call(document.querySelectorAll(".vd.on"), function (d) { return d.id; });
+    setView("over");
+    return { before: before, after: after };
+  });
+  ok("a tab change alone puts that section's dot out",
+     dots.before.indexOf("vd-cal") >= 0 && dots.after.indexOf("vd-cal") < 0, JSON.stringify(dots));
+  ok("and leaves the other sections' dots alone",
+     dots.after.indexOf("vd-time") >= 0, JSON.stringify(dots));
+
+  /* "the new alignment aligns the boxes but not the text" */
+  var chip = await s37.p.evaluate(function () {
+    setView("over");
+    var c = document.querySelector(".arow .chip.d");
+    var st = getComputedStyle(c);
+    return { just: st.justifyContent, min: parseFloat(st.minWidth) };
+  });
+  ok("a countdown chip centres its text inside the box",
+     chip.just === "center" && chip.min >= 60, JSON.stringify(chip));
+
+  /* "the done tasks should be striked out in the overview steps part as well" */
+  var step = await s37.p.evaluate(function () {
+    setView("over");
+    var d = document.querySelector(".steps .step.done b");
+    if (!d) return { none: true };
+    var st = getComputedStyle(d);
+    return { line: st.textDecorationLine, col: st.color };
+  });
+  ok("a closed visa step is struck through and green",
+     /line-through/.test(step.line || "") && step.col === "rgb(0, 169, 143)", JSON.stringify(step));
+
+  /* "in critical path to start, the boxes move slightly when scrolling" --
+     iOS keeps :hover through a scroll, so the lift is mouse-only now. */
+  var css = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  var lift = {
+    guarded: (css.match(/@media \(hover:hover\)\s*\{[^}]*\.pn:hover/g) || []).length,
+    bare: (css.match(/\n\.pn:hover\s*\{/g) || []).length
+  };
+  ok("the critical-path lift is mouse-only", lift.guarded === 1 && lift.bare === 0, JSON.stringify(lift));
+
+  /* "the top right boxes notes, search, newsletter are not the same size" */
+  var tb = await s37.p.evaluate(function () {
+    return [].map.call(document.querySelectorAll(".tbtn"), function (b) {
+      var r = b.getBoundingClientRect();
+      return { w: Math.round(r.width), h: Math.round(r.height), off: b.classList.contains("off") };
+    }).filter(function (b) { return !b.off; });
+  });
+  ok("every top-bar button is the same box on a phone",
+     tb.length >= 2 && tb.every(function (b) { return b.w === tb[0].w && b.h === tb[0].h; }), JSON.stringify(tb));
+
+  /* "move these 2 boxes of days to fontainbleu and tasks complete side by side" */
+  var ms = await s37.p.evaluate(function () {
+    setView("over");
+    var t = document.querySelectorAll(".mstack .tile");
+    if (t.length < 2) return { n: t.length };
+    var a = t[0].getBoundingClientRect(), b = t[1].getBoundingClientRect();
+    return { n: t.length, sameRow: Math.abs(a.top - b.top) < 2, apart: b.left > a.right - 1 };
+  });
+  ok("the two metric tiles sit side by side", ms.n === 2 && ms.sameRow && ms.apart, JSON.stringify(ms));
+
+  ok("the nine draw without a console error", s37.errs.length === 0, s37.errs.join(" | "));
+  await s37.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

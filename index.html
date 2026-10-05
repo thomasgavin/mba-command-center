@@ -64,7 +64,13 @@
      *"after re-bookmarking the bottom is out of proportion again"*. One
      value, read by the bar and by the floating button, so the two can never
      be guessed apart. */
-  --barpad:max(4px, calc(env(safe-area-inset-bottom) - 22px));
+  /* How much of the home-bar inset the section bar adds under itself, read
+     by the bar and the floating button alike so the two cannot be guessed
+     apart. It is zero: a 52px bar already clears the indicator with 15px
+     under the glyphs, which is what an iOS tab bar does, and anything on top
+     of that is the band of nothing he has now asked about twice --
+     *"the bottom nav bar went up now"*. */
+  --barpad:0px;
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -315,7 +321,10 @@ body::before{
 .step b{font-size:12px;font-weight:600;letter-spacing:-.01em;min-width:0;flex:1}
 .step span{font-size:10.5px;font-weight:650;color:var(--ink4);flex:none;font-variant-numeric:tabular-nums}
 .step.done i{background:var(--green);border-color:var(--green)}
-.step.done b{color:var(--ink4)}
+/* Struck through and green, the same as a done row on Calendar and Tasks:
+   one closed-task language on every view. */
+.step.done b{color:var(--green);text-decoration:line-through}
+.step.done span{color:var(--green)}
 .step.now i{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,100,41,.14)}
 .step.now b{color:var(--ink)}
 .step.now span{color:var(--orange)}
@@ -337,9 +346,14 @@ body::before{
    the one that actually gets used. Zero height, so it occupies no row in the
    flex column and hangs over the scroller instead. */
 .ptr{flex:none;height:0;overflow:visible;position:relative;z-index:6;pointer-events:none}
+/* An arrow, not a sentence: *"just show the circling arrow icon instead of
+   the text"*. It turns with the pull and spins while the sync runs, so the
+   three states read without a word on them. */
 .ptr i{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:center;
-  height:38px;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink3);opacity:0;transform:translateY(-38px)}
+  height:38px;color:var(--ink3);opacity:0;transform:translateY(-38px)}
+.ptr svg{width:19px;height:19px;display:block;transition:transform .12s linear}
+.ptr.spin svg{animation:ptrspin .8s linear infinite;transition:none}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
 .view{display:none}
 .view.on{display:block;animation:fade .22s var(--ease)}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -377,6 +391,7 @@ body::before{
 .hero h3{color:rgba(255,255,255,.72)}
 .hero .big{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:.95;font-variant-numeric:tabular-nums}
 .hero .big sup{font-size:14px;font-weight:600;letter-spacing:-.01em;vertical-align:super;margin-left:4px;opacity:.82}
+.hero .hcd{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1}
 .hero .sub{font-size:13.5px;font-weight:650;margin-top:6px;letter-spacing:-.015em;line-height:1.3}
 .hero .met{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:500}
 .hero .foot{margin-top:auto;padding-top:11px;display:flex;gap:6px;flex-wrap:wrap}
@@ -424,7 +439,10 @@ body::before{
   padding:9px 11px;background:var(--wash2);position:relative;cursor:pointer;
   transition:border-color .14s,background .14s,transform .14s var(--ease);
 }
-.pn:hover{transform:translateY(-2px);background:var(--panel);border-color:var(--edge)}
+/* A lift on hover is a mouse affordance, and iOS fires :hover on touch and
+   keeps it through the scroll -- so the chain shifted under his finger:
+   *"the boxes move slightly when scrolling"*. */
+@media (hover:hover){ .pn:hover{transform:translateY(-2px);background:var(--panel);border-color:var(--edge)} }
 .pn .pt{font-size:11.5px;font-weight:650;line-height:1.3;margin-bottom:5px}
 .pn .pd{font-size:10.5px;color:var(--ink4);font-weight:600;font-variant-numeric:tabular-nums}
 .pn.done{background:rgba(0,169,143,.07);border-color:rgba(0,169,143,.3)}
@@ -454,7 +472,11 @@ body::before{
    each other in some places"*. A chip sized by its own text puts "today" and
    "in 5d" and "24d late" at three different left edges down a column of
    seven rows. One width, centred, so the column is a column. */
-.arow .chip.d,.agr .chip.p{flex:none;min-width:66px;text-align:center}
+/* The box and the text both: a chip padded to one width with its text left
+   where its own length put it is still three ragged edges down a column --
+   *"the new alignment aligns the boxes but not the text"*. */
+.arow .chip.d,.agr .chip.p{flex:none;min-width:66px;justify-content:center}
+.agd-d .chip.d{text-align:center}
 .abar{width:3px;align-self:stretch;border-radius:3px;flex:none;min-height:22px}
 .at{font-size:12.5px;font-weight:600;line-height:1.3;flex:1;min-width:0;transition:color .14s}
 .at small{display:block;font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:1px}
@@ -1248,9 +1270,21 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   .vhead{padding:8px 13px} .vhead h2{font-size:16px} .stage{padding:14px 13px 80px}
   .bento{gap:12px}
   .hero,.hero.b{grid-column:span 12} .hero .big{font-size:34px}
-  .mstack{flex-direction:column} .cols{grid-template-columns:1fr}
+  /* Side by side, not stacked: *"move these 2 boxes of days to Fontainebleau
+     and tasks complete side by side"*. Half of 390px is too narrow for a ring
+     beside its number, so the ring goes above it. */
+  .mstack{flex-direction:row} .cols{grid-template-columns:1fr}
+  .mstack .tile{flex-direction:column;align-items:flex-start;gap:9px;min-width:0}
+  .mstack .mx{min-width:0}
   .day{min-height:74px} .zone{width:60px;height:54px}
+  /* Icon-only, so each button is as wide as its own glyph unless it is told
+     otherwise -- three boxes of three widths: *"the top right boxes are not
+     the same size"*. The count moves to a corner badge, since a square has no
+     room for it in the row. */
   .tbtn .lbl{display:none}
+  .tbtn{width:36px;padding:0;justify-content:center;position:relative}
+  .tbtn .n{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--page)}
   .subs{padding:9px 13px}
   /* every wide tile is full width here, and the trackers stack */
   .miles,.seqt,.pipe{grid-column:span 12}
@@ -1333,7 +1367,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 
   <!-- the pull-to-sync label, a zero-height sibling of the scroller so it
        can hang over the top of it without being a row in the column -->
-  <div class="ptr" id="ptr" aria-hidden="true"><i id="ptrL">Pull to sync</i></div>
+  <div class="ptr" id="ptr" aria-hidden="true"><i id="ptrL"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13.4 8a5.4 5.4 0 1 1-1.6-3.8"/><path d="M13.6 1.9v2.9h-2.9"/></svg></i></div>
   <main class="stage" id="stage">
     <section class="view on" id="v-over"><div class="bento" id="bento"></div></section>
 
@@ -2167,12 +2201,20 @@ function render(){
   /* and it goes out on the section he is looking at: he has seen it, so a
      dot on the tab under his thumb is telling him about the screen he is
      already reading -- *"they should go away once I open the section"*. */
-  ["board","time","cal"].forEach(function(k){
-    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateN>0&&view!==k);
-  });
+  lateTabs=lateN>0; syncDots();
   renderOverview(); renderBoard(); renderPlan(); renderCal(); renderMap(); renderChat();
   syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
+}
+
+/* The dot went out on a render and nothing re-rendered on a tab change, so
+   opening the section left it lit until the next edit or poll:
+   *"they should go away once I open the section"*. Both callers run this. */
+var lateTabs=false;
+function syncDots(){
+  ["board","time","cal"].forEach(function(k){
+    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateTabs&&view!==k);
+  });
 }
 
 /* ---------- overview bento ---------- */
@@ -2291,15 +2333,16 @@ function renderOverview(){
   /* hero A: the next hard deadline */
   if(next){
     var n=dleft(next.due);
-    var big = n<0 ? Math.abs(n)+'<sup>d late</sup>' : (n===0?'today':n+'<sup>day'+(n===1?'':'s')+'</sup>');
-    h+='<div class="tile hero a" data-id="'+next.id+'">'+
+    /* No 60px number and no row of buttons. The countdown reads at the size
+       of a sentence -- *"make the 'd late' normal size again, looks weird"* --
+       and the whole tile opens the task, which is what the Open button did;
+       Push and Mark done are two taps away in the card that opens. Tuition
+       keeps its buttons: he said that one is fine. */
+    h+='<div class="tile hero a" data-go="'+next.id+'">'+
        '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
-       '<div class="big">'+big+'</div>'+
+       '<div class="hcd">'+cTxt(n)+'</div>'+
        '<div class="sub">'+esc(next.title)+'</div>'+
-       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div>'+
-       '<div class="foot"><button class="hbtn solid" data-go="'+next.id+'">Open</button>'+
-       '<button class="hbtn" data-sn3="'+next.id+'">Push 3 days</button>'+
-       '<button class="hbtn" data-dn="'+next.id+'">Mark done</button></div></div>';
+       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div></div>';
   }
 
   /* hero B: money.
@@ -3613,7 +3656,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2149";
+var BUILD="2026-10-05-2212";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3788,8 +3831,6 @@ document.addEventListener("click",function(e){
 
   var go=t.closest("[data-go]");
   if(go){ openItem(go.dataset.go); return; }
-  var sn3=t.closest("[data-sn3]"); if(sn3){ snooze(sn3.dataset.sn3,3); return; }
-  var dn=t.closest("[data-dn]"); if(dn){ var q=items[dn.dataset.dn]; patch(dn.dataset.dn,{status:"done"},"Closed: "+q.title); return; }
 
   /* .grow is a Tasks row, .calrow the narrow calendar's agenda row. .calrow
      was left out of this list
@@ -3937,17 +3978,21 @@ document.getElementById("syncBtn").addEventListener("click",syncNow);
    feel attached to the hand. */
 (function(){
   var st=document.getElementById("stage"), lab=document.getElementById("ptrL");
+  var box=document.getElementById("ptr"), ico=lab.querySelector("svg");
   var y0=null, dy=0, TRIP=68, busy=false;
-  function at(px,txt){
+  function at(px,deg){
     lab.style.transform="translateY("+(px-38)+"px)";
     lab.style.opacity=Math.min(1,px/30);
-    if(txt) lab.textContent=txt;
+    ico.style.transform="rotate("+deg+"deg)";
   }
-  function rest(){ y0=null; dy=0; lab.style.transform=""; lab.style.opacity=""; }
+  function rest(){
+    y0=null; dy=0; busy=false;
+    box.classList.remove("spin");
+    lab.style.transform=""; lab.style.opacity=""; ico.style.transform="";
+  }
   st.addEventListener("touchstart",function(e){
     if(busy||e.touches.length!==1||st.scrollTop>0){ y0=null; return; }
     y0=e.touches[0].clientY; dy=0;
-    lab.textContent="Pull to sync";
   },{passive:true});
   st.addEventListener("touchmove",function(e){
     if(y0===null) return;
@@ -3958,14 +4003,16 @@ document.getElementById("syncBtn").addEventListener("click",syncNow);
     e.preventDefault();
     /* resistance, so the label slows as it is pulled rather than tracking
        the finger all the way down the screen */
-    at(Math.min(56,dy*0.5), dy>TRIP?"Release to sync":"Pull to sync");
+    /* the arrow turns with the pull and is a half-turn round by the trip
+       point, which is the whole of "release now" without a word for it */
+    at(Math.min(56,dy*0.5), Math.min(180,dy/TRIP*180));
   },{passive:false});
   st.addEventListener("touchend",function(){
     if(y0===null) return;
     if(dy>TRIP){
-      busy=true; at(38,"Syncing\u2026");
+      busy=true; at(38,0); box.classList.add("spin");
       syncNow();
-      setTimeout(function(){ busy=false; rest(); },900);
+      setTimeout(rest,900);
     }else rest();
     y0=null;
   },{passive:true});
@@ -4108,6 +4155,7 @@ function setView(v){
      thread scrolls to the newest message. */
   /* both the chat and the map own their own scrolling, so the stage must not also scroll */
   document.getElementById("stage").classList.toggle("chatmode",v==="chat"||v==="map");
+  syncDots();   /* the open section's dot goes out now, not at the next render */
   if(v==="chat") renderChat();
   syncFab();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
