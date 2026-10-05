@@ -1,6 +1,6 @@
 ---
 name: nudge
-description: Look at the whole MBA board as a productivity manager would, decide what genuinely needs saying today, and write it into the chat as a nudge. Run by the board pass, three times a day.
+description: Look at the whole MBA board as a productivity manager would, decide what genuinely needs saying today, and write it into the chat as a nudge. Run by the Routine, three times a day.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
@@ -19,7 +19,8 @@ Read `CLAUDE.md` first for the data model and the privacy rule.
 
 ## The thing that will kill this feature
 
-Too many nudges. A board that speaks three times a day about everything is one he
+Too many nudges. A board that speaks three times a day about everything is a
+board he
 mutes, and then the one nudge that mattered never lands either.
 
 So the bar is high and these are not guidelines:
