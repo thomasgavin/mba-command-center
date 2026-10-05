@@ -525,6 +525,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .mans.off{display:none}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:6px 14px 12px}
 .mroot{border:1px solid var(--line);border-radius:var(--r2);margin:9px 0;overflow:hidden}
+/* the whole block is the target while it is shut, so the whole block reacts */
+.mroot[data-mg]{cursor:pointer}
+.mroot[data-mg]:hover .mrt{color:var(--orange)}
 /* the header is the heading of the block, not a label above it: it was 11px
    uppercase and he was right that it vanished into the rows under it */
 .mrh{display:flex;align-items:center;gap:8px;padding:13px 12px;cursor:pointer;
@@ -535,7 +538,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .mroot.open .mrh{padding-bottom:4px}
 /* a shut block still says what is next in it, or nine shut blocks are nine
    headings and he has to open every one to find the thing he wanted */
-.mrn{padding:0 12px 12px 35px;font-size:12px;color:var(--ink3);line-height:1.45;overflow-wrap:anywhere}
+/* two lines, not one: the name, then its date under it */
+.mrn{padding:0 12px 12px 35px;font-size:12px;line-height:1.45;overflow-wrap:anywhere;cursor:pointer}
+.mrn .mrl{display:block;color:var(--ink3)}
+.mrn .mrw{display:block;font-weight:750;font-variant-numeric:tabular-nums;padding-top:1px}
 .mrb{padding:4px 12px 12px}
 .mtw{flex:none;width:17px;height:19px;border:0;background:none;padding:0;cursor:pointer;
   font-size:10px;line-height:19px;transition:transform .15s var(--ease)}
@@ -615,6 +621,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mct{position:relative;flex:1;min-width:0;height:100%}
 .mcb{position:absolute;top:50%;transform:translateY(-50%);height:9px;border-radius:5px;min-width:3px}
+/* the dates beside the bar, in the empty half of the row */
+.mcd{position:absolute;top:50%;transform:translateY(-50%);white-space:nowrap;
+  font-size:9.5px;font-weight:700;color:var(--ink3);font-variant-numeric:tabular-nums;
+  letter-spacing:.01em}
 .mcb.br{height:5px;border-radius:3px}
 .mcp{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;
   transform:translate(-50%,-50%);margin-top:0}
@@ -627,10 +637,6 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .mans .mal:hover{color:var(--orange)}
 .mempty{text-align:center;color:var(--ink4);font-size:12px;line-height:1.7;padding:26px 10px}
 /* the composer is the same shape as Chat's, with a switch for what the text is */
-.mseg{display:flex;gap:4px;padding:0 0 7px}
-.mseg button{flex:none;font-size:11px;font-weight:700;border-radius:20px;padding:4px 11px;cursor:pointer;
-  border:1px solid var(--line);background:#fff;color:var(--ink3)}
-.mseg button.on{background:var(--orange);border-color:var(--orange);color:#fff}
 
 /* ---------- snooze rail ---------- */
 .rail{
@@ -959,11 +965,17 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .cfoot{flex:0 0 auto;background:var(--page);border-top:1px solid var(--line);padding-bottom:4px}
 .cfoot .tip{margin:6px 0 0}
 .cbox{display:flex;gap:8px;align-items:flex-end;padding:10px 0 4px}
-.cbox textarea{flex:1;min-height:40px;max-height:140px;resize:none;padding:10px 13px;
+/* the padding is what centres one line of text against the 40px send button
+   beside it: 2x9 + 16x1.4 is 40.4. At 10/13.5 the box came out 39.6 against
+   the button's 40 and the text sat a hair high -- the half-pixel of
+   misalignment that reads as "the alignment is off" without being nameable.
+   The size is 16px here rather than only on a phone, because the phone rule
+   was already forcing it and two sizes for one control is one too many. */
+.cbox textarea{flex:1;min-width:0;min-height:40px;max-height:140px;resize:none;padding:9px 14px;
   border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
-  font:inherit;font-size:13.5px;line-height:1.45}
+  font:inherit;font-size:16px;line-height:1.4}
 .cbox textarea:focus{outline:none;border-color:var(--orange)}
-.csend{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
+.csend{flex:0 0 40px;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
   background:var(--orange);color:#fff;font-size:17px;line-height:1;transition:opacity .14s}
 .csend:disabled{opacity:.35;cursor:default}
 .cempty{text-align:center;color:var(--ink4);font-size:13px;padding:38px 18px;line-height:1.55}
@@ -1108,12 +1120,8 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
         <p class="tip" id="mapTip"></p>
       </div>
       <div class="cfoot">
-        <div class="mseg">
-          <button data-mm="note" class="on">Add a note</button>
-          <button data-mm="ask">Ask about it</button>
-        </div>
         <div class="cbox">
-          <textarea id="min" rows="1" placeholder="Tell Claude something worth remembering…"></textarea>
+          <textarea id="min" rows="1" placeholder="Note or question…"></textarea>
           <button class="csend" id="msend" aria-label="Send">&#8593;</button>
         </div>
       </div>
@@ -2317,7 +2325,7 @@ var MAP_ELSE="Everything else";
 /* Collapsed by default, all of them: *"Keep all group blocks collapsed by
    default."* Nine headers is an index he can read in one screen; nine open
    blocks is the wall the first version was. */
-var mapOpen={}, mapMode="note", mapQ="", mapAns=null;
+var mapOpen={}, mapQ="", mapAns=null;
 
 /* A group's tint is its position in the list, never chosen and never stored.
    A group Claude invents next week gets its own colour by existing, which is
@@ -2339,15 +2347,6 @@ function kbAlive(){ return kb.filter(function(n){ return n && n.id && !n.deleted
 function kbOf(id){ var r=null; kb.forEach(function(n){ if(n.id===id) r=n; }); return r; }
 function kbKids(id){
   return kbAlive().filter(function(n){ return n.parent===id; }).sort(kbSort);
-}
-/* which sub-tab a node answers to. Nothing else reads this: the view is
-   grouped by what a thing is, not by which of the four buckets it fell in. */
-function mapCat(n){
-  if(n.cat) return n.cat;
-  /* a node pinned to a task inherits that task's category, so Claude can file
-     one by naming the task alone */
-  if(n.item && items[n.item]) return TRACK_CAT[items[n.item].track]||"else";
-  return "else";
 }
 function mapGroup(n){ return (n.group||"").trim() || MAP_ELSE; }
 /* `when` is for reading ("13 November 2026", "Mar - May 2027") and sorts
@@ -2398,7 +2397,6 @@ function hitSet(list){
 function mapGroups(){
   var by={}, ord={}, shp={};
   kbAlive().forEach(function(n){
-    if(cat!=="all" && mapCat(n)!==cat) return;
     var p=n.parent?kbOf(n.parent):null;
     if(p && !p.deleted) return;
     var g=mapGroup(n);
@@ -2418,15 +2416,21 @@ function mapGroups(){
 /* what a collapsed group says for itself. Nine shut blocks that say only their
    name are an index of headings; one that says what is next in it is an index
    of answers, and the whole view is collapsed now. */
-function mapHint(g){
-  var dated=g.rows.filter(function(n){ return n.w; });
+function mapHint(g,c){
+  var dated=g.rows.filter(function(n){ return n.w; }), lab="", when="", pre="";
   if(dated.length){
     var now=iso(new Date()), nxt=null;
     dated.forEach(function(n){ if(!nxt && n.w>=now) nxt=n; });
-    if(nxt) return "Next: "+(nxt.label||"")+(nxt.when?" · "+nxt.when:"");
-    return "Last: "+(dated[dated.length-1].label||"");
+    if(!nxt) nxt=dated[dated.length-1];
+    pre=nxt.w>=now?"Next":"Last"; lab=nxt.label||""; when=nxt.when||"";
+  } else {
+    lab=g.rows.slice(0,2).map(function(n){ return n.label||""; }).join(" · ");
   }
-  return g.rows.slice(0,2).map(function(n){ return n.label||""; }).join(" · ");
+  /* the name and its date are two lines, not one: *"seperate the Next and Date
+     into two seperate lines."* Run together on a phone they wrapped into each
+     other, and the date was the half that got broken mid-word. */
+  return '<span class="mrl">'+(pre?esc(pre)+": ":"")+esc(lab)+'</span>'+
+         (when?'<span class="mrw" style="color:'+rgba(c,.95)+'">'+esc(when)+'</span>':"");
 }
 function renderMap(){
   var host=document.getElementById("mapw");
@@ -2447,20 +2451,22 @@ function renderMap(){
     var open = hits ? g.rows.some(function(n){ return hits[n.id]; }) : !!mapOpen[g.name];
     var n=g.rows.length; g.rows.forEach(function(r){ n+=kbKids(r.id).length; });
     var c=mapTint(gi);
-    h+='<div class="mroot'+(open?" open":"")+'" style="background:'+rgba(c,.05)+
-       ';border-color:'+rgba(c,.2)+'">'+
+    /* a shut block is tappable anywhere, not just on its heading: *"I should
+       be able to tap anywhere on the group blocks to expand not just the
+       heading text."* An open one keeps the target on the header alone, or a
+       tap meant for a row would shut the block under his finger. */
+    h+='<div class="mroot'+(open?" open":"")+'"'+(open?"":' data-mg="'+esc(g.name)+'"')+
+       ' style="background:'+rgba(c,.05)+';border-color:'+rgba(c,.2)+'">'+
        '<div class="mrh" data-mg="'+esc(g.name)+'">'+
          '<button class="mtw'+(open?" open":"")+'" aria-hidden="true" style="color:'+rgba(c,.85)+'">&#9654;</button>'+
          '<span class="mrt">'+esc(g.name)+'</span>'+
          '<span class="mrc" style="background:'+rgba(c,.14)+';color:'+rgba(c,.95)+'">'+n+'</span>'+
        '</div>';
     if(open) h+='<div class="mrb">'+mapShape(g,hits,c)+'</div>';
-    else     h+='<div class="mrn">'+esc(mapHint(g))+'</div>';
+    else     h+='<div class="mrn">'+mapHint(g,c)+'</div>';
     h+='</div>';
   });
-  /* a category he has chosen but written nothing under has to say so, or the
-     card is simply blank and reads as the view having broken */
-  if(!gs.length) h='<div class="mempty">Nothing filed under this category yet.</div>';
+  if(!gs.length) h='<div class="mempty">Nothing filed yet.</div>';
   host.innerHTML=h;
   document.getElementById("mapTip").textContent=
     live.length+" thing"+(live.length===1?"":"s")+" remembered. Claude files what you write here and keeps it in KNOWLEDGE.md in the repo, so it outlives any one session.";
@@ -2472,37 +2478,47 @@ function mapShape(g,hits,c){
   if(g.shape==="calendar") return mapCalendar(g,hits,c);
   if(g.shape==="timeline") return mapTimeline(g,hits,c);
   if(g.shape==="cards")    return mapCards(g,hits,c);
-  return g.rows.map(function(n){ return mapItem(n,hits,0); }).join("");
+  return g.rows.map(function(n){ return mapItem(n,hits,0,c); }).join("");
 }
 /* one row: an informative title with its date, and the paragraph that says
    what it is, underneath and already on screen. There is no twisty here on
    purpose -- a row that has to be opened to say anything is the hole he asked
    to be rid of. `depth` is 0 or 1 and nothing deeper is drawn. */
-function mapItem(n,hits,depth){
+function mapItem(n,hits,depth,c){
   var dim=hits && !hits[n.id];
+  /* the date takes the block's tint rather than grey: *"In some sections the
+     dates are grey - use brighter colour like you used in deadlines group and
+     Platforms."* The rail and the cards were already colouring it and the list
+     was not, so one shape disagreed with the other two about whether a date
+     was worth seeing. */
   var h='<div class="mn'+(depth?" sub":"")+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+
     '" data-kb="'+esc(n.id)+'">'+
     '<div class="mnh"><span class="mnl">'+esc(n.label||"")+
-      (n.when?'<span class="mwhen"> &middot; '+esc(n.when)+'</span>':'')+'</span></div>';
+      (n.when?'<span class="mwhen"'+(c?' style="color:'+rgba(c,.95)+'"':"")+
+        '> &middot; '+esc(n.when)+'</span>':'')+'</span></div>';
   if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
   h+=mapTags(n);
   if(!depth){
     var kids=kbKids(n.id);
     if(kids.length){
       h+='<div class="mkids">';
-      kids.forEach(function(k){ h+=mapItem(k,hits,1); });
+      kids.forEach(function(k){ h+=mapItem(k,hits,1,c); });
       h+='</div>';
     }
   }
   return h+'</div>';
 }
+/* Only the task. `rel[]` rendered as a row of grey bubbles under every node
+   and he had them taken out: *"Remove the linking grey bubbles. You can keep
+   the linked task bubble."* Three or four of them under a paragraph is more
+   chrome than content, and they offered a sideways jump nobody was making --
+   the orange one goes somewhere he actually wants to go. The data stays: `rel`
+   still merges, still travels, still feeds the search and still prints in
+   KNOWLEDGE.md, which is where it was always doing its real work. */
 function mapTags(n){
-  var tags="";
-  if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
-  (n.rel||[]).forEach(function(r){
-    var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
-  });
-  return tags?'<div class="mnr">'+tags+'</div>':"";
+  if(!(n.item && items[n.item])) return "";
+  return '<div class="mnr"><span class="mtag mitem" data-go="'+esc(n.item)+'">'+
+    esc(items[n.item].title)+'</span></div>';
 }
 /* a vertical rail with a dot per item, in date order. A dot whose date has
    passed is hollow, so where he is in the sequence is the first thing the
@@ -2555,7 +2571,7 @@ function mapCalendar(g,hits,c){
       spans.push({t:r.t||n.label||"", a:r.a, b:r.b||r.a, k:r.k||"period", id:n.id});
     });
   });
-  if(!spans.length) return g.rows.map(function(n){ return mapItem(n,hits,0); }).join("");
+  if(!spans.length) return g.rows.map(function(n){ return mapItem(n,hits,0,c); }).join("");
   spans.sort(function(x,y){ return x.a<y.a?-1:x.a>y.a?1:0; });
   var lo=spans[0].a, hi=spans[0].b;
   spans.forEach(function(s){ if(s.a<lo) lo=s.a; if(s.b>hi) hi=s.b; });
@@ -2574,6 +2590,12 @@ function mapCalendar(g,hits,c){
   /* the year is only worth a label when the axis crosses one; on a single-year
      axis it is the same four characters on every tick */
   var manyY=Object.keys(yrs).length>1;
+  /* "07 Jan", never "07 January 2027": this sits in a few dozen pixels beside
+     a bar, and the axis above it already says which year. */
+  var dayMon=function(d){
+    var p=d.split("-");
+    return p[2]+" "+MON[(+p[1])-1];
+  };
   months.forEach(function(m){
     m.l=MON[m.m]+(manyY&&m.m===0?" "+String(m.y).slice(2):"");
   });
@@ -2586,17 +2608,29 @@ function mapCalendar(g,hits,c){
     }).join("")+'</div>';
   var now=Date.now();
   if(now>m0 && now<m1) h+='<div class="mcnow" style="left:'+pc(now)+'%"></div>';
+  /* The bar says where in the year, and the dates beside it say which days.
+     He asked for the second half back: *"use the empty space to add the exact
+     dates or atleast the months like '07 Jan - 12 Mar' next to each bar."* A
+     chart you have to read off an axis by eye is a chart you cannot quote.
+
+     The label goes to the right of the bar while there is room for it and
+     flips to the left of the bar's start when there is not, because a label
+     running off the right edge is worse than no label. 58% is where a bar's
+     end leaves less than the widest label needs. */
   spans.forEach(function(s){
     var a=Date.parse(s.a+"T00:00:00Z"), b=Date.parse(s.b+"T00:00:00Z");
-    var w=Math.max(pc(b)-pc(a),0);
+    var x=pc(a), y=pc(b), w=Math.max(y-x,0);
+    var pt=(s.k==="point" || w<0.6);
+    var txt=dayMon(s.a)+(pt?"":" \u2013 "+dayMon(s.b));
     h+='<div class="mcr" data-kb="'+esc(s.id)+'">'+
        '<span class="mcl">'+esc(s.t)+'</span>'+
        '<span class="mct">';
-    if(s.k==="point" || w<0.6)
-      h+='<i class="mcp" style="left:'+pc(a)+'%;background:'+rgba(c,1)+'"></i>';
-    else
-      h+='<i class="mcb'+(s.k==="break"?" br":"")+'" style="left:'+pc(a)+'%;width:'+w+'%;background:'+
-         (s.k==="break"?rgba(c,.2):rgba(c,.8))+'"></i>';
+    if(pt) h+='<i class="mcp" style="left:'+x+'%;background:'+rgba(c,1)+'"></i>';
+    else   h+='<i class="mcb'+(s.k==="break"?" br":"")+'" style="left:'+x+'%;width:'+w+'%;background:'+
+              (s.k==="break"?rgba(c,.2):rgba(c,.8))+'"></i>';
+    h+= y<=58
+      ? '<span class="mcd" style="left:calc('+y+'% + 7px)">'+esc(txt)+'</span>'
+      : '<span class="mcd rt" style="right:calc('+(100-x)+'% + 7px)">'+esc(txt)+'</span>';
     h+='</span></div>';
   });
   h+='</div>';
@@ -2605,7 +2639,7 @@ function mapCalendar(g,hits,c){
      when and never why. Dropping those nodes was the earlier mistake in
      miniature -- it is what turned a schedule into eleven dates in one
      paragraph. */
-  g.rows.forEach(function(n){ h+=mapItem(n,hits,0); });
+  g.rows.forEach(function(n){ h+=mapItem(n,hits,0,c); });
   return h;
 }
 /* what the board can answer right now, shown the moment he asks rather than
@@ -3125,7 +3159,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1625";
+var BUILD="2026-10-05-1705";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3422,9 +3456,13 @@ stage.addEventListener("dblclick",function(e){
    and a filter would quietly make it wrong, so it never filters. */
 function renderSubs(){
   var el=document.getElementById("subs");
-  /* Overview answers "where do I stand" and Chat is a conversation; neither is
-     a list of tasks, so a category filter on either is meaningless. */
-  if(view==="over"||view==="chat"){ el.classList.remove("on"); el.innerHTML=""; return; }
+  /* Overview answers "where do I stand", Chat is a conversation, and the Mind
+     map is grouped by what a thing is -- none of the three is a list of tasks,
+     so a category filter on any of them is meaningless. The map carried one
+     until he said to take it off: the groups already answer the question the
+     strip was answering, and worse, they cut across it. Filtering to Career
+     chopped the Programme calendar in half. */
+  if(view==="over"||view==="chat"||view==="map"){ el.classList.remove("on"); el.innerHTML=""; return; }
   el.classList.add("on");
   var mk=function(k,label){
     var n=(k==="all"?alive():alive().filter(function(i){return TRACK_CAT[i.track]===k;}));
@@ -3445,8 +3483,11 @@ document.getElementById("subs").addEventListener("click",function(e){
 });
 
 /* --- chat composer ---
-   Enter sends, shift-Enter is a newline: this is a chat box, and on a phone the
-   return key should not be the only way to make a paragraph. */
+   **Enter is a line break, not send**, and the arrow is the only send. He asked
+   for it across every box on the board: *"On all chat/note texboxes, enter on
+   my keyboard should be line break, not send."* It was the other way round, on
+   the theory that this is a chat box -- but what he writes here is usually a
+   paragraph, and a box that fires on the first full stop steals the rest of it. */
 (function(){
   var ta=document.getElementById("cin"), btn=document.getElementById("csend");
   var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; btn.disabled=!ta.value.trim(); };
@@ -3456,9 +3497,6 @@ document.getElementById("subs").addEventListener("click",function(e){
     ta.value=""; grow(); ta.focus();
   };
   ta.addEventListener("input",grow);
-  ta.addEventListener("keydown",function(e){
-    if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
-  });
   btn.addEventListener("click",send);
   grow();
 })();
@@ -3467,38 +3505,43 @@ document.getElementById("subs").addEventListener("click",function(e){
    One box doing two jobs, because he asked for exactly that: "the text box here
    should not only be to add notes but also to ask you questions based on the
    existing information instead of me rummaging through the dashboard". The
-   switch says which, and both end up as a note -- a fact to file, or a question
-   to answer -- so the whole thing travels down the paths that already exist.
+   It had a two-button switch for which job, and he took it away: *"Don't have
+   different options for add a note and ask - you can figure it out yourself
+   based on input."* He is right that it was work he should not have been
+   doing. `asks()` reads the sentence instead, and being wrong costs little in
+   either direction: the text reaches Claude as a note either way, and Claude
+   answers it properly either way. Both still travel down the paths that
+   already exist, as `kind:"fact"` or `kind:"ask"`.
 
    An ask also answers itself immediately out of what the map already holds.
    Claude's answer takes the forty-odd seconds a run takes, and a box that sits
    silent for that long reads as a box that did nothing. */
+/* A question, or a fact to file? A trailing question mark settles it outright;
+   otherwise the first word does, because "what is VMock" and "VMock scores a
+   CV" differ at the very front of the sentence and nowhere else reliably. */
+var ASKW=("what when where which who whom whose how why can could should would "+
+  "is are was were do does did will shall am have has had tell show find explain "+
+  "remind list give").split(" ");
+function asks(t){
+  if(/\?\s*$/.test(t)) return true;
+  var w=((t||"").toLowerCase().match(/[a-z']+/)||[""])[0];
+  return ASKW.indexOf(w)>=0;
+}
 (function(){
   var ta=document.getElementById("min"), btn=document.getElementById("msend");
   var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; btn.disabled=!ta.value.trim(); };
   var send=function(){
     var t=ta.value.trim(); if(!t) return;
-    addNote(null,t,true,true,mapMode==="ask"?"ask":"fact");
-    if(mapMode==="ask"){ mapAns=t; mapQ=t; }
+    var q=asks(t);
+    addNote(null,t,true,true,q?"ask":"fact");
+    if(q){ mapAns=t; mapQ=t; }
+    /* a fact puts the whole list back: a filtered map is the answer to a
+       question he is no longer asking */
     else { mapAns=null; mapQ=""; toast("Noted. Claude is filing it."); }
     ta.value=""; grow();
     renderAns(); renderMap();
   };
-  Array.prototype.forEach.call(document.querySelectorAll("[data-mm]"),function(b){
-    b.addEventListener("click",function(){
-      mapMode=b.dataset.mm;
-      Array.prototype.forEach.call(document.querySelectorAll("[data-mm]"),function(o){ o.classList.toggle("on",o===b); });
-      ta.placeholder = mapMode==="ask" ? "Ask about anything in here\u2026" : "Tell Claude something worth remembering\u2026";
-      /* leaving Ask puts the tree back: a filtered map is an answer to a
-         question he is no longer asking */
-      if(mapMode!=="ask"){ mapAns=null; mapQ=""; renderAns(); renderMap(); }
-      ta.focus();
-    });
-  });
   ta.addEventListener("input",grow);
-  ta.addEventListener("keydown",function(e){
-    if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
-  });
   btn.addEventListener("click",send);
   grow();
 })();

@@ -220,8 +220,10 @@ A node goes in the patch's `kb[]`, alongside `changed[]` and `notes[]`:
 - **`item`** ties it to a task, and that link is most of the value: it is how
   "VMock scores your CV" ends up one tap from the CV task.
 - **`rel[]`** is the cross-links, both ways. **Write the other node's `rel` as
-  well**, or the connection exists in one direction only and he finds it from
-  one end and not the other.
+  well**, or the connection exists in one direction only. It no longer renders
+  as a chip on the board -- he had those removed -- but it still merges, still
+  feeds the search, and still prints in `KNOWLEDGE.md`, which is where a future
+  session reads it. Keep writing it.
 - **`at` is the clock the merge runs on.** Without it the node takes the file's
   time, which is close enough but not yours to leave to chance.
 - **`id`** is stable and yours to choose: `k-<slug>`. **Re-use it to correct a
