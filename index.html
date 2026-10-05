@@ -1194,8 +1194,8 @@ var SEED=[
    n:"Club 8 covers 2027-01-03 to roughly 2027-07-03. The programme runs to 2027-12-15, so five months are uncovered."},
 
  /* admin and exit */
- {id:"portal",      t:"Complete MyINSEAD profile and practical info",   k:"admin", s:"todo", p:"High",     d:"2026-10-22",
-   n:"P0 deck gives 22 October: profile, INSEAD email activated, practical info. From 25 October the Sunday newsletters go only to the INSEAD address."},
+ {id:"portal",      t:"Complete MyINSEAD profile and practical info",   k:"admin", s:"done", p:"High",     d:"2026-10-22",
+   n:"Done ahead of the 22 October deadline: profile created and the INSEAD email is active. From 25 October the Sunday newsletters go only to that address."},
  {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15",
    n:"Nothing on record: no resignation date, notice period or last working day."},
  {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", dep:["locus-exit"]},
@@ -1204,8 +1204,8 @@ var SEED=[
  {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20",},
  {id:"lms-start",   t:"Work through the LMS tutorials",                k:"acad",  s:"todo", p:"Medium",   d:"2026-10-26",
    n:"P0 opens 26 October and the LMS is where every academic and some CDC item is delivered."},
- {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30",
-   n:"Optional one-week quant primer, 16-20 November online. Registration via MyINSEAD closes 30 October, so the decision has a hard date even though the course does not."},
+ {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30", dep:["sbi-sanction"],
+   n:"Optional one-week quant primer, 16-20 November online. He is holding it until the SBI sanction lands, which leaves six days between the sanction date and the 30 October registration close -- so a late sanction is what makes this urgent, not the course."},
  {id:"pldp-webinar",t:"PLDP webinar",                                  k:"acad",  s:"todo", p:"High",     d:"2026-11-05",
    n:"Must do. Zoom. Explains the assignments that run 6 November to 28 December."},
  {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28",
@@ -1218,8 +1218,12 @@ var SEED=[
  /* career */
  {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31",
    n:"Shapes elective choice, exchange decision and recruiting timing. Not recorded anywhere yet."},
- {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10",
+ {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", dep:["vmock"],
    n:"CDC route is VMock first, then the INSEAD CV, which is what gets into the CV Book."},
+ {id:"vmock",       t:"Activate VMock CV platform access",             k:"career",s:"todo", p:"High",     d:"2026-10-06",
+   n:"Invitation has arrived. VMock is step one of the CDC CV process, before the INSEAD CV itself."},
+ {id:"casecoach",   t:"Register for Case Coach",                       k:"career",s:"todo", p:"High",     d:"2026-10-06",
+   n:"Invitation has arrived. Date is his: tonight or tomorrow, set to tomorrow to be safe."},
  {id:"careerglobe", t:"Set up CareerGlobe profile",                   k:"career",s:"todo", p:"High",     d:"2026-10-27",
    n:"Opens 27 October. Booking a coaching appointment runs through it."},
  {id:"cdc-quests",  t:"Do the CareerLeader and Career Anchors questionnaires", k:"career",s:"todo", p:"High", d:"2026-10-31",
@@ -2666,7 +2670,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1045";
+var BUILD="2026-10-05-1110";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
