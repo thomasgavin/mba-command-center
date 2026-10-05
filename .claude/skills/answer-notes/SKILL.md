@@ -151,21 +151,46 @@ A node goes in the patch's `kb[]`, alongside `changed[]` and `notes[]`:
 
 ```json
 "kb": [
-  {"id": "k-vmock", "label": "VMock",
-   "body": "CV analysis tool. Scores a CV and says what to fix.",
-   "cat": "work", "parent": null, "item": "vmock", "rel": ["k-cv"],
+  {"id": "k-cvweb", "label": "INSEAD CV & Cover Letter webinar",
+   "body": "13:00 Paris / 20:00 Singapore. What goes in the INSEAD format and what stays out.",
+   "group": "Webinars and sessions", "ord": 10,
+   "when": "13 November 2026", "w": "2026-11-13",
+   "cat": "work", "item": "cv-webinar", "rel": ["k-cvbook"],
    "at": "<ISO now>", "createdAt": "<ISO now>", "by": "claude"}
 ]
 ```
 
-- **`label`** is the thing's name, two or three words. It is what he scans.
-- **`body`** is one sentence. A paragraph in a tree is a wall, and the map is
-  read on a phone.
-- **`cat`** is `money`, `life`, `study`, `work`, or `else` when you genuinely
-  cannot place it. A node with an `item` and no `cat` inherits that task's
-  category, so naming the task is enough.
-- **`parent`** nests it under another node. Nest when something is *part of*
-  the parent, not merely related to it — relation is what `rel[]` is for.
+- **`group` is the one that matters.** It is free text and it names **what the
+  thing is** — Webinars and sessions, Deadlines, Platforms and tools, Who to
+  contact. It is the top of the list, and you choose it. The view was grouped
+  by Academics / Career / Student Life first and he threw it out: *"Why aren't
+  all webinars just listed together under one 'webinar' section for example?
+  Don't try to follow strict and very generic academic, life, career
+  categorization."* **Reuse a group that already exists** — check
+  `KNOWLEDGE.md`, whose `##` headings are exactly the live groups — rather than
+  coining a near-synonym. A group with one row in it usually wants to be part
+  of a bigger one. Leave `group` out only when you genuinely cannot place the
+  node; it falls into "Everything else", which always sorts last.
+- **`ord`** is the group's place in the order, and every node in a group should
+  carry the same number. The live ones: 10 Webinars and sessions, 20 Deadlines,
+  30 Programme calendar, 40 Platforms and tools, 50 Coaching, 60 The summer
+  internship, 70 Courses and exemptions, 80 Clubs and elections, 90 Who to
+  contact. A new group picks a number that puts it where it belongs.
+- **`label` is the title, and it has to be informative on its own.** "Intro
+  Webinar" is what he rejected; "PLDP intro webinar" is the fix. A title that
+  only means something once you know which branch it was under is not a title.
+- **`when` and `w`** are the date. `when` is what he reads ("13 November 2026",
+  "Mar - May 2027"); `w` is the ISO date it sorts by, and without it a group of
+  webinars comes out in day-of-month order. Carry both, or neither.
+- **`body`** is one sentence, and it is **always on screen** under the title —
+  nothing in this view has to be opened. A paragraph is a wall on a phone.
+- **`cat`** is `money`, `life`, `study`, `work`, or `else`. It does one job
+  only: the sub-tab strip. A node with an `item` and no `cat` inherits that
+  task's category, so naming the task is enough.
+- **`parent`** nests it one level under another node, drawn inline and always
+  visible. Nothing deeper than one level is drawn at all, so use it only when
+  something is genuinely *part of* the parent — relation is what `rel[]` is
+  for, and a flat row in the right group beats a nested one almost always.
 - **`item`** ties it to a task, and that link is most of the value: it is how
   "VMock scores your CV" ends up one tap from the CV task.
 - **`rel[]`** is the cross-links, both ways. **Write the other node's `rel` as
@@ -187,16 +212,22 @@ A node goes in the patch's `kb[]`, alongside `changed[]` and `notes[]`:
 2. **The repository is public.** Never put an account, passport, visa, loan or
    reference number in a node, even when his note contains one. Name the thing
    indirectly and say in your reply that you left the number out.
-3. **Tidy as you go.** When a new fact belongs under an existing node, re-parent
-   it rather than starting a third top-level topic. Two runs that each add a
-   root for the same subject is how the map stops being readable.
+3. **Tidy as you go.** Put a new fact in a group that already exists rather
+   than coining a second name for it; two runs that each invent a group for the
+   same kind of thing is how the map stops being readable.
+4. **Delete what is done and what has nothing to act on.** A node whose task is
+   `done`, or that only restates why something matters ("P0 tells you to start
+   early on visa and housing"), is clutter and he says so. Eight went on
+   2026-10-05 for exactly that. Deleting is as much of this job as adding.
 
 **Then mirror it into `KNOWLEDGE.md`** in the same commit. That file is the
 durable copy he asked for — *"create and maintain one or more .md files in the
 git repo so the context and information is never lost even if this session is
 gone"* — and it is the only copy a future session can read without a browser.
-Its shape is one `##` per category, one `###` per top-level node, nested
-bullets below, and the task link in brackets. Keep the two in step: the map is
+Its shape is **one `##` per group, in `ord` order, and one bullet per node** —
+label, then `when`, then the body, then the task and the id in backticks. The
+headings in that file are the authoritative list of live groups, which is what
+makes it the thing to read before choosing one. Keep the two in step: the map is
 what he reads, `KNOWLEDGE.md` is what the next Claude reads, and a difference
 between them is a bug.
 

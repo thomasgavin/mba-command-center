@@ -1144,14 +1144,22 @@ for (var tw26 of [390, 1280]) {
    goes through a real merge and then a real reload. */
 {
   var KB = [
-    { id: "k-vmock", label: "VMock", body: "Scores a CV and says what to fix.",
+    { id: "k-vmock", label: "VMock scores a CV draft", body: "Says what to fix before a human reads it.",
+      group: "Platforms and tools", ord: 40,
       cat: "work", item: "vmock", rel: ["k-cv"], at: "2026-10-05T09:00:00.000Z", by: "claude" },
-    { id: "k-cv", label: "INSEAD CV format", body: "One page, their template.",
+    { id: "k-cv", label: "One INSEAD CV format", body: "Their template, used as a marketing document.",
+      group: "Platforms and tools", ord: 40,
       cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
-    { id: "k-cdc", label: "CDC", body: "The career development centre.",
+    /* the two webinars are the whole of his complaint: they belong together
+       under what they are, dated, with the later one second */
+    { id: "k-cvweb", label: "INSEAD CV & Cover Letter webinar", body: "What goes in the format and what stays out.",
+      group: "Webinars and sessions", ord: 10, when: "13 November 2026", w: "2026-11-13",
       cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
-    { id: "k-cdc-coach", label: "Coaching sessions", parent: "k-cdc",
-      body: "Booked through CareerGlobe.", cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-pldpweb", label: "PLDP intro webinar", body: "Clarifies the P0 leadership assignments.",
+      group: "Webinars and sessions", ord: 10, when: "05 November 2026", w: "2026-11-05",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-cdc-coach", label: "Coaching sessions are 45 minutes", parent: "k-cv",
+      body: "Short enough to fit before class.", cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
     { id: "k-orphan", label: "A fact whose topic was deleted", parent: "k-ghost",
       cat: "money", at: "2026-10-05T09:00:00.000Z", by: "claude" }
   ];
@@ -1181,17 +1189,45 @@ for (var tw26 of [390, 1280]) {
     setView("map");
     await new Promise(function (r) { setTimeout(r, 120); });
     var stored = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
+    var row = document.querySelector('[data-kb="k-pldpweb"]');
     return { count: kb.length, stored: (stored.kb || []).length,
              badge: document.getElementById("nMap").textContent,
              roots: Array.prototype.map.call(document.querySelectorAll(".mrh"), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); }),
-             labels: Array.prototype.map.call(document.querySelectorAll(".mnl"), function (e) { return e.innerText; }) };
+             labels: Array.prototype.map.call(document.querySelectorAll(".mnl"), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); }),
+             /* the two webinar rows, in the order they are drawn */
+             web: Array.prototype.map.call(
+               document.querySelectorAll('.mroot .mnl'), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); })
+               .filter(function (t) { return /webinar/i.test(t); }),
+             /* the line under the title, with nothing tapped */
+             body: row ? (row.querySelector(".mnb") || {}).innerText || "" : "(no row)",
+             twisties: document.querySelectorAll(".mn .mtw").length };
   }, KB);
   ok("a patch from Claude fills the map", filled.count === KB.length, JSON.stringify(filled));
   ok("and it is written to storage, not only held in memory",
      filled.stored === KB.length, JSON.stringify(filled));
   ok("the badge counts what is in it", filled.badge === String(KB.length), JSON.stringify(filled));
-  ok("the top of the tree is the categories he already thinks in",
-     filled.roots.some(function (r) { return /career/i.test(r); }), JSON.stringify(filled.roots));
+  /* He threw out the first version in these words: "Why aren't all webinars
+     just listed together under one 'webinar' section for example? Don't try to
+     follow strict and very generic academic, life, career categorization." So
+     the top level is what a thing is, and the four buckets are not in it. */
+  ok("the top of the list is what a thing is, not a generic bucket",
+     filled.roots.some(function (r) { return /WEBINARS AND SESSIONS/i.test(r); }) &&
+     !filled.roots.some(function (r) { return /\b(CAREER|ACADEMICS|STUDENT LIFE|FINANCIAL)\b/i.test(r); }),
+     JSON.stringify(filled.roots));
+  ok("both webinars sit in the one group, earliest first",
+     filled.web.length === 2 && /PLDP/.test(filled.web[0]) && /CV/.test(filled.web[1]),
+     JSON.stringify(filled.web));
+  /* "PLDP Webinar - 05 November 2026": the date is half the title, and he
+     should not have to open anything to read the second half */
+  ok("a title carries its own date",
+     /PLDP intro webinar/.test(filled.labels.join(" | ")) &&
+     filled.labels.some(function (t) { return /PLDP intro webinar \u00b7 05 November 2026/.test(t); }),
+     JSON.stringify(filled.labels));
+  /* "I have to click and go down a hole, avoiding which is the whole point of
+     building this app" */
+  ok("the line under a title is already on screen, untapped",
+     /Clarifies the P0/.test(filled.body), JSON.stringify(filled.body));
+  ok("and no row has a twisty to open", filled.twisties === 0, String(filled.twisties));
   /* a node whose parent no longer exists must still be reachable: an orphan at
      the top of its category, never a node that simply stops being drawn */
   ok("a fact whose parent is missing is still on screen",
@@ -1208,19 +1244,21 @@ for (var tw26 of [390, 1280]) {
   ok("the map survives a reload, so it reaches his other device",
      kept.count === KB.length && kept.drawn > 0, JSON.stringify(kept));
 
-  /* collapsed by default below the first level, or a map of a hundred facts is
-     unreadable on a phone; the count is the only thing saying there is more */
+  /* the group header is the only thing that collapses, and it starts open: a
+     list that opens shut is a list that has to be opened before it says
+     anything, which is the hole he asked to be rid of */
   var tw = await s29.p.evaluate(async function () {
-    var head = document.querySelector('[data-kbt="k-cdc"]');
-    var before = !!document.querySelector('[data-kb="k-cdc-coach"]');
+    var head = document.querySelector('[data-mg="Webinars and sessions"]');
+    var before = !!document.querySelector('[data-kb="k-pldpweb"]');
     head.click();
     await new Promise(function (r) { setTimeout(r, 80); });
-    var after = !!document.querySelector('[data-kb="k-cdc-coach"]');
-    document.querySelector('[data-kbt="k-cdc"]').click();
+    var after = !!document.querySelector('[data-kb="k-pldpweb"]');
+    document.querySelector('[data-mg="Webinars and sessions"]').click();
     await new Promise(function (r) { setTimeout(r, 80); });
-    return { before: before, after: after, back: !!document.querySelector('[data-kb="k-cdc-coach"]') };
+    return { before: before, after: after, back: !!document.querySelector('[data-kb="k-pldpweb"]') };
   });
-  ok("a branch expands and collapses on a tap", tw.before !== tw.after && tw.before === tw.back, JSON.stringify(tw));
+  ok("a group starts open and collapses on a tap",
+     tw.before === true && tw.after === false && tw.back === true, JSON.stringify(tw));
 
   /* "instead of me rummaging through the dashboard": the board answers out of
      what it already holds, immediately, and says that Claude's answer follows */
@@ -1241,7 +1279,7 @@ for (var tw26 of [390, 1280]) {
   ok("an ask answers out of the map at once", ask.shown && /VMock/.test(ask.text), JSON.stringify(ask));
   ok("and says Claude's own answer is coming", /Claude/.test(ask.text), JSON.stringify(ask));
   ok("the ask still travels to Claude as a note", ask.asks === 1 && ask.travels, JSON.stringify(ask));
-  ok("and the tree dims what the question did not touch", ask.hit > 0 && ask.dim > 0, JSON.stringify(ask));
+  ok("and the list dims what the question did not touch", ask.hit > 0 && ask.dim > 0, JSON.stringify(ask));
 
   /* a note is a fact to file, not a question: Claude has to be able to tell
      them apart, and the note is the only thing that reaches it */
@@ -1257,7 +1295,7 @@ for (var tw26 of [390, 1280]) {
              cleared: document.getElementById("mAns").classList.contains("off") };
   });
   ok("a note is sent as a fact to file", fact.n === 1 && fact.travels, JSON.stringify(fact));
-  ok("and leaving Ask puts the whole tree back", fact.cleared, JSON.stringify(fact));
+  ok("and leaving Ask puts the whole list back", fact.cleared, JSON.stringify(fact));
 
   /* the link to the task is the point of filing it at all */
   var jump = await s29.p.evaluate(async function () {

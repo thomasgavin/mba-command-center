@@ -511,23 +511,27 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .calrow.done b{color:var(--ink4);text-decoration:line-through}
 
 /* ---------- mind map ----------
-   A tree, not a graph. The dependency view drew one and it answered a question
-   nobody was asking twice a day; this one answers "what do I know about this,
-   and what is it connected to", which is the thing he was keeping in his head. */
+   A grouped list, not a tree. It was a tree first, under Academics / Career /
+   Student Life, and every fact sat two taps down inside it -- which is the
+   rummaging the view exists to replace. Now a group names what a thing is, and
+   every row says what it is without being opened. */
 .mapw{display:flex;flex-direction:column;gap:12px}
 .mans.off{display:none}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:6px 14px 12px}
 .mroot{border-top:1px solid var(--line2);padding-top:9px;margin-top:9px}
 .mroot:first-child{border-top:0}
-.mrh{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--ink4)}
-.mrh .mrc{margin-left:auto;font-size:10px;color:var(--ink4);font-variant-numeric:tabular-nums}
-.mrh .msw{width:7px;height:7px;border-radius:50%;flex:none}
-/* one node: a twisty, a label, and whatever it is connected to underneath */
-.mn{padding-left:3px}
-.mkids{margin-left:9px;padding-left:11px;border-left:1px solid var(--line2)}
-.mnh{display:flex;align-items:flex-start;gap:7px;padding:5px 0;cursor:pointer;min-width:0}
-.mnh:hover .mnl{color:var(--orange)}
+.mrh{display:flex;align-items:center;gap:6px;padding:6px 0;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);cursor:pointer}
+.mrh:hover{color:var(--orange)}
+.mrh .mrc{margin-left:auto;font-size:10px;color:var(--ink4);font-variant-numeric:tabular-nums;
+  letter-spacing:0}
+/* one row: a title with its date, and the line that says what it is. No
+   twisty -- the only thing that collapses is the group header above it. */
+.mn{padding:1px 0 3px}
+.mn+.mn{border-top:1px solid var(--line2)}
+.mkids{margin-left:4px;padding-left:10px;border-left:1px solid var(--line2)}
+.mn.sub+.mn.sub{border-top:1px solid var(--line2)}
+.mnh{display:flex;align-items:flex-start;gap:7px;padding:4px 0 1px;min-width:0}
 .mtw{flex:none;width:15px;height:17px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink4);
   font-size:9px;line-height:17px;transition:transform .15s var(--ease)}
 .mtw.open{transform:rotate(90deg)}
@@ -535,13 +539,16 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* the label has to shrink below its longest word, or one long node sets the
    width of the whole card and the drawer's sideways-scroll bug comes back here */
 .mnl{flex:1;min-width:0;font-size:12.5px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
-.mnc{flex:none;font-size:9.5px;color:var(--ink4);font-weight:700;font-variant-numeric:tabular-nums;padding-top:2px}
-.mnb{font-size:11.5px;color:var(--ink3);line-height:1.5;padding:0 0 6px 22px;overflow-wrap:anywhere}
-.mnr{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 7px 22px}
+/* the date rides on the title line, because "PLDP Webinar" and "05 Nov 2026"
+   are one fact and he should not have to open anything to see the second half */
+.mwhen{font-weight:650;color:var(--ink4);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mnb{font-size:11.5px;color:var(--ink3);line-height:1.5;padding:0 0 6px;overflow-wrap:anywhere}
+.mnr{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 7px}
 .mtag{font-size:9.5px;font-weight:700;border-radius:20px;padding:2px 7px;background:var(--wash2);
   color:var(--ink3);border:1px solid var(--line2);cursor:pointer}
 .mtag.mitem{color:var(--orange);border-color:rgba(255,100,41,.3);background:rgba(255,100,41,.08)}
 .mn.hit>.mnh .mnl{color:var(--orange)}
+.mn.hit>.mnh .mwhen{color:var(--orange)}
 .mn.dim{opacity:.33}
 /* the answer the board can give on its own, while Claude writes the real one */
 .mans{background:rgba(255,100,41,.07);border:1px solid rgba(255,100,41,.22);border-radius:var(--r2);
@@ -2193,8 +2200,8 @@ function renderAgenda(evOn,tIso){
 /* ---------- mind map ----------
    He said it plainly: he is not good at holding information in an organised
    way and leans on memory instead. So this is a place to put a fact once and
-   find it again -- he writes a line, Claude files it under a topic, links it to
-   whatever it relates to, and the tree is the result.
+   find it again -- he writes a line, Claude files it under a topic, and the
+   list is the result.
 
    A node is deliberately the same kind of object as a note: it carries its own
    clock in `at`, merges by id with newest-wins, and travels in the same payload
@@ -2202,46 +2209,58 @@ function renderAgenda(evOn,tIso){
    his other device, and nothing new can disagree with the rules that already
    decide who wins.
 
-   `cat` is one of CATS (plus "else" for anything Claude has not placed yet) so
-   the top of the tree is the four buckets he already thinks in. `parent` nests
-   a node under another; `item` ties it to a task, which is how "VMock scores
-   your CV" ends up one tap from the CV task. */
-var MAP_ROOTS=CATS.map(function(c){ return {k:c.k,label:c.label,c:tc(c.tracks[0])}; })
-                  .concat([{k:"else",label:"Unfiled",c:"#8b8095"}]);
-var mapOpen={}, mapMode="note", mapQ="", mapAns=null;
+   It was a tree under Academics / Career / Student Life first, and he threw it
+   out in those words: *"too much nesting - not easy to follow and no efficient.
+   Why aren't all webinars just listed together under one 'webinar' section for
+   example? Don't try to follow strict and very generic academic, life, career
+   categorization. ... I have to click and go down a hole, avoiding which is the
+   whole point of building this app."*
+
+   So the top of the list is `group`, which is free text and names **what a
+   thing is** -- Webinars, Deadlines, Platforms and tools. A group is whatever
+   Claude needs it to be, because the kinds of thing he writes down are not
+   known in advance and four fixed buckets described none of them. `ord` is how
+   a group earns its place in the order; `when` is the date, printed on the
+   title line rather than hidden one tap down; `body` is the one line under it
+   and is always on screen. `item` ties a node to a task, which is how "VMock
+   scores your CV" ends up one tap from the CV task.
+
+   `cat` still exists, and does one job only: the sub-tab strip. It is no
+   longer the shape of the view. */
+var MAP_ELSE="Everything else";
+var mapShut={}, mapMode="note", mapQ="", mapAns=null;
 
 function kbAlive(){ return kb.filter(function(n){ return n && n.id && !n.deleted; }); }
 function kbOf(id){ var r=null; kb.forEach(function(n){ if(n.id===id) r=n; }); return r; }
 function kbKids(id){
   return kbAlive().filter(function(n){ return n.parent===id; }).sort(kbSort);
 }
-function kbRootsOf(cat){
-  return kbAlive().filter(function(n){
-    /* a node whose parent is gone is an orphan, not a ghost: it shows at the
-       top of its category rather than disappearing with the node that held it */
-    return mapCat(n)===cat && (!n.parent || !kbOf(n.parent) || kbOf(n.parent).deleted);
-  }).sort(kbSort);
-}
+/* which sub-tab a node answers to. Nothing else reads this: the list is
+   grouped by what a thing is, not by which of the four buckets it fell in. */
 function mapCat(n){
-  var k=n.cat||"";
-  for(var i=0;i<MAP_ROOTS.length;i++){ if(MAP_ROOTS[i].k===k) return k; }
+  if(n.cat) return n.cat;
   /* a node pinned to a task inherits that task's category, so Claude can file
      one by naming the task alone */
   if(n.item && items[n.item]) return TRACK_CAT[items[n.item].track]||"else";
   return "else";
 }
-function kbSort(a,b){ return (a.label||"").localeCompare(b.label||""); }
-/* how many facts hang off this one, however deep: the count on a collapsed
-   node is the only thing saying there is anything under it */
-function kbDeep(id,seen){
-  seen=seen||{}; if(seen[id]) return 0; seen[id]=1;
-  var n=0; kbKids(id).forEach(function(k){ n+=1+kbDeep(k.id,seen); });
-  return n;
+function mapGroup(n){ return (n.group||"").trim() || MAP_ELSE; }
+/* date first, because a list of webinars is a timetable and the next one is
+   the one he needs. Undated facts fall to the bottom of their group, in name
+   order, since there is nothing better to sort them by.
+
+   `when` is for reading ("05 November 2026", "Mar - May 2027") and sorts
+   wrongly on its own -- "04 Dec" lands above "05 Nov". `w` is the ISO date it
+   sorts by, and a node carrying one is why the webinars come out as a
+   timetable rather than alphabetically by day-of-month. */
+function wkey(n){ return n.w || n.when || ""; }
+function kbSort(a,b){
+  var x=wkey(a), y=wkey(b);
+  if(x && y && x!==y) return x<y?-1:1;
+  if(x && !y) return -1;
+  if(y && !x) return 1;
+  return (a.label||"").localeCompare(b.label||"");
 }
-/* the local answer. Claude writes the real one, which takes the forty-odd
-   seconds a run takes; this is what the board can say on its own in the
-   meantime, out of what it already holds. Words, not substrings: searching for
-   "cv" should not match "achievement". */
 /* The words a question is actually about. Without this list "what do I need
    for the loan" matched every node on the board, because "the" is in almost
    every sentence -- an answer that returns everything is the rummaging he
@@ -2254,7 +2273,8 @@ function mapHits(q){
   var ws=((q||"").toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(function(w){ return STOP.indexOf(w)<0; });
   if(!ws.length) return [];
   var scored=kbAlive().map(function(n){
-    var hay=((n.label||"")+" "+(n.body||"")+" "+(n.item&&items[n.item]?items[n.item].title:"")).toLowerCase();
+    var hay=((n.label||"")+" "+(n.body||"")+" "+mapGroup(n)+" "+
+             (n.item&&items[n.item]?items[n.item].title:"")).toLowerCase();
     var sc=0; ws.forEach(function(w){ if(hay.indexOf(w)>=0) sc++; });
     return {n:n,sc:sc};
   }).filter(function(x){ return x.sc>0; }).sort(function(x,y){ return y.sc-x.sc || kbSort(x.n,y.n); });
@@ -2264,15 +2284,34 @@ function mapHits(q){
   var best=scored[0].sc;
   return scored.filter(function(x){ return x.sc===best; }).slice(0,8).map(function(x){ return x.n; });
 }
-/* an ancestor of a hit has to stay lit, or the match sits inside a branch
-   drawn as irrelevant */
+/* a hit's parent has to stay lit, or the match sits inside a row drawn as
+   irrelevant. One level, because that is as deep as the list goes. */
 function hitSet(list){
   var o={};
-  list.forEach(function(n){
-    var cur=n, guard=0;
-    while(cur && guard++<40){ o[cur.id]=1; cur=cur.parent?kbOf(cur.parent):null; }
-  });
+  list.forEach(function(n){ o[n.id]=1; if(n.parent) o[n.parent]=1; });
   return o;
+}
+/* the groups, in order, each with its rows already sorted. A node with a live
+   parent is drawn under that parent rather than as a row of its own; a node
+   whose parent is gone is an orphan, not a ghost, and stands on its own. */
+function mapGroups(){
+  var by={}, ord={};
+  kbAlive().forEach(function(n){
+    if(cat!=="all" && mapCat(n)!==cat) return;
+    var p=n.parent?kbOf(n.parent):null;
+    if(p && !p.deleted) return;
+    var g=mapGroup(n);
+    if(!by[g]){ by[g]=[]; ord[g]=n.ord===undefined?500:n.ord; }
+    if(n.ord!==undefined && n.ord<ord[g]) ord[g]=n.ord;
+    by[g].push(n);
+  });
+  /* Everything else is last whatever its nodes claim: it is the bucket for
+     what has not been filed, so it cannot outrank a group that has been */
+  return Object.keys(by).sort(function(a,b){
+    if(a===MAP_ELSE) return 1;
+    if(b===MAP_ELSE) return -1;
+    return (ord[a]-ord[b]) || a.localeCompare(b);
+  }).map(function(g){ return {name:g, rows:by[g].sort(kbSort)}; });
 }
 function renderMap(){
   var host=document.getElementById("mapw");
@@ -2286,49 +2325,47 @@ function renderMap(){
     return;
   }
   var hits=mapQ?hitSet(mapHits(mapQ)):null;
-  var drawn=0;
-  var h="", roots2=MAP_ROOTS.filter(function(r){ return cat==="all" || r.k===cat; });
-  roots2.forEach(function(r){
-    var roots=kbRootsOf(r.k);
-    if(!roots.length) return;
-    drawn++;
-    var total=roots.length; roots.forEach(function(n){ total+=kbDeep(n.id); });
-    h+='<div class="mroot"><div class="mrh"><span class="msw" style="background:'+r.c+'"></span>'+
-       esc(r.label)+'<span class="mrc">'+total+'</span></div>';
-    roots.forEach(function(n){ h+=mapNode(n,hits,0); });
+  var gs=mapGroups(), h="";
+  gs.forEach(function(g){
+    /* a group is open unless he shut it, and a search opens every group so a
+       match can never be hiding behind a collapsed header */
+    var open = hits ? true : !mapShut[g.name];
+    var n=g.rows.length; g.rows.forEach(function(r){ n+=kbKids(r.id).length; });
+    h+='<div class="mroot"><div class="mrh'+(open?" open":"")+'" data-mg="'+esc(g.name)+'">'+
+       '<button class="mtw'+(open?" open":"")+'" aria-hidden="true">&#9654;</button>'+
+       esc(g.name)+'<span class="mrc">'+n+'</span></div>';
+    if(open) g.rows.forEach(function(r){ h+=mapItem(r,hits,0); });
     h+='</div>';
   });
   /* a category he has chosen but written nothing under has to say so, or the
      card is simply blank and reads as the view having broken */
-  if(!drawn) h='<div class="mempty">Nothing filed under this category yet.</div>';
+  if(!gs.length) h='<div class="mempty">Nothing filed under this category yet.</div>';
   host.innerHTML=h;
   document.getElementById("mapTip").textContent=
     live.length+" thing"+(live.length===1?"":"s")+" remembered. Claude files what you write here and keeps it in KNOWLEDGE.md in the repo, so it outlives any one session.";
 }
-function mapNode(n,hits,depth){
-  var kids=kbKids(n.id), deep=kbDeep(n.id);
-  /* a search opens the branches it matched; otherwise the top two levels are
-     open and the rest waits to be asked for, which is what makes a map of a
-     hundred facts readable on a phone */
-  var open = hits ? !!hits[n.id] : (mapOpen[n.id]!==undefined ? mapOpen[n.id] : depth<1);
-  var dim  = hits && !hits[n.id];
-  var h='<div class="mn'+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+'" data-kb="'+esc(n.id)+'">'+
-    '<div class="mnh" data-kbt="'+esc(n.id)+'">'+
-      '<button class="mtw'+(open?" open":"")+(kids.length?"":" leaf")+'" aria-hidden="true">&#9654;</button>'+
-      '<span class="mnl">'+esc(n.label||"")+'</span>'+
-      (kids.length&&!open?'<span class="mnc">'+deep+'</span>':'')+
-    '</div>';
-  if(open){
-    if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
-    var tags="";
-    if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
-    (n.rel||[]).forEach(function(r){
-      var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
-    });
-    if(tags) h+='<div class="mnr">'+tags+'</div>';
+/* one row: an informative title with its date, and the line that says what it
+   is, underneath and already on screen. There is no twisty here on purpose --
+   a row that has to be opened to say anything is the hole he asked to be rid
+   of. `depth` is 0 or 1 and nothing deeper is drawn. */
+function mapItem(n,hits,depth){
+  var dim=hits && !hits[n.id];
+  var h='<div class="mn'+(depth?" sub":"")+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+
+    '" data-kb="'+esc(n.id)+'">'+
+    '<div class="mnh"><span class="mnl">'+esc(n.label||"")+
+      (n.when?'<span class="mwhen"> &middot; '+esc(n.when)+'</span>':'')+'</span></div>';
+  if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
+  var tags="";
+  if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
+  (n.rel||[]).forEach(function(r){
+    var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
+  });
+  if(tags) h+='<div class="mnr">'+tags+'</div>';
+  if(!depth){
+    var kids=kbKids(n.id);
     if(kids.length){
       h+='<div class="mkids">';
-      kids.forEach(function(k){ h+=mapNode(k,hits,depth+1); });
+      kids.forEach(function(k){ h+=mapItem(k,hits,1); });
       h+='</div>';
     }
   }
@@ -2851,7 +2888,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1345";
+var BUILD="2026-10-05-1545";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2998,20 +3035,26 @@ document.addEventListener("click",function(e){
     }
   }
 
-  /* the whole header row is the twisty: a 15px chevron is not a tap target,
-     and there is nothing else a tap on a node could mean */
-  var kbt=t.closest("[data-kbt]");
-  if(kbt && !t.closest("[data-go]") && !t.closest("[data-kbg]")){
-    mapOpen[kbt.dataset.kbt] = !kbt.querySelector(".mtw.open");
-    /* a search is what decided the open branches; touching one by hand ends it,
-       or the next repaint would shut what he just opened */
+  /* the whole group header is the twisty: a 15px chevron is not a tap target,
+     and there is nothing else a tap on a group header could mean. Nodes have
+     no twisty at all -- a row says what it is without being opened. */
+  var mg=t.closest("[data-mg]");
+  if(mg){
+    var gk=mg.dataset.mg;
+    mapShut[gk] = !mapShut[gk];
+    /* a search is what forced every group open; shutting one by hand ends it,
+       or the next repaint would re-open what he just shut */
     mapQ=""; renderMap(); return;
   }
-  /* "see also": jump to the related fact and open it */
+  /* "see also": jump to the related fact. Its group may be shut, so open it --
+     scrolling to a row that is not drawn lands nowhere. */
   var kbg=t.closest("[data-kbg]");
   if(kbg){
-    var tgt=kbg.dataset.kbg, guard=0, cur2=kbOf(tgt);
-    while(cur2 && guard++<40){ mapOpen[cur2.id]=true; cur2=cur2.parent?kbOf(cur2.parent):null; }
+    var tgt=kbg.dataset.kbg, n3=kbOf(tgt);
+    if(n3){
+      var top3=(n3.parent&&kbOf(n3.parent)&&!kbOf(n3.parent).deleted)?kbOf(n3.parent):n3;
+      delete mapShut[mapGroup(top3)];
+    }
     mapQ=""; setView("map"); renderMap();
     var el=document.querySelector('[data-kb="'+tgt+'"]');
     if(el) el.scrollIntoView({block:"center"});
