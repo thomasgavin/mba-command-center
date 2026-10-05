@@ -30,6 +30,9 @@ var PORT     = Number(process.env.PORT || 8391);
 var ROOT     = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 var WIDTHS   = [390, 768, 1280];
 var VIEWS    = ["over", "board", "time", "cal", "map", "chat"];
+/* Chat has no tab any more -- the floating button is the way in -- so the
+   loops that click a tab use this list and reach Chat through setView. */
+var TABS     = ["over", "board", "time", "cal", "map"];
 
 var out = [], bad = 0;
 function ok(name, pass, detail) {
@@ -119,7 +122,8 @@ for (var w of WIDTHS) {
     return getComputedStyle(document.body).position === "fixed";
   }), "a fixed body is the only thing iOS respects when the keyboard opens");
   for (var v of VIEWS) {
-    await s.p.click('.vt[data-v="' + v + '"]');
+    if (TABS.indexOf(v) >= 0) await s.p.click('.vt[data-v="' + v + '"]');
+    else await s.p.evaluate(function (x) { setView(x); }, v);
     await s.p.waitForTimeout(220);
     var m = await s.p.evaluate(function () {
       var d = document.scrollingElement, st = document.querySelector(".stage");
@@ -129,7 +133,7 @@ for (var w of WIDTHS) {
     ok(w + "px " + v + ": nothing runs off the side", m.dw <= m.dc + 1 && m.sw <= m.sc + 1, JSON.stringify(m));
   }
   /* a focused control must not be able to shift the document under the header */
-  await s.p.click('.vt[data-v="chat"]');
+  await s.p.evaluate(function () { setView("chat"); });
   await s.p.waitForTimeout(200);
   var top1 = await s.p.$eval(".top", function (n) { return n.getBoundingClientRect().top; });
   await s.p.focus("#cin");
@@ -760,7 +764,12 @@ for (var w2 of [390, 1280]) {
   });
   ok("it offers once, with a button to tap",
      !states.offer.off && !!states.offer.btn, JSON.stringify(states.offer));
-  ok("and goes away once he is subscribed", states.done.off, JSON.stringify(states.done));
+  /* It used to disappear entirely once subscribed, which is the state he was
+     in when he said he was getting nothing at all: "on" and "silently broken"
+     looked the same, with nothing on screen able to tell them apart. It stays
+     quietly now, carrying the one button that can. */
+  ok("once subscribed it stays, quietly, offering a test",
+     !states.done.off && states.done.quiet && /test/i.test(states.done.btn), JSON.stringify(states.done));
 
   /* An iPhone in a Safari tab cannot be asked at all. A dead button there reads
      as the feature being broken; the sentence is the whole fix. */
@@ -1203,7 +1212,7 @@ for (var tw26 of [390, 1280]) {
     return { tab: !!document.querySelector('.vt[data-v="graph"]'),
              sec: !!document.getElementById("v-graph"),
              fn: typeof window.renderGraph, edges: typeof window.drawEdges,
-             word: /Dependencies/.test(text + Array.prototype.map.call(document.querySelectorAll(".vt"), function (e) { return e.innerText; }).join(" ")),
+             word: /Dependencies/.test(text + Array.prototype.map.call(document.querySelectorAll(".vt"), function (e) { return e.getAttribute("aria-label") || ""; }).join(" ")),
              mapTab: !!document.querySelector('.vt[data-v="map"]') };
   });
   ok("the dependency view is gone, not hidden",
@@ -1220,7 +1229,8 @@ for (var tw26 of [390, 1280]) {
     var stored = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
     var txt = function (e) { return e ? e.innerText.replace(/\s+/g, " ").trim() : ""; };
     return { count: kb.length, stored: (stored.kb || []).length,
-             badge: document.getElementById("nMap").textContent,
+             /* the tabs are icons now: no tab carries a number at all */
+             badge: Array.prototype.map.call(document.querySelectorAll(".vt"), function (b) { return b.innerText.trim(); }).join(""),
              roots: Array.prototype.map.call(document.querySelectorAll(".mrh"), txt),
              /* collapsed: no row of any shape is drawn yet */
              rows: document.querySelectorAll(".mn,.mtli,.mcard,.mcr").length,
@@ -1246,7 +1256,7 @@ for (var tw26 of [390, 1280]) {
   ok("a patch from Claude fills the map", filled.count === KB.length, JSON.stringify(filled));
   ok("and it is written to storage, not only held in memory",
      filled.stored === KB.length, JSON.stringify(filled));
-  ok("the badge counts what is in it", filled.badge === String(KB.length), JSON.stringify(filled));
+  ok("no tab carries a number: they are icons", filled.badge === "", JSON.stringify(filled.badge));
   /* He threw out the first version in these words: "Why aren't all webinars
      just listed together under one 'webinar' section for example? Don't try to
      follow strict and very generic academic, life, career categorization." So
@@ -1526,6 +1536,152 @@ for (var tw26 of [390, 1280]) {
   ok("there is no add-a-note / ask switch left", comp.seg === 0, String(comp.seg));
   ok("the composers draw without a console error", s30.errs.length === 0, s30.errs.join(" | "));
   await s30.ctx.close();
+}
+
+/* ---- 31. the bottom bar, the section title, and the newsletters ---- */
+for (var bw of [390, 1280]) {
+  var s31 = await open(bw);
+  var bar = await s31.p.evaluate(function () {
+    var app = document.querySelector(".app"), nav = document.querySelector(".vbar"),
+        stage = document.querySelector(".stage"), fab = document.getElementById("fab");
+    var nb = nav.getBoundingClientRect(), sb = stage.getBoundingClientRect(),
+        fb = fab.getBoundingClientRect();
+    return {
+      last: app.lastElementChild === nav,
+      /* it is at the foot of the screen and the stage ends where it begins */
+      bottom: Math.round(innerHeight - nb.bottom), under: Math.round(nb.top - sb.bottom),
+      tabs: Array.prototype.map.call(nav.querySelectorAll(".vt"), function (b) { return b.dataset.v; }),
+      /* icons only: no tab has any text in it at all */
+      words: Array.prototype.map.call(nav.querySelectorAll(".vt"), function (b) { return b.innerText.trim(); }).join(""),
+      labelled: Array.prototype.every.call(nav.querySelectorAll(".vt"), function (b) { return !!b.getAttribute("aria-label"); }),
+      /* the floating chat button must not sit on top of the bar */
+      fabClear: fb.bottom <= nb.top,
+      title: document.getElementById("vTitle").textContent
+    };
+  });
+  ok(bw + "px: the sections are a bar at the foot of the screen",
+     bar.last && bar.bottom <= 1 && Math.abs(bar.under) <= 1, JSON.stringify(bar));
+  ok(bw + "px: five icons, and Chat is not one of them",
+     bar.tabs.join(",") === "over,board,time,cal,map", JSON.stringify(bar.tabs));
+  /* "with icons only" -- and an icon with no word still has to say its name to
+     a screen reader, or the strip is five unlabelled buttons */
+  ok(bw + "px: no tab carries a word, and every one carries its name",
+     bar.words === "" && bar.labelled, JSON.stringify(bar));
+  ok(bw + "px: the floating button clears the bar", bar.fabClear, JSON.stringify(bar));
+
+  /* "The section title should only show up when the section is open" */
+  var titles = await s31.p.evaluate(function () {
+    var o = {};
+    ["over", "board", "time", "cal", "map", "chat"].forEach(function (v) {
+      setView(v); o[v] = document.getElementById("vTitle").textContent;
+    });
+    setView("over");
+    return o;
+  });
+  ok(bw + "px: the title names the open section, and only it",
+     titles.over === "Overview" && titles.map === "Mind map" && titles.chat === "Chat" &&
+     titles.time === "Tasks", JSON.stringify(titles));
+
+  /* "Make the text boxes in mindmap and claude chat floating above the new
+     bottom section bar" -- a gap under the box, and nothing welded to the bar */
+  for (var cv of ["chat", "map"]) {
+    /* the view fades in on a 5px rise, so measuring it the same tick measures
+       the animation rather than the layout */
+    await s31.p.evaluate(function (v) { setView(v); }, cv);
+    await s31.p.waitForTimeout(320);
+    var fl = await s31.p.evaluate(function (v) {
+      var box = document.querySelector("#v-" + v + " .cbox"),
+          foot = document.querySelector("#v-" + v + " .cfoot"),
+          nav = document.querySelector(".vbar");
+      var b = box.getBoundingClientRect(), n = nav.getBoundingClientRect();
+      var cs = getComputedStyle(box), fs = getComputedStyle(foot);
+      return { gap: Math.round(n.top - b.bottom), radius: parseFloat(cs.borderTopLeftRadius),
+               border: fs.borderTopWidth, right: Math.round(innerWidth - b.right) };
+    }, cv);
+    ok(bw + "px " + cv + ": the composer floats clear of the bar",
+       fl.gap >= 4 && fl.radius >= 12 && fl.border === "0px" && fl.right >= 4, JSON.stringify(fl));
+  }
+  ok(bw + "px: the bar draws without a console error", s31.errs.length === 0, s31.errs.join(" | "));
+  await s31.ctx.close();
+}
+
+/* ---- 32. a badge goes out where it was read ---- */
+{
+  var s32 = await open(390, [{ id: "r1", from: "claude", text: "a reply he has not read",
+                               createdAt: new Date().toISOString(), state: "new" }]);
+  var badge = await s32.p.evaluate(function () {
+    return document.getElementById("notesN").textContent;
+  });
+  await s32.p.click("#notesBtn");
+  await s32.p.waitForTimeout(420);
+  var after = await s32.p.evaluate(function () {
+    var n = document.getElementById("notesN");
+    return { txt: n.textContent, off: n.classList.contains("off"), unread: unread(),
+             /* the ones that were new still say so on the list he is looking at */
+             tags: document.querySelectorAll("#dBody .tagnew").length };
+  });
+  /* "The all notes section on top right doesn't mark read once open - I need to
+     open the chat section to mark it as read." */
+  ok("opening the notes drawer is reading them",
+     badge === "1" && after.unread === 0 && after.off, JSON.stringify({ badge: badge, after: after }));
+  ok("and the drawer still shows which of them were new", after.tags === 1, JSON.stringify(after));
+  await s32.ctx.close();
+}
+
+/* ---- 33. newsletters ---- */
+{
+  var s33 = await open(390);
+  var NEWS = [
+    { id: "nw-d", period: "daily", date: "2026-10-07", at: new Date().toISOString(),
+      body: "## Due today\nPay the October instalment.\n## Overdue\nThe scholarship chase is three weeks past its date." },
+    { id: "nw-w", period: "weekly", date: "2026-10-11", at: new Date().toISOString(),
+      body: "## Risks\nThe visa appointment is the long pole." }
+  ];
+  var got = await s33.p.evaluate(async function (n) {
+    applyRemote({ exportedAt: new Date().toISOString(), op: "patch", notes: [], changed: [], news: n });
+    await new Promise(function (r) { setTimeout(r, 150); });
+    var stored = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
+    return { count: news.length, stored: (stored.news || []).length,
+             badge: document.getElementById("newsN").textContent };
+  }, NEWS);
+  ok("a newsletter arrives through the same door as everything else",
+     got.count === 2 && got.badge === "2", JSON.stringify(got));
+  /* the DFIELDS lesson: in memory is not on disk, and a reload is the only
+     thing that tells the two apart */
+  ok("and it is written to this device, not just held in memory", got.stored === 2, JSON.stringify(got));
+  await s33.p.reload({ waitUntil: "load" });
+  await s33.p.waitForTimeout(500);
+  await s33.p.click("#newsBtn");
+  await s33.p.waitForTimeout(420);
+  var shown = await s33.p.evaluate(function () {
+    var rows = document.querySelectorAll("#dBody .nwi");
+    return {
+      n: rows.length,
+      titles: Array.prototype.map.call(document.querySelectorAll("#dBody .nwh b"), function (b) { return b.textContent; }),
+      /* every edition shut: sixty open reports is the wall the collapse prevents */
+      open: document.querySelectorAll("#dBody .nwi.open").length,
+      bodyH: rows[0].querySelector(".nwb").getBoundingClientRect().height,
+      heads: rows[0].querySelectorAll(".nwb h4").length
+    };
+  });
+  ok("it survives a reload and lists newest first",
+     shown.n === 2 && shown.titles[0] === "Weekly Report \u2014 11 October 2026" &&
+     shown.titles[1] === "Daily Newsletter \u2014 07 October 2026", JSON.stringify(shown));
+  ok("every edition starts collapsed", shown.open === 0 && shown.bodyH === 0, JSON.stringify(shown));
+  await s33.p.click("#dBody .nwi:last-child .nwh");
+  await s33.p.waitForTimeout(260);
+  var opened = await s33.p.evaluate(function () {
+    var r = document.querySelector("#dBody .nwi:last-child");
+    return { open: r.classList.contains("open"),
+             h: r.querySelector(".nwb").getBoundingClientRect().height,
+             heads: r.querySelectorAll(".nwb h4").length,
+             badge: document.getElementById("newsN").classList.contains("off") };
+  });
+  ok("a tap on the title opens that edition", opened.open && opened.h > 20, JSON.stringify(opened));
+  ok("its sections are headings, not one run of paragraphs", opened.heads === 2, JSON.stringify(opened));
+  ok("and opening the drawer clears the newsletter badge", opened.badge, JSON.stringify(opened));
+  ok("the newsletters draw without a console error", s33.errs.length === 0, s33.errs.join(" | "));
+  await s33.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

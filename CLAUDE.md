@@ -247,16 +247,25 @@ Three things keep it from eating itself or his subscription:
 - It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`, generated with
   `claude setup-token`, and `RELAY_AGENT_KEY`, which the deploy also pushes
   onto the Worker as `AGENT_KEY`, so the two ends match by construction. Without either, the job falls back or fails and nothing
-  else breaks — the Routine still picks the notes up on its schedule.
+  else breaks — the board pass still picks the notes up on its schedule.
 - The relay caps itself at **20 runs an hour** across all callers. Its address
   is public, and a run spends his subscription rather than a line in a public
   folder.
 
-## The twice-daily Routine
+## The board pass, three times a day
 
-`MBA Command Center Updates` (`trig_01Bv7G8MMn3vkY6bbkq4QNiv`) fires at 07:57 and
-17:57 Europe/Paris — 11:27 and 21:27 Asia/Kolkata — starting a fresh session on
-this repo. It polls; it is not woken by a commit.
+`MBA board pass (3x daily)` (`trig_01NzPtMyET8r329X7UCtjeoa`) fires at **09:00,
+15:00 and 19:00 Asia/Jakarta**, into the project thread session rather than a
+fresh one. It polls; it is not woken by a commit.
+
+**Three fixed times is the whole point, and it replaced something that felt
+like a trigger per email.** He said so on 2026-10-05: *"I think currently you
+are getting triggered everytime I get an email - as nice as it is, it will eat
+up credits and also clutter my notes section."* Nothing was actually watching
+his inbox -- there is no Gmail trigger and never was -- but a pass that often
+enough to feel like one has the same cost and the same clutter. **The mail scan
+runs on these three passes and nowhere else.** Jakarta until he moves; Paris
+after.
 
 **Its job is `/nudge`, not notes.** It used to poll `claude-inbox/` for anything
 unanswered, and that has been dead weight since the relay started asking for a
@@ -379,6 +388,23 @@ expected case over the top of what he was reading, when the thread already
 shows a message going from "sending…" to sent and the board already shows the
 change he just made. A **failed** send still speaks, because that is the one
 case he cannot see.
+
+**A newsletter rings the phone too, and it is the one he asked for by name:**
+*"I should get a mobile notification when it is generated like 'Gavin, today's
+command newsletter is ready'."* It goes ahead of a nudge in the same payload,
+under one tag, so a second edition replaces the first rather than stacking. The
+same three gates apply -- it must have arrived on `/agent/reply`, and it must be
+newer than `NOTIFY_FRESH`.
+
+**"On" and "silently broken" used to look identical.** The banner disappeared
+the moment a subscription existed, which is exactly the state he was in when he
+said he was getting nothing at all: nothing on screen could tell a relay that
+had sent nothing from a subscription iOS had quietly dropped. It stays now,
+quiet, carrying a **Send a test** button that posts to `/push/test` and reports
+what the push service actually answered -- no device subscribed, sent but
+refused, or sent and accepted. That separates the three in one tap instead of
+three guesses. The route is capped at one a minute, because its address is
+public like the rest of them.
 
 `checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
 board is handed, the same way the push service will. A signature that is subtly
@@ -571,6 +597,76 @@ exists nowhere else — an archive carrying everything except the irreplaceable
 part is not a backup. The map never expires: a note ages out because it is a
 message, and a fact he wrote down is the opposite of a message.
 
+## The bottom bar, and the title the tabs left behind
+
+The sections are **five icons along the foot of the screen**, in the shape
+every app on his phone already uses: *"Make the section headers Overview,
+board, etc into social media app-like selections at the bottom of the screen
+with icons only."* `.vbar` is the last child of `.app` and never scrolls, so
+the same five targets sit in the same five places on every view, within a
+thumb's reach.
+
+- **There is no Chat tab.** *"No need for a seperate section selection for
+  chat, the floating chat icon is enough."* The `.fab` was built because Chat
+  was the seventh tab in a sideways-scrolling strip and so furthest from his
+  thumb; keeping both would have put the same thing in two places, one of them
+  the worse one. `setView("chat")` still works, Chat is still in `VIEWS`, and
+  the palette and the number keys still reach it.
+- **The open section's name is a row under the header** (`.vhead`), in the row
+  the strip vacated: *"The section title should only show up when the section
+  is open (perhaps where the section selection lives now)."* It reads its text
+  off `VIEWS`, which is why Chat stays in that list despite having no tab.
+- **A tab carries no word and no number.** A count has nowhere to sit on a bare
+  icon, and "35 tasks" was never worth a badge; `.vd` is a dot, and it says the
+  one thing that is -- something in here is already past its date. Every tab
+  carries an `aria-label`, or the strip is five unlabelled buttons.
+- **The composers float above the bar.** *"Make the text boxes in mindmap and
+  claude chat floating above the new bottom section bar."* `.cfoot` lost its
+  background and its top rule and `.cbox` became a rounded, shadowed box with a
+  gap under it -- welded to the foot with a full-width line over it, it read as
+  a second chrome strip stacked on the first, and the thread ended at a hard
+  edge instead of continuing behind it.
+- **The floating button sits clear of the bar**, which is a `calc()` off the
+  bar's own height rather than a number guessed twice.
+
+## The newsletters
+
+Twice the board speaks without being asked: a nudge, and a newsletter. A nudge
+is one line about one task. A newsletter is the whole board at a fixed hour,
+and it is the **only** surface allowed to summarise -- everywhere else, a
+summary nobody asked for is the noise this board exists to cut.
+
+- **Daily at 09:52 Jakarta, every day but Sunday**: due today, overdue, waiting
+  on you, worth starting. Three to eight lines, read on a phone before work.
+- **Weekly on Sunday**: what moved, what did not, **risks**, what to put first.
+  He was explicit that it is a different thing and not a longer one --
+  *"more strategic and analytical of what is done, what are the current risks,
+  what to prioritize"*. The Risks section is the reason the edition exists.
+- **They are their own field, `news[]`, not notes.** A note ages out at seven
+  days because it is a message; the point of a weekly report is that it is
+  still there in a month to read back against. `NEWS_KEEP` is 60, roughly two
+  months of editions. Like `kb`, it is a whole-blob field, so it has its own
+  rule in `save()` (`unionNews`, newest clock per id) -- see the two-tabs
+  section.
+- **`read` is per device and deliberately does not travel.** Reading Sunday's
+  report on the laptop says nothing about the phone, so the relay strips the
+  flag in `fold()` rather than folding it.
+- **The title is derived, never stored.** `newsTitle()` builds "Daily
+  Newsletter &mdash; 07 October 2026" from `period` and `date`; there is no
+  `title` field, because a second copy of a date is a date that can drift.
+- **The body is plain text with one piece of markup**: a line starting `## ` is
+  a section heading. A brief is three or four sections and a run of
+  equal-weight paragraphs is the "all in one paragraph" he objected to on the
+  mind map.
+- **Every edition is shut**, in a drawer of its own behind the newspaper button
+  beside Notes. Sixty open reports is the wall the collapse prevents, and the
+  thread is the wrong home for them: eleven dailies between two of his messages
+  would bury the conversation Chat exists to be.
+- `.claude/skills/newsletter/SKILL.md` is the procedure; two Routines
+  (`trig_016VorBTgieKUUx7kgXmN1dy` daily, `trig_01FLWvPD8AaeNQGcJv2RfBaz`
+  weekly) are the trigger. They fire into the same thread session the board
+  pass uses, which is where the repo access lives.
+
 ## One view for the tasks, not two
 
 Timeline and List were two tabs over the same 35 rows, grouped the same way by
@@ -738,6 +834,13 @@ his last answer. Timestamps are never typed; `noteWhen()` reads `createdAt`.
 The Notes badge counts what is **new**, not what exists. It read 34 for weeks,
 which is a number nobody can act on, and at zero it hides entirely.
 
+**Opening the drawer is reading them.** It used to clear only on the Chat view,
+so the badge sat at 3 over a list he had just read and the only way to put it
+out was to open a second screen showing the same notes: *"The all notes section
+on top right doesn't mark read once open - I need to open the chat section to
+mark it as read."* It is marked after the markup is built, so the NEW tags are
+still on the ones that were new when he opened it -- the same order Chat uses.
+
 `actedOf()` is the receipt filter. A run with nothing to change still says so,
 and it said so in `acted[]` — "No board changes: the flight task being Done is
 what ticks the milestone" — which rendered under **What I changed** as a change
@@ -746,7 +849,7 @@ that did not happen. The box now appears only when something did.
 ## Nudges: Claude speaking first
 
 Everything else on this board reacts to him. A nudge does not: it is Claude
-looking at the whole board twice a day and deciding whether anything is worth
+looking at the whole board three times a day and deciding whether anything is worth
 interrupting him for. He asked for it in these words — *"the notifications
 should be from you, as a productivity manager ensuring I stay on track"*.
 
@@ -766,7 +869,9 @@ learns to ignore everything you send.
 **The judgement lives in `.claude/skills/nudge/SKILL.md`, not in JS.** What
 deserves an interruption is not an if-tree, and the volume caps are in there
 too — at most two a run, one per task per 48 hours, and silence as the normal
-outcome. A board that speaks twice a day about everything is a board he mutes.
+outcome. A board that speaks three times a day about everything is a board he
+mutes, and three passes do not raise the ceiling -- they lower the odds any one
+pass has something to say.
 
 ## How long a task takes, and when to start it
 
@@ -930,7 +1035,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 190 invariants, three widths, a real browser. Every one of them was a
+that runs: 216 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

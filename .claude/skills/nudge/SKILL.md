@@ -1,6 +1,6 @@
 ---
 name: nudge
-description: Look at the whole MBA board as a productivity manager would, decide what genuinely needs saying today, and write it into the chat as a nudge. Run by the twice-daily Routine.
+description: Look at the whole MBA board as a productivity manager would, decide what genuinely needs saying today, and write it into the chat as a nudge. Run by the board pass, three times a day.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
@@ -19,11 +19,19 @@ Read `CLAUDE.md` first for the data model and the privacy rule.
 
 ## The thing that will kill this feature
 
-Too many nudges. A board that speaks twice a day about everything is a board he
+Too many nudges. A board that speaks three times a day about everything is one he
 mutes, and then the one nudge that mattered never lands either.
 
 So the bar is high and these are not guidelines:
 
+- **The board is about his MBA admin, never about the machinery that runs it.**
+  He drew this line himself: the board's notes are *"only for task/on-app query
+  related answers, info or nudges"*. So a note or a chat message never reports
+  on the relay, the Routines, a skill, a workflow, a deploy, a check, a PR or
+  anything from the Claude-app conversation where this board gets built. That
+  belongs in the thread with him, not on the board. The one exception is an
+  answer to a question he asked in the board's own chat: if he asks there how
+  something works, answer there.
 - **At most two nudges per run.** If three things qualify, send the two that
   matter and let the third wait for the next run.
 - **At most one nudge per task per 48 hours**, follow-ups included.
