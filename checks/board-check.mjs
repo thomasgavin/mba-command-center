@@ -1144,23 +1144,52 @@ for (var tw26 of [390, 1280]) {
    goes through a real merge and then a real reload. */
 {
   var KB = [
+    /* cards: peers, nothing in sequence */
     { id: "k-vmock", label: "VMock scores a CV draft", body: "Says what to fix before a human reads it.",
-      group: "Platforms and tools", ord: 40,
+      group: "Platforms and tools", ord: 40, shape: "cards",
       cat: "work", item: "vmock", rel: ["k-cv"], at: "2026-10-05T09:00:00.000Z", by: "claude" },
     { id: "k-cv", label: "One INSEAD CV format", body: "Their template, used as a marketing document.",
-      group: "Platforms and tools", ord: 40,
+      group: "Platforms and tools", ord: 40, shape: "cards",
       cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
-    /* the two webinars are the whole of his complaint: they belong together
-       under what they are, dated, with the later one second */
+    /* timeline: the two webinars are the whole of his first complaint -- they
+       belong together under what they are, dated, with the later one second --
+       and the second of his: a sequence of dated events wants a rail, not a
+       list. One is in the past so the hollow dot is exercised. */
     { id: "k-cvweb", label: "INSEAD CV & Cover Letter webinar", body: "What goes in the format and what stays out.",
-      group: "Webinars and sessions", ord: 10, when: "13 November 2026", w: "2026-11-13",
+      group: "Webinars and sessions", ord: 10, shape: "timeline", when: "13 November 2026", w: "2026-11-13",
       cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
     { id: "k-pldpweb", label: "PLDP intro webinar", body: "Clarifies the P0 leadership assignments.",
-      group: "Webinars and sessions", ord: 10, when: "05 November 2026", w: "2026-11-05",
+      group: "Webinars and sessions", ord: 10, shape: "timeline", when: "05 November 2026", w: "2026-11-05",
       cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    { id: "k-past", label: "A session that already happened", body: "Its dot is hollow.",
+      group: "Webinars and sessions", ord: 10, shape: "timeline", when: "02 October 2026", w: "2026-10-02",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    /* calendar: the schedule he said was "all cluttered in a single paragraph".
+       Three nodes pooling their rows onto one axis is the whole point -- a
+       period, a break and a single date have to share a scale. */
+    { id: "k-p0span", label: "P0, the pre-programme period", body: "Where he is now.",
+      group: "Programme calendar", ord: 30, shape: "calendar", when: "26 Oct 2026 - 17 Jan 2027", w: "2026-10-26",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude",
+      rows: [{ t: "P0", a: "2026-10-26", b: "2027-01-17", k: "period" }] },
+    { id: "k-cal", label: "Period dates, P1 to P5", body: "Provisional; INSEAD says they can move.",
+      group: "Programme calendar", ord: 30, shape: "calendar", when: "18 Jan - 4 Dec 2027", w: "2027-01-18",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude",
+      rows: [{ t: "P1", a: "2027-01-18", b: "2027-03-10", k: "period" },
+             { t: "P2", a: "2027-03-15", b: "2027-05-04", k: "period" }] },
+    { id: "k-breaks", label: "Breaks", body: "Treks run in the short ones.",
+      group: "Programme calendar", ord: 30, shape: "calendar", when: "Mar 2027", w: "2027-03-11",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude",
+      rows: [{ t: "Break", a: "2027-03-11", b: "2027-03-14", k: "break" }] },
+    { id: "k-grad", label: "Graduation, Singapore", body: "Grad trip after.",
+      group: "Programme calendar", ord: 30, shape: "calendar", when: "15 December 2027", w: "2027-12-15",
+      cat: "study", at: "2026-10-05T09:00:00.000Z", by: "claude",
+      rows: [{ t: "Graduation", a: "2027-12-15", k: "point" }] },
     { id: "k-cdc-coach", label: "Coaching sessions are 45 minutes", parent: "k-cv",
       body: "Short enough to fit before class.", cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
+    /* a shape this build has never heard of has to degrade to the list rather
+       than draw nothing, or a future Claude naming one breaks the view */
     { id: "k-orphan", label: "A fact whose topic was deleted", parent: "k-ghost",
+      group: "Everything else", shape: "sunburst",
       cat: "money", at: "2026-10-05T09:00:00.000Z", by: "claude" }
   ];
   var s29 = await open(390);
@@ -1189,18 +1218,18 @@ for (var tw26 of [390, 1280]) {
     setView("map");
     await new Promise(function (r) { setTimeout(r, 120); });
     var stored = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
-    var row = document.querySelector('[data-kb="k-pldpweb"]');
+    var txt = function (e) { return e ? e.innerText.replace(/\s+/g, " ").trim() : ""; };
     return { count: kb.length, stored: (stored.kb || []).length,
              badge: document.getElementById("nMap").textContent,
-             roots: Array.prototype.map.call(document.querySelectorAll(".mrh"), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); }),
-             labels: Array.prototype.map.call(document.querySelectorAll(".mnl"), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); }),
-             /* the two webinar rows, in the order they are drawn */
-             web: Array.prototype.map.call(
-               document.querySelectorAll('.mroot .mnl'), function (e) { return e.innerText.replace(/\s+/g, " ").trim(); })
-               .filter(function (t) { return /webinar/i.test(t); }),
-             /* the line under the title, with nothing tapped */
-             body: row ? (row.querySelector(".mnb") || {}).innerText || "" : "(no row)",
-             twisties: document.querySelectorAll(".mn .mtw").length };
+             roots: Array.prototype.map.call(document.querySelectorAll(".mrh"), txt),
+             /* collapsed: no row of any shape is drawn yet */
+             rows: document.querySelectorAll(".mn,.mtli,.mcard,.mcr").length,
+             open: document.querySelectorAll(".mroot.open").length,
+             hints: Array.prototype.map.call(document.querySelectorAll(".mrn"), txt),
+             /* the tint is derived from the group name, so two groups cannot
+                share one unless the hash collides -- and every block has one */
+             tints: Array.prototype.map.call(document.querySelectorAll(".mroot"),
+               function (e) { return e.style.background; }) };
   }, KB);
   ok("a patch from Claude fills the map", filled.count === KB.length, JSON.stringify(filled));
   ok("and it is written to storage, not only held in memory",
@@ -1211,54 +1240,120 @@ for (var tw26 of [390, 1280]) {
      follow strict and very generic academic, life, career categorization." So
      the top level is what a thing is, and the four buckets are not in it. */
   ok("the top of the list is what a thing is, not a generic bucket",
-     filled.roots.some(function (r) { return /WEBINARS AND SESSIONS/i.test(r); }) &&
-     !filled.roots.some(function (r) { return /\b(CAREER|ACADEMICS|STUDENT LIFE|FINANCIAL)\b/i.test(r); }),
+     filled.roots.some(function (r) { return /Webinars and sessions/i.test(r); }) &&
+     !filled.roots.some(function (r) { return /\b(Career|Academics|Student Life|Financial)\b/i.test(r); }),
      JSON.stringify(filled.roots));
-  ok("both webinars sit in the one group, earliest first",
-     filled.web.length === 2 && /PLDP/.test(filled.web[0]) && /CV/.test(filled.web[1]),
-     JSON.stringify(filled.web));
-  /* "PLDP Webinar - 05 November 2026": the date is half the title, and he
-     should not have to open anything to read the second half */
-  ok("a title carries its own date",
-     /PLDP intro webinar/.test(filled.labels.join(" | ")) &&
-     filled.labels.some(function (t) { return /PLDP intro webinar \u00b7 05 November 2026/.test(t); }),
-     JSON.stringify(filled.labels));
-  /* "I have to click and go down a hole, avoiding which is the whole point of
-     building this app" */
-  ok("the line under a title is already on screen, untapped",
-     /Clarifies the P0/.test(filled.body), JSON.stringify(filled.body));
-  ok("and no row has a twisty to open", filled.twisties === 0, String(filled.twisties));
-  /* a node whose parent no longer exists must still be reachable: an orphan at
-     the top of its category, never a node that simply stops being drawn */
-  ok("a fact whose parent is missing is still on screen",
-     filled.labels.indexOf("A fact whose topic was deleted") >= 0, JSON.stringify(filled.labels));
+  /* "Keep all group blocks collapsed by default" */
+  ok("every group starts collapsed", filled.open === 0 && filled.rows === 0, JSON.stringify(filled));
+  /* nine shut headers are an index of headings; one that says what is next in
+     it is an index of answers, which is what makes collapsing them bearable */
+  ok("and a shut group still says what is next inside it",
+     filled.hints.length === filled.roots.length &&
+     filled.hints.some(function (t) { return /^Next: /.test(t); }), JSON.stringify(filled.hints));
+  /* "Give a light tint colour to each group blocks" -- taken from the block's
+     position in JS, so a group invented next month gets one without a palette
+     edit. Name-hashing came first and put the same colour on two of nine real
+     groups, so what is checked is that no two blocks in a row match. */
+  ok("each block carries its own tint, and no two in a row match",
+     filled.tints.length > 2 && filled.tints.every(function (b) { return /rgba\(/.test(b); }) &&
+     filled.tints.every(function (b, i) { return i === 0 || b !== filled.tints[i - 1]; }),
+     JSON.stringify(filled.tints));
 
   /* the reload is the point: DFIELDS taught that a field can merge and never
-     save, and pass every in-memory assertion on the way */
+     save, and pass every in-memory assertion on the way. `rows[]` and `shape`
+     are new stored fields, so this is the check that would catch either of
+     them merging without saving. */
   await s29.p.reload({ waitUntil: "load" });
   await s29.p.waitForTimeout(500);
-  var kept = await s29.p.evaluate(function () {
+  var kept = await s29.p.evaluate(async function () {
     setView("map");
-    return { count: kb.length, drawn: document.querySelectorAll(".mn").length };
+    /* open every group, which is also the tap-to-open check. Each tap
+       repaints the whole view, so the next header has to be looked up again --
+       a cached NodeList is four detached elements after the first click. */
+    var names = Array.prototype.map.call(document.querySelectorAll("[data-mg]"),
+      function (e) { return e.dataset.mg; });
+    for (var i = 0; i < names.length; i++) {
+      document.querySelector('[data-mg="' + names[i] + '"]').click();
+      await new Promise(function (r) { setTimeout(r, 40); });
+    }
+    var one = kb.filter(function (n) { return n.id === "k-cal"; })[0];
+    return { count: kb.length, rows: one && one.rows ? one.rows.length : 0,
+             shape: one ? one.shape : "", drawn: document.querySelectorAll(".mn,.mtli,.mcard").length,
+             open: document.querySelectorAll(".mroot.open").length };
   });
   ok("the map survives a reload, so it reaches his other device",
      kept.count === KB.length && kept.drawn > 0, JSON.stringify(kept));
+  ok("and the shape and its spans survive it too",
+     kept.shape === "calendar" && kept.rows === 2, JSON.stringify(kept));
+  ok("a group opens on a tap", kept.open === 4, JSON.stringify(kept));
 
-  /* the group header is the only thing that collapses, and it starts open: a
-     list that opens shut is a list that has to be opened before it says
-     anything, which is the hole he asked to be rid of */
-  var tw = await s29.p.evaluate(async function () {
-    var head = document.querySelector('[data-mg="Webinars and sessions"]');
-    var before = !!document.querySelector('[data-kb="k-pldpweb"]');
-    head.click();
-    await new Promise(function (r) { setTimeout(r, 80); });
-    var after = !!document.querySelector('[data-kb="k-pldpweb"]');
-    document.querySelector('[data-mg="Webinars and sessions"]').click();
-    await new Promise(function (r) { setTimeout(r, 80); });
-    return { before: before, after: after, back: !!document.querySelector('[data-kb="k-pldpweb"]') };
+  /* "each block might be best displayed in a completely different way": the
+     shape is a field on the node and this is the one place it becomes markup */
+  var shapes = await s29.p.evaluate(function () {
+    var g = function (name) {
+      var h = Array.prototype.filter.call(document.querySelectorAll(".mrh"), function (e) {
+        return e.innerText.indexOf(name) >= 0; })[0];
+      return h ? h.parentElement : null;
+    };
+    var web = g("Webinars"), cal = g("Programme calendar"), plat = g("Platforms"), els = g("Everything else");
+    var dot = web ? web.querySelector('[data-kb="k-past"] > i') : null;
+    var live = web ? web.querySelector('[data-kb="k-cvweb"] > i') : null;
+    var bars = cal ? Array.prototype.map.call(cal.querySelectorAll(".mcb,.mcp"), function (e) {
+      return { cls: e.className, left: e.style.left, w: e.style.width || "" }; }) : [];
+    return {
+      rail: !!(web && web.querySelector(".mtl")), dots: web ? web.querySelectorAll(".mtli > i").length : 0,
+      past: !!(dot && /past/.test(dot.parentElement.className)),
+      pastHollow: dot ? getComputedStyle(dot).backgroundColor : "",
+      liveFilled: live ? getComputedStyle(live).backgroundColor : "",
+      /* the chart pools three nodes' spans onto one axis */
+      chart: !!(cal && cal.querySelector(".mcal")), bars: bars,
+      months: cal ? cal.querySelectorAll(".mcam").length : 0,
+      now: !!(cal && cal.querySelector(".mcnow")),
+      /* and the prose still reads under it: a bar says when, never why */
+      calProse: cal ? cal.querySelectorAll(".mn").length : 0,
+      grid: !!(plat && plat.querySelector(".mcg")), cards: plat ? plat.querySelectorAll(".mcard").length : 0,
+      /* a chart row whose label is cut off is a row you cannot identify;
+         "Launch Week" ellipsised to "Launch ..." at 78px on a phone */
+      cut: cal ? Array.prototype.filter.call(cal.querySelectorAll(".mcl"), function (e) {
+        return e.scrollWidth > e.clientWidth; }).map(function (e) { return e.innerText; }) : ["(no chart)"],
+      /* an unknown shape degrades to the list rather than drawing nothing */
+      unknown: els ? els.querySelectorAll(".mn").length : -1,
+      twisties: document.querySelectorAll(".mn .mtw, .mtli .mtw, .mcard .mtw").length
+    };
   });
-  ok("a group starts open and collapses on a tap",
-     tw.before === true && tw.after === false && tw.back === true, JSON.stringify(tw));
+  ok("a sequence of dated events draws as a rail with a dot each",
+     shapes.rail && shapes.dots === 3, JSON.stringify(shapes));
+  /* where he is in the sequence, with nothing stored to say it */
+  ok("and a dot whose date has passed is hollow",
+     shapes.past && shapes.pastHollow !== shapes.liveFilled, JSON.stringify(shapes));
+  /* "the program calendar are important dates all cluttered in a single
+     paragraph" -- a schedule is a shape, not a paragraph */
+  ok("a schedule draws as a month axis, not a paragraph",
+     shapes.chart && shapes.months >= 14, JSON.stringify(shapes));
+  /* the one line drawn once for the whole chart rather than per row; it is
+     only there when today is actually inside the axis */
+  ok("and today is marked on it", shapes.now, JSON.stringify(shapes));
+  ok("four nodes' spans share one axis, a point and a break among them",
+     shapes.bars.length === 5 && shapes.bars.filter(function (b) { return /mcp/.test(b.cls); }).length === 1 &&
+     shapes.bars.filter(function (b) { return /br/.test(b.cls); }).length === 1,
+     JSON.stringify(shapes.bars));
+  ok("the chart is ordered left to right by date",
+     shapes.bars.every(function (b, i) {
+       return i === 0 || parseFloat(b.left) >= parseFloat(shapes.bars[i - 1].left); }),
+     JSON.stringify(shapes.bars));
+  ok("and the prose still reads under the chart", shapes.calProse === 4, JSON.stringify(shapes));
+  ok("no chart row label is cut off", shapes.cut.length === 0, JSON.stringify(shapes.cut));
+  ok("a set of peers draws as a grid", shapes.grid && shapes.cards === 2, JSON.stringify(shapes));
+  ok("a shape this build has never heard of falls back to the list",
+     shapes.unknown === 1, JSON.stringify(shapes));
+  ok("and no row of any shape has a twisty to open", shapes.twisties === 0, String(shapes.twisties));
+
+  /* a node whose parent no longer exists must still be reachable: an orphan in
+     its group, never a node that simply stops being drawn */
+  var orph = await s29.p.evaluate(function () {
+    return !!document.querySelector('[data-kb="k-orphan"]');
+  });
+  ok("a fact whose parent is missing is still on screen", orph, String(orph));
 
   /* "instead of me rummaging through the dashboard": the board answers out of
      what it already holds, immediately, and says that Claude's answer follows */
@@ -1273,8 +1368,10 @@ for (var tw26 of [390, 1280]) {
     var sent = notes.filter(function (n) { return n.kind === "ask"; });
     return { shown: !box.classList.contains("off"), text: box.innerText,
              asks: sent.length, travels: sent.length ? sent[0].forClaude !== false : false,
-             dim: document.querySelectorAll(".mn.dim").length,
-             hit: document.querySelectorAll(".mn.hit").length };
+             /* every shape has to dim, or a search inside a card grid or a
+                rail lights nothing and reads as having found nothing */
+             dim: document.querySelectorAll(".mn.dim,.mtli.dim,.mcard.dim").length,
+             hit: document.querySelectorAll(".mn.hit,.mtli.hit,.mcard.hit").length };
   });
   ok("an ask answers out of the map at once", ask.shown && /VMock/.test(ask.text), JSON.stringify(ask));
   ok("and says Claude's own answer is coming", /Claude/.test(ask.text), JSON.stringify(ask));
@@ -1300,6 +1397,13 @@ for (var tw26 of [390, 1280]) {
   /* the link to the task is the point of filing it at all */
   var jump = await s29.p.evaluate(async function () {
     setView("map");
+    /* a chip inside a shut block is not drawn at all, so make sure that one
+       is open -- and do not toggle it shut if it already is */
+    var ph = document.querySelector('[data-mg="Platforms and tools"]');
+    if (!ph.parentElement.classList.contains("open")) {
+      ph.click();
+      await new Promise(function (r) { setTimeout(r, 80); });
+    }
     var chip = document.querySelector('.mtag.mitem[data-go="vmock"]');
     if (!chip) return { chip: false };
     chip.click();

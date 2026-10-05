@@ -1,0 +1,690 @@
+{
+ "v": 3,
+ "op": "patch",
+ "exportedAt": "2026-10-05T16:20:00.000Z",
+ "source": "claude-session-018rMXKNXmBi3MJEoJQCUDLy",
+ "why": "Per-group render shapes and fuller content, per Gavin's five points",
+ "changed": [],
+ "kb": [
+  {
+   "id": "k-iaa",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "IAA Alumni Meet & Greet",
+   "body": "The INSEAD Alumni Association's own introduction to the network: who they are, what the regional chapters do, and how alumni actually get used during and after the MBA. Optional in INSEAD's own rating, and the one P0 session that is about the twenty years after the degree rather than the year of it.",
+   "cat": "life",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "28 October 2026",
+   "w": "2026-10-28"
+  },
+  {
+   "id": "k-pldp-web",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "PLDP intro webinar",
+   "body": "On Zoom. Walks through the Personal Leadership Development Programme: what the P0 assignments ask for, how individual and group coaching fit together across the year, and what your coach does with what you write. INSEAD marks this MUST DO, and it is the session that makes the assignment window make sense rather than feel like homework.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "05 November 2026",
+   "w": "2026-11-05",
+   "item": "pldp-webinar",
+   "rel": [
+    "k-pldp",
+    "k-pldp-p0"
+   ]
+  },
+  {
+   "id": "k-ama",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "AMA on student platforms",
+   "body": "An open question session on the tools you are about to live in: the LMS, CareerGlobe, and the rest of the stack. Optional, and worth it only if something in the platforms is already confusing you by then.",
+   "cat": "life",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "10 November 2026",
+   "w": "2026-11-10",
+   "rel": [
+    "k-lms",
+    "k-careerglobe"
+   ]
+  },
+  {
+   "id": "k-cvweb",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "INSEAD CV & Cover Letter webinar",
+   "body": "13:00 Paris / 20:00 Singapore. What belongs in the INSEAD CV format and what gets cut, how recruiters read it, and where the CV work sits in the year: a first draft through VMock before a human sees it, then review with your coach, and the CV Book after that. Must-do for career switchers.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "13 November 2026",
+   "w": "2026-11-13",
+   "item": "cv-webinar",
+   "rel": [
+    "k-cvbook",
+    "k-vmock"
+   ]
+  },
+  {
+   "id": "k-acadweb",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "Academics overview webinar",
+   "body": "On Zoom, with the MBA Programme Management Director and current students. The curriculum end to end, how the core and electives fit, exemptions, and what people wish they had done before arriving. Highly recommended rather than required, and the one place to ask a second-hand question about workload.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "26 November 2026",
+   "w": "2026-11-26",
+   "item": "acad-webinar",
+   "rel": [
+    "k-p1cores",
+    "k-exempt"
+   ]
+  },
+  {
+   "id": "k-sumweb",
+   "group": "Webinars and sessions",
+   "ord": 10,
+   "shape": "timeline",
+   "label": "Your Summer Experience & Prep for Arrival",
+   "body": "The three honest ways to spend the eight-week break after P3: a short-term summer project with a company, a startup tour, or deliberate time off to prepare for full-time recruitment. Also covers arrival logistics. This is the session that decides what you spend P2 recruiting for.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "04 December 2026",
+   "w": "2026-12-04",
+   "item": "summer-webinar",
+   "rel": [
+    "k-intern",
+    "k-interntiming"
+   ]
+  },
+  {
+   "id": "k-bizfound",
+   "group": "Deadlines",
+   "ord": 20,
+   "shape": "timeline",
+   "label": "Business Foundations: register by 30 October",
+   "body": "The course itself runs one week online, 16-20 November: an intensive introduction to Financial Accounting, Finance and Quantitative Methods aimed at people arriving without a quant background. Optional, registered through MyINSEAD, and the decision has to be made three weeks before it runs.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Register by 30 October 2026",
+   "w": "2026-10-30",
+   "item": "bizfound",
+   "rel": [
+    "k-p1cores"
+   ]
+  },
+  {
+   "id": "k-quest",
+   "group": "Deadlines",
+   "ord": 20,
+   "shape": "timeline",
+   "label": "CareerLeader and Career Anchors, before the first coaching session",
+   "body": "Two profiling questionnaires plus the workbook questions that go with them. They are the entire raw material for the first coaching conversation, so the session is only as good as what you put in: arriving without them turns a 45-minute slot into an introduction you could have had by email.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Before November 2026",
+   "w": "2026-11-01",
+   "item": "cdc-quests",
+   "rel": [
+    "k-coach1",
+    "k-coach-ses"
+   ]
+  },
+  {
+   "id": "k-pldp-p0",
+   "group": "Deadlines",
+   "ord": 20,
+   "shape": "timeline",
+   "label": "PLDP assignments window",
+   "body": "Delivered online through the LMS across roughly seven weeks. Your coach reads these before meeting you, so they are what shapes the coaching you get rather than a box to tick. INSEAD marks them MUST DO, and the window deliberately spans the December break because they are not a single sitting.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "06 Nov - 28 Dec 2026",
+   "w": "2026-11-06",
+   "item": "pldp-work",
+   "rel": [
+    "k-pldp",
+    "k-pldp-web"
+   ]
+  },
+  {
+   "id": "k-launchprep",
+   "group": "Deadlines",
+   "ord": 20,
+   "shape": "timeline",
+   "label": "Launch Week career pre-work appears on the LMS",
+   "body": "Posted in early December, to be completed before Launch Week rather than during it. Launch Week is dense enough that anything left undone gets done badly or not at all, and the career workshop assumes the pre-work is behind you.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Early December 2026",
+   "w": "2026-12-01",
+   "item": "launch-prework",
+   "rel": [
+    "k-launch"
+   ]
+  },
+  {
+   "id": "k-p0span",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "P0, the pre-programme period",
+   "when": "26 Oct 2026 - 17 Jan 2027",
+   "w": "2026-10-26",
+   "body": "Where the board is right now: the twelve weeks between the LMS going live and Launch Week. Three strands run through it at once -- Academics, Careers and Student Life -- and almost everything in the Webinars and Deadlines blocks sits inside this stretch. It ends the day Launch Week begins.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-launch"
+   ],
+   "rows": [
+    {
+     "t": "P0",
+     "a": "2026-10-26",
+     "b": "2027-01-17",
+     "k": "period"
+    }
+   ]
+  },
+  {
+   "id": "k-launch",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "Launch Week",
+   "body": "Fontainebleau, eleven days. The P1 core exemption exams sit inside it along with orientation, the career workshop and the first run of sessions that set up P1. The pre-work that goes with it lands on the LMS in early December.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "07 - 17 January 2027",
+   "w": "2027-01-07",
+   "rel": [
+    "k-exempt",
+    "k-launchprep"
+   ],
+   "rows": [
+    {
+     "t": "Launch Week",
+     "a": "2027-01-07",
+     "b": "2027-01-17",
+     "k": "period"
+    }
+   ]
+  },
+  {
+   "id": "k-cal",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "Period dates, P1 to P5",
+   "body": "Five eight-week periods across eleven months, with a long summer gap in the middle. INSEAD publishes these as provisional and says they can still move, so treat anything booked around the edges as provisional too.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "18 Jan - 4 Dec 2027",
+   "w": "2027-01-18",
+   "rows": [
+    {
+     "t": "P1",
+     "a": "2027-01-18",
+     "b": "2027-03-10",
+     "k": "period"
+    },
+    {
+     "t": "P2",
+     "a": "2027-03-15",
+     "b": "2027-05-04",
+     "k": "period"
+    },
+    {
+     "t": "P3",
+     "a": "2027-05-10",
+     "b": "2027-06-30",
+     "k": "period"
+    },
+    {
+     "t": "P4",
+     "a": "2027-08-23",
+     "b": "2027-10-12",
+     "k": "period"
+    },
+    {
+     "t": "P5",
+     "a": "2027-10-18",
+     "b": "2027-12-04",
+     "k": "period"
+    }
+   ]
+  },
+  {
+   "id": "k-breaks",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "Breaks",
+   "body": "Three short ones and the long summer. The short breaks are not empty: career treks and club treks run in them, which is most of what people mean when they say the MBA has no holidays. The 1 July to 22 August gap is the one the summer project fits inside.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Mar / May / Jul-Aug / Oct 2027",
+   "w": "2027-03-11",
+   "rel": [
+    "k-intern"
+   ],
+   "rows": [
+    {
+     "t": "Break",
+     "a": "2027-03-11",
+     "b": "2027-03-14",
+     "k": "break"
+    },
+    {
+     "t": "Break",
+     "a": "2027-05-05",
+     "b": "2027-05-09",
+     "k": "break"
+    },
+    {
+     "t": "Summer",
+     "a": "2027-07-01",
+     "b": "2027-08-22",
+     "k": "break"
+    },
+    {
+     "t": "Break",
+     "a": "2027-10-13",
+     "b": "2027-10-17",
+     "k": "break"
+    }
+   ]
+  },
+  {
+   "id": "k-exchange",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "Campus exchange bidding happens during P1",
+   "body": "Campus is Fontainebleau or Singapore for P1 and P2; exchange opens from P3 onwards, and the bidding for it runs inside P1 while you are still finding your feet. The rules change year to year, so the P1 briefing is the authority rather than anything written now.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Bid during P1, Jan - Mar 2027",
+   "w": "2027-01-19"
+  },
+  {
+   "id": "k-grad",
+   "group": "Programme calendar",
+   "ord": 30,
+   "shape": "calendar",
+   "label": "Graduation, Singapore",
+   "body": "Singapore campus, with the grad trip after it. Twenty-three months from the deposit to the gown.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "15 December 2027",
+   "w": "2027-12-15",
+   "rows": [
+    {
+     "t": "Graduation",
+     "a": "2027-12-15",
+     "k": "point"
+    }
+   ]
+  },
+  {
+   "id": "k-lms",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "label": "LMS",
+   "body": "Live from 26 October. Every piece of academic content runs through it, a chunk of the CDC curriculum as well, and club registration too. The PLDP assignments are delivered here.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Live 26 October 2026",
+   "w": "2026-10-26",
+   "item": "lms-start",
+   "rel": [
+    "k-pldp-p0",
+    "k-clubs"
+   ]
+  },
+  {
+   "id": "k-careerglobe",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "label": "CareerGlobe",
+   "body": "Live from 27 October. The CDC platform: appointments, jobs, events. The profile has to be set up before you can book the first coaching appointment, which makes it the gate on everything else CDC.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Live 27 October 2026",
+   "w": "2026-10-27",
+   "item": "careerglobe",
+   "rel": [
+    "k-coach1"
+   ]
+  },
+  {
+   "id": "k-vmock",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "label": "VMock",
+   "body": "Part 1 of the INSEAD CV process. It scores a draft against the format and tells you what to fix, so the version a human finally reads is not the first one you wrote.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "item": "vmock",
+   "rel": [
+    "k-cvbook",
+    "k-cvweb"
+   ]
+  },
+  {
+   "id": "k-cvbook",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "label": "The INSEAD CV format",
+   "body": "One format, used as a networking and marketing document rather than a record of employment, and the basis for the INSEAD CV Book that goes to recruiters. The process runs on through P1, so the first version is not the last.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "item": "cv",
+   "rel": [
+    "k-vmock",
+    "k-cvweb"
+   ]
+  },
+  {
+   "id": "k-cdc",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Two teams behind you: a Career Coach and Employer Engagement",
+   "body": "That is the whole of CDC's structure, and it is worth knowing which one to ask. The coach is your primary contact for strategy, materials and accountability. Employer Engagement are the sector specialists who know what a given industry is actually hiring for this year.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-coach-ses",
+    "k-ee"
+   ]
+  },
+  {
+   "id": "k-coach-ses",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Coaching sessions are 45 minutes and you set the agenda",
+   "body": "Short enough to fit before class, which is deliberate. You bring the update and the question and agree the next steps; the coach pressure-tests the plan rather than making it. A session you arrive at without having done the last set of next steps is a session spent recapping.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-quest",
+    "k-coach1"
+   ]
+  },
+  {
+   "id": "k-coach-alloc",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Your coach is allocated on P1 location and never changes",
+   "body": "Deliberately coach-agnostic: they are allocated by where you start, follow you the whole MBA including exchange, and there are no coach changes. So the relationship is worth investing in early rather than shopping around.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z"
+  },
+  {
+   "id": "k-coach1",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "First coaching session, from November",
+   "body": "Covers how the partnership works, what CareerLeader and Career Anchors said about you, and the three stages of the career journey. CareerGlobe has to be set up before you can book it.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "From November 2026",
+   "w": "2026-11-02",
+   "item": "cdc-coach1",
+   "rel": [
+    "k-quest",
+    "k-careerglobe"
+   ]
+  },
+  {
+   "id": "k-journey",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "The career journey is three stages",
+   "body": "Self Awareness: strengths, interests, values, and what you actually bring. Market Exploration: industry knowledge built through networking, narrowed to two or three target plans rather than one bet or ten. Execution: a value proposition you can say out loud, and recruiting to each sector's real timetable, which differs by months.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "item": "postmba",
+   "rel": [
+    "k-takeaways"
+   ]
+  },
+  {
+   "id": "k-switcher",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Career switcher status decides how much of CDC is must-do",
+   "body": "Most CDC items are marked must-do for people switching Location, Sector or Function, and only highly recommended for everyone else. Which of the three you are switching is therefore the single input that sets your CDC workload, and it is worth writing down early.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "item": "postmba"
+  },
+  {
+   "id": "k-ee",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Employer Engagement are Sector Advisors",
+   "body": "Subject-matter experts who split their time between advising students and talking to companies, which is what makes their market read current. They give market intelligence, name who to connect with, sharpen a pitch for a specific sector, and help with offer negotiation.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-cags"
+   ]
+  },
+  {
+   "id": "k-cags",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Careers Across Geographies & Sectors workshop",
+   "body": "February 2027, for Fontainebleau and Singapore. CDC asks 27Ds not to book Sector Advisor appointments until after it, because most of the sector information is delivered there and a one-to-one before it just repeats the workshop. The one exception is roles with early internship application deadlines.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "February 2027",
+   "w": "2027-02-01",
+   "rel": [
+    "k-ee",
+    "k-interntiming"
+   ]
+  },
+  {
+   "id": "k-events",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "Company events, treks and the Industry Expert Series",
+   "body": "Pre-MBA company event invitations arrive through the Sunday newsletters, which is the practical reason to read them. During the year there are treks, networking forums, the Tech Symposium and the Industry Expert Series.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z"
+  },
+  {
+   "id": "k-takeaways",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "CDC's own key takeaways",
+   "body": "Networking is what works: alumni first, then people in the target industry, then classmates. Pick a few priorities rather than defaulting to consulting because it recruits loudest. Take a leadership role in a club. A radical career changer should start before the programme, not in P1. If you are targeting one country with no experience there, explore widely early and aim at roles where local competition is thinner. And only apply where you genuinely fit, because the interview exposes the rest.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-journey"
+   ]
+  },
+  {
+   "id": "k-pldp",
+   "group": "Coaching: CDC and PLDP",
+   "ord": 50,
+   "shape": "list",
+   "label": "PLDP runs the whole year, not just P0",
+   "body": "The Personal Leadership Development Programme: individual and group coaching that starts with the P0 assignments and continues across the periods. It is the leadership counterpart to CDC's career coaching, and it is the one INSEAD flags as high-importance alongside CDC.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-pldp-p0",
+    "k-pldp-web"
+   ]
+  },
+  {
+   "id": "k-interntiming",
+   "group": "The summer internship",
+   "ord": 60,
+   "shape": "timeline",
+   "label": "Internship recruiting runs through P2",
+   "body": "March to May 2027. Some internships start as early as June, before P3 finishes. Roles with early application deadlines are the one reason to approach Employer Engagement before the February workshop.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Mar - May 2027",
+   "w": "2027-03-15",
+   "rel": [
+    "k-cags"
+   ]
+  },
+  {
+   "id": "k-intern",
+   "group": "The summer internship",
+   "ord": 60,
+   "shape": "timeline",
+   "label": "The summer project itself: optional, 8 weeks",
+   "body": "A Short-Term Summer Project in the break after P3. The alternatives INSEAD names are a startup tour or deliberate time off to prepare for full-time recruitment, and it does not treat the internship as obligatory for this cohort. Gavin's own plan is to start looking from the day the course starts rather than waiting for P2.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "01 Jul - 22 Aug 2027",
+   "w": "2027-07-01",
+   "rel": [
+    "k-interntiming",
+    "k-sumweb",
+    "k-breaks"
+   ]
+  },
+  {
+   "id": "k-p1cores",
+   "group": "Courses and exemptions",
+   "ord": 70,
+   "shape": "cards",
+   "label": "Six P1 core courses",
+   "body": "Financial Accounting, Financial Markets & Valuation, Organisational Behaviour I, Prices & Markets, Uncertainty Data & Judgment, and Introduction to Strategy. Three of the six are quantitative, which is what Business Foundations exists for.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-bizfound",
+    "k-prereads"
+   ]
+  },
+  {
+   "id": "k-prereads",
+   "group": "Courses and exemptions",
+   "ord": 70,
+   "shape": "cards",
+   "label": "P1 pre-readings",
+   "body": "For Financial Accounting and Prices & Markets specifically, with book recommendations on the MBA Journey pages. Highly recommended rather than required, which in practice means the people who do them have an easier first three weeks.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "item": "prereads",
+   "rel": [
+    "k-p1cores"
+   ]
+  },
+  {
+   "id": "k-exempt",
+   "group": "Courses and exemptions",
+   "ord": 70,
+   "shape": "cards",
+   "label": "Core exemption exams",
+   "body": "P1 core exemptions are examined during Launch Week; P2 and P3 exemptions are taken during P1. Passing one frees the slot for an elective, so an exemption is worth a course you would rather take than a week of revision saved.",
+   "cat": "study",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "Launch Week, Jan 2027",
+   "w": "2027-01-08",
+   "rel": [
+    "k-launch"
+   ]
+  },
+  {
+   "id": "k-clubs",
+   "group": "Clubs and elections",
+   "ord": 80,
+   "shape": "timeline",
+   "label": "Club introduction and registration",
+   "body": "Runs through the LMS from 26 October. Club leadership elections and the handover to the 27D cohort come in P1 and P2, so the clubs you join now are the ones you can take a leadership role in later, which CDC names as one of its key takeaways.",
+   "cat": "life",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "From 26 October 2026",
+   "w": "2026-10-26",
+   "rel": [
+    "k-lms",
+    "k-takeaways"
+   ]
+  },
+  {
+   "id": "k-council",
+   "group": "Clubs and elections",
+   "ord": 80,
+   "shape": "timeline",
+   "label": "27D Student Council and Student Rep elections",
+   "body": "January 2027. Team diversity is a stated requirement for the slates, so the teams form before the election rather than after it.",
+   "cat": "life",
+   "at": "2026-10-05T16:20:00.000Z",
+   "when": "January 2027",
+   "w": "2027-01-05"
+  },
+  {
+   "id": "k-contacts",
+   "group": "Who to contact",
+   "ord": 90,
+   "shape": "cards",
+   "label": "Programme questions",
+   "body": "degree.programmes@insead.edu for anything about the programme itself: dates, registration, admin, documents.",
+   "cat": "life",
+   "at": "2026-10-05T16:20:00.000Z"
+  },
+  {
+   "id": "k-contact-cdc",
+   "group": "Who to contact",
+   "ord": 90,
+   "shape": "cards",
+   "label": "Career questions",
+   "body": "careerdevelopmentcentre@insead.edu for CDC: coaching, CareerGlobe, Employer Engagement, anything career.",
+   "cat": "work",
+   "at": "2026-10-05T16:20:00.000Z",
+   "rel": [
+    "k-cdc"
+   ]
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-20261005T162000",
+   "itemId": null,
+   "itemTitle": null,
+   "from": "claude",
+   "createdAt": "2026-10-05T16:20:00.000Z",
+   "state": "read",
+   "forClaude": false,
+   "text": "Each block now draws itself in the shape its content wants, and every block is collapsed to start.\n\nProgramme calendar is a month-axis infographic: P1 to P5 as bars across 2027, the breaks as thinner bars underneath, Launch Week and Graduation on the same scale, with a line for today. The eleven dates that were one paragraph are now a picture, and the prose still reads in full below it.\n\nWebinars, Deadlines, Internship and Clubs are vertical timelines with a dot each. A dot whose date has passed is hollow, so where you are in the sequence is the first thing you see. Platforms, Courses and Contacts are card grids. Coaching stays a list, because it is prose.\n\nEach block has its own tint, derived from its name rather than chosen, so a group I invent next month gets a colour by existing. Titles are bigger, the detail text is longer and set looser, and a collapsed block tells you what is next inside it so you are not opening nine headers to find one thing.",
+   "acted": [
+    "Per-group render shapes: calendar, timeline, cards, list",
+    "Programme calendar is now a month-axis chart, not a paragraph",
+    "All groups collapsed by default, each with a next-up line",
+    "Bigger titles, fuller bodies, a tint per block",
+    "40 nodes rewritten at length; two new contact cards"
+   ],
+   "ack": []
+  }
+ ]
+}

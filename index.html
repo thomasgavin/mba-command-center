@@ -511,45 +511,114 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .calrow.done b{color:var(--ink4);text-decoration:line-through}
 
 /* ---------- mind map ----------
-   A grouped list, not a tree. It was a tree first, under Academics / Career /
-   Student Life, and every fact sat two taps down inside it -- which is the
-   rummaging the view exists to replace. Now a group names what a thing is, and
-   every row says what it is without being opened. */
+   A grouped view, not a tree, and **each group draws itself in the shape its
+   content wants**: a vertical rail for a sequence of dated events, a month
+   axis for a schedule, a grid for a set of peers, a list for prose. He asked
+   for exactly that -- *"each block might be best displayed in a completely
+   different way"* -- and the alternative was a schedule rendered as a
+   paragraph of eleven dates, which is what it was.
+
+   Every block is its own tinted card, collapsed by default, with the tint
+   derived from the group's name in JS so a group invented later gets a colour
+   without anyone extending a list. */
 .mapw{display:flex;flex-direction:column;gap:12px}
 .mans.off{display:none}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:6px 14px 12px}
-.mroot{border-top:1px solid var(--line2);padding-top:9px;margin-top:9px}
-.mroot:first-child{border-top:0}
-.mrh{display:flex;align-items:center;gap:6px;padding:6px 0;font-size:11px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);cursor:pointer}
-.mrh:hover{color:var(--orange)}
-.mrh .mrc{margin-left:auto;font-size:10px;color:var(--ink4);font-variant-numeric:tabular-nums;
-  letter-spacing:0}
-/* one row: a title with its date, and the line that says what it is. No
-   twisty -- the only thing that collapses is the group header above it. */
-.mn{padding:1px 0 3px}
-.mn+.mn{border-top:1px solid var(--line2)}
-.mkids{margin-left:4px;padding-left:10px;border-left:1px solid var(--line2)}
-.mn.sub+.mn.sub{border-top:1px solid var(--line2)}
-.mnh{display:flex;align-items:flex-start;gap:7px;padding:4px 0 1px;min-width:0}
-.mtw{flex:none;width:15px;height:17px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink4);
-  font-size:9px;line-height:17px;transition:transform .15s var(--ease)}
+.mroot{border:1px solid var(--line);border-radius:var(--r2);margin:9px 0;overflow:hidden}
+/* the header is the heading of the block, not a label above it: it was 11px
+   uppercase and he was right that it vanished into the rows under it */
+.mrh{display:flex;align-items:center;gap:8px;padding:13px 12px;cursor:pointer;
+  font-size:14.5px;font-weight:750;letter-spacing:-.012em;color:var(--ink);line-height:1.25}
+.mrh .mrt{flex:1;min-width:0;overflow-wrap:anywhere}
+.mrh .mrc{flex:none;font-size:11px;font-weight:750;border-radius:20px;padding:2px 8px;
+  font-variant-numeric:tabular-nums}
+.mroot.open .mrh{padding-bottom:4px}
+/* a shut block still says what is next in it, or nine shut blocks are nine
+   headings and he has to open every one to find the thing he wanted */
+.mrn{padding:0 12px 12px 35px;font-size:12px;color:var(--ink3);line-height:1.45;overflow-wrap:anywhere}
+.mrb{padding:4px 12px 12px}
+.mtw{flex:none;width:17px;height:19px;border:0;background:none;padding:0;cursor:pointer;
+  font-size:10px;line-height:19px;transition:transform .15s var(--ease)}
 .mtw.open{transform:rotate(90deg)}
-.mtw.leaf{visibility:hidden}
+
+/* one row: a title with its date, and the paragraph that says what it is. No
+   twisty -- the only thing that collapses is the group header above it. */
+.mn{padding:3px 0 5px}
+.mn+.mn{border-top:1px solid var(--line2)}
+.mkids{margin-left:4px;padding-left:11px;border-left:1px solid var(--line2)}
+.mn.sub+.mn.sub{border-top:1px solid var(--line2)}
+.mnh{display:flex;align-items:flex-start;gap:7px;padding:5px 0 2px;min-width:0}
 /* the label has to shrink below its longest word, or one long node sets the
    width of the whole card and the drawer's sideways-scroll bug comes back here */
-.mnl{flex:1;min-width:0;font-size:12.5px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.mnl{flex:1;min-width:0;font-size:13.5px;font-weight:700;line-height:1.35;
+  letter-spacing:-.008em;color:var(--ink);overflow-wrap:anywhere}
 /* the date rides on the title line, because "PLDP Webinar" and "05 Nov 2026"
    are one fact and he should not have to open anything to see the second half */
 .mwhen{font-weight:650;color:var(--ink4);font-variant-numeric:tabular-nums;white-space:nowrap}
-.mnb{font-size:11.5px;color:var(--ink3);line-height:1.5;padding:0 0 6px;overflow-wrap:anywhere}
+/* 12.5/1.6 rather than 11.5/1.5: *"Don't be so brief on the details sub-text"*
+   came with *"feel free to use more vertical space"*, and a longer body set
+   tighter answers only half of it */
+.mnb{font-size:12.5px;color:var(--ink2);line-height:1.6;padding:1px 0 7px;overflow-wrap:anywhere}
 .mnr{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 7px}
-.mtag{font-size:9.5px;font-weight:700;border-radius:20px;padding:2px 7px;background:var(--wash2);
+.mtag{font-size:10px;font-weight:700;border-radius:20px;padding:3px 8px;background:var(--panel);
   color:var(--ink3);border:1px solid var(--line2);cursor:pointer}
 .mtag.mitem{color:var(--orange);border-color:rgba(255,100,41,.3);background:rgba(255,100,41,.08)}
 .mn.hit>.mnh .mnl{color:var(--orange)}
 .mn.hit>.mnh .mwhen{color:var(--orange)}
-.mn.dim{opacity:.33}
+.mn.dim,.mtli.dim,.mcard.dim{opacity:.33}
+
+/* ---------- shape: timeline ----------
+   *"The timelines might be better depicted as a vertical timeline with dots
+   representing each items."* The rail is a pseudo-element on the container so
+   it cannot drift from the dots, and the last item clips it short so the line
+   ends on the final dot rather than running past it into the padding. */
+.mtl{position:relative;padding:2px 0 0 21px}
+.mtl:before{content:"";position:absolute;left:5px;top:12px;bottom:14px;width:2px;
+  background:var(--rail);border-radius:2px}
+.mtli{position:relative;padding:3px 0 11px}
+.mtli>i{position:absolute;left:-21px;top:4px;width:11px;height:11px;border-radius:50%;
+  border:2px solid;box-sizing:border-box;background:var(--panel)}
+/* a date already gone is a hollow dot, so where he is in the sequence is the
+   first thing the block says and nothing had to be stored to say it */
+.mtli.past>i{background:var(--panel)}
+.mtli.past .mnl{color:var(--ink2)}
+.mtld{font-size:11px;font-weight:750;letter-spacing:.01em;font-variant-numeric:tabular-nums;
+  padding-bottom:1px}
+.mtli .mnl{font-size:13.5px}
+.mtli.hit .mnl{color:var(--orange)}
+
+/* ---------- shape: cards ----------
+   peers, where nothing is a sequence and nothing outranks its neighbour */
+.mcg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px;padding-top:3px}
+.mcard{border:1px solid;border-radius:var(--r3);padding:10px 11px;background:var(--panel)}
+.mcard .mnl{font-size:13px}
+.mcard .mnb{padding-bottom:4px}
+.mcard.hit .mnl{color:var(--orange)}
+
+/* ---------- shape: calendar ----------
+   a month axis with a bar per span. The label column is a fixed `ch` width so
+   the bars of every row share one scale; without that each row measured its
+   own label and the axis meant nothing. */
+.mcal{padding:4px 0 10px;position:relative}
+.mcax{position:relative;height:15px;margin-left:84px;border-bottom:1px solid var(--line)}
+.mcam{position:absolute;top:0;font-size:9.5px;font-weight:700;color:var(--ink4);
+  letter-spacing:.02em;transform:translateX(-1px)}
+.mcam.off{display:none}
+/* today, drawn once for the whole chart rather than per row */
+.mcnow{position:absolute;top:15px;bottom:4px;left:0;width:1px;background:rgba(255,100,41,.55);
+  margin-left:84px;pointer-events:none}
+.mcr{display:flex;align-items:center;gap:0;height:21px}
+/* 84px fits "Graduation" and "Launch Week", which are the two longest labels
+   the programme calendar produces; at 78 the second ellipsised to "Launch ..."
+   and a truncated row label on a chart is a row you cannot identify */
+.mcl{flex:none;width:84px;padding-right:8px;font-size:10.5px;font-weight:700;color:var(--ink2);
+  line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mct{position:relative;flex:1;min-width:0;height:100%}
+.mcb{position:absolute;top:50%;transform:translateY(-50%);height:9px;border-radius:5px;min-width:3px}
+.mcb.br{height:5px;border-radius:3px}
+.mcp{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;
+  transform:translate(-50%,-50%);margin-top:0}
+
 /* the answer the board can give on its own, while Claude writes the real one */
 .mans{background:rgba(255,100,41,.07);border:1px solid rgba(255,100,41,.22);border-radius:var(--r2);
   padding:11px 12px;font-size:12px;line-height:1.5}
@@ -940,6 +1009,11 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      The months are tighter here too, for the same reason. */
   .ginner{--lw:186px;min-width:760px}
   .glg{gap:5px 11px}
+  /* the axis gets whatever the longest label does not need: 72 still fits
+     "Launch Week" at 10px and buys back a fortnight of resolution */
+  .mcl{width:72px;padding-right:6px;font-size:10px}
+  .mcax,.mcnow{margin-left:72px}
+  .mrh{padding:12px 11px} .mrb{padding:4px 11px 11px} .mrn{padding:0 11px 11px 33px}
 
   /* iOS zooms the whole page the moment a focused control is under 16px, and
      the zoom stays after the keyboard closes -- which is what pushed the
@@ -2201,7 +2275,7 @@ function renderAgenda(evOn,tIso){
    He said it plainly: he is not good at holding information in an organised
    way and leans on memory instead. So this is a place to put a fact once and
    find it again -- he writes a line, Claude files it under a topic, and the
-   list is the result.
+   view is the result.
 
    A node is deliberately the same kind of object as a note: it carries its own
    clock in `at`, merges by id with newest-wins, and travels in the same payload
@@ -2209,33 +2283,64 @@ function renderAgenda(evOn,tIso){
    his other device, and nothing new can disagree with the rules that already
    decide who wins.
 
-   It was a tree under Academics / Career / Student Life first, and he threw it
-   out in those words: *"too much nesting - not easy to follow and no efficient.
-   Why aren't all webinars just listed together under one 'webinar' section for
-   example? Don't try to follow strict and very generic academic, life, career
-   categorization. ... I have to click and go down a hole, avoiding which is the
-   whole point of building this app."*
+   **The top of the view is `group`, which is free text and names what a thing
+   is** -- Webinars and sessions, Deadlines, Platforms and tools. Not Academics
+   / Career / Student Life: he threw that out in those words, and a group is
+   whatever Claude needs it to be, because the kinds of thing he writes down
+   are not known in advance.
 
-   So the top of the list is `group`, which is free text and names **what a
-   thing is** -- Webinars, Deadlines, Platforms and tools. A group is whatever
-   Claude needs it to be, because the kinds of thing he writes down are not
-   known in advance and four fixed buckets described none of them. `ord` is how
-   a group earns its place in the order; `when` is the date, printed on the
-   title line rather than hidden one tap down; `body` is the one line under it
-   and is always on screen. `item` ties a node to a task, which is how "VMock
-   scores your CV" ends up one tap from the CV task.
+   **And a group draws itself in the shape its content actually wants**, which
+   is the part he cares about most: *"This is a intelligent, self-evolving
+   command center which on-the-go figures out the best way to store, visualize
+   and display information as new information keeps coming. ... each block
+   might be best displayed in a completely different way. The academic schedule
+   might be better displayed as a mini simplied calender infographic. The
+   timelines might be better depicted as a vertical timeline with dots."*
 
-   `cat` still exists, and does one job only: the sub-tab strip. It is no
-   longer the shape of the view. */
+   So `shape` is a field on the node, read off the first node in the group:
+
+   - `timeline` -- a vertical rail with a dot per item, for anything that is a
+     sequence of dated events. A dot already in the past is hollow.
+   - `calendar` -- a month axis with a bar per span, for a schedule. It pools
+     every `rows[]` in the group into one chart, so periods, breaks and single
+     dates land on one axis instead of three paragraphs.
+   - `cards` -- a grid, for a set of peers nobody reads in order.
+   - `list` -- the default, for prose facts.
+
+   A shape it does not recognise falls back to `list`, so a future Claude can
+   name one before it exists without breaking the view.
+
+   `when` is the date he reads and `w` the ISO date it sorts by. `item` ties a
+   node to a task, which is how "VMock scores your CV" ends up one tap from the
+   CV task. `cat` survives and does one job: the sub-tab strip. */
 var MAP_ELSE="Everything else";
-var mapShut={}, mapMode="note", mapQ="", mapAns=null;
+/* Collapsed by default, all of them: *"Keep all group blocks collapsed by
+   default."* Nine headers is an index he can read in one screen; nine open
+   blocks is the wall the first version was. */
+var mapOpen={}, mapMode="note", mapQ="", mapAns=null;
+
+/* A group's tint is its position in the list, never chosen and never stored.
+   A group Claude invents next week gets its own colour by existing, which is
+   the point -- a palette someone has to remember to extend is a palette that
+   runs out mid-session.
+
+   It was hashed from the group's name first, which is prettier in principle
+   and wrong in practice: two of nine real groups collided and sat next to each
+   other wearing the same colour, which reads as a bug rather than a scheme.
+   Position cannot collide until there are more groups than tints, and then the
+   repeat is eight blocks away. */
+var MAP_TINTS=[[255,100,41],[50,100,255],[0,169,143],[176,102,255],
+               [255,159,0],[20,181,240],[229,69,127],[224,38,60]];
+function mapTint(i){ return MAP_TINTS[i%MAP_TINTS.length]; }
+function rgba(c,a){ return "rgba("+c[0]+","+c[1]+","+c[2]+","+a+")"; }
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function kbAlive(){ return kb.filter(function(n){ return n && n.id && !n.deleted; }); }
 function kbOf(id){ var r=null; kb.forEach(function(n){ if(n.id===id) r=n; }); return r; }
 function kbKids(id){
   return kbAlive().filter(function(n){ return n.parent===id; }).sort(kbSort);
 }
-/* which sub-tab a node answers to. Nothing else reads this: the list is
+/* which sub-tab a node answers to. Nothing else reads this: the view is
    grouped by what a thing is, not by which of the four buckets it fell in. */
 function mapCat(n){
   if(n.cat) return n.cat;
@@ -2245,11 +2350,7 @@ function mapCat(n){
   return "else";
 }
 function mapGroup(n){ return (n.group||"").trim() || MAP_ELSE; }
-/* date first, because a list of webinars is a timetable and the next one is
-   the one he needs. Undated facts fall to the bottom of their group, in name
-   order, since there is nothing better to sort them by.
-
-   `when` is for reading ("05 November 2026", "Mar - May 2027") and sorts
+/* `when` is for reading ("13 November 2026", "Mar - May 2027") and sorts
    wrongly on its own -- "04 Dec" lands above "05 Nov". `w` is the ISO date it
    sorts by, and a node carrying one is why the webinars come out as a
    timetable rather than alphabetically by day-of-month. */
@@ -2285,7 +2386,7 @@ function mapHits(q){
   return scored.filter(function(x){ return x.sc===best; }).slice(0,8).map(function(x){ return x.n; });
 }
 /* a hit's parent has to stay lit, or the match sits inside a row drawn as
-   irrelevant. One level, because that is as deep as the list goes. */
+   irrelevant. One level, because that is as deep as the view goes. */
 function hitSet(list){
   var o={};
   list.forEach(function(n){ o[n.id]=1; if(n.parent) o[n.parent]=1; });
@@ -2295,7 +2396,7 @@ function hitSet(list){
    parent is drawn under that parent rather than as a row of its own; a node
    whose parent is gone is an orphan, not a ghost, and stands on its own. */
 function mapGroups(){
-  var by={}, ord={};
+  var by={}, ord={}, shp={};
   kbAlive().forEach(function(n){
     if(cat!=="all" && mapCat(n)!==cat) return;
     var p=n.parent?kbOf(n.parent):null;
@@ -2303,6 +2404,7 @@ function mapGroups(){
     var g=mapGroup(n);
     if(!by[g]){ by[g]=[]; ord[g]=n.ord===undefined?500:n.ord; }
     if(n.ord!==undefined && n.ord<ord[g]) ord[g]=n.ord;
+    if(n.shape && !shp[g]) shp[g]=n.shape;
     by[g].push(n);
   });
   /* Everything else is last whatever its nodes claim: it is the bucket for
@@ -2311,7 +2413,20 @@ function mapGroups(){
     if(a===MAP_ELSE) return 1;
     if(b===MAP_ELSE) return -1;
     return (ord[a]-ord[b]) || a.localeCompare(b);
-  }).map(function(g){ return {name:g, rows:by[g].sort(kbSort)}; });
+  }).map(function(g){ return {name:g, shape:shp[g]||"list", rows:by[g].sort(kbSort)}; });
+}
+/* what a collapsed group says for itself. Nine shut blocks that say only their
+   name are an index of headings; one that says what is next in it is an index
+   of answers, and the whole view is collapsed now. */
+function mapHint(g){
+  var dated=g.rows.filter(function(n){ return n.w; });
+  if(dated.length){
+    var now=iso(new Date()), nxt=null;
+    dated.forEach(function(n){ if(!nxt && n.w>=now) nxt=n; });
+    if(nxt) return "Next: "+(nxt.label||"")+(nxt.when?" · "+nxt.when:"");
+    return "Last: "+(dated[dated.length-1].label||"");
+  }
+  return g.rows.slice(0,2).map(function(n){ return n.label||""; }).join(" · ");
 }
 function renderMap(){
   var host=document.getElementById("mapw");
@@ -2326,15 +2441,21 @@ function renderMap(){
   }
   var hits=mapQ?hitSet(mapHits(mapQ)):null;
   var gs=mapGroups(), h="";
-  gs.forEach(function(g){
-    /* a group is open unless he shut it, and a search opens every group so a
-       match can never be hiding behind a collapsed header */
-    var open = hits ? true : !mapShut[g.name];
+  gs.forEach(function(g,gi){
+    /* a search opens every group that matched, so a hit can never be hiding
+       behind a shut header; otherwise shut is the default */
+    var open = hits ? g.rows.some(function(n){ return hits[n.id]; }) : !!mapOpen[g.name];
     var n=g.rows.length; g.rows.forEach(function(r){ n+=kbKids(r.id).length; });
-    h+='<div class="mroot"><div class="mrh'+(open?" open":"")+'" data-mg="'+esc(g.name)+'">'+
-       '<button class="mtw'+(open?" open":"")+'" aria-hidden="true">&#9654;</button>'+
-       esc(g.name)+'<span class="mrc">'+n+'</span></div>';
-    if(open) g.rows.forEach(function(r){ h+=mapItem(r,hits,0); });
+    var c=mapTint(gi);
+    h+='<div class="mroot'+(open?" open":"")+'" style="background:'+rgba(c,.05)+
+       ';border-color:'+rgba(c,.2)+'">'+
+       '<div class="mrh" data-mg="'+esc(g.name)+'">'+
+         '<button class="mtw'+(open?" open":"")+'" aria-hidden="true" style="color:'+rgba(c,.85)+'">&#9654;</button>'+
+         '<span class="mrt">'+esc(g.name)+'</span>'+
+         '<span class="mrc" style="background:'+rgba(c,.14)+';color:'+rgba(c,.95)+'">'+n+'</span>'+
+       '</div>';
+    if(open) h+='<div class="mrb">'+mapShape(g,hits,c)+'</div>';
+    else     h+='<div class="mrn">'+esc(mapHint(g))+'</div>';
     h+='</div>';
   });
   /* a category he has chosen but written nothing under has to say so, or the
@@ -2344,10 +2465,19 @@ function renderMap(){
   document.getElementById("mapTip").textContent=
     live.length+" thing"+(live.length===1?"":"s")+" remembered. Claude files what you write here and keeps it in KNOWLEDGE.md in the repo, so it outlives any one session.";
 }
-/* one row: an informative title with its date, and the line that says what it
-   is, underneath and already on screen. There is no twisty here on purpose --
-   a row that has to be opened to say anything is the hole he asked to be rid
-   of. `depth` is 0 or 1 and nothing deeper is drawn. */
+/* the one place a shape name becomes markup. An unknown shape falls through to
+   the list, so Claude can file a node under a shape this build has not learned
+   yet and the view degrades instead of breaking. */
+function mapShape(g,hits,c){
+  if(g.shape==="calendar") return mapCalendar(g,hits,c);
+  if(g.shape==="timeline") return mapTimeline(g,hits,c);
+  if(g.shape==="cards")    return mapCards(g,hits,c);
+  return g.rows.map(function(n){ return mapItem(n,hits,0); }).join("");
+}
+/* one row: an informative title with its date, and the paragraph that says
+   what it is, underneath and already on screen. There is no twisty here on
+   purpose -- a row that has to be opened to say anything is the hole he asked
+   to be rid of. `depth` is 0 or 1 and nothing deeper is drawn. */
 function mapItem(n,hits,depth){
   var dim=hits && !hits[n.id];
   var h='<div class="mn'+(depth?" sub":"")+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+
@@ -2355,12 +2485,7 @@ function mapItem(n,hits,depth){
     '<div class="mnh"><span class="mnl">'+esc(n.label||"")+
       (n.when?'<span class="mwhen"> &middot; '+esc(n.when)+'</span>':'')+'</span></div>';
   if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
-  var tags="";
-  if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
-  (n.rel||[]).forEach(function(r){
-    var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
-  });
-  if(tags) h+='<div class="mnr">'+tags+'</div>';
+  h+=mapTags(n);
   if(!depth){
     var kids=kbKids(n.id);
     if(kids.length){
@@ -2370,6 +2495,118 @@ function mapItem(n,hits,depth){
     }
   }
   return h+'</div>';
+}
+function mapTags(n){
+  var tags="";
+  if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
+  (n.rel||[]).forEach(function(r){
+    var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
+  });
+  return tags?'<div class="mnr">'+tags+'</div>':"";
+}
+/* a vertical rail with a dot per item, in date order. A dot whose date has
+   passed is hollow, so where he is in the sequence is the first thing the
+   block says and nothing had to be stored to say it. */
+function mapTimeline(g,hits,c){
+  var now=iso(new Date());
+  var h='<div class="mtl" style="--rail:'+rgba(c,.28)+'">';
+  g.rows.forEach(function(n){
+    var past=n.w && n.w<now, dim=hits && !hits[n.id];
+    h+='<div class="mtli'+(past?" past":"")+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+
+       '" data-kb="'+esc(n.id)+'">'+
+       '<i style="'+(past?"border-color:"+rgba(c,.5):"background:"+rgba(c,1)+";border-color:"+rgba(c,1))+'"></i>';
+    if(n.when) h+='<div class="mtld" style="color:'+rgba(c,.95)+'">'+esc(n.when)+'</div>';
+    h+='<div class="mnl">'+esc(n.label||"")+'</div>';
+    if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
+    h+=mapTags(n)+'</div>';
+  });
+  return h+'</div>';
+}
+/* a grid of peers. Nothing here is a sequence and nothing is more important
+   than its neighbour, so a vertical list only makes it longer. */
+function mapCards(g,hits,c){
+  var h='<div class="mcg">';
+  g.rows.forEach(function(n){
+    var dim=hits && !hits[n.id];
+    h+='<div class="mcard'+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+
+       '" data-kb="'+esc(n.id)+'" style="border-color:'+rgba(c,.22)+'">'+
+       '<div class="mnl">'+esc(n.label||"")+
+       (n.when?'<span class="mwhen" style="color:'+rgba(c,.95)+'"> &middot; '+esc(n.when)+'</span>':'')+'</div>';
+    if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
+    h+=mapTags(n)+'</div>';
+  });
+  return h+'</div>';
+}
+/* A schedule is a shape, not a paragraph. He said so about this exact block:
+   *"the program calendar are important dates all cluttered in a single
+   paragraph."*
+
+   Every `rows[]` in the group is pooled onto one month axis, so the periods,
+   the breaks and the single dates share a scale instead of being three lists
+   that the reader has to line up in his head. A row is
+   `{t:label, a:ISO start, b:ISO end, k:kind}`; `a===b` (or no `b`) is a point.
+   A node with no `rows[]` still reads as prose underneath, which is what keeps
+   this a mind map rather than a gantt chart. */
+function mapCalendar(g,hits,c){
+  var spans=[];
+  g.rows.forEach(function(n){
+    (n.rows||[]).forEach(function(r){
+      if(!r || !r.a) return;
+      spans.push({t:r.t||n.label||"", a:r.a, b:r.b||r.a, k:r.k||"period", id:n.id});
+    });
+  });
+  if(!spans.length) return g.rows.map(function(n){ return mapItem(n,hits,0); }).join("");
+  spans.sort(function(x,y){ return x.a<y.a?-1:x.a>y.a?1:0; });
+  var lo=spans[0].a, hi=spans[0].b;
+  spans.forEach(function(s){ if(s.a<lo) lo=s.a; if(s.b>hi) hi=s.b; });
+  /* snap the axis to whole months, or the first bar starts flush against the
+     left edge and reads as having begun before the chart does */
+  var d0=new Date(lo+"T00:00:00Z"), d1=new Date(hi+"T00:00:00Z");
+  var m0=Date.UTC(d0.getUTCFullYear(),d0.getUTCMonth(),1);
+  var m1=Date.UTC(d1.getUTCFullYear(),d1.getUTCMonth()+1,1);
+  var span=m1-m0, pc=function(t){ return ((t-m0)/span*100); };
+  var months=[], cur=new Date(m0), yrs={};
+  while(cur.getTime()<m1){
+    yrs[cur.getUTCFullYear()]=1;
+    months.push({t:cur.getTime(), m:cur.getUTCMonth(), y:cur.getUTCFullYear()});
+    cur=new Date(Date.UTC(cur.getUTCFullYear(),cur.getUTCMonth()+1,1));
+  }
+  /* the year is only worth a label when the axis crosses one; on a single-year
+     axis it is the same four characters on every tick */
+  var manyY=Object.keys(yrs).length>1;
+  months.forEach(function(m){
+    m.l=MON[m.m]+(manyY&&m.m===0?" "+String(m.y).slice(2):"");
+  });
+  /* every month label will not fit in 290px on a phone, and a label that
+     overlaps its neighbour is worse than one that is not drawn */
+  var step=months.length>8?2:1;
+  var h='<div class="mcal">'+
+    '<div class="mcax">'+months.map(function(m,i){
+      return '<span class="mcam'+(i%step?" off":"")+'" style="left:'+pc(m.t)+'%">'+m.l+'</span>';
+    }).join("")+'</div>';
+  var now=Date.now();
+  if(now>m0 && now<m1) h+='<div class="mcnow" style="left:'+pc(now)+'%"></div>';
+  spans.forEach(function(s){
+    var a=Date.parse(s.a+"T00:00:00Z"), b=Date.parse(s.b+"T00:00:00Z");
+    var w=Math.max(pc(b)-pc(a),0);
+    h+='<div class="mcr" data-kb="'+esc(s.id)+'">'+
+       '<span class="mcl">'+esc(s.t)+'</span>'+
+       '<span class="mct">';
+    if(s.k==="point" || w<0.6)
+      h+='<i class="mcp" style="left:'+pc(a)+'%;background:'+rgba(c,1)+'"></i>';
+    else
+      h+='<i class="mcb'+(s.k==="break"?" br":"")+'" style="left:'+pc(a)+'%;width:'+w+'%;background:'+
+         (s.k==="break"?rgba(c,.2):rgba(c,.8))+'"></i>';
+    h+='</span></div>';
+  });
+  h+='</div>';
+  /* The chart is the overview and the rows underneath are the detail; a node
+     that fed the chart still reads in full below it, because a bar can say
+     when and never why. Dropping those nodes was the earlier mistake in
+     miniature -- it is what turned a schedule into eleven dates in one
+     paragraph. */
+  g.rows.forEach(function(n){ h+=mapItem(n,hits,0); });
+  return h;
 }
 /* what the board can answer right now, shown the moment he asks rather than
    forty seconds later. It never pretends to be Claude's answer: it says what
@@ -2888,7 +3125,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1545";
+var BUILD="2026-10-05-1625";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3041,9 +3278,9 @@ document.addEventListener("click",function(e){
   var mg=t.closest("[data-mg]");
   if(mg){
     var gk=mg.dataset.mg;
-    mapShut[gk] = !mapShut[gk];
-    /* a search is what forced every group open; shutting one by hand ends it,
-       or the next repaint would re-open what he just shut */
+    mapOpen[gk] = !mapOpen[gk];
+    /* a search is what opened the groups that matched; opening or shutting one
+       by hand ends it, or the next repaint would undo what he just did */
     mapQ=""; renderMap(); return;
   }
   /* "see also": jump to the related fact. Its group may be shut, so open it --
@@ -3053,7 +3290,7 @@ document.addEventListener("click",function(e){
     var tgt=kbg.dataset.kbg, n3=kbOf(tgt);
     if(n3){
       var top3=(n3.parent&&kbOf(n3.parent)&&!kbOf(n3.parent).deleted)?kbOf(n3.parent):n3;
-      delete mapShut[mapGroup(top3)];
+      mapOpen[mapGroup(top3)]=true;
     }
     mapQ=""; setView("map"); renderMap();
     var el=document.querySelector('[data-kb="'+tgt+'"]');
