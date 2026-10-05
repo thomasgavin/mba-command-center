@@ -1,0 +1,738 @@
+{
+  "v": 3,
+  "op": "archive",
+  "exportedAt": "2026-10-05T03:37:24.321Z",
+  "why": "daily snapshot from the relay",
+  "notes": [
+    {
+      "id": "n1791085058450232",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Testing the relay",
+      "createdAt": "2026-10-04T03:37:38.450Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791108000000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "That milestone is gated on the 'Book flight to Paris for 3 January' task, and you marked that task Done last night (20:44 on 3 Oct). The milestone counts as reached whenever its gate task is done, so it flipped. It is really showing 'flight booked', not 'moved', which is misleading, since the 3 Jan date is still three months away. If the flight is booked, nothing is wrong with your data. I have not changed anything. The fix is in the board's code (gate the milestone on something that happens at arrival, or relabel it), so I'd do that on a branch rather than from this workflow.",
+      "createdAt": "2026-10-04T04:18:12.092Z",
+      "state": "read",
+      "acted": [
+        "No board changes: the flight task being Done is what ticks the milestone"
+      ]
+    },
+    {
+      "id": "n1791081138224668",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "The move to fonty milestone is marked done - why is that",
+      "createdAt": "2026-10-04T02:32:18.224Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791054175853317",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "Move this to blocked and eef validation to to-do. Validation just started",
+      "createdAt": "2026-10-03T19:02:55.853Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791050837660694",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Deadline for payment extended to 5 nov",
+      "createdAt": "2026-10-03T18:07:17.660Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791049895665591",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "Deadline for payment changed to 5 mov by insead on my request due to delay in loan processing",
+      "createdAt": "2026-10-03T17:51:35.665Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791047161234214",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "The date gas been extended by Insead on my request to 5 nov due to loan delays",
+      "createdAt": "2026-10-03T17:06:01.234Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791039114071829",
+      "itemId": "nri-fema",
+      "itemTitle": "Resolve NRI / FEMA co-applicant problem",
+      "text": "Remove this, not applicable",
+      "createdAt": "2026-10-03T14:51:54.071Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791036159823489",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "1 month extension approved by INSEAD due to loan delays",
+      "createdAt": "2026-10-03T14:02:39.823Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791085100626833",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Testing the relay",
+      "createdAt": "2026-10-04T03:38:20.626Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085240878322",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "testing relay",
+      "createdAt": "2026-10-04T03:40:40.878Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085365781179",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "tesing relay - 4",
+      "createdAt": "2026-10-04T03:42:45.781Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085935072805",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "test relay -5",
+      "createdAt": "2026-10-04T03:52:15.072Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791111600000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Your relay tests (including test relay -5) all arrived, and this reply is coming back down the same socket, so the round trip works. Nothing on the board needed changing.",
+      "createdAt": "2026-10-04T04:18:12.804Z",
+      "state": "read",
+      "acted": [
+        "No board changes: relay test messages only"
+      ]
+    },
+    {
+      "id": "claude-1791087487000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Your relay tests arrived and this reply is going back down the same route, so the round trip works. Nothing on the board needed changing.",
+      "createdAt": "2026-10-04T04:18:07.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: relay test messages only"
+      ]
+    },
+    {
+      "id": "n1791087585634897",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for “Moving in to Club 8” and tie this milestone completion to that task",
+      "createdAt": "2026-10-04T04:19:45.634Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791087613",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Good fix: a Club 8 move-in task is the right gate for that milestone, since it would tick on arrival rather than when the flight is booked. A new task and a re-gated milestone live in the board's code, not in your data, so I can't add them from this reply workflow. I've changed nothing and it needs a code change on a branch with a PR. Until then the milestone will keep reading as reached because the flight task is Done.",
+      "createdAt": "2026-10-04T04:20:13.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n179108765776777",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Why can’t you directly do the code change and merge/commit?",
+      "createdAt": "2026-10-04T04:20:57.767Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791087688",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "I can, just not from this chat. This quick-reply job is deliberately limited to your data (dates, statuses, replies). Its rules say code changes go on a branch with a PR, and it has no way to open a browser and test. The repo does let me commit, open a PR and merge without asking, but only after I've tried the change in a real browser and the board checks pass, because a merge goes live straight away. That needs a full coding session. In one of those, adding the 'Moving in to Club 8' task and gating the milestone on it is a small change I can make and merge. Start a session on the repo and ask for it, and it will go through.",
+      "createdAt": "2026-10-04T04:21:28.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: explained why code changes need a full session"
+      ]
+    },
+    {
+      "id": "n179108824845392",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for “Moving in to Club 8” and tie this milestone completion to that task",
+      "createdAt": "2026-10-04T04:30:48.453Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088284000",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Good call, and it fixes the 'move to Fontainebleau is done' problem properly: the milestone should be reached by moving in, not by booking the flight. Adding a task means editing the board's task list in code, which I can't do from this reply workflow, so I haven't changed anything yet. I'd add a 'Move in to Club 8' task due 3 Jan 2027 and gate the milestone on it, on a branch with a check. Say go (or ask me from a code session) and I'll do it.",
+      "createdAt": "2026-10-04T04:31:24.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n179108834874360",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "The latest change we pushed explicitly was so you can make changes on your own",
+      "createdAt": "2026-10-04T04:32:28.743Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088389",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "You're right that the repo now lets small code changes go straight to main, and I've read that commit. Two things still keep it out of this chat job: the Club 8 move-in task changes the task list and the milestone gate, which counts as a data-model change and so still gets a PR, and this job's own rules forbid editing code and give it no browser to test in. A normal Claude Code session on the repo has none of those limits, so the move-in task and the re-gated milestone have to be done there. I've changed nothing on the board.",
+      "createdAt": "2026-10-04T04:33:09.516Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791088695064689",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for move in to club 8 dated 3 jan and tie this milestone completion to that task instead",
+      "createdAt": "2026-10-04T04:38:15.064Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088728",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Understood: a 'Move in to Club 8' task dated 3 Jan, with the move milestone gated on it instead of the flight. I haven't made it, because new tasks and milestone gates live in the board's code (SEED and MILES), and this reply job is limited to your data. The change itself is small. It needs a full coding session on the repo, where I can test it in a browser and run the board checks before merging. Ask for it there and it will ship. Until then the milestone keeps reading as reached because the flight task is Done.",
+      "createdAt": "2026-10-04T04:38:48.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n1791119072828765",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Move the beds attention section up on the overview tab",
+      "createdAt": "2026-10-04T13:04:32.828Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119235",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Done. I read 'beds attention' as 'Needs attention'. It now sits straight under the milestones at the top of Overview, full width. It's live. Force-quit the app once to pick it up. If you meant a different section, tell me which.",
+      "createdAt": "2026-10-04T13:07:15.000Z",
+      "state": "read",
+      "acted": [
+        "Overview: Needs attention moved directly under the milestones",
+        "Checks pass, with a new one for the order"
+      ]
+    },
+    {
+      "id": "n1791119359180992",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "Add a follow-up subtask to check with Campus France Indonesia team",
+      "createdAt": "2026-10-04T13:09:19.180Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119459",
+      "from": "claude",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "Added \"Follow up with Campus France Indonesia team\" as its own task under Visa, High priority, due 14 Oct. The board has no subtasks, so it sits alongside EEF validation rather than inside it, and it isn't blocked on anything so you can do it now. The date is my placeholder, so move it to suit. It's live; force-quit the app once to pick it up.",
+      "createdAt": "2026-10-04T13:10:59.000Z",
+      "state": "read",
+      "acted": [
+        "New task cf-indonesia (Visa, High, 14 Oct)",
+        "BUILD bumped, 85 board checks pass, pushed to main"
+      ]
+    },
+    {
+      "id": "n1791126016347316",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Canpus France - have sent them an email but no response yet. Remind me to follow up Tuesday.",
+      "createdAt": "2026-10-04T15:00:16.347Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119880313",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "sbi-sanction",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "text": "Where does the SBI sanction stand — have they come back, or is it still sitting with the branch? It is dated 24 Oct and the 5 Nov instalment depends on it, and since nothing on your board carries a time estimate yet I am reminding you off the date alone, which is far too late for something that is mostly three weeks of their time.",
+      "createdAt": "2026-10-04T13:18:01.312Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-10-24"
+      }
+    },
+    {
+      "id": "claude-1791119880312",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "cf-indonesia",
+      "itemId": "cf-indonesia",
+      "itemTitle": "Follow up with Campus France Indonesia team",
+      "text": "Booking the Campus France interview is Critical and dated 10 Oct, but the only thing that moves it — chasing the Indonesia team — is sitting on a placeholder date of 14 Oct, four days after. Chase them this week, or move the interview date so the board stops saying you are on track.",
+      "createdAt": "2026-10-04T13:18:00.312Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-14"
+      }
+    },
+    {
+      "id": "n1791126024349402",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "SBI - still in process",
+      "createdAt": "2026-10-04T15:00:24.349Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791126120000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Done: the Campus France Indonesia follow-up was due Monday 5 Oct, so I moved it to Tuesday 6 Oct, and it will show up as due that day. On SBI, noted that it is still in process. I left the 24 Oct sanction date alone, and I'll keep it in view since the 5 Nov instalment depends on it.",
+      "createdAt": "2026-10-04T15:01:19.786Z",
+      "state": "read",
+      "acted": [
+        "Follow up with Campus France Indonesia team moved from 5 Oct to Tue 6 Oct"
+      ]
+    },
+    {
+      "id": "n179112688047396",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "I deleted this task - why is it still in visa overview section",
+      "createdAt": "2026-10-04T15:14:40.473Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791127128000",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "That was a bug: the Visa overview tile read the task list directly and ignored deletions, so a deleted step stayed in the sequence. It now skips deleted tasks, and so do the milestones and the Accommodation tile, which had the same flaw. It's live. Force-quit the app once to pick it up.",
+      "createdAt": "2026-10-04T15:18:48.000Z",
+      "state": "read",
+      "acted": [
+        "Visa tile, milestones and Accommodation tile now ignore deleted tasks",
+        "Added a board check for it"
+      ]
+    },
+    {
+      "id": "n1791130309766342",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "my flight ticket to paris is booked on 3 rd jan",
+      "createdAt": "2026-10-04T16:11:49.766Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791130386",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Noted. The flight task was already Done on the board, so nothing needed to change. The 'Move in to Club 8' task now gates the move milestone, so that one will stay open until you arrive.",
+      "createdAt": "2026-10-04T16:13:06.000Z",
+      "state": "read",
+      "acted": []
+    }
+  ],
+  "changed": [
+    {
+      "id": "tuition-oct",
+      "title": "Pay EUR 53,000 tuition instalment",
+      "status": "doing",
+      "due": "2026-11-05",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T20:45:03.561Z"
+    },
+    {
+      "id": "scholarship-r3",
+      "title": "Chase Round 3 scholarship decision",
+      "status": "done",
+      "due": "2026-09-11",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:15:54.671Z"
+    },
+    {
+      "id": "poa-exec",
+      "title": "Execute PoA at SBI Hindon branch",
+      "status": "done",
+      "due": "2026-10-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "sbi-sanction",
+      "title": "SBI Global Ed-Vantage sanction letter",
+      "status": "todo",
+      "due": "2026-10-24",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T16:17:20.782Z"
+    },
+    {
+      "id": "tuition-apr",
+      "title": "Pay EUR 44,860 final instalment",
+      "status": "blocked",
+      "due": "2027-04-15",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T16:17:20.782Z"
+    },
+    {
+      "id": "cf-interview",
+      "title": "Book Campus France interview",
+      "status": "blocked",
+      "due": "2026-10-10",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T13:11:23.939Z"
+    },
+    {
+      "id": "docs-apost",
+      "title": "Apostille and attest academic documents",
+      "status": "todo",
+      "due": "2026-10-18",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T11:58:15.824Z"
+    },
+    {
+      "id": "cf-validation",
+      "title": "Campus France EEF validated",
+      "status": "blocked",
+      "due": "2026-10-21",
+      "priority": "Critical",
+      "snoozes": 1,
+      "origDue": "2026-10-07",
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:23:07.693Z"
+    },
+    {
+      "id": "flight",
+      "title": "Book flight to Paris for 3 January",
+      "status": "done",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T02:41:19.227Z"
+    },
+    {
+      "id": "bank-fr",
+      "title": "Open French bank account",
+      "status": "blocked",
+      "due": "2027-01-10",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T20:44:28.039Z"
+    },
+    {
+      "id": "portal",
+      "title": "Clear INSEAD onboarding portal tasks",
+      "status": "done",
+      "due": "2026-11-01",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T02:41:19.227Z"
+    },
+    {
+      "id": "locus-exit",
+      "title": "Plan Locus exit: notice, LWD, handover",
+      "status": "doing",
+      "due": "2026-10-07",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T13:02:54.344Z"
+    },
+    {
+      "id": "handover-hf",
+      "title": "Hand over HelloFresh FR and UK engagements",
+      "status": "done",
+      "due": "2026-12-05",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "postmba",
+      "title": "Write down post-MBA function, industry, geography",
+      "status": "blocked",
+      "due": "2026-10-31",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:30.806Z"
+    },
+    {
+      "id": "club8-movein",
+      "title": "Move in to Club 8",
+      "status": "blocked",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:28:50.040Z"
+    },
+    {
+      "id": "club8-detail",
+      "title": "Confirm Club 8 inventory and move-in window",
+      "status": "todo",
+      "due": "2026-11-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T10:43:37.258Z"
+    },
+    {
+      "id": "cf-indonesia",
+      "title": "Follow up with Campus France Indonesia team",
+      "status": "todo",
+      "due": "2026-10-06",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:02:29.000Z"
+    },
+    {
+      "id": "third-lang",
+      "title": "Decide and register the third language",
+      "status": "todo",
+      "due": "2027-02-28",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T15:28:36.958Z"
+    },
+    {
+      "id": "housing-h2",
+      "title": "Solve housing after 3 July 2027",
+      "status": "blocked",
+      "due": "2027-03-01",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:28:45.219Z"
+    },
+    {
+      "id": "shipping",
+      "title": "Shipping and baggage plan",
+      "status": "todo",
+      "due": "2026-12-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T15:28:59.057Z"
+    },
+    {
+      "id": "cv",
+      "title": "Rebuild CV in INSEAD format",
+      "status": "todo",
+      "due": "2026-11-02",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:14.680Z"
+    },
+    {
+      "id": "forex",
+      "title": "Open EUR account for fees and living costs",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:48.122Z"
+    },
+    {
+      "id": "classmates",
+      "title": "Reach out to five MBA'27D classmates",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Low",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:52.989Z"
+    },
+    {
+      "id": "insurance",
+      "title": "French health cover and travel insurance",
+      "status": "blocked",
+      "due": "2026-12-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:30:05.824Z"
+    }
+  ]
+}
