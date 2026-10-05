@@ -1,0 +1,64 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-05T11:19:10.000Z",
+ "source": "Claude",
+ "why": "Capture today's mail as notes on the tasks they belong to",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-1791199150001",
+   "from": "claude",
+   "itemId": "cf-validation",
+   "itemTitle": "Campus France EEF validated",
+   "text": "✉ Etudes en France: Please correct your preconsular file (5 Oct, Campus France Indonesia)\n\nThey have checked the file and sent it back for corrections, asked for as soon as possible. Two things: add your ITAS in the identity section, and upload the original bachelor certificate in colour plus your transcripts. The fields are marked \"to correct\" in the portal. You have to submit the file again before they re-check it, and they warn that each extra round costs time. Dossier reference left out of this note on purpose.",
+   "createdAt": "2026-10-05T10:29:35.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791199150002",
+   "from": "claude",
+   "itemId": "cf-validation",
+   "itemTitle": "Campus France EEF validated",
+   "text": "✉ RE: Account Verification (5 Oct, Fitria, Campus France Jakarta)\n\n\"We have sent you access to make the requested modifications to the relevant sections. Please let us know once the modifications have been completed.\" So the portal is open for the corrections above, and they want a note back when you are done.",
+   "createdAt": "2026-10-05T10:30:56.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791199150003",
+   "from": "claude",
+   "itemId": "docs-apost",
+   "itemTitle": "Apostille and attest academic documents",
+   "text": "✉ Etudes en France: Please correct your preconsular file (5 Oct, Campus France Indonesia)\n\nThis is the task the correction lands on: they want the original bachelor certificate in colour and the transcripts re-uploaded. Due 18 Oct here, but Campus France asked for it as soon as possible and the EEF validation waits on it.",
+   "createdAt": "2026-10-05T10:29:36.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791199150004",
+   "from": "claude",
+   "itemId": "vmock",
+   "itemTitle": "Activate VMock CV platform access",
+   "text": "✉ Fw: Enhance your CV with VMock SMART Career Platform (5 Oct, INSEAD)\n\nThe VMock invitation, forwarded from your INSEAD address. This is the access the task is about.",
+   "createdAt": "2026-10-05T10:29:51.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791199150005",
+   "from": "claude",
+   "itemId": "casecoach",
+   "itemTitle": "Register for Case Coach",
+   "text": "✉ Fw: Your CaseCoach INSEAD Subscription invitation (5 Oct, CaseCoach)\n\nThe CaseCoach subscription invitation, forwarded from your INSEAD address. This is the registration the task is about.",
+   "createdAt": "2026-10-05T10:30:07.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791199150006",
+   "from": "claude",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "text": "✉ Authority to recover legal and valuation charges (3 Oct, sent by you to the branch)\n\nYou sent the branch the authority to recover legal and valuation charges against the education loan application, copying your parents. Nothing back from them yet as of this scan.",
+   "createdAt": "2026-10-03T13:21:40.000Z",
+   "state": "new"
+  }
+ ]
+}
