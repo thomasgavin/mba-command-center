@@ -428,6 +428,71 @@ unknown keys, `save()` only stores seed ids) and published files mentioning it
 merge as no-ops. Notes survive regardless, since they carry their own
 `itemTitle`. Check `claude-inbox/` for edits on an id before retiring it.
 
+## The mind map, and the dependency view it replaced
+
+He asked for it plainly: *"I'm not very good at managing information in a
+organized way and usually tend to rely on my memory. I want to change that."*
+So the board has a place to put a fact once and find it again. He writes a
+line, Claude files it under a topic, links it to whatever it relates to, and
+the tree is the result.
+
+**It took the Dependencies view's place, and that view is gone.** It drew what
+gated what, which the drawer already says per task and the cascade already acts
+on; it answered a question nobody was asking twice a day. The `deps` data stays
+— `depsOpen()` and the cascade are untouched — only the view is removed.
+
+- **A node is the same kind of object as a note.** It carries its own clock in
+  `at`, merges by id with newest-wins, and rides in the payload the board
+  already publishes. Nothing new had to be invented to reach his other device,
+  and nothing new can disagree with the rules that already decide who wins. A
+  nudge was built the same way and for the same reason.
+- **`kb` is a whole-blob field, so it has its own rule in `save()`** —
+  `unionKb`, newest clock per id — per the two-tabs section below. A deleted
+  node keeps travelling as `deleted:true`; a node simply left out of a payload
+  is unchanged, never removed.
+- **It travels whole**, newest 300 nodes in every file. There is no `SEED` to
+  diff a fact against the way there is for a task, and half a map on his other
+  device would be worse than none.
+- **The top of the tree is `CATS`** — the four buckets he already thinks in —
+  plus Unfiled for anything not placed yet. A node with an `item` and no `cat`
+  inherits the task's category, so Claude can file one by naming the task. The
+  sub-tab strip filters the map like every other view.
+- **A node whose parent is missing is an orphan, not a ghost.** It renders at
+  the top of its category rather than vanishing with the node that held it.
+- **`item` is most of the value.** It is how "VMock scores your CV" ends up one
+  tap from the CV task; `rel[]` is the cross-links, and the skill writes both
+  sides or the connection only exists from one end.
+- **The composer does two jobs**, because he asked for exactly that: *"the text
+  box here should not only be to add notes but also to ask you questions based
+  on the existing information instead of me rummaging through the dashboard."*
+  Both end up as a note — `kind:"fact"` or `kind:"ask"` — so it travels the
+  paths that already exist.
+- **An ask answers itself immediately** out of what the map holds, and says so:
+  Claude's real answer takes the forty-odd seconds a run takes, and a box that
+  sits silent that long reads as a box that did nothing. `STOP` is the reason
+  that answer is usable — without a stop-word list, *"what do I need for the
+  loan"* matched every node on the board, because "the" is in almost every
+  sentence, and an answer that returns everything is the rummaging he asked to
+  be rid of. Only the best-scoring matches are shown, not everything that
+  brushed one word.
+- Below the first level the tree is **collapsed**, with the count on a node the
+  only thing saying there is more under it. A map of a hundred facts has to be
+  readable on a phone.
+
+**`KNOWLEDGE.md` is the durable copy**, and the same ask: *"create and maintain
+one or more .md files in the git repo so the context and information is never
+lost even if this session is gone."* The map is what he reads; `KNOWLEDGE.md`
+is what the next Claude reads without a browser, a session or a Durable Object.
+A run that changes `kb[]` updates it in the same commit, and a difference
+between the two is a bug. `.claude/skills/answer-notes/SKILL.md` §3c is the
+whole procedure.
+
+**The relay folds the map into the daily archive**, in `fold()` and `alarm()`.
+Tasks rebuild from `SEED` and notes expire at seven days, but what he knows
+exists nowhere else — an archive carrying everything except the irreplaceable
+part is not a backup. The map never expires: a note ages out because it is a
+message, and a fact he wrote down is the opposite of a message.
+
 ## One view for the tasks, not two
 
 Timeline and List were two tabs over the same 35 rows, grouped the same way by
@@ -787,7 +852,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 135 invariants, three widths, a real browser. Every one of them was a
+that runs: 159 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

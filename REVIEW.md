@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 90 checks, three widths, a real browser
+node checks/board-check.mjs          # 159 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -49,11 +49,37 @@ view tabs off the screen. A fixed body has no scrollport to move.
 *Checked: `the document is locked`, `the header stays put`.*
 
 ### Nothing runs off the side, on any view, at any width
-Checked at 390, 768 and 1280 for all seven views, on both the document and
+Checked at 390, 768 and 1280 for every view, on both the document and
 `.stage`. The widths that matter are his iPhone and his Mac; 768 is there
 because the breakpoint is at 720 and the first thing past a breakpoint is where
 layouts break.
 *Checked: `nothing runs off the side`.*
+
+### A fact he gave the board is never lost
+`kb` is the mind map, and it is the one thing on this board that cannot be
+rebuilt from `SEED`. So it has to survive every path: a merge, a reload, a
+second tab, and the Worker being deleted. It goes in `unionKb` (newest clock per
+id, deletions included), in `save()` as a whole-blob field with its own rule, in
+both payloads, in `mergePayload`, in the relay's `fold()` and in the daily
+archive — and it is mirrored into `KNOWLEDGE.md` in the same commit that
+changes it. A field that merges but never saves passes every in-memory
+assertion and fails completely, which is what `deleted` taught; so the check
+reloads the page.
+*Checked: `a patch from Claude fills the map`, `it is written to storage, not
+only held in memory`, `the map survives a reload`, `the relay folds the mind
+map`, `the daily archive carries it into the repo`.*
+
+### A node whose parent is gone is still reachable
+It renders at the top of its category. A tree that silently drops a branch when
+one node above it is deleted is a tree that loses what he wrote.
+*Checked: `a fact whose parent is missing is still on screen`.*
+
+### An answer out of the map is the best matches, not everything
+Without a stop-word list, "what do I need for the loan" matched every node,
+because "the" is in nearly every sentence. Words of three letters or more, stop
+words dropped, and only the best-scoring nodes shown.
+*Checked: `an ask answers out of the map at once`, `the tree dims what the
+question did not touch`.*
 
 ### The drawer fits the screen, for every task
 Not for the first task — for every one, because the task with the long title and

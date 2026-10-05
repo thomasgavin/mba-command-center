@@ -87,7 +87,7 @@ One file, `claude-inbox/<YYYY-MM-DD-HHMM>.json`:
   "source": "Claude",
   "why": "<short phrase, shown in his toast>",
   "changed": [
-    {"id": "<item>", "due": "YYYY-MM-DD", "dateType": "Target|Confirmed|Awaiting"}
+    {"id": "<item>", "due": "YYYY-MM-DD"}
   ],
   "ack": ["<id of every note this answers>"],
   "notes": [
@@ -129,6 +129,80 @@ answer it. But **his reply to one usually carries a status**: *"branch said
 Tuesday"*, *"already done"*, *"not happening, move it"*. Patch what it tells
 you, `manual:true` on any status you set, and `ack` his reply. A nudge that got
 an answer and changed nothing on the board is the loop failing quietly.
+
+## 3c. The mind map — a note can be a fact, or a question about one
+
+He said why it exists: *"I'm not very good at managing information in a
+organized way and usually tend to rely on my memory. I want to change that."*
+So the Mind map view is his memory, and **you are the one who maintains it.**
+
+A note carries `kind` and that is how you tell what you were handed:
+
+- **`kind:"fact"`** — something to remember. *"VMock is a CV analysis tool to
+  score and improve my CV."* File it.
+- **`kind:"ask"`** — a question to answer out of what the map already holds,
+  not a job to do. Answer it in `notes[]` like any other reply. Add a node only
+  if answering taught you something the map did not have.
+- **no `kind`** — an ordinary message. Unchanged.
+- A plain note that is plainly a fact is a fact. The flag says where he typed
+  it, not what it is, and he will write things worth keeping in Chat.
+
+A node goes in the patch's `kb[]`, alongside `changed[]` and `notes[]`:
+
+```json
+"kb": [
+  {"id": "k-vmock", "label": "VMock",
+   "body": "CV analysis tool. Scores a CV and says what to fix.",
+   "cat": "work", "parent": null, "item": "vmock", "rel": ["k-cv"],
+   "at": "<ISO now>", "createdAt": "<ISO now>", "by": "claude"}
+]
+```
+
+- **`label`** is the thing's name, two or three words. It is what he scans.
+- **`body`** is one sentence. A paragraph in a tree is a wall, and the map is
+  read on a phone.
+- **`cat`** is `money`, `life`, `study`, `work`, or `else` when you genuinely
+  cannot place it. A node with an `item` and no `cat` inherits that task's
+  category, so naming the task is enough.
+- **`parent`** nests it under another node. Nest when something is *part of*
+  the parent, not merely related to it — relation is what `rel[]` is for.
+- **`item`** ties it to a task, and that link is most of the value: it is how
+  "VMock scores your CV" ends up one tap from the CV task.
+- **`rel[]`** is the cross-links, both ways. **Write the other node's `rel` as
+  well**, or the connection exists in one direction only and he finds it from
+  one end and not the other.
+- **`at` is the clock the merge runs on.** Without it the node takes the file's
+  time, which is close enough but not yours to leave to chance.
+- **`id`** is stable and yours to choose: `k-<slug>`. **Re-use it to correct a
+  node** — same id, new body, new `at`. A second node about the same thing is
+  how a map becomes a mess.
+- **Deleting** is `{"id": "k-x", "deleted": true, "at": "<ISO now>"}`. It has to
+  travel; a node simply left out of a patch is unchanged, not removed.
+
+**Three rules about the content, and they are the ones that matter:**
+
+1. **Only what he actually said.** Filing a fact he did not give you is the
+   drift this whole board exists to prevent, and it is worse here than anywhere
+   else, because he will come back in six months and trust it.
+2. **The repository is public.** Never put an account, passport, visa, loan or
+   reference number in a node, even when his note contains one. Name the thing
+   indirectly and say in your reply that you left the number out.
+3. **Tidy as you go.** When a new fact belongs under an existing node, re-parent
+   it rather than starting a third top-level topic. Two runs that each add a
+   root for the same subject is how the map stops being readable.
+
+**Then mirror it into `KNOWLEDGE.md`** in the same commit. That file is the
+durable copy he asked for — *"create and maintain one or more .md files in the
+git repo so the context and information is never lost even if this session is
+gone"* — and it is the only copy a future session can read without a browser.
+Its shape is one `##` per category, one `###` per top-level node, nested
+bullets below, and the task link in brackets. Keep the two in step: the map is
+what he reads, `KNOWLEDGE.md` is what the next Claude reads, and a difference
+between them is a bug.
+
+On the relay route there is no commit, so write the node into `kb[]` of the
+reply you post to `/agent/reply`, and commit `KNOWLEDGE.md` on its own with
+`[skip ci]`.
 
 ## 4. Age out the thread
 

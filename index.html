@@ -510,23 +510,51 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .calrow span{flex-basis:100%;padding-left:15px;font-size:10.5px;font-weight:600;color:var(--ink4)}
 .calrow.done b{color:var(--ink4);text-decoration:line-through}
 
-/* ---------- dependency graph ---------- */
-.gfx{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:18px;overflow-x:auto}
-.layers{display:flex;gap:30px;align-items:flex-start;min-width:fit-content;position:relative}
-.layer{display:flex;flex-direction:column;gap:12px;min-width:168px}
-.lhd{font-size:9.5px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:.09em;margin-bottom:2px}
-.fnode{
-  border:1px solid var(--line);border-radius:var(--r2);padding:10px 11px;background:var(--wash2);cursor:pointer;
-  transition:transform .14s var(--ease),box-shadow .14s,border-color .14s;position:relative;
-}
-.fnode:hover{transform:translateY(-2px);box-shadow:var(--sh);background:#fff}
-.fnode .ft{font-size:11.5px;font-weight:650;line-height:1.3}
-.fnode .fd{font-size:10px;color:var(--ink4);font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
-.fnode.done{background:rgba(0,169,143,.07);border-color:rgba(0,169,143,.28)}
-.fnode.done .ft{color:var(--green)}
-.fnode.now{border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(255,100,41,.1)}
-.fnode.blocked{border-style:dashed;opacity:.72}
-.fsvg{position:absolute;inset:0;pointer-events:none;overflow:visible}
+/* ---------- mind map ----------
+   A tree, not a graph. The dependency view drew one and it answered a question
+   nobody was asking twice a day; this one answers "what do I know about this,
+   and what is it connected to", which is the thing he was keeping in his head. */
+.mapw{display:flex;flex-direction:column;gap:12px}
+.mans.off{display:none}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:6px 14px 12px}
+.mroot{border-top:1px solid var(--line2);padding-top:9px;margin-top:9px}
+.mroot:first-child{border-top:0}
+.mrh{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink4)}
+.mrh .mrc{margin-left:auto;font-size:10px;color:var(--ink4);font-variant-numeric:tabular-nums}
+.mrh .msw{width:7px;height:7px;border-radius:50%;flex:none}
+/* one node: a twisty, a label, and whatever it is connected to underneath */
+.mn{padding-left:3px}
+.mkids{margin-left:9px;padding-left:11px;border-left:1px solid var(--line2)}
+.mnh{display:flex;align-items:flex-start;gap:7px;padding:5px 0;cursor:pointer;min-width:0}
+.mnh:hover .mnl{color:var(--orange)}
+.mtw{flex:none;width:15px;height:17px;border:0;background:none;padding:0;cursor:pointer;color:var(--ink4);
+  font-size:9px;line-height:17px;transition:transform .15s var(--ease)}
+.mtw.open{transform:rotate(90deg)}
+.mtw.leaf{visibility:hidden}
+/* the label has to shrink below its longest word, or one long node sets the
+   width of the whole card and the drawer's sideways-scroll bug comes back here */
+.mnl{flex:1;min-width:0;font-size:12.5px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.mnc{flex:none;font-size:9.5px;color:var(--ink4);font-weight:700;font-variant-numeric:tabular-nums;padding-top:2px}
+.mnb{font-size:11.5px;color:var(--ink3);line-height:1.5;padding:0 0 6px 22px;overflow-wrap:anywhere}
+.mnr{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 7px 22px}
+.mtag{font-size:9.5px;font-weight:700;border-radius:20px;padding:2px 7px;background:var(--wash2);
+  color:var(--ink3);border:1px solid var(--line2);cursor:pointer}
+.mtag.mitem{color:var(--orange);border-color:rgba(255,100,41,.3);background:rgba(255,100,41,.08)}
+.mn.hit>.mnh .mnl{color:var(--orange)}
+.mn.dim{opacity:.33}
+/* the answer the board can give on its own, while Claude writes the real one */
+.mans{background:rgba(255,100,41,.07);border:1px solid rgba(255,100,41,.22);border-radius:var(--r2);
+  padding:11px 12px;font-size:12px;line-height:1.5}
+.mans b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);margin-bottom:5px}
+.mans .mal{display:block;padding:3px 0;cursor:pointer;overflow-wrap:anywhere}
+.mans .mal:hover{color:var(--orange)}
+.mempty{text-align:center;color:var(--ink4);font-size:12px;line-height:1.7;padding:26px 10px}
+/* the composer is the same shape as Chat's, with a switch for what the text is */
+.mseg{display:flex;gap:4px;padding:0 0 7px}
+.mseg button{flex:none;font-size:11px;font-weight:700;border-radius:20px;padding:4px 11px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink3)}
+.mseg button.on{background:var(--orange);border-color:var(--orange);color:#fff}
 
 /* ---------- snooze rail ---------- */
 .rail{
@@ -822,7 +850,12 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    sticky pins it to the viewport but the rest of the messages keep rendering
    underneath it. So the view owns the height and the thread owns the scroll. */
 .stage.chatmode{padding-bottom:0;overflow:hidden}
-#v-chat.on{display:flex;flex-direction:column;height:100%}
+#v-chat.on,#v-map.on{display:flex;flex-direction:column;height:100%}
+/* the map scrolls inside the view and the composer does not, for the same
+   reason the chat thread does: a sticky composer in the page scroller looks
+   right until the content is taller than a screen and renders over the top of
+   it. .mapw is the scroller, .cfoot stays put. */
+#v-map .mapw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:4px}
 .chatw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;
   display:flex;flex-direction:column;gap:12px;padding:4px 2px 10px}
 .cday{align-self:center;font-size:11px;font-weight:600;color:var(--ink4);
@@ -954,7 +987,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     <button class="vt" role="tab" data-v="board" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4" height="12" rx="1.3"/><rect x="6.8" y="2" width="4" height="8" rx="1.3"/><rect x="12" y="2" width="2.5" height="10" rx="1.2"/></svg>Board<small id="nBoard">0</small></button>
     <button class="vt" role="tab" data-v="time" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h7M2 8h11M2 12h5"/><circle cx="12.5" cy="4" r="1.4"/><circle cx="7.5" cy="12" r="1.4"/></svg>Tasks<small id="nList">0</small></button>
     <button class="vt" role="tab" data-v="cal" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.8" y="3" width="12.4" height="11" rx="1.6"/><path d="M1.8 6.6h12.4M5 1.6v2.6M11 1.6v2.6"/></svg>Calendar</button>
-    <button class="vt" role="tab" data-v="graph" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.8"/><circle cx="8" cy="3.4" r="1.8"/><circle cx="8" cy="12.6" r="1.8"/><circle cx="13" cy="8" r="1.8"/><path d="M4.5 7 6.6 4.6M4.5 9l2.1 2.4M9.5 4.4 11.6 6.8M9.5 11.6 11.6 9.2"/></svg>Dependencies</button>
+    <button class="vt" role="tab" data-v="map" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="3" cy="8" r="1.7"/><rect x="10" y="2" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="6.3" width="4.5" height="3.4" rx="1.2"/><rect x="10" y="10.6" width="4.5" height="3.4" rx="1.2"/><path d="M4.7 8h2.1M6.8 8V3.7h3.2M6.8 8h3.2M6.8 8v4.3h3.2"/></svg>Mind map<small id="nMap">0</small></button>
     <button class="vt" role="tab" data-v="chat" aria-selected="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9.5a2 2 0 0 1-2 2H6l-3.5 2.6V4.5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 2 2z"/><path d="M5.5 6h5M5.5 8.4h3"/></svg>Chat<small id="nChat">0</small></button>
   </nav>
 
@@ -987,10 +1020,22 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       <p class="tip">Drag an item onto another day to reschedule it exactly, or onto the snooze rail to push it by a fixed number of days.</p>
     </section>
 
-    <section class="view" id="v-graph">
-      <div class="gfx"><div class="layers" id="layers"></div></div>
-      <p class="tip" id="gfxNote"></p>
-      <p class="tip">What gates what. A box is <b>dashed</b> while something upstream is still open, <b>orange</b> when it is the next thing you can actually move, <b>green</b> when done.</p>
+    <section class="view" id="v-map">
+      <div class="mapw">
+        <div class="mans off" id="mAns"></div>
+        <div class="mbox" id="mapw"></div>
+        <p class="tip" id="mapTip"></p>
+      </div>
+      <div class="cfoot">
+        <div class="mseg">
+          <button data-mm="note" class="on">Add a note</button>
+          <button data-mm="ask">Ask about it</button>
+        </div>
+        <div class="cbox">
+          <textarea id="min" rows="1" placeholder="Tell Claude something worth remembering…"></textarea>
+          <button class="csend" id="msend" aria-label="Send">&#8593;</button>
+        </div>
+      </div>
     </section>
 
     <section class="view" id="v-chat">
@@ -1243,7 +1288,7 @@ var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
 
 /* ---------- state ---------- */
 var KEY="mbacc_v3";
-var items={}, notes=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
+var items={}, notes=[], kb=[], view="over", openId=null, dMode=null, noteDraft="", justDragged=false;
 /* Which property row is open in the task card, and whether the note composer
    is unfolded. Both are drawer state, not board state: they reset when it
    closes and never reach localStorage. */
@@ -1319,6 +1364,10 @@ function load(){
      runs when he edits something, so a board he merely reads would re-date the
      same note to every load -- which is the original bug wearing a hat. */
   if(repaired){ repaired=false; setTimeout(save,0); }
+  /* the mind map. Same shape as notes on the way in: a list carrying its own
+     per-item clocks, so nothing about it can disagree with the merge rules the
+     rest of the board already runs on. */
+  kb=unionKb((st&&st.kb)||[],[]);
   savedAt=(st&&st.saved)||null;
   syncedAt=(st&&st.syncedAt)||null;
   pending=(st&&st.pending)||null;
@@ -1451,7 +1500,10 @@ function save(){
   });
   fromMerge={};
   var merged=unionNotes(notes,(prev&&prev.notes)||[]);
-  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:merged,
+  /* a whole-blob field with no rule of its own is the two-tab bug waiting to
+     happen: the other tab's newer nodes have to survive this tab's save */
+  kb=unionKb(kb,(prev&&prev.kb)||[]);
+  try{ localStorage.setItem(KEY,JSON.stringify({v:3,items:out,notes:merged,kb:kb,
     saved:now,syncedAt:maxOf(syncedAt,prev&&prev.syncedAt),
     pending:pending||(prev&&prev.pending)||null,touched:touched,
     seen:unionSeen(seenF,prev&&prev.seen),
@@ -1460,6 +1512,21 @@ function save(){
 function maxOf(a,b){ return (a&&b) ? (a>b?a:b) : (a||b||null); }
 /* a file either tab has folded in is folded in; re-reading one is harmless but
    pointless, and losing the record is how a device re-merges the whole folder */
+/* Newest clock per id, and that is the whole rule -- the same one a task field
+   merges by. A deleted node keeps travelling (it carries deleted:true), or
+   deleting one on the laptop would quietly come back from the phone. */
+function unionKb(a,b){
+  var m={}, out=[];
+  [a||[],b||[]].forEach(function(list){
+    list.forEach(function(n){
+      if(!n||!n.id) return;
+      var cur=m[n.id];
+      if(!cur || (n.at||"")>(cur.at||"")) m[n.id]=n;
+    });
+  });
+  Object.keys(m).forEach(function(k){ out.push(m[k]); });
+  return out;
+}
 function unionSeen(a,b){
   var o={}; [a||{},b||{}].forEach(function(m){ Object.keys(m).forEach(function(k){ o[k]=m[k]; }); });
   return o;
@@ -1480,10 +1547,11 @@ window.addEventListener("storage",function(e){
     if(!theirs || (mine && theirs<=mine)) return;
     applyStored(k,pit[k]||null); touched[k]=theirs; moved=true;
   });
-  var before=notes.length;
+  var before=notes.length, kbWas=kbStamp();
   notes=unionNotes(notes,st.notes||[]);
+  kb=unionKb(kb,st.kb||[]);
   if(st.relaySeq>relaySeq) relaySeq=st.relaySeq;
-  if(moved || notes.length!==before) render();
+  if(moved || notes.length!==before || kbStamp()!==kbWas) render();
 });
 
 /* ---------- dates ---------- */
@@ -1597,11 +1665,18 @@ function snooze(id,n){
    outstanding. `state:"read"` is what makes that true: "new" means "written
    here and not yet delivered", and a note nobody is delivering would have worn
    a sending badge for ever. */
-function addNote(itemId,text,quiet,forClaude){
+/* `kind` is how Claude tells what it has been handed. A plain note is a
+   message; "fact" is something to file in the map; "ask" is a question to
+   answer out of the map rather than a job to do. It rides on the note object
+   because a note already merges, syncs and ages out -- the mind map needed no
+   second channel, exactly as a nudge needed none. */
+function addNote(itemId,text,quiet,forClaude,kind){
   var ask = forClaude!==false;
-  notes.unshift({id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
+  var n={id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
-    createdAt:new Date().toISOString(),state:ask?"new":"read",from:"me",forClaude:ask});
+    createdAt:new Date().toISOString(),state:ask?"new":"read",from:"me",forClaude:ask};
+  if(kind) n.kind=kind;
+  notes.unshift(n);
   save(); render();
   if(ask) autoSend();
   if(!quiet) toast(ask?(RELAY?"Note saved. Sending to Claude…":"Note saved. Export it with “For Claude”.")
@@ -1652,10 +1727,9 @@ function render(){
   document.getElementById("exportBtn").classList.toggle("off",!needs);
   document.getElementById("nChat").textContent=unreadReplies();
   document.getElementById("nChat").parentNode.classList.toggle("hot",unreadReplies()>0);
-  renderOverview(); renderBoard(); renderPlan(); renderCal(); renderGraph(); renderChat();
+  renderOverview(); renderBoard(); renderPlan(); renderCal(); renderMap(); renderChat();
   syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
-  if(view==="graph") requestAnimationFrame(drawEdges);
 }
 
 /* ---------- overview bento ---------- */
@@ -2116,70 +2190,164 @@ function renderAgenda(evOn,tIso){
     any?h:'<p class="tip" style="padding:16px">Nothing due in '+MN[m]+'. Use &#8249; and &#8250; to look at another month.</p>';
 }
 
-/* ---------- dependency graph ---------- */
-var depth={};
-function renderGraph(){
-  depth={};
-  function dep(id,seen){
-    if(depth[id]!==undefined) return depth[id];
-    seen=seen||{}; if(seen[id]) return 0; seen[id]=1;
-    var i=items[id]; if(!i||!i.deps||!i.deps.length){ depth[id]=0; return 0; }
-    var m=0; i.deps.forEach(function(d){ if(items[d]) m=Math.max(m,dep(d,seen)+1); });
-    depth[id]=m; return m;
-  }
-  /* only items that gate something, or are gated: the rest are not dependencies */
-  var linked={};
-  alive().forEach(function(i){
-    if((i.deps||[]).length){ linked[i.id]=1; i.deps.forEach(function(d){ if(items[d]) linked[d]=1; }); }
+/* ---------- mind map ----------
+   He said it plainly: he is not good at holding information in an organised
+   way and leans on memory instead. So this is a place to put a fact once and
+   find it again -- he writes a line, Claude files it under a topic, links it to
+   whatever it relates to, and the tree is the result.
+
+   A node is deliberately the same kind of object as a note: it carries its own
+   clock in `at`, merges by id with newest-wins, and travels in the same payload
+   the board already publishes. Nothing new had to be invented to get it onto
+   his other device, and nothing new can disagree with the rules that already
+   decide who wins.
+
+   `cat` is one of CATS (plus "else" for anything Claude has not placed yet) so
+   the top of the tree is the four buckets he already thinks in. `parent` nests
+   a node under another; `item` ties it to a task, which is how "VMock scores
+   your CV" ends up one tap from the CV task. */
+var MAP_ROOTS=CATS.map(function(c){ return {k:c.k,label:c.label,c:tc(c.tracks[0])}; })
+                  .concat([{k:"else",label:"Unfiled",c:"#8b8095"}]);
+var mapOpen={}, mapMode="note", mapQ="", mapAns=null;
+
+function kbAlive(){ return kb.filter(function(n){ return n && n.id && !n.deleted; }); }
+function kbOf(id){ var r=null; kb.forEach(function(n){ if(n.id===id) r=n; }); return r; }
+function kbKids(id){
+  return kbAlive().filter(function(n){ return n.parent===id; }).sort(kbSort);
+}
+function kbRootsOf(cat){
+  return kbAlive().filter(function(n){
+    /* a node whose parent is gone is an orphan, not a ghost: it shows at the
+       top of its category rather than disappearing with the node that held it */
+    return mapCat(n)===cat && (!n.parent || !kbOf(n.parent) || kbOf(n.parent).deleted);
+  }).sort(kbSort);
+}
+function mapCat(n){
+  var k=n.cat||"";
+  for(var i=0;i<MAP_ROOTS.length;i++){ if(MAP_ROOTS[i].k===k) return k; }
+  /* a node pinned to a task inherits that task's category, so Claude can file
+     one by naming the task alone */
+  if(n.item && items[n.item]) return TRACK_CAT[items[n.item].track]||"else";
+  return "else";
+}
+function kbSort(a,b){ return (a.label||"").localeCompare(b.label||""); }
+/* how many facts hang off this one, however deep: the count on a collapsed
+   node is the only thing saying there is anything under it */
+function kbDeep(id,seen){
+  seen=seen||{}; if(seen[id]) return 0; seen[id]=1;
+  var n=0; kbKids(id).forEach(function(k){ n+=1+kbDeep(k.id,seen); });
+  return n;
+}
+/* the local answer. Claude writes the real one, which takes the forty-odd
+   seconds a run takes; this is what the board can say on its own in the
+   meantime, out of what it already holds. Words, not substrings: searching for
+   "cv" should not match "achievement". */
+/* The words a question is actually about. Without this list "what do I need
+   for the loan" matched every node on the board, because "the" is in almost
+   every sentence -- an answer that returns everything is the rummaging he
+   asked to be rid of. */
+var STOP=("the a an and or of for to in on at is are was were be been do does did "+
+  "what when where which who whom how why can could should would will shall my me i "+
+  "it its this that these those with from about any some all have has had need needs "+
+  "get got tell show know about there their them you your").split(" ");
+function mapHits(q){
+  var ws=((q||"").toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(function(w){ return STOP.indexOf(w)<0; });
+  if(!ws.length) return [];
+  var scored=kbAlive().map(function(n){
+    var hay=((n.label||"")+" "+(n.body||"")+" "+(n.item&&items[n.item]?items[n.item].title:"")).toLowerCase();
+    var sc=0; ws.forEach(function(w){ if(hay.indexOf(w)>=0) sc++; });
+    return {n:n,sc:sc};
+  }).filter(function(x){ return x.sc>0; }).sort(function(x,y){ return y.sc-x.sc || kbSort(x.n,y.n); });
+  if(!scored.length) return [];
+  /* only the best matches, not everything that brushed one word: a list of
+     eight near-misses answers nothing */
+  var best=scored[0].sc;
+  return scored.filter(function(x){ return x.sc===best; }).slice(0,8).map(function(x){ return x.n; });
+}
+/* an ancestor of a hit has to stay lit, or the match sits inside a branch
+   drawn as irrelevant */
+function hitSet(list){
+  var o={};
+  list.forEach(function(n){
+    var cur=n, guard=0;
+    while(cur && guard++<40){ o[cur.id]=1; cur=cur.parent?kbOf(cur.parent):null; }
   });
-  /* depth is computed over every item, so a chain that crosses categories keeps
-     its real shape; the filter only decides what is drawn */
-  var graphPool=alive().filter(function(i){ return linked[i.id]; });
-  var maxD=0;
-  graphPool.forEach(function(i){ maxD=Math.max(maxD,dep(i.id)); });
-  var shown=graphPool.filter(inCat);
-  var layers=[];
-  for(var l=0;l<=maxD;l++) layers.push(shown.filter(function(i){return depth[i.id]===l;}).sort(byDue));
-  var hidden=alive().length-graphPool.length;
-  var h='<svg class="fsvg" id="fsvg"></svg>';
-  layers.forEach(function(g,ix){
-    h+='<div class="layer"><div class="lhd">'+(ix===0?"No prerequisites":"Stage "+(ix+1))+'</div>';
-    g.forEach(function(i){
-      var cls=i.status==="done"?"done":(depsOpen(i).length?"blocked":"now");
-      h+='<div class="fnode '+cls+'" data-go="'+i.id+'" data-nid="'+i.id+'">'+
-         '<div class="ft">'+esc(i.title.length>30?i.title.slice(0,29)+"…":i.title)+'</div>'+
-         '<div class="fd" style="color:'+tc(i.track)+'">'+esc(tl(i.track))+' &middot; '+fmtD(i.due)+'</div></div>';
-    });
+  return o;
+}
+function renderMap(){
+  var host=document.getElementById("mapw");
+  var live=kbAlive();
+  document.getElementById("nMap").textContent=live.length;
+  if(!live.length){
+    host.innerHTML='<div class="mempty">Your map is empty.<br>'+
+      'Write a line below &mdash; &ldquo;VMock scores a CV and says what to fix&rdquo; &mdash; and Claude '+
+      'files it under a topic, links it to the task it belongs to, and keeps it here.</div>';
+    document.getElementById("mapTip").textContent="";
+    return;
+  }
+  var hits=mapQ?hitSet(mapHits(mapQ)):null;
+  var drawn=0;
+  var h="", roots2=MAP_ROOTS.filter(function(r){ return cat==="all" || r.k===cat; });
+  roots2.forEach(function(r){
+    var roots=kbRootsOf(r.k);
+    if(!roots.length) return;
+    drawn++;
+    var total=roots.length; roots.forEach(function(n){ total+=kbDeep(n.id); });
+    h+='<div class="mroot"><div class="mrh"><span class="msw" style="background:'+r.c+'"></span>'+
+       esc(r.label)+'<span class="mrc">'+total+'</span></div>';
+    roots.forEach(function(n){ h+=mapNode(n,hits,0); });
     h+='</div>';
   });
-  document.getElementById("layers").innerHTML=h;
-  document.getElementById("gfxNote").textContent = hidden
-    ? hidden+" standalone item"+(hidden===1?" is":"s are")+" not shown here: nothing gates them and they gate nothing."
-    : "";
+  /* a category he has chosen but written nothing under has to say so, or the
+     card is simply blank and reads as the view having broken */
+  if(!drawn) h='<div class="mempty">Nothing filed under this category yet.</div>';
+  host.innerHTML=h;
+  document.getElementById("mapTip").textContent=
+    live.length+" thing"+(live.length===1?"":"s")+" remembered. Claude files what you write here and keeps it in KNOWLEDGE.md in the repo, so it outlives any one session.";
 }
-function drawEdges(){
-  var svg=document.getElementById("fsvg"); if(!svg) return;
-  var host=document.getElementById("layers"), hr=host.getBoundingClientRect();
-  if(!hr.width) return;
-  svg.setAttribute("width",hr.width); svg.setAttribute("height",hr.height);
-  svg.setAttribute("viewBox","0 0 "+hr.width+" "+hr.height);
-  var p="";
-  alive().forEach(function(i){
-    (i.deps||[]).forEach(function(d){
-      var a=host.querySelector('[data-nid="'+d+'"]'), b=host.querySelector('[data-nid="'+i.id+'"]');
-      if(!a||!b) return;
-      var ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
-      var x1=ra.right-hr.left, y1=ra.top-hr.top+ra.height/2;
-      var x2=rb.left-hr.left,  y2=rb.top-hr.top+rb.height/2;
-      var mx=(x1+x2)/2;
-      var open=items[d].status!=="done";
-      p+='<path d="M'+x1+' '+y1+' C'+mx+' '+y1+' '+mx+' '+y2+' '+x2+' '+y2+'" fill="none" stroke="'+
-         (open?"#d8d1e0":"#00a98f")+'" stroke-width="1.5"'+(open?' stroke-dasharray="4 4"':'')+' opacity="'+(open?.9:.55)+'"/>';
+function mapNode(n,hits,depth){
+  var kids=kbKids(n.id), deep=kbDeep(n.id);
+  /* a search opens the branches it matched; otherwise the top two levels are
+     open and the rest waits to be asked for, which is what makes a map of a
+     hundred facts readable on a phone */
+  var open = hits ? !!hits[n.id] : (mapOpen[n.id]!==undefined ? mapOpen[n.id] : depth<1);
+  var dim  = hits && !hits[n.id];
+  var h='<div class="mn'+(hits&&hits[n.id]?" hit":"")+(dim?" dim":"")+'" data-kb="'+esc(n.id)+'">'+
+    '<div class="mnh" data-kbt="'+esc(n.id)+'">'+
+      '<button class="mtw'+(open?" open":"")+(kids.length?"":" leaf")+'" aria-hidden="true">&#9654;</button>'+
+      '<span class="mnl">'+esc(n.label||"")+'</span>'+
+      (kids.length&&!open?'<span class="mnc">'+deep+'</span>':'')+
+    '</div>';
+  if(open){
+    if(n.body) h+='<div class="mnb">'+esc(n.body)+'</div>';
+    var tags="";
+    if(n.item&&items[n.item]) tags+='<span class="mtag mitem" data-go="'+esc(n.item)+'">'+esc(items[n.item].title)+'</span>';
+    (n.rel||[]).forEach(function(r){
+      var o=kbOf(r); if(o&&!o.deleted) tags+='<span class="mtag" data-kbg="'+esc(r)+'">'+esc(o.label||"")+'</span>';
     });
-  });
-  svg.innerHTML=p;
+    if(tags) h+='<div class="mnr">'+tags+'</div>';
+    if(kids.length){
+      h+='<div class="mkids">';
+      kids.forEach(function(k){ h+=mapNode(k,hits,depth+1); });
+      h+='</div>';
+    }
+  }
+  return h+'</div>';
 }
-
+/* what the board can answer right now, shown the moment he asks rather than
+   forty seconds later. It never pretends to be Claude's answer: it says what
+   it is, and Claude's lands in Chat as a reply like any other. */
+function renderAns(){
+  var box=document.getElementById("mAns");
+  if(!mapAns){ box.classList.add("off"); box.innerHTML=""; return; }
+  var found=mapHits(mapAns);
+  box.classList.remove("off");
+  box.innerHTML='<b>From your map</b>'+
+    (found.length
+      ? found.map(function(n){ return '<span class="mal" data-kbg="'+esc(n.id)+'">'+esc(n.label)+(n.body?' &mdash; '+esc(n.body):"")+'</span>'; }).join("")
+      : '<span>Nothing here touches that yet.</span>')+
+    '<span class="mal" style="color:var(--ink4);cursor:default">Claude is reading the whole map and will answer in Chat.</span>';
+}
 /* ---------- list ---------- */
 /* ---------- chat ----------
    Notes were only ever half a conversation: he could write, and Claude could
@@ -2214,7 +2382,9 @@ function syncFab(){
            /* the snooze rail rises into the same corner during a drag, and a
               drop target half-covered by a button reads as a button */
            document.getElementById("rail").classList.contains("up");
-  f.classList.toggle("off", view==="chat"||busy);
+  /* the map has a composer of its own in the same corner, so the button
+     would sit on the box he is typing in */
+  f.classList.toggle("off", view==="chat"||view==="map"||busy);
   var u=unreadReplies();
   f.classList.toggle("has",u>0);
   document.getElementById("fabN").textContent=u>9?"9+":String(u);
@@ -2616,7 +2786,7 @@ function changedItems(){
 }
 function fullPayload(){
   return {exportedAt:new Date().toISOString(),source:"MBA Command Center",
-    notes:notes, changed:changedItems(),
+    notes:notes, changed:changedItems(), kb:kb,
     open:live().sort(byDue).map(function(i){ return {id:i.id,title:i.title,track:i.track,status:i.status,due:i.due,daysLeft:dleft(i.due),priority:i.priority,blockedBy:depsOpen(i).map(function(d){return d;})}; })};
 }
 /* lean on purpose: the baseline task list already lives in SEED in this file,
@@ -2635,7 +2805,18 @@ function leanPayload(){
     /* the relay names the file from this, so both routes stamp in the same zone
        and the newest-file sort on pull stays honest */
     stamp:stamp(),
-    notes:outNotes(), changed:changedItems()};
+    notes:outNotes(), changed:changedItems(), kb:outKb()};
+}
+/* The map travels whole. It is small -- a line of text per fact -- it has no
+   baseline in SEED to diff against the way a task does, and half a map on his
+   other device would be worse than none. So the newest 300 nodes ride in every
+   file and newest-clock-wins sorts out the rest. */
+function outKb(){
+  return kb.slice().sort(function(a,b){ return (b.at||"").localeCompare(a.at||""); }).slice(0,300);
+}
+/* cheap "did the map change": ids and clocks, which is all a merge can move */
+function kbStamp(){
+  return kb.map(function(n){ return n.id+"@"+(n.at||""); }).sort().join("|");
 }
 function stamp(){
   var d=new Date(), z=function(n){ return (n<10?"0":"")+n; };
@@ -2670,7 +2851,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-1110";
+var BUILD="2026-10-05-1345";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2815,6 +2996,26 @@ document.addEventListener("click",function(e){
       }
       if(act.dataset.act==="grip") return;
     }
+  }
+
+  /* the whole header row is the twisty: a 15px chevron is not a tap target,
+     and there is nothing else a tap on a node could mean */
+  var kbt=t.closest("[data-kbt]");
+  if(kbt && !t.closest("[data-go]") && !t.closest("[data-kbg]")){
+    mapOpen[kbt.dataset.kbt] = !kbt.querySelector(".mtw.open");
+    /* a search is what decided the open branches; touching one by hand ends it,
+       or the next repaint would shut what he just opened */
+    mapQ=""; renderMap(); return;
+  }
+  /* "see also": jump to the related fact and open it */
+  var kbg=t.closest("[data-kbg]");
+  if(kbg){
+    var tgt=kbg.dataset.kbg, guard=0, cur2=kbOf(tgt);
+    while(cur2 && guard++<40){ mapOpen[cur2.id]=true; cur2=cur2.parent?kbOf(cur2.parent):null; }
+    mapQ=""; setView("map"); renderMap();
+    var el=document.querySelector('[data-kb="'+tgt+'"]');
+    if(el) el.scrollIntoView({block:"center"});
+    return;
   }
 
   var go=t.closest("[data-go]");
@@ -2982,6 +3183,46 @@ document.getElementById("subs").addEventListener("click",function(e){
   grow();
 })();
 
+/* --- mind map composer ---
+   One box doing two jobs, because he asked for exactly that: "the text box here
+   should not only be to add notes but also to ask you questions based on the
+   existing information instead of me rummaging through the dashboard". The
+   switch says which, and both end up as a note -- a fact to file, or a question
+   to answer -- so the whole thing travels down the paths that already exist.
+
+   An ask also answers itself immediately out of what the map already holds.
+   Claude's answer takes the forty-odd seconds a run takes, and a box that sits
+   silent for that long reads as a box that did nothing. */
+(function(){
+  var ta=document.getElementById("min"), btn=document.getElementById("msend");
+  var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(ta.scrollHeight,140)+"px"; btn.disabled=!ta.value.trim(); };
+  var send=function(){
+    var t=ta.value.trim(); if(!t) return;
+    addNote(null,t,true,true,mapMode==="ask"?"ask":"fact");
+    if(mapMode==="ask"){ mapAns=t; mapQ=t; }
+    else { mapAns=null; mapQ=""; toast("Noted. Claude is filing it."); }
+    ta.value=""; grow();
+    renderAns(); renderMap();
+  };
+  Array.prototype.forEach.call(document.querySelectorAll("[data-mm]"),function(b){
+    b.addEventListener("click",function(){
+      mapMode=b.dataset.mm;
+      Array.prototype.forEach.call(document.querySelectorAll("[data-mm]"),function(o){ o.classList.toggle("on",o===b); });
+      ta.placeholder = mapMode==="ask" ? "Ask about anything in here\u2026" : "Tell Claude something worth remembering\u2026";
+      /* leaving Ask puts the tree back: a filtered map is an answer to a
+         question he is no longer asking */
+      if(mapMode!=="ask"){ mapAns=null; mapQ=""; renderAns(); renderMap(); }
+      ta.focus();
+    });
+  });
+  ta.addEventListener("input",grow);
+  ta.addEventListener("keydown",function(e){
+    if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+  btn.addEventListener("click",send);
+  grow();
+})();
+
 /* opens the view and nothing else. Focusing the composer here raised the
    keyboard over half the thread before he had read any of it; he taps the box
    himself when he wants to type. */
@@ -2996,17 +3237,17 @@ Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
 function setView(v){
   view=v;
   Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(o){ o.setAttribute("aria-selected",o.dataset.v===v?"true":"false"); });
-  ["over","board","time","cal","graph","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
+  ["over","board","time","cal","map","chat"].forEach(function(k){ document.getElementById("v-"+k).classList.toggle("on",k===v); });
   document.getElementById("stage").scrollTop=0;
   renderSubs();
   /* render() paints the chat while another view is still current, so entering
      it has to repaint: that is when its replies count as read and when the
      thread scrolls to the newest message. */
-  document.getElementById("stage").classList.toggle("chatmode",v==="chat");
+  /* both the chat and the map own their own scrolling, so the stage must not also scroll */
+  document.getElementById("stage").classList.toggle("chatmode",v==="chat"||v==="map");
   if(v==="chat") renderChat();
   syncFab();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
-  if(v==="graph") requestAnimationFrame(drawEdges);
 }
 /* The swipe between sections is gone. It was a deliberately narrow gesture and
    still wrong: on a board full of competing gestures -- cards dragged by touch,
@@ -3015,7 +3256,6 @@ function setView(v){
 
 document.getElementById("calPrev").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCal(); });
 document.getElementById("calNext").addEventListener("click",function(){ calCur=new Date(calCur.getFullYear(),calCur.getMonth()+1,1); renderCal(); });
-window.addEventListener("resize",function(){ if(view==="graph") drawEdges(); });
 
 /* ===========================================================
    DRAG: listeners live on the document, never on the dragged
@@ -3144,7 +3384,7 @@ document.addEventListener("visibilitychange",function(){ if(document.hidden) end
 /* ===========================================================
    COMMAND PALETTE
    =========================================================== */
-var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Tasks"},{v:"cal",n:"Calendar"},{v:"graph",n:"Dependencies"},{v:"chat",n:"Chat"}];
+var VIEWS=[{v:"over",n:"Overview"},{v:"board",n:"Board"},{v:"time",n:"Tasks"},{v:"cal",n:"Calendar"},{v:"map",n:"Mind map"},{v:"chat",n:"Chat"}];
 var palSel=0, palRows=[];
 function openPal(){
   document.getElementById("pal").classList.add("on");
@@ -3277,7 +3517,23 @@ function mergePayload(pay){
       n.answered=true; n.state="read"; acked++;
     });
   }
-  return moved>0 || added>0 || acked>0;
+  /* The mind map, through the same door as everything else. A patch from
+     Claude is how the map is maintained at all: it files what he wrote, links
+     it to a task or another fact, and the node lands here with a clock like any
+     other change -- so a map edited on one device and a note written on the
+     other cannot disagree about who wins. */
+  var kbMoved=0;
+  if(pay.kb && pay.kb.length){
+    var was=kbStamp();
+    kb=unionKb((pay.kb||[]).map(function(n){
+      /* a node written without a clock is still news: it falls back to the
+         file's own time, exactly as a change with no `at` does */
+      if(n && !n.at){ n=JSON.parse(JSON.stringify(n)); n.at=pay.exportedAt; }
+      return n;
+    }), kb);
+    if(kbStamp()!==was) kbMoved=1;
+  }
+  return moved>0 || added>0 || acked>0 || kbMoved>0;
 }
 
 /* single-payload entry: the guards plus a save and a repaint */
