@@ -1056,6 +1056,36 @@ for (var tw26 of [390, 1280]) {
   await s27.ctx.close();
 }
 
+/* ---- 28. the axis starts last month, not at the oldest thing on the board ----
+   "Why does the timeline chart start from June? Start it from Sep." It ran back
+   to the earliest dated task, so four months of finished work squeezed what is
+   ahead into the right-hand third. */
+{
+  var s28 = await open(1280);
+  var k28 = await s28.p.evaluate(function () {
+    setView("time");
+    var t = todayD();
+    var want = new Date(t.getFullYear(), t.getMonth() - 1, 1);
+    var MNS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var months = Array.prototype.map.call(document.querySelectorAll("#gantt .gax .gm div"),
+      function (e) { return e.textContent; });
+    /* a task dated before the axis is pinned to its left edge, not drawn off it */
+    var old = alive().filter(function (i) { return i.due && D(i.due) < want; });
+    var pinned = old.map(function (i) {
+      var m = document.querySelector('#gantt .grow[data-id="' + i.id + '"] .gpt');
+      return m ? { left: m.style.left, pre: m.classList.contains("pre") } : null;
+    }).filter(Boolean);
+    return { first: months[0], want: MNS[want.getMonth()] + " " + String(want.getFullYear()).slice(2),
+             months: months.length, oldCount: old.length,
+             allPinned: pinned.length > 0 && pinned.every(function (m) { return m.left === "0%" && m.pre; }) };
+  });
+  ok("the timeline starts the month before this one",
+     k28.first === k28.want, JSON.stringify(k28));
+  ok("and a task older than that pins to the left edge with its real date",
+     k28.oldCount === 0 || k28.allPinned, JSON.stringify(k28));
+  await s28.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

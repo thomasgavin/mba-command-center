@@ -443,6 +443,15 @@ never be a tab apart again.
 - At 720px the column is 186px. The tick is `flex:none` and the title and
   priority share a `.gtx` that wraps inside it: letting the tick wrap is what
   turned a one-line row into a three-line one.
+- **The axis starts the month before this one**, never at the earliest date on
+  the board. Running it back to the first thing he ever did gave a June start
+  for an October question, and four months of finished work squeezed what is
+  actually ahead into the right-hand third of the screen. One month of context
+  behind is what "did I just miss that" needs; the rest is the Done section's
+  job. The end still follows the furthest date out. Anything older than the
+  axis **pins to its left edge** at 40% opacity (`.pre`) rather than being
+  drawn off it, and its label still prints the real date -- a clamped marker
+  must never be able to say a task happened later than it did.
 - `renderPlan` reads `pool()`, so the sub-tab filter applies. A category with
   no dated task still has to draw: a zero-width axis divides by zero, so the
   month range falls back to the current month.
@@ -721,7 +730,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 114 invariants, three widths, a real browser. Every one of them was a
+that runs: 130 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

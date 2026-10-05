@@ -449,6 +449,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    kind of thing from the due diamond even at a glance on a phone */
 .gdn{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:var(--green);
   transform:translate(-50%,-50%);box-shadow:0 0 0 3px var(--panel);z-index:3}
+/* a marker older than the axis is pinned to its left edge: hollowed out so it
+   reads as "before this" rather than as a date on the chart */
+.gpt.pre,.gdn.pre{opacity:.4}
 .grow:hover .gpt{transform:translate(-50%,-50%) rotate(45deg) scale(1.3)}
 .glab{position:absolute;top:50%;font-size:10.5px;font-weight:700;white-space:nowrap;color:var(--ink3);font-variant-numeric:tabular-nums;z-index:2}
 .glab.rgt{transform:translate(11px,-50%)}
@@ -956,7 +959,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     <section class="view" id="v-time">
       <div class="glg" id="glg"></div>
       <div class="gwrap"><div class="gscroll"><div class="ginner" id="gantt"></div></div></div>
-      <p class="tip">Every task, grouped by track. The colour of its marker is its state, per the key above; the orange line is today. Tap a row to open it, or <b>&#10003;</b> to close it.</p>
+      <p class="tip">Every task in date order, done ones at the bottom. The colour of its marker is its state, per the key above; the green dot is the day it was closed and the orange line is today. The chart starts last month, so anything older pins to the left edge with its real date beside it. Tap a row to open it, or <b>&#10003;</b> to close it.</p>
     </section>
 
     <section class="view" id="v-cal">
@@ -1900,22 +1903,30 @@ function renderLegend(){
 function renderPlan(){
   renderLegend();
   var P=pool(), t=todayD();
-  /* The axis is built from every date drawn on it, dones included: a task
-     closed before the earliest due date would otherwise sit off the left end. */
+  /* The axis starts the month before this one, not at the earliest date on the
+     board. Running it back to the first thing he ever did meant a June start
+     for an October question, and four months of finished work squeezing what
+     is actually ahead into the right-hand third of the screen. One month of
+     context behind is what a "did I just miss that" needs; the rest is the
+     Done section's job. The end still follows the furthest date out. */
   var ds=P.map(function(i){return i.due;}).concat(P.map(function(i){return i.doneAt;}))
           .filter(Boolean).sort();
-  var A,B;
+  var A=new Date(t.getFullYear(),t.getMonth()-1,1), B;
   if(ds.length){
-    var s0=D(ds[0]), e0=D(ds[ds.length-1]);
-    if(t<s0) s0=t; if(t>e0) e0=t;
-    A=new Date(s0.getFullYear(),s0.getMonth(),1); B=new Date(e0.getFullYear(),e0.getMonth()+1,1);
+    var e0=D(ds[ds.length-1]); if(t>e0) e0=t;
+    B=new Date(e0.getFullYear(),e0.getMonth()+1,1);
   }else{
     /* a category can be filtered down to nothing with a date, and a zero-width
        axis divides by zero rather than drawing an empty month */
-    A=new Date(t.getFullYear(),t.getMonth(),1); B=new Date(t.getFullYear(),t.getMonth()+1,1);
+    B=new Date(t.getFullYear(),t.getMonth()+1,1);
   }
+  if(B<=A) B=new Date(A.getFullYear(),A.getMonth()+1,1);
   var span=B-A, mcount=(B.getFullYear()-A.getFullYear())*12+(B.getMonth()-A.getMonth());
-  function pos(d){ return (D(d)-A)/span*100; }
+  /* Anything older than the axis pins to its left edge rather than being drawn
+     off it. The label still prints the real date, so a clamped marker can never
+     say a task happened later than it did. */
+  function raw(d){ return (D(d)-A)/span*100; }
+  function pos(d){ var x=raw(d); return x<0?0:x>100?100:x; }
   var MNS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
   var h='<div class="gax"><div class="gl"></div><div class="gm">';
@@ -1944,12 +1955,12 @@ function renderPlan(){
        Drawn before the bar so the diamond still wins where the two coincide. */
     if(i.doneAt){
       var xd=pos(i.doneAt);
-      o+='<div class="gdn" style="left:'+xd.toFixed(2)+'%" title="Done '+esc(fmtD(i.doneAt))+'"></div>';
+      o+='<div class="gdn'+(raw(i.doneAt)<0?" pre":"")+'" style="left:'+xd.toFixed(2)+'%" title="Done '+esc(fmtD(i.doneAt))+'"></div>';
     }
     if(i.due){
       var x=pos(i.due);
       o+='<div class="gbar" style="left:0;width:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
-         '<div class="gpt" style="left:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
+         '<div class="gpt'+(raw(i.due)<0?" pre":"")+'" style="left:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
          '<div class="glab '+(x>60?"lft":"rgt")+(late?" late":"")+'" style="left:'+x.toFixed(2)+'%">'+
             fmtD(i.due)+(late?" · late":"")+'</div>';
     }
@@ -2612,7 +2623,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-0645";
+var BUILD="2026-10-05-0710";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
