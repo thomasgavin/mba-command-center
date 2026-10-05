@@ -281,6 +281,15 @@ interrupting him for become nudges; the rest are notes, which is the difference
 between a record and an interruption. Read tools only: the run never sends,
 replies, drafts, labels or trashes anything.
 
+**It must never search the inbox.** His Outlook mail is auto-forwarded into
+Gmail and a filter archives it under the label "INSEAD", so an `in:inbox` scan
+would miss exactly the mail the forwarding was set up to deliver. Archived mail
+is included in a Gmail search by default and a plain keyword search does reach
+it -- verified on 2026-10-05 against a message carrying only that label -- but
+the pass also runs `newer_than:3d label:INSEAD`, so anything under the label is
+swept whether or not it happens to match a keyword. The display name works in
+`label:` here; `list_labels` gives the ID if it ever stops.
+
 Gmail works unattended because the routine fires **into a project thread
 session** rather than spawning one, and inherits that session's connectors --
 the routine itself stores none (`create_trigger` refuses `connectors` for this
