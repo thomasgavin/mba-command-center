@@ -1,0 +1,514 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-05T14:51:36.000Z",
+  "source": "Claude",
+  "why": "Mind map seeded from the two P0 PDFs",
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-p0",
+      "label": "P0",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "The pre-programme period, 26 Oct 2026 to 17 Jan 2027. Three pillars: Academics, Careers, Student Life. The point is to hit P1 running.",
+      "cat": "study"
+    },
+    {
+      "id": "k-cal",
+      "label": "Programme calendar",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "P1 18 Jan-10 Mar 27, P2 15 Mar-4 May 27, P3 10 May-30 Jun 27, P4 23 Aug-12 Oct 27, P5 18 Oct-4 Dec 27. Dates may still change.",
+      "cat": "study"
+    },
+    {
+      "id": "k-breaks",
+      "label": "Breaks",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "11-14 Mar, 5-9 May, summer 1 Jul-22 Aug, 13-17 Oct. Career and club treks run in the short ones.",
+      "cat": "study",
+      "parent": "k-cal",
+      "rel": [
+        "k-intern"
+      ]
+    },
+    {
+      "id": "k-grad",
+      "label": "Graduation",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Singapore, 15 Dec 2027, grad trip after. Campus is FBL or SGP in P1-P2; exchange opens from P3.",
+      "cat": "study",
+      "parent": "k-cal"
+    },
+    {
+      "id": "k-launch",
+      "label": "Launch Week",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "7-17 Jan 2027. P1 core course exemption exams sit inside it, along with a lot of other sessions.",
+      "cat": "study",
+      "parent": "k-cal",
+      "rel": [
+        "k-exempt",
+        "k-launchprep"
+      ]
+    },
+    {
+      "id": "k-p1cores",
+      "label": "P1 core courses",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Six: Financial Accounting, Financial Markets & Valuation, Organisational Behaviour I, Prices & Markets, Uncertainty Data & Judgment, Introduction to Strategy.",
+      "cat": "study",
+      "parent": "k-cal"
+    },
+    {
+      "id": "k-prereads",
+      "label": "P1 pre-readings",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "For Financial Accounting and Prices & Markets. Book recommendations are on the MBA Journey pages. Highly recommended, not required.",
+      "cat": "study",
+      "parent": "k-p1cores",
+      "item": "prereads"
+    },
+    {
+      "id": "k-exempt",
+      "label": "Exemption exams",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "P1 core exemptions are examined in Launch Week; P2 and P3 exemptions during P1. Passing one frees a slot for an elective.",
+      "cat": "study"
+    },
+    {
+      "id": "k-lms",
+      "label": "LMS",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Live from 26 October. All academic content goes through it, and some of the CDC curriculum too. Club registration also runs on it.",
+      "cat": "study",
+      "item": "lms-start"
+    },
+    {
+      "id": "k-pldp",
+      "label": "PLDP",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Personal Leadership Development Programme. Individual and group coaching that runs the whole year, starting with P0 assignments.",
+      "cat": "study",
+      "rel": [
+        "k-cdc"
+      ]
+    },
+    {
+      "id": "k-pldp-p0",
+      "label": "P0 assignments",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "6 Nov to 28 Dec 2026, online on the LMS. Marked MUST DO. They are what your coach reads before meeting you, so they shape the coaching you get.",
+      "cat": "study",
+      "parent": "k-pldp",
+      "item": "pldp-work"
+    },
+    {
+      "id": "k-pldp-web",
+      "label": "Intro webinar",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "5 November, Zoom. Clarifies the assignments. Marked MUST DO.",
+      "cat": "study",
+      "parent": "k-pldp",
+      "item": "pldp-webinar"
+    },
+    {
+      "id": "k-acadweb",
+      "label": "Academics Overview webinar",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "26 November, Zoom. The MBA Programme Management Director and current students on the curriculum and how to prepare. Highly recommended.",
+      "cat": "study",
+      "item": "acad-webinar"
+    },
+    {
+      "id": "k-bizfound",
+      "label": "Business Foundations",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "One week online, 16-20 November, intensive intro to Financial Accounting, Finance and Quantitative Methods for people without a quant background. Optional. Registration via MyINSEAD by 30 October.",
+      "cat": "study",
+      "item": "bizfound"
+    },
+    {
+      "id": "k-exchange",
+      "label": "Campus exchange",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Bidding for P3-P5 exchange happens during P1. Rules can change.",
+      "cat": "study",
+      "parent": "k-cal"
+    },
+    {
+      "id": "k-prio",
+      "label": "Prioritisation",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "INSEAD's own framing: everything on offer adds value but you cannot do it all. Items are marked Must do, Highly recommended or Optional, and CDC and PLDP are the high-importance must-dos.",
+      "cat": "study",
+      "parent": "k-p0"
+    },
+    {
+      "id": "k-cdc",
+      "label": "CDC",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "The Career Development Centre. Two teams behind you: a Career Coach and the Employer Engagement team.",
+      "cat": "work"
+    },
+    {
+      "id": "k-coach",
+      "label": "Career Coach",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Your primary contact all year. Career strategy, target and transferable skills, networking approach, CV and cover letter review, elevator pitch, mock interviews, choosing between offers, and holding you accountable.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-coach-alloc",
+      "label": "Coach allocation",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Allocated on your P1 location, follows you the whole MBA, deliberately coach-agnostic, and there are no coach changes.",
+      "cat": "work",
+      "parent": "k-coach"
+    },
+    {
+      "id": "k-coach-ses",
+      "label": "Coaching sessions",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "45 minutes, so they fit before class. You set the agenda, bring the update and agree the next steps; the coach pressure-tests and plans. Turning up without homework wastes the slot.",
+      "cat": "work",
+      "parent": "k-coach"
+    },
+    {
+      "id": "k-ee",
+      "label": "Employer Engagement",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Sector Advisors: subject-matter experts who spend half their time advising students and half talking to companies. Market intelligence, who to connect with, sharpening your pitch for a sector, and help with offer negotiation.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-cags",
+      "label": "Careers Across Geographies & Sectors",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "February 2027 workshop for FBL and SGP. CDC asks 27Ds not to book Sector Advisor appointments until after it, because most sector information is delivered there. The one exception is early internship application roles.",
+      "cat": "work",
+      "parent": "k-ee",
+      "rel": [
+        "k-intern"
+      ]
+    },
+    {
+      "id": "k-journey",
+      "label": "The career journey",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Three stages: Self Awareness (strengths, interests, values, what you bring), Market Exploration (industry knowledge through networking, turn ideas into 2-3 target plans), Execution (a value proposition, and recruiting to each sector's real timetable).",
+      "cat": "work",
+      "parent": "k-cdc",
+      "item": "postmba"
+    },
+    {
+      "id": "k-webinars",
+      "label": "P0 career webinars",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Three. Let's Start Your Career Journey (2 Oct, done), INSEAD CV & Cover Letter Tips (13 Nov), Your Summer Experience & Prep for Arrival (4 Dec). Must-do for career switchers.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-cvweb",
+      "label": "CV & Cover Letter webinar",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Friday 13 November 2026, 13:00 Paris / 20:00 Singapore. What to put in and what to leave out, and when you work on the CV during the year.",
+      "cat": "work",
+      "parent": "k-webinars",
+      "item": "cv-webinar"
+    },
+    {
+      "id": "k-sumweb",
+      "label": "Summer Experience webinar",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "4 December. The options for the summer break: 8-week internships, a startup tour, or time off to prepare for recruitment.",
+      "cat": "work",
+      "parent": "k-webinars",
+      "item": "summer-webinar",
+      "rel": [
+        "k-intern"
+      ]
+    },
+    {
+      "id": "k-switcher",
+      "label": "Career switcher status",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Most CDC items are marked must-do for career switchers by Location, Sector or Function and only highly recommended for everyone else. Which of the three you are switching decides how much of this is optional.",
+      "cat": "work",
+      "parent": "k-cdc",
+      "item": "postmba"
+    },
+    {
+      "id": "k-careerglobe",
+      "label": "CareerGlobe",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "The CDC platform, live from 27 October. Your profile has to be set up before you can book the first coaching appointment.",
+      "cat": "work",
+      "parent": "k-cdc",
+      "item": "careerglobe"
+    },
+    {
+      "id": "k-vmock",
+      "label": "VMock",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "The CV tool in Part 1 of the INSEAD CV process. It scores a draft and says what to fix before a human sees it.",
+      "cat": "work",
+      "item": "vmock",
+      "rel": [
+        "k-cvbook"
+      ]
+    },
+    {
+      "id": "k-cvbook",
+      "label": "INSEAD CV",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "One INSEAD format, used as a networking and marketing document, and the basis for the INSEAD CV Book. The CV process runs on through P1.",
+      "cat": "work",
+      "item": "cv",
+      "rel": [
+        "k-vmock"
+      ]
+    },
+    {
+      "id": "k-quest",
+      "label": "CareerLeader and Career Anchors",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Two questionnaires to finish before the first coaching session, plus the workbook questions. They are the raw material for that session.",
+      "cat": "work",
+      "parent": "k-coach",
+      "item": "cdc-quests"
+    },
+    {
+      "id": "k-coach1",
+      "label": "First coaching session",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "From November. Covers how the partnership works, what the profiling tools said, and the steps of the career journey.",
+      "cat": "work",
+      "parent": "k-coach",
+      "item": "cdc-coach1"
+    },
+    {
+      "id": "k-launchprep",
+      "label": "Launch Week career pre-work",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Available on the LMS in early December, to be done before Launch Week.",
+      "cat": "work",
+      "item": "launch-prework"
+    },
+    {
+      "id": "k-intern",
+      "label": "Summer internship",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Optional. An 8-week Short-Term Summer Project in the 1 Jul - 22 Aug break after P3; the alternatives are a startup tour or time off. Gavin's own plan is to start looking from the day the course starts and prepare accordingly.",
+      "cat": "work",
+      "rel": [
+        "k-breaks",
+        "k-interntiming",
+        "k-sumweb"
+      ]
+    },
+    {
+      "id": "k-interntiming",
+      "label": "Internship timetable",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Internship recruitment activities run through P2 (Mar-May 27). Some internships can start as early as June 2027, before P3 finishes. Early internship application roles are the one reason to contact Employer Engagement before the February workshop.",
+      "cat": "work",
+      "parent": "k-intern",
+      "rel": [
+        "k-cags"
+      ]
+    },
+    {
+      "id": "k-takeaways",
+      "label": "CDC's key takeaways",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Networking is what works: alumni, target industry, classmates. Pick a few priorities rather than defaulting to consulting. Take a leadership role in a club. A radical career changer should start before the programme, and if targeting one country with no experience there, explore everything early and aim at easier roles given local competition. Be authentic and only apply where you genuinely fit.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-partnership",
+      "label": "Who does the work",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "CDC's framing, stated plainly: they coach, you play. You do the networking, build the relationships, articulate your value, front the interviews and hold yourself accountable. The employer is buying you.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-events",
+      "label": "Company events and treks",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Pre-MBA company event invitations arrive through the newsletters. Treks, networking forums, the Tech Symposium and the Industry Expert Series run through the year.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-myinsead",
+      "label": "MyINSEAD",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Profile, INSEAD email and practical information due by 22 October 2026. The email has to exist before then; the how-to was in the acceptance email.",
+      "cat": "life",
+      "item": "portal",
+      "rel": [
+        "k-news"
+      ]
+    },
+    {
+      "id": "k-news",
+      "label": "Newsletters",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Every Sunday. From 25 October they go only to the INSEAD address, so an email that is not set up means missing them.",
+      "cat": "life",
+      "parent": "k-myinsead",
+      "item": "insead-mail"
+    },
+    {
+      "id": "k-clubs",
+      "label": "Student clubs",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Introduction and registration from 26 October through the LMS. Club leadership elections and the handover to 27Ds come in P1-P2.",
+      "cat": "life",
+      "rel": [
+        "k-takeaways"
+      ]
+    },
+    {
+      "id": "k-council",
+      "label": "Student Council",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "27D Student Council and Student Representative elections in January 2027. Team diversity is required.",
+      "cat": "life",
+      "parent": "k-clubs"
+    },
+    {
+      "id": "k-p0life",
+      "label": "Optional P0 sessions",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "IAA Alumni Meet & Greet 28 October, AMA on student platforms 10 November. Both optional.",
+      "cat": "life"
+    },
+    {
+      "id": "k-contacts",
+      "label": "Who to email",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "degree.programmes@insead.edu for programme questions, careerdevelopmentcentre@insead.edu for CDC.",
+      "cat": "life"
+    },
+    {
+      "id": "k-visa",
+      "label": "Immigration and logistics",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "P0 explicitly tells you to start early on visa, housing, a bank account and a phone plan, and to register a partner if you have one.",
+      "cat": "life",
+      "item": "portal"
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-20261005T145136",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "I've filled the Mind map from the two P0 decks you shared - the 24 September P0 intro and the 2 October Career Journey webinar. 45 things, under Academics, Career and Student Life, with the ones that have a task on the board linked to it.\n\nThe internship point is in there as you put it: optional, an 8-week Short-Term Summer Project in the 1 July to 22 August break after P3, with a startup tour or time off as the alternatives, and your plan to start looking from day one. Worth knowing two things the decks add to that. Internship recruitment activities run through P2, so the hunt really starts in March, and some internships begin in June 2027 before P3 even finishes. And CDC asks 27Ds not to book a Sector Advisor until after the Careers Across Geographies & Sectors workshop in February - except for early internship applications, which is the stated exception, so that is your route in.\n\nEverything in there came off those two decks. Nothing is invented. Ask the map anything and I'll answer from it.",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "state": "new",
+      "acted": [
+        "45 nodes filed under Academics, Career and Student Life",
+        "Linked to 19 tasks already on your board",
+        "Mirrored into KNOWLEDGE.md in the repo"
+      ]
+    }
+  ]
+}
