@@ -667,11 +667,23 @@ thumb's reach.
   came through and the bar grew a band of nothing under it (*"after
   re-bookmarking the bottom is out of proportion again"*). It is the inset
   less 22px now, floored at 4.
-- **A dot goes out on the section he has opened.** It says "something in here
-  is past its date", which is not worth saying about the screen he is already
-  reading: *"they should go away once I open the section"*.
+- **A dot goes out on the section he has opened, and stays out.** It says
+  "something in here is past its date", which is not worth saying about the
+  screen he is already reading: *"they should go away once I open the
+  section"*. It went out and came straight back on the next tab change, which
+  reads as a dot that means nothing, so `dotSeen` records the set of late task
+  ids he was shown when he opened each section and the dot returns only when
+  that set changes. Opening it is reading it; new lateness is the only news.
+  `syncDots()` runs from `setView` as well as `render`, because the dot is
+  decided by which section is open and `setView` is where that changes.
 - **Search is a drawn magnifying glass.** It was `\2315` rotated 45 degrees,
   which at 17px reads as a map pin.
+- **The view's own count sits beside its name**, in `.vsub` in the title row:
+  *"just keep the '41 things remembered' and move it next to the section
+  title"*. The map's paragraph under its composer and the chat's "replies
+  arrive on their own" line are both gone with it -- a sentence that explains
+  the same thing every day for as long as the view exists is two lines of a
+  390px screen spent on something he learned the first time.
 - **The bar is 52px and takes `--barpad` of the home-bar inset.** It was 46px for an
   evening and read as a hairline (*"looks a little too thin"*). A 54px bar under the
   full 34px iOS declares came to 88px of chrome at the foot of a 390x844
@@ -1172,9 +1184,14 @@ The board is used on an iPhone, mostly from the home screen.
   so it carries `appearance:none` and `max-width:100%`.
 - **Pull down at the top of a view to sync.** The Sync button is in the top
   bar and his thumb is at the foot of a 390px screen, so the gesture every
-  other app on his phone has is the one that gets used. It arms only at
+  other app on his phone has is the one that gets used. The indicator is a
+  circular arrow, not a word: it turns with the pull, is round by the trip
+  point and spins while the sync runs. It arms only at
   `scrollTop` 0 and hands an upward drag straight back, so it can never take
-  over a scroll already in progress, and it calls the same `syncNow()` the
+  over a scroll already in progress. **It is off on Chat and the map**, which
+  scroll inside themselves -- the stage is permanently at `scrollTop` 0 there,
+  so every downward drag read as a pull and neither view could be scrolled
+  back up at all, and it calls the same `syncNow()` the
   button does -- one way in, so the two cannot drift. `.ptr` is a zero-height
   sibling of the scroller, which is how the label hangs over the top of it
   without being a row in the flex column.
@@ -1238,7 +1255,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 266 invariants, three widths, a real browser. Every one of them was a
+that runs: 287 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

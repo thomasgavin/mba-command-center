@@ -245,12 +245,20 @@ for (var w2 of [390, 1280]) {
   });
   ok("the chat button does not raise the keyboard", focused !== "cin",
      "focus is on " + focused + "; focusing the composer covers half the thread before he has read it");
+  /* The line under the composer is gone -- it explained once a day, for as
+     long as the thread exists, that replies arrive on their own, and took two
+     lines of a 390px screen off the thread. What must hold is that the last
+     message still clears the composer: *"the got your note gets cut off by
+     the textbox"*. */
   var tip = await s5.p.evaluate(function () {
-    var t = document.getElementById("chatTip"), r = t.getBoundingClientRect();
-    return { h: r.height, sh: t.scrollHeight, bottom: r.bottom, win: innerHeight };
+    var w = document.getElementById("chatw"), f = document.querySelector("#v-chat .cfoot");
+    w.scrollTop = w.scrollHeight;
+    var last = w.lastElementChild;
+    return { tip: !!document.getElementById("chatTip"),
+             clear: Math.round(f.getBoundingClientRect().top - last.getBoundingClientRect().bottom) };
   });
-  ok("the line under the composer is whole, not squeezed",
-     tip.h > 0 && tip.h + 1 >= tip.sh && tip.bottom <= tip.win + 1, JSON.stringify(tip));
+  ok("the thread has no standing footnote under it", tip.tip === false, JSON.stringify(tip));
+  ok("and the last message clears the composer", tip.clear >= 0, JSON.stringify(tip));
   /* a message typed in Chat is already on screen with its own state under it */
   await s5.p.fill("#cin", "typed in the chat window");
   await s5.p.click("#csend");
@@ -2295,6 +2303,92 @@ for (var bw of [390, 1280]) {
 
   ok("the nine draw without a console error", s37.errs.length === 0, s37.errs.join(" | "));
   await s37.ctx.close();
+}
+
+/* ---- 38. the six off the deployed phone, 2026-10-05 ---- */
+{
+  var s38 = await open(390);
+
+  /* "the dots are gone when I open it but it comes back when I go to another
+     section" -- opening it is reading it, and only a change in what is late
+     brings it back. */
+  var dot = await s38.p.evaluate(function () {
+    setView("over"); render();
+    var lit = function () { return [].map.call(document.querySelectorAll(".vd.on"), function (d) { return d.id; }); };
+    var before = lit();
+    setView("cal");
+    var open1 = lit();
+    setView("time");
+    var away = lit();          /* back on another view: cal must stay out */
+    render();                  /* and a repaint must not relight it either */
+    var painted = lit();
+    setView("over");
+    return { before: before, open1: open1, away: away, painted: painted };
+  });
+  ok("a section he has opened keeps its dot out",
+     dot.before.indexOf("vd-cal") >= 0 && dot.away.indexOf("vd-cal") < 0, JSON.stringify(dot));
+  ok("and a repaint does not bring it back",
+     dot.painted.indexOf("vd-cal") < 0 && dot.painted.indexOf("vd-board") >= 0, JSON.stringify(dot));
+
+  /* "can't scroll back up on mindmap and chat - it considers it a refresh
+     pull". Those views scroll inside themselves, so the stage is always at 0
+     and every downward drag looked like a pull. */
+  var eat = await s38.p.evaluate(function () {
+    setView("chat");
+    var st = document.getElementById("stage");
+    function t(type, y) {
+      return st.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [new Touch({ identifier: 1, target: st, clientY: y, clientX: 60 })]
+      }));
+    }
+    t("touchstart", 200);
+    var ok1 = t("touchmove", 300);   /* false means preventDefault: the pull ate it */
+    t("touchend", 300);
+    setView("over");
+    return { chat: ok1, opacity: getComputedStyle(document.getElementById("ptrL")).opacity };
+  });
+  ok("a drag in Chat is a scroll, not a pull-to-sync",
+     eat.chat === true && parseFloat(eat.opacity) === 0, JSON.stringify(eat));
+
+  /* "just keep the 41 things remembered and move it next to the section
+     title", and nothing under the map's own composer. */
+  var sub = await s38.p.evaluate(function () {
+    kb = [{ id: "k1", group: "Platforms", label: "VMock", body: "scores a CV", at: Date.now() }];
+    setView("map"); renderMap();
+    var onMap = document.getElementById("vSub").textContent;
+    setView("over");
+    return { onMap: onMap, offMap: document.getElementById("vSub").textContent,
+             tip: !!document.getElementById("mapTip") };
+  });
+  ok("the map's count sits beside the section name", /1 thing remembered/.test(sub.onMap), JSON.stringify(sub));
+  ok("and it is that view's alone, with no paragraph under the map",
+     sub.offMap === "" && sub.tip === false, JSON.stringify(sub));
+
+  /* "make the 1d late slightly bigger than the text below and all caps" */
+  var cd = await s38.p.evaluate(function () {
+    setView("over");
+    var h = document.querySelector(".tile.hero.a");
+    return {
+      cd: parseFloat(getComputedStyle(h.querySelector(".hcd")).fontSize),
+      caps: getComputedStyle(h.querySelector(".hcd")).textTransform,
+      sub: parseFloat(getComputedStyle(h.querySelector(".sub")).fontSize)
+    };
+  });
+  ok("the countdown leads the card, in caps", cd.caps === "uppercase" && cd.cd > cd.sub, JSON.stringify(cd));
+
+  /* "center them on their boxes" */
+  var ms = await s38.p.evaluate(function () {
+    setView("over");
+    var t = document.querySelector(".mstack .tile");
+    var box = t.getBoundingClientRect(), r = t.querySelector(".ring").getBoundingClientRect();
+    return { off: Math.round(Math.abs((r.left + r.right) / 2 - (box.left + box.right) / 2)),
+             align: getComputedStyle(t.querySelector(".mx")).textAlign };
+  });
+  ok("the metric tiles centre their contents", ms.off <= 1 && ms.align === "center", JSON.stringify(ms));
+
+  ok("the six draw without a console error", s38.errs.length === 0, s38.errs.join(" | "));
+  await s38.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

@@ -218,7 +218,12 @@ body::before{
   flex:none;display:flex;align-items:center;gap:10px;padding:9px 20px;
   border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);
 }
-.vhead h2{font-size:17px;font-weight:700;letter-spacing:-.025em;flex:1;min-width:0;
+.vhead h2{font-size:17px;font-weight:700;letter-spacing:-.025em;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* A view's one-line count, beside its name rather than under its content:
+   *"just keep the '41 things remembered' and move it next to the section
+   title"*. It takes the slack so the search button stays at the right end. */
+.vsub{flex:1;min-width:0;font-size:11.5px;font-weight:600;color:var(--ink4);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Search moved down here off the top bar: *"Move the find pin icon to the
    second bar on the right end of the title name."* The top bar was four
@@ -391,7 +396,10 @@ body::before{
 .hero h3{color:rgba(255,255,255,.72)}
 .hero .big{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:.95;font-variant-numeric:tabular-nums}
 .hero .big sup{font-size:14px;font-weight:600;letter-spacing:-.01em;vertical-align:super;margin-left:4px;opacity:.82}
-.hero .hcd{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1}
+/* A step above the title under it and in caps, so it reads as the card's
+   headline rather than another line of text: *"make the 1d late slightly
+   bigger than the text below and all caps"*. */
+.hero .hcd{font-size:17px;font-weight:800;letter-spacing:.02em;line-height:1;text-transform:uppercase}
 .hero .sub{font-size:13.5px;font-weight:650;margin-top:6px;letter-spacing:-.015em;line-height:1.3}
 .hero .met{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:500}
 .hero .foot{margin-top:auto;padding-top:11px;display:flex;gap:6px;flex-wrap:wrap}
@@ -1182,7 +1190,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    row of the map ending underneath it */
 #v-map .mapw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:60px}
 .chatw{flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;
-  display:flex;flex-direction:column;gap:12px;padding:4px 2px 78px}
+  display:flex;flex-direction:column;gap:12px;padding:4px 2px 64px}
 .cday{align-self:center;font-size:11px;font-weight:600;color:var(--ink4);
   background:var(--wash);border:1px solid var(--line);border-radius:999px;padding:3px 11px;margin:6px 0 2px}
 .cmsg{display:flex;flex-direction:column;max-width:76%}
@@ -1274,8 +1282,8 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      and tasks complete side by side"*. Half of 390px is too narrow for a ring
      beside its number, so the ring goes above it. */
   .mstack{flex-direction:row} .cols{grid-template-columns:1fr}
-  .mstack .tile{flex-direction:column;align-items:flex-start;gap:9px;min-width:0}
-  .mstack .mx{min-width:0}
+  .mstack .tile{flex-direction:column;align-items:center;gap:9px;min-width:0}
+  .mstack .mx{min-width:0;text-align:center}
   .day{min-height:74px} .zone{width:60px;height:54px}
   /* Icon-only, so each button is as wide as its own glyph unless it is told
      otherwise -- three boxes of three widths: *"the top right boxes are not
@@ -1359,7 +1367,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
 
-  <div class="vhead"><h2 id="vTitle">Overview</h2>
+  <div class="vhead"><h2 id="vTitle">Overview</h2><span class="vsub" id="vSub"></span>
     <button class="cmdk" id="cmdkBtn"><svg class="mg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg><span>Search or jump to&hellip;</span><kbd>&#8984;K</kbd></button>
   </div>
 
@@ -1402,7 +1410,6 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       <div class="mapw">
         <div class="mans off" id="mAns"></div>
         <div class="mbox" id="mapw"></div>
-        <p class="tip" id="mapTip"></p>
       </div>
       <div class="cfoot">
         <div class="cbox">
@@ -1420,7 +1427,6 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
           <textarea id="cin" rows="1" placeholder="Message Claude…"></textarea>
           <button class="csend" id="csend" aria-label="Send">&#8593;</button>
         </div>
-        <p class="tip" id="chatTip"></p>
       </div>
     </section>
   </main>
@@ -2197,11 +2203,13 @@ function render(){
   /* A number has nowhere to sit on a bare icon, and "35 tasks" was never the
      thing worth a badge anyway. The dot says the one thing that is: something
      in here is already past its date. */
-  var lateN=alive().filter(function(i){ var n=dleft(i.due); return i.status!=="done" && n!==null && n<0; }).length;
+  var late=alive().filter(function(i){ var n=dleft(i.due); return i.status!=="done" && n!==null && n<0; })
+    .map(function(i){ return i.id; }).sort();
   /* and it goes out on the section he is looking at: he has seen it, so a
      dot on the tab under his thumb is telling him about the screen he is
      already reading -- *"they should go away once I open the section"*. */
-  lateTabs=lateN>0; syncDots();
+  lateTabs=late.length>0; dotSig=late.join(",");
+  syncDots();
   renderOverview(); renderBoard(); renderPlan(); renderCal(); renderMap(); renderChat();
   syncFab();
   if(!drag) killGhosts();   /* a re-render replaces every card: nothing may survive it */
@@ -2210,10 +2218,21 @@ function render(){
 /* The dot went out on a render and nothing re-rendered on a tab change, so
    opening the section left it lit until the next edit or poll:
    *"they should go away once I open the section"*. Both callers run this. */
-var lateTabs=false;
+var lateTabs=false, dotSeen={}, dotSig="";
+var mapCount="";
+function syncVSub(){
+  var e=document.getElementById("vSub");
+  if(e) e.textContent = view==="map" ? mapCount : "";
+}
 function syncDots(){
+  /* Opening the section is reading it, so the dot stays out afterwards --
+     *"it comes back when I go to another section"*. What puts it back is the
+     lateness changing: dotSig is the set of late task ids, and a different
+     set is news he has not seen. */
+  if(view) dotSeen[view]=dotSig;
   ["board","time","cal"].forEach(function(k){
-    var d=document.getElementById("vd-"+k); if(d) d.classList.toggle("on",lateTabs&&view!==k);
+    var d=document.getElementById("vd-"+k);
+    if(d) d.classList.toggle("on",lateTabs&&dotSeen[k]!==dotSig);
   });
 }
 
@@ -2872,7 +2891,7 @@ function renderMap(){
     host.innerHTML='<div class="mempty">Your map is empty.<br>'+
       'Write a line below &mdash; &ldquo;VMock scores a CV and says what to fix&rdquo; &mdash; and Claude '+
       'files it under a topic, links it to the task it belongs to, and keeps it here.</div>';
-    document.getElementById("mapTip").textContent="";
+    mapCount=""; syncVSub();
     return;
   }
   var hits=mapQ?hitSet(mapHits(mapQ)):null;
@@ -2900,8 +2919,8 @@ function renderMap(){
   });
   if(!gs.length) h='<div class="mempty">Nothing filed yet.</div>';
   host.innerHTML=h;
-  document.getElementById("mapTip").textContent=
-    live.length+" thing"+(live.length===1?"":"s")+" remembered. Claude files what you write here and keeps it in KNOWLEDGE.md in the repo, so it outlives any one session.";
+  mapCount=live.length+" thing"+(live.length===1?"":"s")+" remembered";
+  syncVSub();
 }
 /* the one place a shape name becomes markup. An unknown shape falls through to
    the list, so Claude can file a node under a shape this build has not learned
@@ -3189,10 +3208,9 @@ function renderChat(){
     }
     w.innerHTML=h;
   }
-  var tip=document.getElementById("chatTip");
-  tip.textContent=msgs.length
-    ? "Replies arrive on their own. Older than "+CHAT_DAYS+" days is cleared automatically."
-    : "";
+  /* The line under the composer explaining that replies arrive on their own
+     said it once a day for as long as the thread exists, and took two lines
+     of a 390px screen off the conversation it was explaining. */
   /* reading the thread is reading the replies */
   if(view==="chat" && unreadReplies()){
     notes.forEach(function(n){ if(isClaude(n)) n.state="read"; });
@@ -3656,7 +3674,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2245";
+var BUILD="2026-10-05-2250";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3990,8 +4008,13 @@ document.getElementById("syncBtn").addEventListener("click",syncNow);
     box.classList.remove("spin");
     lab.style.transform=""; lab.style.opacity=""; ico.style.transform="";
   }
+  /* Chat and the map scroll inside themselves, so the stage is always at
+     scrollTop 0 and every downward drag in them looked like a pull: he could
+     not scroll back up at all. The gesture belongs to the views the stage
+     actually scrolls. */
+  function armed(){ return !st.classList.contains("chatmode"); }
   st.addEventListener("touchstart",function(e){
-    if(busy||e.touches.length!==1||st.scrollTop>0){ y0=null; return; }
+    if(busy||!armed()||e.touches.length!==1||st.scrollTop>0){ y0=null; return; }
     y0=e.touches[0].clientY; dy=0;
   },{passive:true});
   st.addEventListener("touchmove",function(e){
@@ -3999,7 +4022,7 @@ document.getElementById("syncBtn").addEventListener("click",syncNow);
     dy=e.touches[0].clientY-y0;
     /* an upward drag, or one that began before the top, is an ordinary
        scroll: hand it straight back rather than half-owning it */
-    if(dy<=0||st.scrollTop>0){ rest(); return; }
+    if(dy<=0||st.scrollTop>0||!armed()){ rest(); return; }
     e.preventDefault();
     /* resistance, so the label slows as it is pulled rather than tracking
        the finger all the way down the screen */
@@ -4156,6 +4179,7 @@ function setView(v){
   /* both the chat and the map own their own scrolling, so the stage must not also scroll */
   document.getElementById("stage").classList.toggle("chatmode",v==="chat"||v==="map");
   syncDots();   /* the open section's dot goes out now, not at the next render */
+  syncVSub();
   if(v==="chat") renderChat();
   syncFab();
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
