@@ -541,14 +541,20 @@ for (var w2 of [390, 1280]) {
   });
   await s16.p.waitForTimeout(350);
   var shut = await s16.p.evaluate(function () {
-    return { rows: document.querySelectorAll("#dBody .prow").length,
+    return { rows: document.querySelectorAll("#dBody .prow[data-row]").length,
+             trk: !!document.querySelector("#dBody .prow.ptrk"),
+             loose: !!document.querySelector("#dBody > .fld .chip.tr"),
              open: document.querySelectorAll("#dBody .pex").length,
              nt: !!document.getElementById("nt"),
              add: !!document.querySelector("#dBody .nadd"),
              segs: document.querySelectorAll("#dBody .seg").length };
   });
   ok("a card opens closed: every row collapsed, nothing expanded",
-     shut.rows === 5 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
+     shut.rows === 4 && shut.open === 0 && shut.segs === 0, JSON.stringify(shut));
+  /* "Shouldn't the visa sit inside the top box here?" -- it should: a lone chip
+     above a bordered group reads as something that fell out of it. */
+  ok("the track is a row of the box, not a chip floating above it",
+     shut.trk && !shut.loose, JSON.stringify(shut));
   ok("and the composer is one line until he asks for it",
      !shut.nt && shut.add, JSON.stringify(shut));
 
@@ -563,10 +569,11 @@ for (var w2 of [390, 1280]) {
   function val(k){ var v=vals.find(function(x){ return x.indexOf(k+"=")===0; }); return v?v.slice(k.length+1):null; }
   ok("every row states the value it holds",
      val("Status") === "To do" && val("Priority") === "High", JSON.stringify(vals));
-  /* Title is the exception on purpose: the drawer header is the title, so the
-     row offers the action instead of printing the same string twice. */
-  ok("and the title row offers the rename rather than repeating the header",
-     val("Title") === "Rename", JSON.stringify(vals));
+  /* "no need to have a seperate action row just for rename, just add a pencil
+     next to the title" -- a row whose only job was to open a text box is a tap
+     and a line of card spent on a field already on screen. */
+  ok("and renaming is a pencil on the header, not a row of its own",
+     !val("Title"), JSON.stringify(vals));
 
   var one = await s16.p.evaluate(function () {
     document.querySelector('#dBody .prow[data-row="status"]').click();
@@ -824,39 +831,60 @@ for (var cw of [390, 1280]) {
 /* ---- 23. a title is his to change, and it has to survive a reload ----
    `deleted` shipped in DFIELDS alone and came back on the next load while
    every in-memory assertion passed, so a new field is checked through
-   localStorage and a real reload, not in memory. */
+   localStorage and a real reload, not in memory. The rename itself is driven
+   through the header's pencil, which is the only way in. */
 {
   var s23 = await open(390);
   var id23 = await s23.p.evaluate(function () { return Object.keys(items)[0]; });
   var ren = await s23.p.evaluate(async function (id) {
     openItem(id);
-    document.querySelector('#dBody .prow[data-row="title"]').click();
-    var el = document.getElementById("tt");
-    el.value = "Renamed from the card";
-    document.querySelector('#dBody [data-tsave]').click();
-    await new Promise(function (r) { setTimeout(r, 60); });
-    return { live: items[id].title, head: document.getElementById("dTitle").textContent,
+    await new Promise(function (r) { setTimeout(r, 80); });
+    var opened = !document.getElementById("dTin").classList.contains("off");
+    document.getElementById("dPen").click();
+    var el = document.getElementById("dTin");
+    var swapped = !el.classList.contains("off") && document.getElementById("dTitle").classList.contains("off");
+    el.value = "Renamed from the header";
+    document.getElementById("dPen").click();
+    await new Promise(function (r) { setTimeout(r, 80); });
+    return { wasClosed: !opened, swapped: swapped,
+             live: items[id].title, head: document.getElementById("dTitle").textContent,
+             back: document.getElementById("dTin").classList.contains("off"),
              stored: JSON.parse(localStorage.getItem("mbacc_v3") || "{}").items[id].title };
   }, id23);
-  ok("a rename lands on the task and in the drawer header",
-     ren.live === "Renamed from the card" && ren.head === "Renamed from the card", JSON.stringify(ren));
-  ok("and save() actually wrote it", ren.stored === "Renamed from the card", JSON.stringify(ren));
+  ok("a card opens on the name, not on a field", ren.wasClosed, JSON.stringify(ren));
+  /* the field takes the title's place: showing both is the same name twice */
+  ok("the pencil turns the title into the field", ren.swapped, JSON.stringify(ren));
+  ok("a rename lands on the task and back in the header",
+     ren.live === "Renamed from the header" && ren.head === "Renamed from the header" && ren.back,
+     JSON.stringify(ren));
+  ok("and save() actually wrote it", ren.stored === "Renamed from the header", JSON.stringify(ren));
   await s23.p.reload({ waitUntil: "load" });
   await s23.p.waitForTimeout(500);
-  var after = await s23.p.evaluate(function (id) {
-    return { title: items[id].title, inView: (document.querySelector('.grow[data-id="' + id + '"] .gt') || {}).textContent };
-  }, id23);
-  ok("and it is still there after a reload", after.title === "Renamed from the card", JSON.stringify(after));
+  var after = await s23.p.evaluate(function (id) { return items[id].title; }, id23);
+  ok("and it is still there after a reload", after === "Renamed from the header", String(after));
   /* an empty name is refused: a task with no title cannot be found again */
   var blank = await s23.p.evaluate(async function (id) {
     openItem(id);
-    document.querySelector('#dBody .prow[data-row="title"]').click();
-    document.getElementById("tt").value = "   ";
-    document.querySelector('#dBody [data-tsave]').click();
-    await new Promise(function (r) { setTimeout(r, 60); });
+    document.getElementById("dPen").click();
+    document.getElementById("dTin").value = "   ";
+    document.getElementById("dPen").click();
+    await new Promise(function (r) { setTimeout(r, 80); });
     return items[id].title;
   }, id23);
-  ok("an empty title is refused", blank === "Renamed from the card", String(blank));
+  ok("an empty title is refused", blank === "Renamed from the header", String(blank));
+  /* Escape abandons, and the Notes drawer has no name to change */
+  var esc = await s23.p.evaluate(async function (id) {
+    openItem(id);
+    document.getElementById("dPen").click();
+    document.getElementById("dTin").value = "thrown away";
+    document.getElementById("dTin").dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await new Promise(function (r) { setTimeout(r, 80); });
+    var kept = items[id].title;
+    openNotes();
+    return { kept: kept, penOnNotes: !document.getElementById("dPen").classList.contains("off") };
+  }, id23);
+  ok("Escape abandons the edit", esc.kept === "Renamed from the header", JSON.stringify(esc));
+  ok("and the Notes drawer offers no rename", !esc.penOnNotes, JSON.stringify(esc));
   await s23.ctx.close();
 }
 

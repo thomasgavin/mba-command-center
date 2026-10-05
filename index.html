@@ -590,6 +590,15 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .drawer{visibility:hidden}
 .dh{flex:none;display:flex;align-items:flex-start;gap:10px;padding:16px 16px 13px;border-bottom:1px solid var(--line)}
 .dh h3{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;flex:1;min-width:0;overflow-wrap:anywhere}
+.pen{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;
+  cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
+.pen:hover{background:var(--wash);color:var(--ink)}
+.pen.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.pen.off{display:none}
+/* the field takes the title's place rather than appearing under it, so the
+   name never shows twice and the header does not change height */
+.dh #dTin{flex:1;min-width:0;font-size:15px;font-weight:700;letter-spacing:-.02em;padding:6px 9px}
+.dh #dTin.off,.dh h3.off{display:none}
 .x{width:29px;height:29px;flex:none;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink3);font-size:13px;display:grid;place-items:center}
 .x:hover{background:var(--wash);color:var(--ink)}
 .db{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:16px}
@@ -620,6 +629,9 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   border:0;border-top:1px solid var(--line2);background:#fff;font:inherit;cursor:pointer;
   padding:11px 12px;color:var(--ink2);transition:background .13s}
 .prow:first-child{border-top:0}
+/* the track states a value and offers no action, so it must not look tappable */
+.prow.ptrk{cursor:default;background:var(--wash2)}
+.prow.ptrk:hover{background:var(--wash2)}
 .prow:hover{background:var(--wash)}
 .prow[aria-expanded="true"]{background:var(--wash)}
 .pkey{flex:none;font-size:12px;font-weight:600;color:var(--ink4)}
@@ -639,7 +651,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   color:var(--ink3);padding:11px 12px;cursor:pointer;text-align:left}
 .nadd:hover{background:var(--wash);color:var(--ink2)}
 .nadd b{font-size:15px;line-height:1;color:var(--ink4);font-weight:700;flex:none}
-.dsub{font-size:12px;color:var(--ink3);line-height:1.5;margin:-6px 0 15px;overflow-wrap:anywhere}
+.dsub{font-size:12px;color:var(--ink3);line-height:1.5;margin:0 0 14px;overflow-wrap:anywhere}
 input[type=date],input[type=text],textarea{
   width:100%;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:var(--r3);background:#fff;
   font:inherit;font-size:13px;color:var(--ink);padding:9px 11px;
@@ -691,8 +703,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .drow{display:flex;align-items:center;gap:6px;min-width:0}
 .drow input[type=date]{flex:1 1 auto;min-width:0}
 /* the rename field: full width, and it may not push the drawer sideways */
-.trow{display:flex;min-width:0}
-.trow input[type=text]{flex:1 1 auto;min-width:0}
+
 .pch{flex:none;border:1px solid var(--line);background:#fff;border-radius:var(--r3);height:33px;
   padding:0 9px;font:inherit;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;
   font-variant-numeric:tabular-nums}
@@ -896,7 +907,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      pinch-zoom outright, which is worse. */
   /* every input inside the drawer, not just the date one: a checkbox is a
      focusable control too, and the rule is about the whole class of them */
-  input[type=date],input[type=text],textarea,.pal-box input,.db input{font-size:16px}
+  input[type=date],input[type=text],textarea,.pal-box input,.db input,.dh #dTin{font-size:16px}
   /* .cbox textarea sets its own size, which beats the rule above on
      specificity, so the composer needs saying again or the chat box is the one
      control on the board that still zooms the page */
@@ -1013,7 +1024,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 <div class="scrim" id="scrim"></div>
 
 <aside class="drawer" id="drawer" aria-hidden="true">
-  <div class="dh"><h3 id="dTitle">&nbsp;</h3><button class="x" id="dClose" aria-label="Close">&#10005;</button></div>
+  <div class="dh"><h3 id="dTitle">&nbsp;</h3><input type="text" id="dTin" class="off" maxlength="120" autocomplete="off" aria-label="Task name">
+    <button class="pen" id="dPen" aria-label="Rename" title="Rename">&#9998;</button>
+    <button class="x" id="dClose" aria-label="Close">&#10005;</button></div>
   <div class="db" id="dBody"></div>
 </aside>
 
@@ -2302,6 +2315,7 @@ function hideDrawer(){
   clearTimeout(drawerT);
   /* hide only once it has slid out, or the animation is lost */
   drawerT=setTimeout(function(){ if(!d.classList.contains("on")) d.style.visibility="hidden"; },320);
+  titleEdit(false);
   openId=null; dMode=null; noteDraft=""; dRow=null; dNote=false;
   syncFab();
 }
@@ -2330,6 +2344,10 @@ function renderDrawer(keepDraft){
   var ta=document.getElementById("nt");
   if(keepDraft&&ta) noteDraft=ta.value;
   document.getElementById("dTitle").textContent=i.title;
+  /* a repaint while he is typing must not stamp the old name back over the
+     field, and the pencil only exists for a task */
+  if(!dEdit) document.getElementById("dTin").value=i.title;
+  document.getElementById("dPen").classList.remove("off");
   var n=dleft(i.due), mine=notesFor(i.id).slice().sort(function(a,b){
     return (b.createdAt||"").localeCompare(a.createdAt||"");   /* newest first */
   });
@@ -2342,21 +2360,23 @@ function renderDrawer(keepDraft){
        '<div class="row-b" style="margin-top:9px"><button class="btn" data-undel="1">Put it back</button></div></div>';
   }
 
-  /* What the task is. The track is not editable, so it is a label rather than a
-     control, and the brief reads as the sentence under the title it always was. */
-  h+='<div class="fld" style="margin-bottom:12px"><div class="row-b">'+
-     '<span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+esc(tl(i.track))+'</span>'+
-     '</div></div>';
   if(i.brief) h+='<div class="dsub">'+esc(i.brief)+'</div>';
 
-  /* --- the four things that can change, one row each --- */
+  /* --- what the task is, then the things that can change --- */
+  /* The track is the first row of the same box rather than a chip floating
+     above it: it is one of the task's properties, and a lone chip over a
+     bordered group reads as something that fell out of it. It is not a button
+     -- the track is not his to change -- so it carries no chevron and does not
+     respond to a tap, which is the difference he should be able to see. */
   /* Title is a row like the rest, not a pencil tucked onto the header: every
      other editable field on this card is a row, and the one he asked to be
      able to change should not be the exception he has to hunt for. Its value
      reads "Rename" rather than the title, because the header two lines above
      IS the title and printing it twice forty pixels apart is not a summary. */
   h+='<div class="pgrp">'+
-     prow("title","Title",{t:"Rename"})+
+     '<div class="prow ptrk"><span class="pkey">Track</span>'+
+       '<span class="pval"><span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+
+       esc(tl(i.track))+'</span></span></div>'+
      prow("status","Status",statusVal(i))+
      prow("due","Due",dueVal(i,n))+
      prow("priority","Priority",priVal(i))+
@@ -2463,11 +2483,6 @@ function pexOf(k){
       '</div>'+
       (i.snoozes?'<div class="hint">Pushed '+i.snoozes+' time'+(i.snoozes>1?"s":"")+
         (i.origDue?', from '+esc(fmtD(i.origDue)):'')+'.</div>':'');
-  if(k==="title")
-    return '<div class="trow"><input type="text" id="tt" maxlength="120" value="'+esc(i.title||"")+'" '+
-      'placeholder="What is this task" autocomplete="off"></div>'+
-      '<div class="row-b" style="margin-top:7px"><button class="btn o" data-tsave="1">Save title</button></div>'+
-      '<div class="hint">This is the name everywhere on the board. Notes already on the task keep the name they were written under.</div>';
   if(k==="effort"){
     /* The one thing a due date cannot tell you, so the start-by under it is not
        decoration: it is the number the nudge is built on, shown so he can
@@ -2510,6 +2525,8 @@ function noteWhen(isoStr){
 }
 function openNotes(){
   dMode="notes"; openId=null;
+  titleEdit(false);
+  document.getElementById("dPen").classList.add("off");
   document.getElementById("dTitle").textContent="Notes for Claude";
   var h='<div class="fld"><label>Add a note</label>'+
     '<textarea id="gn" placeholder="Anything you want Claude to know or act on. Not tied to one item."></textarea>'+
@@ -2623,7 +2640,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-0710";
+var BUILD="2026-10-05-0745";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -2785,20 +2802,44 @@ document.addEventListener("click",function(e){
   if(row&&row.dataset.id&&!t.closest("[data-act]")){ openItem(row.dataset.id); return; }
 });
 
-/* A rename is a one-field form, so Enter commits it: a text input that only
-   saves from a button reads as broken to anyone who types. An empty one is
-   refused rather than accepted -- a nameless task cannot be found again. */
+/* Renaming is the title itself turning into a field, not a row of its own: a
+   row whose only job was to open a text box is one tap and one line of card
+   spent on a field that was already on screen. The pencil sits next to the
+   name it changes.
+
+   Enter and blur commit, Escape abandons -- a one-field edit that only saves
+   from a button somewhere else reads as broken to anyone who types. An empty
+   name is refused rather than accepted: a nameless task cannot be found
+   again. */
+var dEdit=false;
+function titleEdit(on){
+  var h=document.getElementById("dTitle"), el=document.getElementById("dTin"),
+      pen=document.getElementById("dPen");
+  dEdit=!!on && !!openId && dMode==="item";
+  h.classList.toggle("off",dEdit);
+  el.classList.toggle("off",!dEdit);
+  pen.classList.toggle("on",dEdit);
+  pen.setAttribute("aria-label",dEdit?"Save name":"Rename");
+  if(dEdit){ el.value=items[openId].title||""; el.focus(); el.select(); }
+}
 function saveTitle(){
-  var el=document.getElementById("tt"); if(!el||!openId) return;
+  var el=document.getElementById("dTin");
+  if(!dEdit||!openId){ return; }
   var v=(el.value||"").trim();
   if(!v){ toast("A task needs a name."); el.focus(); return; }
-  if(v===items[openId].title){ dRow=null; renderDrawer(true); return; }
-  dRow=null;
-  patch(openId,{title:v},"Renamed");
+  titleEdit(false);
+  if(v!==items[openId].title) patch(openId,{title:v},"Renamed");
 }
-document.getElementById("dBody").addEventListener("keydown",function(e){
-  if(e.key==="Enter"&&e.target&&e.target.id==="tt"){ e.preventDefault(); saveTitle(); }
+document.getElementById("dPen").addEventListener("click",function(){
+  if(dEdit) saveTitle(); else titleEdit(true);
 });
+document.getElementById("dTin").addEventListener("keydown",function(e){
+  if(e.key==="Enter"){ e.preventDefault(); saveTitle(); }
+  if(e.key==="Escape"){ e.preventDefault(); titleEdit(false); }
+});
+/* a tap anywhere else is a commit, not a cancel: the value is on screen and
+   losing it because he looked at the date would be its own small betrayal */
+document.getElementById("dTin").addEventListener("blur",function(){ if(dEdit) saveTitle(); });
 /* --- drawer body --- */
 document.getElementById("dBody").addEventListener("click",function(e){
   var b=e.target.closest("button"); if(!b) return;
@@ -2812,7 +2853,6 @@ document.getElementById("dBody").addEventListener("click",function(e){
   }
   /* one row open at a time: the card is a summary, and two open rows is the
      stack of controls this replaced. Nothing is saved by opening one. */
-  if(b.dataset.tsave){ saveTitle(); return; }
   if(b.dataset.row){ dRow=(dRow===b.dataset.row?null:b.dataset.row); renderDrawer(true); return; }
   if(b.dataset.nadd){ dNote=true; renderDrawer(true);
     var nt=document.getElementById("nt"); if(nt) nt.focus();
