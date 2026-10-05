@@ -472,14 +472,27 @@ deletion itself would never travel.
 ## Renaming a task
 
 A title is his to change: `title` is in `DFIELDS` **and** `diffOf`, so a rename
-saves, survives a reload and reaches his other device like a date does. It is a
-property row on the card like everything else -- a pencil hidden on the header
-would make the one field he asked for the one he has to hunt for -- and its
-collapsed value reads **"Rename"**, not the title, because the drawer header
-two lines above is the title and printing it twice forty pixels apart is not a
-summary. Enter commits; an empty name is refused, since a task with no name
-cannot be found again. Notes already on the task keep the `itemTitle` they were
-written under, which is what they were: the name at the time.
+saves, survives a reload and reaches his other device like a date does.
+
+**It is a pencil beside the name in the drawer header, not a row.** It shipped
+as a property row like the others and he was right that it should not be:
+*"no need to have a seperate action row just for rename, just add a pencil next
+to the title."* A row whose only job was to open a text box is a tap and a line
+of card spent on a field that is already on screen. The field **takes the
+title's place** rather than appearing under it, so the name never shows twice
+and the header does not change height; the pencil turns orange and becomes the
+save.
+
+Enter and blur commit, Escape abandons, and an empty name is refused, since a
+task with no name cannot be found again. `renderDrawer` must not stamp the old
+name back into the field while he is typing, which is what `dEdit` guards. The
+Notes drawer hides the pencil: it has no task and no name to change. Notes
+already on a task keep the `itemTitle` they were written under, which is what
+they were: the name at the time.
+
+The field is **16px on a phone like every other control** -- it is in `.dh`,
+not `.db`, so it had to be added to that media query by hand, and the check
+caught it at 15px. Under 16px iOS zooms the page on focus and stays zoomed.
 
 `HIST_FIELDS` in the relay logs it too. A rename is exactly the change the
 audit log is for, since every other row in that file names its task by title.
@@ -503,7 +516,13 @@ the audit log would be the one place still saying Blocked.
 ## The task card: a summary first, a form only when asked
 
 The drawer answers two questions, in that order: what is this task, and what do
-I want to change. Status, due, priority and effort are **one row each**, stating
+I want to change. **The track is the first row of the same box**, not a chip
+above it: *"Shouldn't the visa sit inside the top box here?"* -- a lone chip
+over a bordered group reads as something that fell out of it. It carries no
+chevron and does not respond to a tap, because the track is not his to change
+and a row that looks tappable and is not is a small lie.
+
+Status, due, priority and effort are **one row each**, stating
 the value they hold with a chevron; tapping one opens its options inline, and
 choosing a value closes it again. One row is open at a time, and nothing is
 saved by opening one.
@@ -730,7 +749,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 130 invariants, three widths, a real browser. Every one of them was a
+that runs: 135 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

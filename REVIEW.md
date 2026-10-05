@@ -248,8 +248,14 @@ silently and completely -- `deleted` proved it -- so the check types a new name
 into the card, reads it back out of `localStorage`, **reloads the page**, and
 reads it again. An in-memory assertion cannot see this class of bug at all.
 
-An empty name is refused rather than saved: a task with no name cannot be found
-again.
+The rename is driven the only way he has: the pencil on the drawer header. The
+field takes the title's place (showing both is the same name twice), Escape
+abandons, an empty name is refused -- a task with no name cannot be found again
+-- and the Notes drawer offers no pencil at all.
+
+The track is a row inside the property box, not a chip floating above it, and
+the check asserts both halves of that: the row is there and the loose chip is
+not.
 
 ### The words on screen are his words
 
