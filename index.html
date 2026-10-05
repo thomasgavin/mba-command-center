@@ -1130,7 +1130,9 @@ var MILES=[
   {t:"First tuition instalment",  item:"tuition-oct"},
   {t:"Visa in hand",              d:"2026-11-30", gate:"vfs-appt", k:"visa"},
   {t:"Move to Fontainebleau",     d:"2027-01-03", gate:"club8-movein",   k:"move"},
+  {t:"P0 pre-programme starts",   d:"2026-10-26", k:"acad"},
   {t:"Programme starts",          d:"2027-01-07", gate:"flight",   k:"acad"},
+  {t:"Core courses start (P1)",   d:"2027-01-18", k:"acad"},
   {t:"Final tuition instalment",  item:"tuition-apr"},
   /* he named the exchange and there is no date on record for it; inventing one
      would be worse than saying so */
@@ -1192,13 +1194,23 @@ var SEED=[
    n:"Club 8 covers 2027-01-03 to roughly 2027-07-03. The programme runs to 2027-12-15, so five months are uncovered."},
 
  /* admin and exit */
- {id:"portal",      t:"Clear INSEAD onboarding portal tasks",         k:"admin", s:"todo", p:"High",     d:"2026-11-01",},
+ {id:"portal",      t:"Complete MyINSEAD profile and practical info",   k:"admin", s:"todo", p:"High",     d:"2026-10-22",
+   n:"P0 deck gives 22 October: profile, INSEAD email activated, practical info. From 25 October the Sunday newsletters go only to the INSEAD address."},
  {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15",
    n:"Nothing on record: no resignation date, notice period or last working day."},
  {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", dep:["locus-exit"]},
 
  /* academics */
  {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20",},
+ {id:"lms-start",   t:"Work through the LMS tutorials",                k:"acad",  s:"todo", p:"Medium",   d:"2026-10-26",
+   n:"P0 opens 26 October and the LMS is where every academic and some CDC item is delivered."},
+ {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30",
+   n:"Optional one-week quant primer, 16-20 November online. Registration via MyINSEAD closes 30 October, so the decision has a hard date even though the course does not."},
+ {id:"pldp-webinar",t:"PLDP webinar",                                  k:"acad",  s:"todo", p:"High",     d:"2026-11-05",
+   n:"Must do. Zoom. Explains the assignments that run 6 November to 28 December."},
+ {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28",
+   n:"Must do, on the LMS. The coach prepares from what is submitted, so late means a wasted first session."},
+ {id:"acad-webinar",t:"Academics overview webinar",                    k:"acad",  s:"todo", p:"Medium",   d:"2026-11-26",},
  {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31",},
  {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28",
    n:"Required for graduation. What Gavin is using for it is not recorded."},
@@ -1206,7 +1218,20 @@ var SEED=[
  /* career */
  {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31",
    n:"Shapes elective choice, exchange decision and recruiting timing. Not recorded anywhere yet."},
- {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10",},
+ {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10",
+   n:"CDC route is VMock first, then the INSEAD CV, which is what gets into the CV Book."},
+ {id:"careerglobe", t:"Set up CareerGlobe profile",                   k:"career",s:"todo", p:"High",     d:"2026-10-27",
+   n:"Opens 27 October. Booking a coaching appointment runs through it."},
+ {id:"cdc-quests",  t:"Do the CareerLeader and Career Anchors questionnaires", k:"career",s:"todo", p:"High", d:"2026-10-31",
+   n:"Both, plus the workbook questions: together they are the prep for the first coaching session."},
+ {id:"cdc-coach1",  t:"Book the first CDC coaching session",          k:"career",s:"todo", p:"High",     d:"2026-11-15", dep:["careerglobe","cdc-quests"],
+   n:"Slots from November, 45 minutes, and the coach is allocated by P1 location with no changes later."},
+ {id:"cv-webinar",  t:"INSEAD CV and cover letter webinar",           k:"career",s:"todo", p:"High",     d:"2026-11-13",
+   n:"Friday 13 November, 13:00 Paris. Needs registering in advance."},
+ {id:"summer-webinar",t:"Summer experience webinar",                  k:"career",s:"todo", p:"High",     d:"2026-12-04",
+   n:"Covers the 8-week summer project, the startup tour and taking the break to recruit."},
+ {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31",
+   n:"On the LMS from early December; the workshop itself is in Launch Week."},
  {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30",}
 ];
 
@@ -2641,7 +2666,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    it is force-quit, which is why a fix did not arrive until he cleared it. The
    page asks the server what the live build is, with caching off, and reloads
    itself past the cache when they differ. */
-var BUILD="2026-10-05-0800";
+var BUILD="2026-10-05-1045";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
