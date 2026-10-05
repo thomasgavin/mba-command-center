@@ -710,9 +710,13 @@ waiting to see whether a third is coming.
   colour, which was literally grey — see "One view for the tasks".
 - **The iOS status bar is the page's now.**
   `apple-mobile-web-app-status-bar-style` was `default`, which paints an
-  opaque white strip above the app and **is read at launch**, so the runtime
-  `theme-color` change could never repaint it: a black board under a white
-  bar (*"why is the top section still white?"*). It is `black-translucent`,
+  opaque white strip above the app, so the runtime `theme-color` change could
+  never repaint it: a black board under a white bar (*"why is the top section
+  still white?"*). **iOS captures that meta with the Home Screen bookmark**,
+  the way it captures the icon, so changing it in the page does nothing for an
+  app already installed -- the icon has to be removed and re-added. Deploying
+  the change and watching the strip stay white is the expected outcome, not a
+  broken fix. It is `black-translucent`,
   the inset belongs to the page, and `.sbar` — the first child of `.app`,
   `env(safe-area-inset-top)` tall, which is zero everywhere but an installed
   iOS app — fills it from `--sbar`. That token is **dark in both themes**,
