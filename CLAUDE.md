@@ -1208,6 +1208,38 @@ its colour from `STATUS` where the value is a status; anything else is prose
 under **Board**. Parsing rather than storing is what let every receipt already
 written render the new way with nothing to migrate.
 
+## What "unread" means, and the badge that argued with itself
+
+He asked why a new version seemed to hand him everything back unread, and the
+measurement said it does not: a reply read in Chat and a brief read in the
+drawer both come back read through the `?v=` reload, in memory and in the
+stored blob, and there is no path through `unionNotes`, `unionNews` or
+`mergeNotes` that can downgrade a read flag -- every one of them only ever
+upgrades. What a new version really brings is new content, because the run
+that ships the build is the run that writes the reply.
+
+Two things were genuinely wrong, and both were `state` doing two jobs at once.
+On a note of his it means **not yet delivered** -- that is what the thread's
+"sending…" line reads off -- and on a note Claude wrote it means **not yet
+read**. A badge can only honestly be the second.
+
+- **`unread()` counts Claude's notes and nothing else.** It counted every
+  note, so typing a message in Chat put a badge on something he had just
+  written and the board was telling him to go and read himself. `unreadReplies()`
+  is gone with it: one number, one meaning, rather than two functions that
+  had to agree. The NEW tag in the thread and in the Notes drawer reads the
+  same way, and opening that drawer marks only Claude's notes read -- marking
+  one of his own would claim it had reached the relay when nothing had sent it.
+- **A confirmed send marked every note on the board read, replies included.**
+  `relaySend` passed `notes.map(id)` to `markSent` while its own comment said
+  "only what we actually sent", so moving a date swallowed the badge on a
+  reply he had never opened. It passes the payload's notes now, and `markSent`
+  skips Claude's notes outright: delivery is something that happens to his.
+- **`read` on a brief must not travel.** The relay strips it from its archive
+  for the stated reason -- reading Sunday's report on the laptop says nothing
+  about the phone -- and the board was sending it straight back up the live
+  socket over the top of that. `outNews()` strips it on the way out.
+
 **Anything Claude changes on its own carries a note saying why**, on that task,
 with the evidence named: *"whenever there is an action you take yourself on a
 task, add a note under it and mention the reasoning"*. The receipt says what
@@ -1518,7 +1550,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 326 invariants, three widths, a real browser. Every one of them was a
+that runs: 331 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

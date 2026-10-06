@@ -2249,7 +2249,14 @@ function actedOf(n){
 }
 /* remembered between notes, because the answer is the same most of the time */
 var sendDefault=true;
-function unread(){ return notes.filter(function(n){return n.state!=="read";}).length; }
+/* `state` does two jobs, and reading it as one is what put a badge on a
+   message he had just typed himself. On a note of his it means "written here
+   and not yet delivered" -- that is what the "sending..." line in the thread
+   reads -- and on a note Claude wrote it means "not yet read". A badge can
+   only honestly be the second, so this counts Claude's notes and nothing
+   else, and the Notes badge and the Chat badge are now the same number by
+   construction rather than by two functions agreeing. */
+function unread(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
 function tc(k){ return (TRACKS[k]||{c:"#8b8095"}).c; }
 function tl(k){ return (TRACKS[k]||{label:k}).label; }
 
@@ -3332,7 +3339,6 @@ function noteTitle(n){
   return '<div class="ntt" style="color:'+noteTint(n)+'">'+esc(n.title)+'</div>';
 }
 function nudgeRound(n){ return Math.max(1, +(n&&n.round)||1); }
-function unreadReplies(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
 
 /* The floating button is the Chat tab within reach of a thumb, so it has the
    tab's badge too. It stands down on Chat itself and under anything opened
@@ -3348,7 +3354,7 @@ function syncFab(){
   /* the map has a composer of its own in the same corner, so the button
      would sit on the box he is typing in */
   f.classList.toggle("off", view==="chat"||view==="map"||busy);
-  var u=unreadReplies();
+  var u=unread();
   f.classList.toggle("has",u>0);
   document.getElementById("fabN").textContent=u>9?"9+":String(u);
 }
@@ -3416,7 +3422,7 @@ function renderChat(){
      said it once a day for as long as the thread exists, and took two lines
      of a 390px screen off the conversation it was explaining. */
   /* reading the thread is reading the replies */
-  if(view==="chat" && unreadReplies()){
+  if(view==="chat" && unread()){
     notes.forEach(function(n){ if(isClaude(n)) n.state="read"; });
     setTimeout(function(){ save(); render(); },0);
   }
@@ -3677,7 +3683,7 @@ function noteRow(p){
       (isNudge(p)?' &middot; <b>'+esc(nudgeRound(p)>1?"Following up":"Nudge")+'</b>'
                  :(isClaude(p)?' &middot; <b>Claude</b>':''))+
       (p.forClaude===false?' &middot; <span class="tlo">yours only</span>':'')+
-      (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
+      (isClaude(p)&&p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
     '</div>'+
     '<div class="tlx">'+noteTitle(p)+esc(p.text||"")+'</div>'+
     (isClaude(p)?actedBox(p,"tld"):'')+
@@ -3703,7 +3709,7 @@ function openNotes(){
     '<button class="btn o" data-export="1" title="Saves a full snapshot to this device. Does not reach the repo.">Download a copy</button></div></div>';
   h+= notes.length ? '<div class="fld"><label>'+notes.length+' note'+(notes.length>1?"s":"")+'</label>'+
       notes.map(function(p){ return '<div class="nitem" style="border-left:3px solid '+noteTint(p)+'"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
-        (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+noteTitle(p)+esc(p.text)+'</div>'+
+        (isClaude(p)&&p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+noteTitle(p)+esc(p.text)+'</div>'+
         (p.itemTitle?'<div class="nf">on: '+esc(p.itemTitle)+'</div>':'')+'</div>'; }).join("")+'</div>'
     : '<p class="hint">No notes yet. Double-click any card, or hit the &#9998; on it, to leave one.</p>';
   document.getElementById("dBody").innerHTML=h;
@@ -3715,7 +3721,9 @@ function openNotes(){
      the ones that were new when he opened it -- the same order the thread
      uses. */
   if(unread()){
-    notes.forEach(function(n){ n.state="read"; });
+    /* and only Claude's: marking one of his own read here would say it had
+       reached the relay when nothing had sent it. */
+    notes.forEach(function(n){ if(isClaude(n)) n.state="read"; });
     setTimeout(function(){ save(); render(); },0);
   }
   setTimeout(function(){ var t=document.getElementById("gn"); if(t) t.focus(); },300);
@@ -3874,7 +3882,17 @@ function leanPayload(){
     /* the relay names the file from this, so both routes stamp in the same zone
        and the newest-file sort on pull stays honest */
     stamp:stamp(),
-    notes:outNotes(), changed:changedItems(), kb:outKb(), news:news};
+    notes:outNotes(), changed:changedItems(), kb:outKb(), news:outNews()};
+}
+/* The relay strips `read` out of its archive for a reason -- reading Sunday's
+   report on the laptop says nothing about the phone -- and the board has to
+   strip it on the way out for the same one, or the live socket would carry
+   over the top of that and mark an edition read on a screen he never opened. */
+function outNews(){
+  return news.map(function(n){
+    var c={}; Object.keys(n).forEach(function(k){ if(k!=="read") c[k]=n[k]; });
+    return c;
+  });
 }
 /* The map travels whole. It is small -- a line of text per fact -- it has no
    baseline in SEED to diff against the way a task does, and half a map on his
@@ -3898,7 +3916,11 @@ function stamp(){
    the folder empty. Now the relay confirms on the spot, and the GitHub route
    waits for the next pull to find the file before it believes the send. */
 function markSent(ids){
-  notes.forEach(function(n){ if(!ids||ids.indexOf(n.id)>=0) n.state="read"; });
+  /* `isClaude` is the guard that matters: `ids` used to be every note on the
+     board, so a confirmed send quietly marked Claude's unanswered replies
+     read and he lost the badge on something he had never opened. Delivery is
+     a thing that happens to HIS notes; Claude's arrive already delivered. */
+  notes.forEach(function(n){ if(!isClaude(n) && (!ids||ids.indexOf(n.id)>=0)) n.state="read"; });
   pending=null; save(); render();
 }
 function sendToClaude(){
@@ -3926,7 +3948,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1215";
+var BUILD="2026-10-06-1330";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3979,8 +4001,11 @@ window.addEventListener("pagehide",flushAuto);
 document.addEventListener("visibilitychange",function(){ if(document.hidden) flushAuto(); });
 var sending=false;
 function relaySend(pay, json, quiet){
-  var n=notes.filter(function(x){ return x.state!=="read"; }).length;
-  var ids=notes.map(function(x){ return x.id; });
+  /* both of these are about the payload, not the board: a note written while
+     this is in flight is not in the file and has not been delivered. */
+  var out=(pay&&pay.notes)||[];
+  var n=out.length;
+  var ids=out.map(function(x){ return x.id; });
   sending=true;
   if(!quiet) toast("Sending "+n+" note"+(n===1?"":"s")+"…");
   var hd={"Content-Type":"application/json"};
@@ -4038,7 +4063,7 @@ function sendViaGitHub(json, st){
   /* best-effort: rejects when the page is not a secure context or focus was taken */
   try{ if(navigator.clipboard&&navigator.clipboard.writeText){ var cp=navigator.clipboard.writeText(json); if(cp&&cp.catch) cp.catch(function(){}); } }catch(e){}
   /* remember what we asked for so the next pull can tell whether it landed */
-  pending={path:INBOX+"/"+st+".json", ids:notes.map(function(n){ return n.id; }), at:new Date().toISOString()};
+  pending={path:INBOX+"/"+st+".json", ids:outNotes().map(function(n){ return n.id; }), at:new Date().toISOString()};
   save(); render();
   if(!w){ toast("Pop-up blocked. The JSON is on your clipboard - paste it into a new file in the repo."); return; }
   toast("GitHub opened. Press “Commit changes” there, or the "+notes.length+" note"+(notes.length===1?"":"s")+" stay on this device.");

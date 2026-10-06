@@ -322,12 +322,25 @@ for (var w2 of [390, 1280]) {
     return { txt: n.textContent, off: n.classList.contains("off"), total: notes.length };
   });
   ok("the badge is hidden when nothing is new", b1.off && b1.txt === "0" && b1.total === 1, JSON.stringify(b1));
+  /* a note of his own is NOT news: on his note `state:"new"` means "not yet
+     delivered", which is what the thread's "sending..." line reads, and a
+     badge over a message he just typed is the board telling him to go and
+     read himself. */
   var b2 = await s7.p.evaluate(function () {
     addNote(Object.keys(items)[0], "something new", true);
     var n = document.getElementById("notesN");
     return { txt: n.textContent, off: n.classList.contains("off"), total: notes.length };
   });
-  ok("and shows the new count, not the total", !b2.off && b2.txt === "1" && b2.total === 2, JSON.stringify(b2));
+  ok("a note he wrote himself never lights it", b2.off && b2.txt === "0" && b2.total === 2, JSON.stringify(b2));
+  var b3 = await s7.p.evaluate(function () {
+    notes.unshift({ id: "claude-x", from: "claude", text: "a reply",
+                    createdAt: new Date().toISOString(), state: "new" });
+    render();
+    var n = document.getElementById("notesN");
+    return { txt: n.textContent, off: n.classList.contains("off"), chat: unread() };
+  });
+  ok("and a reply from Claude is the only thing that does",
+     !b3.off && b3.txt === "1" && b3.chat === 1, JSON.stringify(b3));
   await s7.ctx.close();
 }
 
@@ -342,9 +355,57 @@ for (var w2 of [390, 1280]) {
              unread: unread(), thread: notesFor(k).length };
   });
   ok("an unticked note is not sent", keep.out.length === 1 && keep.out[0] === "for Claude", JSON.stringify(keep));
-  ok("an unticked note is not outstanding", keep.unread === 1, JSON.stringify(keep));
+  ok("and neither of his own notes is something to read", keep.unread === 0, JSON.stringify(keep));
   ok("but it is still in the task's thread", keep.thread === 2, JSON.stringify(keep));
   await s8.ctx.close();
+}
+
+/* ---- 8b. a new version must not hand back a board he has already read ----
+   He asked it as a question -- "everytime there is a new version why does the
+   notes and brief and chat get unread" -- and the three mechanisms that could
+   do it are each checked here rather than reasoned about: the reload itself,
+   the send that follows an edit, and what the payload carries out. */
+{
+  var now8 = new Date().toISOString();
+  var s8b = await open(390, [
+    { id: "claude-r", from: "claude", text: "a reply", createdAt: now8, state: "new" }
+  ]);
+  /* reading the thread, then a new version arriving */
+  await s8b.p.evaluate(function () { setView("chat"); });
+  await s8b.p.waitForTimeout(300);
+  var did = await s8b.p.evaluate(function () {
+    news.push({ id: "news-daily-x", period: "daily", date: "2026-10-06",
+                at: new Date().toISOString(), body: "## A\n- b\nc" });
+    openNews();
+    return { notes: unread(), briefs: unreadNews() };
+  });
+  await s8b.p.waitForTimeout(300);
+  ok("reading the thread and the briefs clears both", did.notes === 0 && did.briefs === 0, JSON.stringify(did));
+  await s8b.p.goto(URL_ + "?v=next-" + Date.now(), { waitUntil: "load" });
+  await s8b.p.waitForTimeout(600);
+  var after = await s8b.p.evaluate(function () {
+    return { notes: unread(), briefs: unreadNews(), n: notes.length, w: news.length };
+  });
+  ok("and a new version's reload hands them back read, not new",
+     after.n === 1 && after.w === 1 && after.notes === 0 && after.briefs === 0, JSON.stringify(after));
+  /* the send after an edit used to pass every note on the board to markSent,
+     so an unread reply was swallowed by the next date he moved */
+  var swal = await s8b.p.evaluate(function () {
+    notes.unshift({ id: "claude-r2", from: "claude", text: "newer reply",
+                    createdAt: new Date().toISOString(), state: "new" });
+    markSent(notes.map(function (n) { return n.id; }));
+    return { unread: unread() };
+  });
+  ok("a confirmed send never marks a reply he has not opened read", swal.unread === 1, JSON.stringify(swal));
+  /* and `read` is per device: the relay strips it from its archive, so the
+     live payload must not carry it over the top of that */
+  var trav = await s8b.p.evaluate(function () {
+    news.forEach(function (n) { n.read = true; });
+    return { out: outNews().filter(function (n) { return "read" in n; }).length, kept: news[0].read };
+  });
+  ok("and a brief read here does not travel to his other device",
+     trav.out === 0 && trav.kept === true, JSON.stringify(trav));
+  await s8b.ctx.close();
 }
 
 /* ---- 9. "What I changed" never claims a change that did not happen ---- */
