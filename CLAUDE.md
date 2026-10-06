@@ -1191,14 +1191,24 @@ the save button and made a status change feel unsaved without one.
 ## Staying on the current version
 
 `BUILD` near the top of the script is a plain datestamp and **must be bumped in
-the same commit as any change to `index.html`**. An iPhone home-screen app holds
+the same commit as any change to `index.html`**. There must be **exactly one**
+`var BUILD="..."` line in the file, and the check counts them: `checkBuild()`
+matches the first hit in the text it fetches, so a second one anywhere — a
+line-numbered edit once dropped one inside the comment above it — makes the
+page compare the file against itself, disagree for ever, and tell him on every
+pull that the cache will not let go. A message about a cache, caused by a
+duplicate. An iPhone home-screen app holds
 its cached copy until it is force-quit, which is why fixes did not reach him for
 hours. `checkBuild()` re-fetches the page with `cache:"no-store"` on foreground,
 on focus, on boot and when he presses Sync, compares the stamp, and reloads via
 `?v=<build>` — a plain `location.reload()` is served the same stale copy. If
 `BUILD` is forgotten the board simply never reloads itself, which is the safe
-failure. A reload is attempted once per version (tracked in `sessionStorage`),
-so a cache that refuses to let go says so instead of looping.
+failure. A reload is attempted **three times** per version, each at a URL carrying a
+timestamp the cache has never seen (tracked in `sessionStorage` as
+`<build>|<tries>`), because iOS standalone can serve the same copy back through
+a fresh query string and one attempt left him on a board that knew it was stale
+and would not do anything about it. After the third the toast names the one
+thing that always works: force-quit the app and open it again.
 
 ## Categories
 
@@ -1310,7 +1320,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 300 invariants, three widths, a real browser. Every one of them was a
+that runs: 301 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

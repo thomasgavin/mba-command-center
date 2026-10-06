@@ -3721,9 +3721,15 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
 
 /* Bump on every deploy. An iPhone home-screen app holds its cached copy until
    it is force-quit, which is why a fix did not arrive until he cleared it. The
-var BUILD="2026-10-06-0420";
-   itself past the cache when they differ. */
-var BUILD="2026-10-06-0405";
+   page asks the server what the live build is, with caching off, and reloads
+   itself past the cache when they differ.
+   There must be exactly ONE of these lines in the file, and the check counts
+   them. A careless line-numbered edit once left a second one inside this very
+   comment: the regex below matches the first hit in the fetched text, so the
+   page compared the comment against its own constant, never agreed with
+   itself, and told him on every pull that the cache would not let go -- a
+   message about a cache, caused by a duplicate. */
+var BUILD="2026-10-06-0432";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3735,18 +3741,23 @@ function checkBuild(announce){
       if(!t) return;
       var m=t.match(/var BUILD="([^"]+)"/);
       if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version."); return; }
-      /* if a reload for this exact version has already happened and the page
-         still came back old, something upstream is serving a stale copy and
-         reloading again would just loop every time he opens the board */
-      var tried=null;
-      try{ tried=sessionStorage.getItem("mbacc_ver"); }catch(e){}
-      if(tried===m[1]){ if(announce) toast("A newer version exists but the cache will not let go. Pull down to reload."); return; }
-      try{ sessionStorage.setItem("mbacc_ver",m[1]); }catch(e){}
+      /* One attempt was not enough: iOS standalone can serve the same copy
+         back even through a fresh query string, and giving up after one try
+         left him looking at a board that knew it was stale and would not do
+         anything about it. Three tries, each at a URL the cache has never
+         seen, and only then the message -- which now names the one thing
+         that always works. */
+      var tried=0;
+      try{ var sv=(sessionStorage.getItem("mbacc_ver")||"").split("|");
+           if(sv[0]===m[1]) tried=parseInt(sv[1],10)||0; }catch(e){}
+      if(tried>=3){ if(announce) toast("A newer version exists but the cache will not let go. Force-quit the app and open it again."); return; }
+      try{ sessionStorage.setItem("mbacc_ver",m[1]+"|"+(tried+1)); }catch(e){}
       toast("A new version is live. Loading it now…");
       /* the query string is what actually defeats the cache; a plain reload
-         on iOS standalone will happily serve the same stale copy */
+         on iOS standalone will happily serve the same stale copy, and so will
+         a query string it has already stored -- hence the timestamp */
       setTimeout(function(){
-        location.replace(location.pathname+"?v="+encodeURIComponent(m[1]));
+        location.replace(location.pathname+"?v="+encodeURIComponent(m[1])+"-"+Date.now());
       },900);
     })
     .catch(function(){});

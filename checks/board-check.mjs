@@ -2498,6 +2498,12 @@ for (var bw of [390, 1280]) {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   var stamp = (html.match(/var BUILD="([^"]+)"/) || [])[1];
   ok("BUILD is a datestamp", /^\d{4}-\d{2}-\d{2}-\d{4}$/.test(stamp || ""), String(stamp));
+  /* checkBuild() matches the FIRST `var BUILD="..."` in the fetched page, so a
+     second one anywhere -- even inside a comment, which is how it happened --
+     makes the board compare the file against itself, disagree for ever, and
+     tell him on every pull that the cache will not let go. */
+  var decls = (html.match(/^var BUILD="/gm) || []).length;
+  ok("and there is exactly one of it in the file", decls === 1, String(decls));
 }
 
 await browser.close();
