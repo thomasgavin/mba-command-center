@@ -705,6 +705,11 @@ thumb's reach.
   **The rule: measure the pixel before changing the declaration**, and when a
   colour matches no value you are setting, ask *when* it was read, not which
   file it came from.
+  The readout that found it was a line at the top of Overview, put where his
+  screenshots already pointed rather than in the Sync toast -- and it is
+  **gone again**, the same evening, like the push test banner before it. It
+  cost a grid row of a 390px screen, which is the price of an instrument and
+  not of a feature.
 - **The white strip was a cached manifest, and the measurement is what found
   it.** Six fixes went out aimed at metas and manifests without anyone
   measuring the thing being fixed, which is the complaint he finally made:

@@ -430,7 +430,6 @@ body::before{
 /* ---------- bento ---------- */
 /* the foot of Overview, quiet: one line nobody reads until it is the only
    thing that can answer the question */
-.diagl{order:-1;font-size:9.5px !important;opacity:.85 !important;word-break:break-all}
 .bstamp{grid-column:1/-1;text-align:center;font-size:10.5px;font-weight:600;
   letter-spacing:.04em;color:var(--ink4);opacity:.6;padding:4px 0 2px}
 .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;grid-auto-rows:minmax(92px,auto)}
@@ -2496,15 +2495,6 @@ function renderOverview(){
      next deadline is simply the soonest one still open. */
   var next=(L.filter(function(i){return i.due&&i.status!=="done";})[0]||L[0]||null);
   var h="";
-  /* TEMPORARY, and it is here rather than in the Sync toast for one reason:
-     the strip at the top of his screen measured #f6f5f9 in a screenshot of a
-     dark board, and that colour exists in exactly one place in this repo --
-     the light theme's `--page`. Six fixes have been fired at metas and
-     manifests without anyone knowing which element on his device is actually
-     painting it, which is what he objected to. This line sits where his
-     screenshots already point, so the next one answers it instead of starting
-     another round. Remove it the moment the strip is settled. */
-  h+='<div class="bstamp diagl">'+esc(paintLine())+'</div>';
 
   /* Next deadline leads the view and Needs attention follows it: *"move next
      deadline to the top and needs attention second"*. The one thing with a
@@ -3936,7 +3926,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1200";
+var BUILD="2026-10-06-1215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5087,31 +5077,6 @@ function pctH(){
   var h=d.getBoundingClientRect().height;
   d.parentNode.removeChild(d);
   return h;
-}
-/* What is actually painting the top of his screen. Every value here has been
-   guessed at least once: whether the installed app honours the status-bar
-   meta, which theme the tokens resolved in, what the runtime theme-color says
-   by the time the page is up, and whether the safe-area inset is non-zero at
-   all. The device knows all five. */
-function paintLine(){
-  var cs=getComputedStyle(document.documentElement), bs=getComputedStyle(document.body);
-  var tc=document.querySelector('meta[name="theme-color"]');
-  var sb=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-  return BUILD
-    +" "+(navigator.standalone?"app":"browser")
-    +" th:"+theme()
-    +" html:"+hx(cs.backgroundColor)
-    +" body:"+hx(bs.backgroundColor)
-    +" tc:"+((tc&&tc.getAttribute("content"))||"-")
-    +" sb:"+((sb&&sb.getAttribute("content"))||"-")
-    +" insT:"+Math.round(insTop);
-}
-/* rgb(246, 245, 249) means nothing next to #f6f5f9 in a stylesheet, and the
-   whole point of this line is comparing the two by eye. */
-function hx(c){
-  var m=/(\d+),\s*(\d+),\s*(\d+)/.exec(c||"");
-  if(!m) return c||"-";
-  return "#"+[m[1],m[2],m[3]].map(function(n){ n=(+n).toString(16); return n.length<2?"0"+n:n; }).join("");
 }
 function layoutLine(){
   var a=document.querySelector(".app").getBoundingClientRect();

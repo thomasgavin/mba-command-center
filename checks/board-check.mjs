@@ -1218,7 +1218,7 @@ for (var tw26 of [390, 1280]) {
   });
   var st28 = await s28.p.evaluate(function () {
     setView("over");
-    var e = document.querySelector(".bstamp:not(.diagl)");
+    var e = document.querySelector(".bstamp");
     return e ? { t: e.textContent, h: e.offsetHeight } : null;
   });
   /* Which build the app is running has been the unanswerable question behind
