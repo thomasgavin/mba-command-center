@@ -1024,6 +1024,11 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .row-b{display:flex;gap:6px;flex-wrap:wrap}
 .hint{font-size:11.5px;color:var(--ink4);line-height:1.5;margin-top:7px}
 .nitem{background:var(--wash2);border:1px solid var(--line2);border-radius:var(--r3);padding:9px 11px;margin-bottom:7px}
+/* the note's own heading: a label, not a sentence, and the one line in the
+   card that is allowed a colour */
+.ntt{font-size:12.5px;font-weight:750;letter-spacing:-.012em;line-height:1.3;margin-bottom:3px}
+.cbub .ntt{margin-bottom:2px}
+.cme .ntt{color:#fff !important;opacity:.92}
 .nitem .nm{font-size:10px;font-weight:700;color:var(--ink4);letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
 .nitem .nx{font-size:12.5px;line-height:1.5;margin-top:5px;white-space:pre-wrap;color:var(--ink2);overflow-wrap:anywhere}
 .nitem .nf{font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:5px}
@@ -1325,6 +1330,32 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 @keyframes cdot{0%,62%,100%{opacity:.26;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 
 /* ---------- responsive ---------- */
+/* Overview on a wide screen used to be a column of part-filled rows: the
+   orange hero took five of twelve and the other seven were empty, Needs
+   attention then took a whole row to itself, and tuition plus the two rings
+   left five columns of nothing beside them. Every tile was the width it
+   wanted rather than the width the row had. This packs each row to twelve.
+   It is min-width, so nothing below 1181px -- the phone included -- sees any
+   of it. */
+@media (min-width:1181px){
+  /* Placed, not flowed. Auto-placement sizes each tile to what it wants and
+     then leaves whatever the row has left over empty -- the orange hero took
+     five of twelve and the other seven were blank, Needs attention took a row
+     to itself, and tuition sat beside five columns of nothing. Two columns
+     instead: the narrow left one carries the things that are a single figure
+     (the deadline, the two rings, the tuition), the wide right one carries
+     the lists, and the tall tile on one side spans the rows the short ones
+     opposite it occupy. */
+  .hero{grid-column:1/6;grid-row:1} .att{grid-column:6/13;grid-row:1/3}
+  .mstack{grid-column:1/6;grid-row:2;flex-direction:row}
+  .hero.b{grid-column:1/6;grid-row:3}
+  .pipe{grid-column:6/13;grid-row:3;align-self:start}
+  .agd{grid-column:1/6;grid-row:4} .trk{grid-column:6/13;grid-row:4;align-self:start}
+  /* a short tile opposite a tall one keeps its own height: stretched, the
+     visa list ended halfway up a card with the rest of it empty. */
+  .seqt{grid-row:5;align-self:start}
+  .seqt:nth-of-type(odd){grid-column:1/7} .seqt:nth-of-type(even){grid-column:7/13}
+}
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
   .mstack{grid-column:span 12;grid-row:span 1;flex-direction:row}
@@ -1800,6 +1831,7 @@ var savedAt=null, syncedAt=null;   /* last local change, newest export seen */
    laptop's older file -- the one holding the moved date -- was skipped forever
    and no amount of reloading could fix it. A file is read once, by name. */
 var seenF=null;
+var kbCold=false;   /* this load has never seen a mind map: ask for everything once */
 /* How far down the relay's log this device has read. The socket asks for
    everything after it, so a reload costs one short catch-up rather than a
    re-read of the folder. */
@@ -1847,6 +1879,16 @@ function load(){
   pending=(st&&st.pending)||null;
   seenF=(st&&st.seen)||null;
   relaySeq=(st&&st.relaySeq)||0;
+  /* A device whose map is empty is a device the facts never reached, and the
+     two mechanisms that would have carried them both refuse to try again: the
+     socket asks only for events above relaySeq, and the folder pull skips any
+     file it has read once by name. Both are right in the ordinary case and
+     both leave this one unrecoverable by reloading -- which is what the map
+     being blank on the laptop while the phone had nine groups actually was.
+     So an empty map asks for everything once: the catch-up starts at zero and
+     the pull ignores `seen` for one pass. Re-merging is harmless by
+     construction, because every item carries its own clock. */
+  kbCold=!kb.length;
   /* a board saved before this existed has read nothing by name, so it gets one
      pass over the folder. That is the repair path for a device stuck behind. */
   if(!seenF) seenF={};
@@ -3216,6 +3258,20 @@ function isClaude(n){ return n.from==="claude" || /^claude-/.test(n.id||""); }
    `about` is the task it concerns, and `round` is how many times this has now
    been raised, because the second ask has to read as a second ask. */
 function isNudge(n){ return !!n && n.kind==="nudge" && isClaude(n); }
+/* A note now opens with a short title, because sixty-five same-sized grey
+   paragraphs down a drawer read as *"a T&C document and not inviting to
+   read"*. The tint is the track of the task the note is about -- colour on
+   this board already means track, and inventing a second scheme would be one
+   more thing to learn -- and a note belonging to no task takes the accent. */
+function noteTint(n){
+  var id=(n&&(n.itemId||n.about))||null;
+  var i=id&&items[id];
+  return i?tc(i.track):"var(--purple)";
+}
+function noteTitle(n){
+  if(!n || !n.title) return "";
+  return '<div class="ntt" style="color:'+noteTint(n)+'">'+esc(n.title)+'</div>';
+}
 function nudgeRound(n){ return Math.max(1, +(n&&n.round)||1); }
 function unreadReplies(){ return notes.filter(function(n){ return isClaude(n) && n.state!=="read"; }).length; }
 
@@ -3276,9 +3332,9 @@ function renderChat(){
              esc(rd>1?"Following up":"Nudge")+
              (n.itemTitle?' &middot; <b>'+esc(n.itemTitle)+'</b>':'')+
              (rd>1?' <span class="cnr">'+rd+'&times;</span>':'')+
-           '</div>'+esc(n.text||"")+'</div>';
+           '</div>'+noteTitle(n)+esc(n.text||"")+'</div>';
       }else{
-        h+='<div class="cbub">'+esc(n.text||"")+'</div>';
+        h+='<div class="cbub">'+noteTitle(n)+esc(n.text||"")+'</div>';
       }
       /* what Claude changed on the board because of this message -- and
          nothing at all when the honest answer was that nothing changed */
@@ -3564,7 +3620,7 @@ function noteRow(p){
       (p.forClaude===false?' &middot; <span class="tlo">yours only</span>':'')+
       (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+
     '</div>'+
-    '<div class="tlx">'+esc(p.text||"")+'</div>'+
+    '<div class="tlx">'+noteTitle(p)+esc(p.text||"")+'</div>'+
     (isClaude(p)?actedBox(p,"tld"):'')+
   '</div>';
 }
@@ -3587,8 +3643,8 @@ function openNotes(){
     '<div class="row-b" style="margin-top:8px"><button class="btn o" data-gsave="1">Leave note</button>'+
     '<button class="btn o" data-export="1" title="Saves a full snapshot to this device. Does not reach the repo.">Download a copy</button></div></div>';
   h+= notes.length ? '<div class="fld"><label>'+notes.length+' note'+(notes.length>1?"s":"")+'</label>'+
-      notes.map(function(p){ return '<div class="nitem"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
-        (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+esc(p.text)+'</div>'+
+      notes.map(function(p){ return '<div class="nitem" style="border-left:3px solid '+noteTint(p)+'"><div class="nm">'+esc(p.createdAt.slice(0,16).replace("T"," "))+
+        (p.state!=="read"?' <span class="tagnew">NEW</span>':'')+'</div><div class="nx">'+noteTitle(p)+esc(p.text)+'</div>'+
         (p.itemTitle?'<div class="nf">on: '+esc(p.itemTitle)+'</div>':'')+'</div>'; }).join("")+'</div>'
     : '<p class="hint">No notes yet. Double-click any card, or hit the &#9998; on it, to leave one.</p>';
   document.getElementById("dBody").innerHTML=h;
@@ -3811,7 +3867,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1030";
+var BUILD="2026-10-06-1115";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4687,12 +4743,13 @@ function pullFromRepo(announce){
          only that one is exactly how the other device's work went missing. */
       var did=false, patch=null;
       pays.forEach(function(f){
-        if(seenF[f.name]) return;            /* this exact file has been read */
+        if(seenF[f.name] && !kbCold) return; /* this exact file has been read */
         seenF[f.name]=1;
         if(mergePayload(f.pay)){ did=true; if(f.pay.op==="patch") patch=f.pay; }
       });
       /* a name can only ever be read once, so the list cannot grow past the
          handful of files a pull looks at plus a little history */
+      kbCold=false;   /* one pass, whether or not it found anything */
       var names=Object.keys(seenF);
       if(names.length>60) names.sort().slice(0,names.length-60).forEach(function(k){ delete seenF[k]; });
       var hi=pays[pays.length-1].pay.exportedAt;
@@ -4765,7 +4822,7 @@ function openWS(){
   if(!RELAY || !window.WebSocket || location.protocol==="file:") return;
   if(WS && (WS.readyState===0 || WS.readyState===1)) return;
   clearTimeout(wsT); wsT=null;
-  var url=RELAY.replace(/^http/,"ws")+"/ws?since="+relaySeq+
+  var url=RELAY.replace(/^http/,"ws")+"/ws?since="+(kbCold?0:relaySeq)+
           (RELAY_KEY?"&key="+encodeURIComponent(RELAY_KEY):"");
   var w;
   try{ w=new WebSocket(url); }catch(e){ return retryWS(); }

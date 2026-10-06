@@ -475,6 +475,46 @@ for (var w2 of [390, 1280]) {
   await s13.ctx.close();
 }
 
+/* ---- 13b. a note opens with a title, in the colour of its task ----
+   Sixty-five same-sized grey paragraphs down a drawer read as *"a T&C
+   document and not inviting to read"*. The title is the fix and the tint is
+   the track, so neither may silently stop rendering; a note written before
+   the field existed still has to draw. */
+{
+  var now13b = new Date().toISOString();
+  var s13b = await open(390, [
+    { id: "claude-t1", from: "claude", itemId: "deposit", title: "SBI wants confirmation",
+      itemTitle: "EUR 12,000 tuition deposit paid", text: "the body of the note",
+      state: "read", createdAt: now13b },
+    { id: "claude-t2", from: "claude", text: "no title on this one",
+      state: "read", createdAt: now13b }
+  ]);
+  var n13b = await s13b.p.evaluate(function () {
+    var t = document.querySelectorAll("#chatw .ntt");
+    /* the expected colour as the browser computes it, so the assertion is
+       not a hex-to-rgb conversion written twice */
+    var probe = document.createElement("span");
+    probe.style.color = tc(items.deposit.track);
+    document.body.appendChild(probe);
+    var want = getComputedStyle(probe).color;
+    probe.parentNode.removeChild(probe);
+    openNotes();
+    var drawer = document.querySelectorAll("#dBody .nitem .ntt").length;
+    var edge = document.querySelector("#dBody .nitem");
+    return { n: t.length, txt: t[0] ? t[0].textContent : "",
+             colour: t[0] ? getComputedStyle(t[0]).color : "",
+             want: want, drawer: drawer,
+             edge: edge ? getComputedStyle(edge).borderLeftWidth : "" };
+  });
+  ok("a note with a title draws it, and one without draws nothing",
+     n13b.n === 1 && n13b.txt === "SBI wants confirmation", JSON.stringify(n13b));
+  ok("the title takes the colour of the task's track",
+     !!n13b.colour && n13b.colour === n13b.want, JSON.stringify(n13b));
+  ok("and the notes drawer carries both the title and a colour edge",
+     n13b.drawer === 1 && parseFloat(n13b.edge) >= 3, JSON.stringify(n13b));
+  await s13b.ctx.close();
+}
+
 /* ---- 14. two tabs on one device do not eat each other's edits ---- */
 {
   /* The board saves on nearly everything -- a poll, a socket event, the clock
@@ -1163,7 +1203,35 @@ for (var tw26 of [390, 1280]) {
      k28.first === k28.want, JSON.stringify(k28));
   ok("and a task older than that pins to the left edge with its real date",
      k28.oldCount === 0 || k28.allPinned, JSON.stringify(k28));
+  /* Overview on a wide screen used to be a column of part-filled rows -- the
+     hero took five of twelve columns and the other seven were empty, and
+     Needs attention then took a row to itself. Two tiles sharing a row is
+     the whole of the fix, so that is what is measured. */
+  var ov28 = await s28.p.evaluate(function () {
+    setView("over");
+    function top(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().top):null; }
+    function right(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().right):null; }
+    var st=document.getElementById("stage");
+    return { hero: top(".hero.a"), att: top(".att"),
+             tui: top(".hero.b"), pipe: top(".pipe"),
+             attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right) };
+  });
+  ok("Overview puts the deadline and Needs attention on one row at 1280",
+     ov28.hero !== null && ov28.hero === ov28.att, JSON.stringify(ov28));
+  ok("and tuition shares its row with the critical path",
+     ov28.tui !== null && ov28.tui === ov28.pipe, JSON.stringify(ov28));
   await s28.ctx.close();
+}
+
+/* A device whose map never arrived could not recover by reloading: the socket
+   asks only for events above relaySeq and the folder pull skips a file it has
+   read once by name. An empty map asks for everything once instead. */
+{
+  ok("an empty map asks the relay for the whole log",
+     /"\/ws\?since="\+\(kbCold\?0:relaySeq\)/.test(src), "");
+  ok("and re-reads the folder it had already marked seen",
+     /if\(seenF\[f\.name\] && !kbCold\) return;/.test(src)
+       && /kbCold=!kb\.length;/.test(src) && /kbCold=false;/.test(src), "");
 }
 
 /* ---- 29. the mind map ----

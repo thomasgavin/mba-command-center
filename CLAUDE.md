@@ -737,6 +737,43 @@ thumb's reach.
   the rule was still refusing every vertical drag that began on a milestone:
   ten tiles at the top of Overview that the page would not scroll under.
 
+## Overview on a wide screen
+
+The bento is twelve columns and every tile took the width it wanted, so a
+desktop opened on a column of part-filled rows: the orange hero took five and
+the other seven were empty, Needs attention then took a whole row to itself,
+and tuition sat beside five columns of nothing. *"The overview tab looks very
+bad on desktop."*
+
+Above 1181px the tiles are **placed rather than flowed**, in two columns: the
+narrow left one carries the things that are a single figure (the next
+deadline, the two rings, the tuition), the wide right one carries the lists
+(Needs attention, the critical path, progress by track), and a tall tile spans
+the rows the short ones opposite it occupy. A short tile beside a tall one
+takes `align-self:start` -- stretched, the visa list ended halfway up a card
+with the rest of it empty, and the track bars spread out until the tile read
+as a chart with no data.
+
+It is a **`min-width`** query, deliberately: *"fix this without affecting the
+mobile view"*, and nothing below 1181px -- the phone included -- can see any of
+it. The check measures the pairing rather than the CSS, so a tile that stops
+sharing its row fails.
+
+## A device whose map never arrived
+
+The mind map was empty on the laptop while the phone had nine groups, and no
+reload could fix it, because the two mechanisms that would have carried the
+facts both refuse to try twice: the socket asks only for events **above**
+`relaySeq`, and the folder pull skips any file it has already read **by
+name**. Both are right in the ordinary case and together they make this one
+unrecoverable.
+
+So an empty map asks for everything, once. `kbCold` is set on load when
+`kb` is empty: the catch-up starts at zero and the pull ignores `seen` for a
+single pass, then clears itself whether or not it found anything. Re-merging
+is harmless by construction -- every item carries its own clock -- which is the
+same property that lets a file be read twice.
+
 ## Dark mode, on three taps of the name
 
 *"Add a dark mode hidden switch - tapping on the logo/name 3 times."* Hidden is
@@ -1148,6 +1185,16 @@ target is his own sentence, not a word count invented here:
   change what he does next, and if nothing survives the cut the note should
   not be written at all.
 
+**The title is drawn, and it takes the colour of the task the note is about.**
+`noteTitle()` is the one place it becomes markup, so the three surfaces that
+render a note -- the Chat bubble, the task's own thread and the Notes drawer --
+cannot disagree about it, and `noteTint()` reads the track off `itemId` (or
+`about`, for a nudge). Colour on this board already means track; a second
+scheme would be one more thing to learn. A note belonging to no task takes the
+accent, and the drawer card carries the same tint as a left edge, which is what
+turns sixty-five identical grey blocks into a list. A note written before the
+field existed simply draws no title.
+
 This is one rule in four places: the Routine's prompt, `.claude/skills/nudge`,
 `.claude/skills/answer-notes`, and here. A reply in Chat is held to it too —
 he said "notes and replies", and a reply is the half he reads most.
@@ -1395,7 +1442,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 313 invariants, three widths, a real browser. Every one of them was a
+that runs: 320 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
