@@ -1819,27 +1819,17 @@ for (var bw of [390, 1280]) {
   ok("the milestone rail is the last tile on Overview",
      /\bmiles\b/.test(mord.last), JSON.stringify(mord));
 
-  /* "Why Is the top section still white?" -- it is the iOS status bar, which
-     `default` paints opaque white and which is read at launch, so the runtime
-     theme-color change could never repaint it. The page owns the inset now. */
+  /* The strip was built to fill a translucent status bar, and the translucent
+     status bar is what made the section bar float for seven rounds: it hands
+     the page the whole screen and then resolves a percentage height and a
+     `bottom` offset against different boxes. The bar sitting where it should
+     is worth more than the strip at the top being painted, so both went back
+     to what 09e98bd had. */
   var html35 = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  ok("the iOS status bar is the page's, not an opaque white strip",
-     /apple-mobile-web-app-status-bar-style" content="black-translucent"/.test(html35) &&
-     /viewport-fit=cover/.test(html35), "meta");
-  var sb = await s35.p.evaluate(function () {
-    var e = document.querySelector(".sbar");
-    if (!e) return null;
-    var dark = {};
-    document.documentElement.setAttribute("data-theme", "dark");
-    dark.bg = getComputedStyle(e).backgroundColor;
-    document.documentElement.removeAttribute("data-theme");
-    dark.light = getComputedStyle(e).backgroundColor;
-    dark.firstChild = document.querySelector(".app").firstElementChild.className;
-    return dark;
-  });
-  ok("the status strip is the first thing in .app and dark in both themes",
-     sb && sb.firstChild === "sbar" &&
-     sb.bg === "rgb(27, 27, 27)" && sb.light === "rgb(40, 10, 56)", JSON.stringify(sb));
+  ok("the iOS status bar is back to the style that never floated the bar",
+     /apple-mobile-web-app-status-bar-style" content="default"/.test(html35), "meta");
+  ok("and the strip that only existed to fill it is gone",
+     !/class="sbar"/.test(html35), "sbar");
 
   /* "Too much grey and it is hard to see" -- every ink has to clear 4.5:1 on
      the surface it is actually drawn on, which is what the first dark palette
@@ -2426,43 +2416,31 @@ for (var bw of [390, 1280]) {
              win: innerHeight, pad: parseFloat(getComputedStyle(b).paddingBottom),
              gap: Math.round(innerHeight - b.getBoundingClientRect().bottom) };
   });
-  ok("the app is anchored to the viewport, not to a viewport unit",
-     bar.pos === "fixed" && bar.top === 0 && bar.h === bar.win, JSON.stringify(bar));
+  /* 09e98bd's geometry, restored: an ordinary block filling the fixed body.
+     Seven attempts at being cleverer -- height:100% on a fixed body, 100dvh,
+     a painted ::after, inset:0, three clamps, a measured --vtop -- each came
+     back wrong in one direction or the other. */
+  ok("the app is an ordinary block filling the fixed body",
+     bar.pos === "relative" && bar.top === 0 && bar.h === bar.win, JSON.stringify(bar));
   ok("and the bar reaches the bottom of it", bar.gap === 0, JSON.stringify(bar));
   var barSrc = /\.app\{([^}]*)\}/.exec(src);
   ok("no viewport-height unit decides the app's height",
      !!barSrc && !/\d(dv|sv|lv|v)h/.test(barSrc[1]), barSrc && barSrc[1]);
-  /* The inset's magnitude cannot be trusted -- his installed app reports about
-     93px where a simulated one gives 34 -- so the clearance is clamped. It was
-     clamped in CSS three times (max, then clamp, then min(max())) and his
-     installed app rendered all three identically at the raw inset, so the
-     arithmetic is in JS now and no env() may appear in this custom property. */
+  /* Half of what the home indicator declares clears it and gives the board the
+     rest back -- 09e98bd's formula, restored with its geometry. */
   var padSrc = /--barpad:([^;]*);/.exec(src);
-  ok("the section bar's clearance is a plain number, not an env() in a clamp",
-     !!padSrc && !/env\(/.test(padSrc[1]) && /px/.test(padSrc[1]), padSrc && padSrc[1]);
-  ok("and JS is what caps it", /Math\.min\(20,Math\.max\(4,insBot-14\)\)/.test(src), "");
-  ok("the clearance survives a resize", /addEventListener\("resize",fitBar\)/.test(src), "");
-  /* His Sync readout settled it: vp812 app0+812 on an 874 screen with a 62px
-     top inset. A translucent status bar puts the window above the layout
-     viewport, and innerHeight stops short of the screen by exactly that much,
-     so everything anchored to the viewport's bottom floated 62px up. */
-  /* A percentage height resolves against the WINDOW on his device (874) while
-     `bottom` resolves against the layout viewport (812). Adding --vtop to the
-     height as well overshot by the same 62px and put the bar under the screen,
-     so the height is a plain 100% and only `bottom` offsets are corrected. */
-  ok("the app is sized by a plain percentage, with no inset correction",
-     /\.app\{[^}]*height:100%[^}]*\}/.test(src) && !/height:calc\(100% \+ var\(--vtop\)\)/.test(src),
-     "");
-  ok("and --vtop is only trusted when the two numbers agree",
-     /Math\.abs\(over-insTop\)<=2 \? insTop : 0/.test(src), "");
-  var vtopUsers = (src.match(/var\(--vtop\)/g) || []).length;
-  ok("every surface placed by `bottom` reads it", vtopUsers >= 3, String(vtopUsers));
-  ok("and nothing sized from the top does", !/height:calc\([^)]*--vtop/.test(src), "");
-  /* Six rounds of this bug went on measuring his screenshots in pixels to work
-     out which number was wrong. The device knows all of them. */
-  ok("and Sync reports what the layout actually resolved to",
+  ok("the section bar gives back half the home-bar inset",
+     !!padSrc && /env\(safe-area-inset-bottom\) \/ 2/.test(padSrc[1]), padSrc && padSrc[1]);
+  ok("the app is sized by a plain percentage of the body, nothing cleverer",
+     /\.app\{[^}]*height:100%[^}]*\}/.test(src), "");
+  ok("and no inset correction is left anywhere in the layout",
+     !/--vtop/.test(src), "");
+  /* Seven rounds of this bug went on measuring his screenshots in pixels to
+     work out which number was wrong. The device knows all of them, and the
+     line goes to the audit log rather than over the top of the board. */
+  ok("and the board still reports what the layout resolved to",
      /function layoutLine\(\)/.test(src) && /" ins"\+Math\.round\(insTop\)/.test(src)
-       && /" vtop"\+getComputedStyle/.test(src), "");
+       && /" pct"\+Math\.round\(pctH\(\)\)/.test(src), "");
   /* "it says you're on the latest version" is only useful with the number on
      it; without one, which build he is looking at can only be worked out by
      measuring a screenshot. */

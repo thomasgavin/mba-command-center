@@ -648,71 +648,30 @@ thumb's reach.
   the strip vacated: *"The section title should only show up when the section
   is open (perhaps where the section selection lives now)."* It reads its text
   off `VIEWS`, which is why Chat stays in that list despite having no tab.
-- **No viewport unit decides the app's height, and that is the fix.** The band
-  of board colour under the bar was reported four times, and the first four
-  attempts were four guesses at what a height unit resolves to inside an
-  installed iOS app: `height:100%` on a fixed body, then `100dvh`, then
-  `100dvh` with a `.vbar::after` painting 80px of bar colour underneath. All
-  three came back about 60px short of the screen once the status bar went
-  `black-translucent` — the space Safari reserves for a toolbar that is not
-  there, which is exactly what he saw: *"it looks like it still maintaining
-  space for chrome's nav section"*. The `::after` could never have helped,
-  because `.app` is `overflow:hidden` and clipped it. `.app` is
-  `position:fixed; inset:0` now, anchored the same way `body` already is, so
-  it **is** the layout viewport by construction and there is no "below the
-  bar" left to paint. The check asserts no `vh`/`dvh` is back in that rule.
-- **A tab carries no word and no number.** A count has nowhere to sit on a bare
-  icon, and "35 tasks" was never worth a badge; `.vd` is a dot, and it says the
-  one thing that is -- something in here is already past its date. Every tab
-  carries an `aria-label`, or the strip is five unlabelled buttons.
-- **The composers float above the bar.** *"Make the text boxes in mindmap and
-  claude chat floating above the new bottom section bar."* `.cfoot` lost its
-  background and its top rule and `.cbox` became a rounded, shadowed box with a
-  gap under it -- welded to the foot with a full-width line over it, it read as
-  a second chrome strip stacked on the first, and the thread ended at a hard
-  edge instead of continuing behind it.
-- **The floating button sits clear of the bar**, which is a `calc()` off the
-  bar's own height rather than a number guessed twice.
-- **`--barpad` is how much of the home-bar inset the bar gives back**, and
-  the bar and the floating button both read it, so the two cannot be guessed
-  apart. It went to 0 while the bar was floating, which only hid the real
-  bug — now that the bar reaches the foot of the screen this padding is the
-  only thing between the icons and the home indicator, so it cannot be 0.
-  **The inset is not a number to trust.** His installed app reports about
-  **93px**, where a simulated inset on the same layout gives 34, and taking it
-  at face value made the bar 131px tall — so the bar still read as floating
-  even once it genuinely reached the bottom of the screen, which is the fifth
-  report and the one that was no longer about the viewport at all. The home
-  indicator itself sits 8–13px up, so the clearance is 20px on his phone and
-  a 4px floor everywhere with no inset at all.
-- **That clamp is done in JS, because CSS would not do it.** It was written
-  three times — `max(4px, inset − 14px)`, then `clamp(4px, …, 20px)`, then
-  `min(20px, max(4px, …))` — and his installed app rendered all three
-  **identically**: a 131px bar, which is `1 + 52 + (93 − 14)`, the raw inset
-  with the cap having no effect at all. Two different clamping syntaxes
-  producing byte-identical screenshots is not a coincidence; it is WebKit
-  declining to clamp an `env()` it has wrapped in a `calc()`. So `--barpad`
-  is a plain `20px` in CSS and `fitBar()` reads the inset off a probe element
-  and sets the real value with `Math.min`. **No `env()` may go back into that
-  property**, and the check asserts it.
-- **The app is as tall as the window, not as tall as the viewport.** That is
-  the seventh report and the actual cause, and `layoutLine()` named it in one
-  tap: `vp812/874 app0+812 bar73 pad20 gap0 ins62/34`. The bar was 73px, its
-  padding was 20px and it sat flush at the foot of `.app` — every number was
-  right — and `.app` was 812 tall on an 874 screen. With the status bar
-  translucent the window starts at the top of the screen, but `innerHeight`
-  still stops short of the bottom by exactly the top inset, so a
-  `position:fixed; inset:0` box ends 62px high and everything anchored to it
-  floated. `--vtop` is that difference, set by `fitBar()` and only when
-  `screen.height − innerHeight` actually agrees with the measured top inset.
-  **The two bases disagree, and that is the whole of it.** A percentage
-  height resolves against the **window** (874), while `bottom` resolves
-  against the **layout viewport** (812). So a box sized from the top wants a
-  plain `height:100%` and no correction at all — adding `--vtop` to it as
-  well overshot by the same 62px and put the bar just under the bottom of the
-  screen, with only the 2.5px orange tab indicator showing — and **only a box
-  placed by `bottom` subtracts it** (`.fab`, the toast, the snooze rail). The
-  check asserts both directions.
+- **The geometry is 09e98bd's, restored, and the status bar went back with
+  it.** `.app` is an ordinary block filling the fixed body —
+  `position:relative; height:100%`, no viewport unit, no percentage of a
+  fixed box, no inset correction — and
+  `apple-mobile-web-app-status-bar-style` is `default` again. The bar was
+  reported floating **seven times** over two days, and each fix was a
+  different guess at a number nobody had measured: `height:100%` on a fixed
+  body, then `100dvh`, then `100dvh` with a `.vbar::after` painting bar
+  colour underneath (dead code — `.app` is `overflow:hidden` and clipped
+  it), then `position:fixed; inset:0`, then three different clamps on
+  `--barpad`, then a measured `--vtop` added to the height, which overshot by
+  the same 62px and put the bar *under* the screen.
+  **The cause of all seven was the translucent status bar.** `black-translucent`
+  hands the page the whole screen and then resolves a percentage height and a
+  `bottom` offset against different boxes, and nothing in CSS says which one
+  any given rule is using. He said it plainly and repeatedly — *"this was
+  never a issue 3-4 updates back"* — and he was right: `13ef11e` introduced
+  it, for the white strip above the dark board. **The bar sitting where it
+  belongs is worth more than that strip being painted**, so `.sbar` is gone
+  with it. `--barpad` is `calc(env(safe-area-inset-bottom) / 2)` again.
+  iOS captures that meta with the Home Screen bookmark, so an app already
+  installed keeps the old style until it is removed and re-added.
+  **The rule this leaves: do not get clever about height here.** Seven
+  attempts, none of them right, against one plain declaration that was.
 - **`layoutLine()` is why there was no seventh round, and it lives in the
   log.** Six reports were spent measuring his screenshots in pixels to work
   out which number was wrong — the viewport, the bar's height, the padding or
@@ -1377,7 +1336,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 312 invariants, three widths, a real browser. Every one of them was a
+that runs: 308 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

@@ -20,7 +20,7 @@
      above the app, read at launch, so a theme switch at runtime cannot repaint
      it -- a dark board under a white bar, which is what he saw. Translucent
      hands the inset to the page, and `.sbar` fills it from a token. -->
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="27D">
 <meta name="theme-color" content="#ff6429">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,31 +70,9 @@
      under the glyphs, which is what an iOS tab bar does, and anything on top
      of that is the band of nothing he has now asked about twice --
      *"the bottom nav bar went up now"*. */
-  /* Set by fitBar() in JS, and 20px until it runs -- which is the right
-     answer on his phone and merely 16px generous on a desktop, so the
-     pre-script value is never wrong in the direction that matters.
-     It used to read the inset here, wrapped first in max(), then clamp(),
-     then min(max()). All three rendered identically on his installed app:
-     a 131px bar, which is 1 + 52 + (93 - 14) -- the raw inset, uncapped,
-     with the clamp having no effect at all. Two different clamping syntaxes
-     producing byte-identical screenshots is not a coincidence, it is
-     WebKit not clamping an env() it has wrapped in a calc(). So the
-     arithmetic moved to JS, where Math.min cannot be ignored. */
-  --barpad:20px;
-  /* How far the window reaches above the layout viewport. In his installed
-     app the status bar is translucent, so the window starts at the top of
-     the screen while innerHeight still stops short of the bottom by exactly
-     that much: his Sync readout says vp812 on an 874 screen with a 62px top
-     inset. Anything anchored to the viewport's bottom -- the section bar
-     first of all -- therefore floated 62px up. fitBar() sets this; 0 is
-     right everywhere the window and the viewport agree.
-     The two bases disagree, which is the whole of this bug: a PERCENTAGE
-     height resolves against the window (874), while `bottom` resolves
-     against the layout viewport (812). So a box sized from the top wants a
-     plain height:100% and no correction at all -- adding --vtop to it
-     overshot by the same 62px and put the bar just under the screen -- and
-     only a box placed by `bottom` subtracts it. */
-  --vtop:0px;
+  /* Half of what the home indicator declares clears it and gives the board
+     the rest back; this is 09e98bd's formula, restored with it. */
+  --barpad:calc(env(safe-area-inset-bottom) / 2);
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -173,17 +151,17 @@ body::before{
     radial-gradient(900px 340px at 12% -8%, rgba(255,100,41,.10), transparent 62%),
     radial-gradient(820px 320px at 88% -12%, rgba(50,100,255,.10), transparent 62%);
 }
-/* No viewport unit decides this height, and that is the whole fix. Four
-   attempts at the band of page colour under the section bar were four
-   guesses at what 100% or 100dvh resolves to inside an installed iOS app:
-   with the status bar translucent, both of them came back about 60px short
-   -- the space Safari reserves for a toolbar that is not there -- and the
-   board showed through underneath. .app is anchored the same way body
-   already is, inset:0 on a fixed box, so it is the layout viewport by
-   construction and there is no "below the bar" left to paint over. */
-.app{position:fixed;top:0;left:0;right:0;height:100%;z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
-/* The status-bar inset, which is zero everywhere but an installed iOS app. */
-.sbar{flex:none;height:env(safe-area-inset-top);background:var(--sbar)}
+/* This is the geometry from 09e98bd, the last build where the section bar
+   sat where it should. .app is an ordinary block filling the fixed body --
+   no viewport unit, no percentage of a fixed box, no inset correction. Seven
+   attempts at being cleverer than this each came back wrong in one direction
+   or the other, because inside an installed iOS app a translucent status bar
+   makes a percentage height and a `bottom` offset resolve against different
+   boxes, and nothing in CSS says which. The status-bar style went back to
+   `default` in the same change: it is what made the two disagree, and it is
+   worth more to have the bar in the right place than the strip at the top
+   painted. */
+.app{position:relative;z-index:1;height:100%;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 
 /* ---------- top bar ---------- */
 .top{
@@ -891,7 +869,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 
 /* ---------- snooze rail ---------- */
 .rail{
-  position:fixed;left:50%;transform:translate(-50%,130%);bottom:calc(22px - var(--vtop));z-index:300;
+  position:fixed;left:50%;transform:translate(-50%,130%);bottom:22pxz-index:300;
   display:flex;gap:9px;padding:9px;background:var(--glass);backdrop-filter:blur(16px);
   border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh2);
   transition:transform .26s var(--ease);
@@ -920,7 +898,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   right:max(16px,env(safe-area-inset-right));
   /* the bar is 54px plus the home-bar inset and is the last child of .app,
      so the button has to sit clear of it rather than on top of it */
-  bottom:calc(52px + var(--barpad) + 12px - var(--vtop));
+  bottom:calc(52px + var(--barpad) + 12px);
   width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
   background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
   box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
@@ -1213,7 +1191,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 
 /* ---------- toast ---------- */
 .toast{
-  position:fixed;left:50%;bottom:calc(104px - var(--vtop));transform:translate(-50%,calc(100% + 170px));z-index:700;
+  position:fixed;left:50%;bottom:104pxtransform:translate(-50%,calc(100% + 170px));z-index:700;
   pointer-events:none;
   background:var(--inkbg);color:#fff;border-radius:11px;padding:11px 16px;font-size:12.5px;font-weight:600;
   box-shadow:var(--sh2);transition:transform .3s var(--ease);max-width:min(420px,92vw);
@@ -1409,7 +1387,6 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 <body>
 
 <div class="app">
-<div class="sbar" aria-hidden="true"></div>
   <header class="top">
     <div class="brand">
       <div class="mark" title="MBA Command Center">
@@ -3761,7 +3738,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0719";
+var BUILD="2026-10-06-0738";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4891,13 +4868,9 @@ function fitBar(){
   var cs=getComputedStyle(pr);
   insTop=parseFloat(cs.paddingTop)||0;
   insBot=parseFloat(cs.paddingBottom)||0;
-  document.documentElement.style.setProperty("--barpad", Math.min(20,Math.max(4,insBot-14))+"px");
-  /* The window reaches above the layout viewport by the top inset when the
-     status bar is translucent, and innerHeight stops short of the screen by
-     the same amount. Only trust it when the numbers actually say so. */
-  var over=(window.screen&&screen.height?Math.round(screen.height-innerHeight):0);
-  document.documentElement.style.setProperty("--vtop",
-    (over>0 && Math.abs(over-insTop)<=2 ? insTop : 0)+"px");
+  /* It sets nothing any more. The clearance is CSS's again, the way it was in
+     09e98bd; this only reads the insets so the line written to the audit log
+     can say what they were. */
 }
 /* What the board actually resolved, in one line he can screenshot. Six
    rounds of this bug were spent measuring his screenshots in pixels to
@@ -4920,7 +4893,6 @@ function layoutLine(){
     +" bar"+Math.round(r.height)+"@"+Math.round(r.bottom)+" pad"+Math.round(parseFloat(getComputedStyle(b).paddingBottom))
     +" gap"+Math.round(innerHeight-r.bottom)
     +" ins"+Math.round(insTop)+"/"+Math.round(insBot)
-    +" vtop"+getComputedStyle(document.documentElement).getPropertyValue("--vtop").trim()
     /* Which box each ruler is actually measuring. The bar was fixed twice off
        an inference about what a percentage height resolves against, and the
        inference was wrong both times in opposite directions, so the page
