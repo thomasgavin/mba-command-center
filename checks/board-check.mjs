@@ -1932,6 +1932,40 @@ for (var bw of [390, 1280]) {
   ok("and the strip that only existed to fill it is gone",
      !/class="sbar"/.test(html35), "sbar");
 
+  /* The one that actually mattered. An installed iOS app keeps whatever the
+     page was at launch for the strip it reserves, so a theme applied at the
+     foot of a 250KB file is applied too late -- the first frames paint light
+     and the strip stays #f6f5f9 for the session. The theme must be on <html>
+     before <body> is parsed, which is a question about source order, so that
+     is what is asserted; the behaviour is checked underneath it. */
+  {
+    var headEnd = html35.indexOf("<body");
+    var init35 = html35.indexOf('localStorage.getItem("mbacc_theme")');
+    ok("the theme is applied in the head, before the body can paint light",
+       init35 > -1 && headEnd > -1 && init35 < headEnd,
+       JSON.stringify({ init: init35, body: headEnd }));
+
+    /* In a session of its own: this one has to decide the theme before the
+       page's first byte runs, and reloading the shared page would hand every
+       later block a board in a state it did not set up. */
+    var dk = await open(390);
+    await dk.p.addInitScript(function () {
+      try { localStorage.setItem("mbacc_theme", "dark"); } catch (e) {}
+    });
+    await dk.p.reload({ waitUntil: "domcontentloaded" });
+    var first35 = await dk.p.evaluate(function () {
+      var m = document.querySelector('meta[name="theme-color"]');
+      return { theme: document.documentElement.getAttribute("data-theme"),
+               tc: m && m.getAttribute("content"),
+               page: getComputedStyle(document.body).backgroundColor };
+    });
+    ok("so a dark board never paints a light frame iOS could keep",
+       first35.theme === "dark" && first35.tc === "#1b1b1b"
+         && /27, 27, 27/.test(first35.page || ""),
+       JSON.stringify(first35));
+    await dk.ctx.close();
+  }
+
   /* The one that actually mattered, and the reason this is measured rather
      than read: nothing the page *declares* was ever white, so every check
      that read a meta or a token passed while his phone showed a white strip.

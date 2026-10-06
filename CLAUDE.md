@@ -684,6 +684,27 @@ thumb's reach.
   it.
   **The rule this leaves: do not get clever about height here.** Seven
   attempts, none of them right, against one plain declaration that was.
+- **The white strip was the first paint, and the theme arriving too late.**
+  `setTheme()` lives at the foot of a 250KB file, so for the first frames the
+  page painted with the **light** tokens -- `--page` is `#f6f5f9` -- and an
+  installed iOS app keeps whatever the page was *at launch* for the strip it
+  reserves. His screen measured `#f6f5f9` exactly, in both themes, through
+  seven fixes aimed at metas and manifests, because none of them is what iOS
+  was reading. **His own device caught it**: two readouts minutes apart said
+  `th:dark` and `th:light` for the same board, which is only possible if the
+  theme is still changing while the page renders. `insT:0` in the same line
+  said the page never reaches that strip, so nothing in CSS could ever have
+  repainted it.
+  The fix is an inline script in the **head**, before `<body>`, setting both
+  `data-theme` and the `theme-color` meta -- duplicated rather than shared
+  with `setTheme()`, because it must run before the script that defines it.
+  This is where everyone else lands too: set the theme before first paint and
+  again on change. The check asserts the **source order** (the init must come
+  before `<body>`) and then measures it in a session of its own, since
+  reloading the shared page hands every later block a board it did not set up.
+  **The rule: measure the pixel before changing the declaration**, and when a
+  colour matches no value you are setting, ask *when* it was read, not which
+  file it came from.
 - **The white strip was a cached manifest, and the measurement is what found
   it.** Six fixes went out aimed at metas and manifests without anyone
   measuring the thing being fixed, which is the complaint he finally made:
@@ -1492,7 +1513,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 324 invariants, three widths, a real browser. Every one of them was a
+that runs: 326 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

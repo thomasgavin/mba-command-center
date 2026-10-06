@@ -31,6 +31,30 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="27D">
 <meta name="theme-color" content="#ff6429">
+<!-- The theme has to be on <html> BEFORE the first paint, and this is the
+     whole of the status-strip bug. setTheme() lives at the foot of a 250KB
+     file, so for the first frames the page painted with the light tokens --
+     `--page` is #f6f5f9 -- and an installed iOS app keeps whatever the page
+     was when it launched for that reserved strip. His screen measured
+     #f6f5f9 exactly, and his own device readout caught it in the act: two
+     screenshots minutes apart reported `th:dark` and `th:light` for the same
+     board, because the line is built during render and the theme was still
+     changing underneath it. Others land here too -- the fix everyone arrives
+     at is a theme set in the head before first paint and again on change,
+     because nothing in the page can repaint that strip afterwards.
+     It is deliberately duplicated rather than shared with setTheme(): this
+     has to run before any of the script below it parses, and a function call
+     into code that does not exist yet is not an option. -->
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem("mbacc_theme")==="dark"?"dark":"light";
+    if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
+    var m=document.querySelector('meta[name="theme-color"]');
+    if(m) m.setAttribute("content", t==="dark" ? "#1b1b1b" : "#ff6429");
+  }catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -3912,7 +3936,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1140";
+var BUILD="2026-10-06-1200";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
