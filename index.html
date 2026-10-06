@@ -81,6 +81,17 @@
      WebKit not clamping an env() it has wrapped in a calc(). So the
      arithmetic moved to JS, where Math.min cannot be ignored. */
   --barpad:20px;
+  /* How far the window reaches above the layout viewport. In his installed
+     app the status bar is translucent, so the window starts at the top of
+     the screen while innerHeight still stops short of the bottom by exactly
+     that much: his Sync readout says vp812 on an 874 screen with a 62px top
+     inset. Anything anchored to the viewport's bottom -- the section bar
+     first of all -- therefore floated 62px up. fitBar() sets this; 0 is
+     right everywhere the window and the viewport agree.
+     A box sized from the top adds it; a box placed by `bottom` subtracts it,
+     because that offset is measured from the viewport's bottom edge, which
+     is --vtop above the real one. */
+  --vtop:0px;
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -167,7 +178,7 @@ body::before{
    board showed through underneath. .app is anchored the same way body
    already is, inset:0 on a fixed box, so it is the layout viewport by
    construction and there is no "below the bar" left to paint over. */
-.app{position:fixed;inset:0;z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
+.app{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 /* The status-bar inset, which is zero everywhere but an installed iOS app. */
 .sbar{flex:none;height:env(safe-area-inset-top);background:var(--sbar)}
 
@@ -877,7 +888,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 
 /* ---------- snooze rail ---------- */
 .rail{
-  position:fixed;left:50%;transform:translate(-50%,130%);bottom:22px;z-index:300;
+  position:fixed;left:50%;transform:translate(-50%,130%);bottom:calc(22px - var(--vtop));z-index:300;
   display:flex;gap:9px;padding:9px;background:var(--glass);backdrop-filter:blur(16px);
   border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh2);
   transition:transform .26s var(--ease);
@@ -906,7 +917,7 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
   right:max(16px,env(safe-area-inset-right));
   /* the bar is 54px plus the home-bar inset and is the last child of .app,
      so the button has to sit clear of it rather than on top of it */
-  bottom:calc(52px + var(--barpad) + 12px);
+  bottom:calc(52px + var(--barpad) + 12px - var(--vtop));
   width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;padding:0;
   background:linear-gradient(142deg,#ff5a1f,#ff8f4e);
   box-shadow:0 3px 10px rgba(255,100,41,.3),0 16px 32px -12px rgba(255,100,41,.8);
@@ -927,10 +938,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .fab.off{transform:translateY(96px) scale(.86);opacity:0;pointer-events:none}
 
 /* ---------- drawer ---------- */
-.scrim{position:fixed;inset:0;background:rgba(40,10,56,.3);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(1px)}
+.scrim{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));background:rgba(40,10,56,.3);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(1px)}
 .scrim.on{opacity:1;pointer-events:auto}
 .drawer{
-  position:fixed;right:0;top:0;bottom:0;width:min(432px,100%);background:var(--panel);z-index:510;
+  position:fixed;right:0;top:0;height:calc(100% + var(--vtop));width:min(432px,100%);background:var(--panel);z-index:510;
   display:flex;flex-direction:column;box-shadow:-22px 0 60px -26px rgba(40,10,56,.4);
   transform:translateX(102%);transition:transform .28s var(--ease);
 }
@@ -1174,7 +1185,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .dep .dd{width:7px;height:7px;border-radius:50%;flex:none}
 
 /* ---------- command palette ---------- */
-.pal{position:fixed;inset:0;z-index:600;display:none;padding:76px 20px 20px;justify-content:center;align-items:flex-start}
+.pal{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));z-index:600;display:none;padding:76px 20px 20px;justify-content:center;align-items:flex-start}
 .pal.on{display:flex}
 .pal-bg{position:absolute;inset:0;background:rgba(40,10,56,.34);backdrop-filter:blur(3px)}
 .pal-box{
@@ -1199,7 +1210,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 
 /* ---------- toast ---------- */
 .toast{
-  position:fixed;left:50%;bottom:104px;transform:translate(-50%,calc(100% + 170px));z-index:700;
+  position:fixed;left:50%;bottom:calc(104px - var(--vtop));transform:translate(-50%,calc(100% + 170px));z-index:700;
   pointer-events:none;
   background:var(--inkbg);color:#fff;border-radius:11px;padding:11px 16px;font-size:12.5px;font-weight:600;
   box-shadow:var(--sh2);transition:transform .3s var(--ease);max-width:min(420px,92vw);
@@ -3741,7 +3752,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0612";
+var BUILD="2026-10-06-0631";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4872,6 +4883,12 @@ function fitBar(){
   insTop=parseFloat(cs.paddingTop)||0;
   insBot=parseFloat(cs.paddingBottom)||0;
   document.documentElement.style.setProperty("--barpad", Math.min(20,Math.max(4,insBot-14))+"px");
+  /* The window reaches above the layout viewport by the top inset when the
+     status bar is translucent, and innerHeight stops short of the screen by
+     the same amount. Only trust it when the numbers actually say so. */
+  var over=(window.screen&&screen.height?Math.round(screen.height-innerHeight):0);
+  document.documentElement.style.setProperty("--vtop",
+    (over>0 && Math.abs(over-insTop)<=2 ? insTop : 0)+"px");
 }
 /* What the board actually resolved, in one line he can screenshot. Six
    rounds of this bug were spent measuring his screenshots in pixels to
@@ -4884,6 +4901,7 @@ function layoutLine(){
     +" bar"+Math.round(r.height)+" pad"+Math.round(parseFloat(getComputedStyle(b).paddingBottom))
     +" gap"+Math.round(innerHeight-r.bottom)
     +" ins"+Math.round(insTop)+"/"+Math.round(insBot)
+    +" vtop"+getComputedStyle(document.documentElement).getPropertyValue("--vtop").trim()
     +(navigator.standalone?" app-mode":" browser");
 }
 addEventListener("resize",fitBar);

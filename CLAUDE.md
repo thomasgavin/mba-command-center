@@ -695,6 +695,22 @@ thumb's reach.
   is a plain `20px` in CSS and `fitBar()` reads the inset off a probe element
   and sets the real value with `Math.min`. **No `env()` may go back into that
   property**, and the check asserts it.
+- **The app is as tall as the window, not as tall as the viewport.** That is
+  the seventh report and the actual cause, and `layoutLine()` named it in one
+  tap: `vp812/874 app0+812 bar73 pad20 gap0 ins62/34`. The bar was 73px, its
+  padding was 20px and it sat flush at the foot of `.app` — every number was
+  right — and `.app` was 812 tall on an 874 screen. With the status bar
+  translucent the window starts at the top of the screen, but `innerHeight`
+  still stops short of the bottom by exactly the top inset, so a
+  `position:fixed; inset:0` box ends 62px high and everything anchored to it
+  floated. `--vtop` is that difference, set by `fitBar()` and only when
+  `screen.height − innerHeight` actually agrees with the measured top inset.
+  **A box sized from the top adds it** (`.app`, `.scrim`, `.pal`, the drawer:
+  `height:calc(100% + var(--vtop))`); **a box placed by `bottom` subtracts
+  it** (`.fab`, the toast, the snooze rail), because that offset is measured
+  from the viewport's bottom edge, which is `--vtop` above the real one. The
+  check asserts both, and simulating a 62px `--vtop` puts the bar's bottom at
+  874 — his screen, not his viewport.
 - **`layoutLine()` is why there was no seventh round.** Six reports were spent
   measuring his screenshots in pixels to work out which number was wrong —
   the viewport, the bar's height, the padding or the build — and the device
@@ -1349,7 +1365,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 305 invariants, three widths, a real browser. Every one of them was a
+that runs: 308 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

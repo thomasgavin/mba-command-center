@@ -2442,11 +2442,21 @@ for (var bw of [390, 1280]) {
      !!padSrc && !/env\(/.test(padSrc[1]) && /px/.test(padSrc[1]), padSrc && padSrc[1]);
   ok("and JS is what caps it", /Math\.min\(20,Math\.max\(4,insBot-14\)\)/.test(src), "");
   ok("the clearance survives a resize", /addEventListener\("resize",fitBar\)/.test(src), "");
+  /* His Sync readout settled it: vp812 app0+812 on an 874 screen with a 62px
+     top inset. A translucent status bar puts the window above the layout
+     viewport, and innerHeight stops short of the screen by exactly that much,
+     so everything anchored to the viewport's bottom floated 62px up. */
+  ok("the app is as tall as the window, not as tall as the viewport",
+     /height:calc\(100% \+ var\(--vtop\)\)/.test(src), "");
+  ok("and --vtop is only trusted when the two numbers agree",
+     /Math\.abs\(over-insTop\)<=2 \? insTop : 0/.test(src), "");
+  var vtopUsers = (src.match(/var\(--vtop\)/g) || []).length;
+  ok("every surface hung off the bottom edge reads it", vtopUsers >= 7, String(vtopUsers));
   /* Six rounds of this bug went on measuring his screenshots in pixels to work
      out which number was wrong. The device knows all of them. */
   ok("and Sync reports what the layout actually resolved to",
      /function layoutLine\(\)/.test(src) && /" ins"\+Math\.round\(insTop\)/.test(src)
-       && /" gap"\+Math\.round\(innerHeight-r\.bottom\)/.test(src), "");
+       && /" vtop"\+getComputedStyle/.test(src), "");
   /* "it says you're on the latest version" is only useful with the number on
      it; without one, which build he is looking at can only be worked out by
      measuring a screenshot. */
