@@ -684,6 +684,23 @@ thumb's reach.
   it.
   **The rule this leaves: do not get clever about height here.** Seven
   attempts, none of them right, against one plain declaration that was.
+- **The white strip was a cached manifest, and the measurement is what found
+  it.** Six fixes went out aimed at metas and manifests without anyone
+  measuring the thing being fixed, which is the complaint he finally made:
+  *"Are you doing any research or the issues or just trial and error wasting
+  my time?"* The strip in his screenshot measures **`rgb(246,245,249)` =
+  `#f6f5f9`** -- not iOS's own light grey (`#f2f2f7`), and not any value in
+  the deployment. It is byte for byte the `background_color`
+  `manifest.webmanifest` carried **before `0dd2da1`**. So his Home Screen icon
+  was reading a *cached* copy of the old manifest: iOS caches it, and a re-add
+  reuses the cached copy, which is exactly why two re-adds changed nothing and
+  why every page-side fix was irrelevant. The fix is a **URL iOS has never
+  seen** -- the link points at `app.webmanifest` now, with the old file left in
+  place so an icon still pointing at it does not 404. The check reads
+  whichever manifest the page actually links to, and fails if any manifest on
+  the site carries `#f6f5f9` again.
+  **The rule: measure the pixel before changing the declaration.** A colour
+  that matches no value in the deployment is a cache, not a bug in the CSS.
 - **The white strip was the canvas, not the status bar.** It was reported half
   a dozen times and every fix was a guess at which file iOS was reading --
   the Safari meta, then the manifest, then a re-add from the other browser --
@@ -1475,7 +1492,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 323 invariants, three widths, a real browser. Every one of them was a
+that runs: 324 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

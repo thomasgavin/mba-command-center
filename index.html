@@ -14,7 +14,15 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon.png" sizes="512x512" type="image/png">
-<link rel="manifest" href="manifest.webmanifest">
+<!-- app.webmanifest, not manifest.webmanifest, and the rename is the fix.
+     His strip measured #f6f5f9 exactly -- byte for byte the `background_color`
+     this manifest carried before 0dd2da1 corrected it. That value exists
+     nowhere in the deployment any more, so his Home Screen icon was reading a
+     *cached* copy of the old file: iOS caches the manifest and a re-add reuses
+     it, which is why two re-adds changed nothing. A URL iOS has never seen has
+     no cache entry to reuse. The old file stays in place so an icon still
+     pointing at it is not left with a 404. -->
+<link rel="manifest" href="app.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <!-- black-translucent, not default: `default` paints an opaque white strip
      above the app, read at launch, so a theme switch at runtime cannot repaint
@@ -3904,7 +3912,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1125";
+var BUILD="2026-10-06-1140";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

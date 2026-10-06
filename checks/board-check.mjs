@@ -1912,10 +1912,22 @@ for (var bw of [390, 1280]) {
      what he got was white. The manifest names the same dark strip the board
      uses, so the icon comes out the same whichever browser added it. */
   {
-    var mani = JSON.parse(fs.readFileSync(new URL("../manifest.webmanifest", import.meta.url), "utf8"));
-    ok("the manifest paints the strip the same dark the board does",
+    /* Read the manifest the page actually links to, not the one named here by
+       habit: the link was repointed at a fresh URL precisely because the old
+       one was being served out of his device's cache, and a check that keeps
+       reading the old path would pass while the live icon reads something
+       else. */
+    var href35 = (/<link rel="manifest" href="([^"]+)"/.exec(html35) || [])[1];
+    var mani = JSON.parse(fs.readFileSync(path.join(ROOT, href35), "utf8"));
+    ok("the manifest the page links to paints the strip the same dark the board does",
        mani.theme_color === "#280a38" && mani.background_color === "#280a38",
-       JSON.stringify({ t: mani.theme_color, b: mani.background_color }));
+       JSON.stringify({ href: href35, t: mani.theme_color, b: mani.background_color }));
+    /* #f6f5f9 is the colour his strip measured. No manifest on this site may
+       carry it again, whatever its filename. */
+    var stale35 = fs.readdirSync(ROOT).filter(function (f) { return /\.webmanifest$/.test(f); })
+      .filter(function (f) { return /f6f5f9/i.test(fs.readFileSync(path.join(ROOT, f), "utf8")); });
+    ok("and no manifest on the site still carries the colour his strip was",
+       stale35.length === 0, JSON.stringify(stale35));
   }
   ok("and the strip that only existed to fill it is gone",
      !/class="sbar"/.test(html35), "sbar");
