@@ -674,6 +674,14 @@ thumb's reach.
   with it. `--barpad` is `calc(env(safe-area-inset-bottom) / 2)` again.
   iOS captures that meta with the Home Screen bookmark, so an app already
   installed keeps the old style until it is removed and re-added.
+  **And it has to be re-added from Safari.** That meta is Safari's; an icon
+  added from Chrome on iOS is a manifest install and ignores it entirely, so
+  the strip is whatever `manifest.webmanifest` says. It said `#ff6429`, the
+  brand orange, which is not a status bar colour -- and what he got was a
+  white strip through two re-adds and a dozen pushes, each one looking like
+  the fix had failed. The manifest now names the same `--sbar` dark, so the
+  icon comes out the same whichever browser added it, and the check asserts
+  it.
   **The rule this leaves: do not get clever about height here.** Seven
   attempts, none of them right, against one plain declaration that was.
 - **`layoutLine()` is why there was no seventh round, and it lives in the
@@ -1442,7 +1450,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 320 invariants, three widths, a real browser. Every one of them was a
+that runs: 321 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

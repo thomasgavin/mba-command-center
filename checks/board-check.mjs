@@ -1896,6 +1896,17 @@ for (var bw of [390, 1280]) {
   var html35 = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   ok("the iOS status bar is opaque and dark, not translucent and not white",
      /apple-mobile-web-app-status-bar-style" content="black"/.test(html35), "meta");
+  /* That meta is Safari's. A Home Screen icon added from Chrome on iOS is a
+     manifest install and ignores it, so the strip is whatever the manifest
+     says -- it was the brand orange, which is not a status bar colour, and
+     what he got was white. The manifest names the same dark strip the board
+     uses, so the icon comes out the same whichever browser added it. */
+  {
+    var mani = JSON.parse(fs.readFileSync(new URL("../manifest.webmanifest", import.meta.url), "utf8"));
+    ok("the manifest paints the strip the same dark the board does",
+       mani.theme_color === "#280a38" && mani.background_color === "#280a38",
+       JSON.stringify({ t: mani.theme_color, b: mani.background_color }));
+  }
   ok("and the strip that only existed to fill it is gone",
      !/class="sbar"/.test(html35), "sbar");
 
