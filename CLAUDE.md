@@ -648,14 +648,19 @@ thumb's reach.
   the strip vacated: *"The section title should only show up when the section
   is open (perhaps where the section selection lives now)."* It reads its text
   off `VIEWS`, which is why Chat stays in that list despite having no tab.
-- **Whatever is below the bar is the bar.** `.vbar::after` paints the bar's
-  own colour over the 80px beneath it and `.app` is `100dvh` rather than
-  `height:100%`. The band of board colour under the bar was reported three
-  times in one evening and each fix was a different guess at the inset
-  arithmetic; this one does not depend on getting that right, because a short
-  viewport now shows bar rather than board. A fixed body's `100%` is the
-  layout viewport, which on an installed iOS app under a translucent status
-  bar is not reliably the screen.
+- **No viewport unit decides the app's height, and that is the fix.** The band
+  of board colour under the bar was reported four times, and the first four
+  attempts were four guesses at what a height unit resolves to inside an
+  installed iOS app: `height:100%` on a fixed body, then `100dvh`, then
+  `100dvh` with a `.vbar::after` painting 80px of bar colour underneath. All
+  three came back about 60px short of the screen once the status bar went
+  `black-translucent` — the space Safari reserves for a toolbar that is not
+  there, which is exactly what he saw: *"it looks like it still maintaining
+  space for chrome's nav section"*. The `::after` could never have helped,
+  because `.app` is `overflow:hidden` and clipped it. `.app` is
+  `position:fixed; inset:0` now, anchored the same way `body` already is, so
+  it **is** the layout viewport by construction and there is no "below the
+  bar" left to paint. The check asserts no `vh`/`dvh` is back in that rule.
 - **A tab carries no word and no number.** A count has nowhere to sit on a bare
   icon, and "35 tasks" was never worth a badge; `.vd` is a dot, and it says the
   one thing that is -- something in here is already past its date. Every tab
@@ -670,11 +675,11 @@ thumb's reach.
   bar's own height rather than a number guessed twice.
 - **`--barpad` is how much of the home-bar inset the bar gives back**, and
   the bar and the floating button both read it, so the two cannot be guessed
-  apart. It was half the inset, which was right only while the status-bar meta
-  was `default` and iOS hid the inset: once the page owned it the real 34px
-  came through and the bar grew a band of nothing under it (*"after
-  re-bookmarking the bottom is out of proportion again"*). It is the inset
-  less 22px now, floored at 4.
+  apart. It went to 0 while the bar was floating, which only hid the real
+  bug — now that the bar reaches the foot of the screen this padding is the
+  only thing between the icons and the home indicator, so it cannot be 0. It
+  is the inset less 14px, floored at 4: 20px on his phone, which clears the
+  indicator without the 86px of chrome a full 34px would cost.
 - **A dot goes out on the section he has opened, and stays out.** It says
   "something in here is past its date", which is not worth saying about the
   screen he is already reading: *"they should go away once I open the
@@ -799,8 +804,28 @@ is one line about one task. A newsletter is the whole board at a fixed hour,
 and it is the **only** surface allowed to summarise -- everywhere else, a
 summary nobody asked for is the noise this board exists to cut.
 
-- **Daily at 09:52 Jakarta, every day but Sunday**: due today, overdue, waiting
-  on you, worth starting. Three to eight lines, read on a phone before work.
+- **Daily at 09:52 Jakarta, every day but Sunday.** It is the **Daily Brief**
+  on the board; "Daily Newsletter" was the shipped title and he renamed it on
+  2026-10-06. Three to ten lines, read on a phone before work.
+- **It has no fixed set of headings, and that is the point.** The first edition
+  had four because the skill listed four, and filled all four because an empty
+  one looked like a failure: *"what is this shitty ass content? ... just to
+  force some words in ... not a 10yo asking for updates."* He wrote a
+  replacement shape himself and then refused to have that treated as the
+  template either — *"that was an example. Do your research and make it. ...
+  Things change and so should the newsletters accordingly."* So the brief
+  decides its sections after reading the board, the same way a mind map group
+  picks its `shape`, and a heading exists only because lines earned it.
+- **Every item earns a second line or it does not go in**: a question only he
+  can answer, a suggestion with a specific name in it, or something he has not
+  noticed. A restatement of a status is not one, and some mornings the brief is
+  one section and three lines.
+- **An elapsed time is read off a date or it is not written.** That edition
+  claimed "a week's silence" on a task whose own note said he was sending the
+  documents the next day: *"If I just sent the corrected documents to them
+  tomorrow, what do you mean a week's silence?"* A gap, a streak or a "no
+  movement since" comes from `touched[id]`, `doneAt` or a dated line in
+  `history/`, after reading the task's notes — never from a feeling.
 - **Weekly on Sunday**: what moved, what did not, **risks**, what to put first.
   He was explicit that it is a different thing and not a longer one --
   *"more strategic and analytical of what is done, what are the current risks,
@@ -1285,7 +1310,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 298 invariants, three widths, a real browser. Every one of them was a
+that runs: 300 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

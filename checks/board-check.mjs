@@ -1687,7 +1687,7 @@ for (var bw of [390, 1280]) {
   });
   ok("it survives a reload and lists newest first",
      shown.n === 2 && shown.titles[0] === "Weekly Report \u2014 11 October 2026" &&
-     shown.titles[1] === "Daily Newsletter \u2014 07 October 2026", JSON.stringify(shown));
+     shown.titles[1] === "Daily Brief \u2014 07 October 2026", JSON.stringify(shown));
   ok("every edition starts collapsed", shown.open === 0 && shown.bodyH === 0, JSON.stringify(shown));
   await s33.p.click("#dBody .nwi:last-child .nwh");
   await s33.p.waitForTimeout(260);
@@ -2225,8 +2225,11 @@ for (var bw of [390, 1280]) {
 {
   var s37 = await open(390);
 
-  /* "the bottom nav bar went up now" -- the bar adds nothing under itself any
-     more, so there is no band of page colour below the icons. */
+  /* "the bottom nav bar went up now" -- the bar gives back only what the home
+     indicator needs, so the icons sit on the foot of the screen rather than
+     floating above a band of nothing. Off an iPhone the inset is 0 and the
+     floor is all that is left, which is why this reads the row rather than
+     the padding; 39 checks the formula in the source. */
   var bar = await s37.p.evaluate(function () {
     var b = document.querySelector(".vbar");
     return {
@@ -2235,7 +2238,8 @@ for (var bw of [390, 1280]) {
       gap: Math.round(innerHeight - b.getBoundingClientRect().bottom)
     };
   });
-  ok("the section bar keeps none of the home-bar inset", bar.pad === 0 && bar.h <= 53, JSON.stringify(bar));
+  ok("the section bar is an icon row plus the indicator's clearance, no more",
+     bar.h - bar.pad <= 53 && bar.pad <= 20, JSON.stringify(bar));
   ok("and it sits on the bottom of the screen", bar.gap === 0, JSON.stringify(bar));
 
   /* "the nav icon dots still don't go away after opening" -- setView alone has
@@ -2409,19 +2413,27 @@ for (var bw of [390, 1280]) {
   });
   ok("the agenda date sits level with the box it labels", cal.off <= 2, JSON.stringify(cal));
 
-  /* "the nav bar went up again - stop this happening over and over" -- the
-     bar's own colour is painted over everything between it and the bottom,
-     so a short viewport can no longer show a band of board under it. */
+  /* "the nav bar is still floating ... it looks like it still maintaining
+     space for chrome's nav section". Every previous attempt was a guess at
+     what a viewport unit resolves to inside an installed iOS app; .app is
+     now a fixed box at inset:0, so no unit is involved and the only way the
+     bar can float is a regression back to one. */
   var bar = await s39.p.evaluate(function () {
-    var b = document.querySelector(".vbar"), st = getComputedStyle(b, "::after");
-    var app = getComputedStyle(document.querySelector(".app"));
-    return { pad: parseFloat(getComputedStyle(b).paddingBottom),
-             under: parseFloat(st.height), h: Math.round(parseFloat(app.height)),
-             win: innerHeight,
+    var b = document.querySelector(".vbar");
+    var app = document.querySelector(".app"), ac = getComputedStyle(app);
+    var r = app.getBoundingClientRect();
+    return { pos: ac.position, top: Math.round(r.top), h: Math.round(r.height),
+             win: innerHeight, pad: parseFloat(getComputedStyle(b).paddingBottom),
              gap: Math.round(innerHeight - b.getBoundingClientRect().bottom) };
   });
-  ok("nothing below the bar is board colour", bar.under >= 40 && bar.pad === 0, JSON.stringify(bar));
-  ok("and the app is as tall as the screen", bar.gap === 0 && bar.h === bar.win, JSON.stringify(bar));
+  ok("the app is anchored to the viewport, not to a viewport unit",
+     bar.pos === "fixed" && bar.top === 0 && bar.h === bar.win, JSON.stringify(bar));
+  ok("and the bar reaches the bottom of it", bar.gap === 0, JSON.stringify(bar));
+  var barSrc = /\.app\{([^}]*)\}/.exec(src);
+  ok("no viewport-height unit decides the app's height",
+     !!barSrc && !/\d(dv|sv|lv|v)h/.test(barSrc[1]), barSrc && barSrc[1]);
+  ok("the section bar keeps clearance for the home indicator",
+     /--barpad:max\(4px, calc\(env\(safe-area-inset-bottom\)/.test(src), String(bar.pad));
 
   /* "the pencil icon of all notes is too small" */
   var pen = await s39.p.evaluate(function () {

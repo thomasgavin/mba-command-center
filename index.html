@@ -70,7 +70,7 @@
      under the glyphs, which is what an iOS tab bar does, and anything on top
      of that is the band of nothing he has now asked about twice --
      *"the bottom nav bar went up now"*. */
-  --barpad:0px;
+  --barpad:max(4px, calc(env(safe-area-inset-bottom) - 14px));
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -149,14 +149,15 @@ body::before{
     radial-gradient(900px 340px at 12% -8%, rgba(255,100,41,.10), transparent 62%),
     radial-gradient(820px 320px at 88% -12%, rgba(50,100,255,.10), transparent 62%);
 }
-/* 100dvh, not 100%: a fixed body's 100% is the layout viewport, and on an
-   installed iOS app under a translucent status bar that is not always the
-   screen -- which is how the section bar kept ending up with a band of page
-   colour under it, three times running. dvh tracks what is actually visible.
-   .vbar::after then paints the bar's own colour over anything below it, so
-   even if the viewport is short by the home-indicator inset, what shows there
-   is bar rather than board. */
-.app{position:relative;z-index:1;height:100dvh;min-height:100%;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
+/* No viewport unit decides this height, and that is the whole fix. Four
+   attempts at the band of page colour under the section bar were four
+   guesses at what 100% or 100dvh resolves to inside an installed iOS app:
+   with the status bar translucent, both of them came back about 60px short
+   -- the space Safari reserves for a toolbar that is not there -- and the
+   board showed through underneath. .app is anchored the same way body
+   already is, inset:0 on a fixed box, so it is the layout viewport by
+   construction and there is no "below the bar" left to paint over. */
+.app{position:fixed;inset:0;z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 /* The status-bar inset, which is zero everywhere but an installed iOS app. */
 .sbar{flex:none;height:env(safe-area-inset-top);background:var(--sbar)}
 
@@ -249,21 +250,13 @@ body::before{
   position:relative;flex:none;display:flex;align-items:stretch;
   border-top:1px solid var(--line);background:var(--glass);
   backdrop-filter:saturate(1.6) blur(14px);
-  /* The home indicator wants clearance, not the whole 34px it declares: a
-     46px bar under a full inset came to 80px of chrome at the foot of a
-     390x844 screen, which is the "lot of space left on the bottom". Half of
-     it clears the indicator and gives the board the rest back. */
+  /* The home indicator wants clearance, not the whole 34px it declares. Now
+     that the bar really does reach the bottom of the screen, this padding is
+     the only thing between the icons and the indicator, so it cannot be 0 --
+     but 34px under a 52px bar is 86px of chrome on an 844px screen, which is
+     the "lot of space left on the bottom". 20px clears the indicator. */
   padding-bottom:var(--barpad);
   position:relative;z-index:30;
-}
-/* Whatever is below the bar is the bar, never the board. The band of page
-   colour under it has been reported three times; this is the one fix that
-   does not depend on getting the inset arithmetic right, because it paints
-   the bar's own colour over anything between it and the bottom of the
-   screen. */
-.vbar::after{
-  content:"";position:absolute;left:0;right:0;top:100%;height:80px;
-  background:var(--glass);pointer-events:none;
 }
 .vt{
   position:relative;flex:1 1 0;min-width:0;border:0;background:none;font:inherit;
@@ -1400,7 +1393,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
     </div>
     <div class="sp"></div>
     <button class="tbtn" id="notesBtn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:15px;height:15px"><path d="M11.2 1.9a1.6 1.6 0 0 1 2.3 2.3L5.4 12.3 2 13.4l1.1-3.4z"/><path d="M10.2 3l2.3 2.3"/></svg><span class="lbl">Notes</span><span class="n" id="notesN">0</span></button>
-    <button class="tbtn" id="newsBtn" title="Your daily and weekly newsletters."><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" style="width:15px;height:15px"><path d="M2 3.4h8.6v9.2H3.2A1.2 1.2 0 0 1 2 11.4z"/><path d="M10.6 6h2.2a1.2 1.2 0 0 1 1.2 1.2v4.2a1.2 1.2 0 0 1-1.2 1.2h-2.2"/><path d="M3.7 5.6h5.2M3.7 7.7h5.2M3.7 9.8h3.1"/></svg><span class="lbl">Newsletters</span><span class="n" id="newsN">0</span></button>
+    <button class="tbtn" id="newsBtn" title="Your daily briefs and Sunday reports."><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" style="width:15px;height:15px"><path d="M2 3.4h8.6v9.2H3.2A1.2 1.2 0 0 1 2 11.4z"/><path d="M10.6 6h2.2a1.2 1.2 0 0 1 1.2 1.2v4.2a1.2 1.2 0 0 1-1.2 1.2h-2.2"/><path d="M3.7 5.6h5.2M3.7 7.7h5.2M3.7 9.8h3.1"/></svg><span class="lbl">Briefs</span><span class="n" id="newsN">0</span></button>
     <button class="tbtn" id="syncBtn" title="Check the repo for changes from your other device."><span>&#8635;</span><span class="lbl">Sync</span></button>
     <button class="tbtn hot" id="exportBtn" title="Commit your notes to the repo for Claude. Shift-click to download instead."><span>&#8681;</span><span class="lbl">For Claude</span></button>
   </header>
@@ -3566,9 +3559,11 @@ function openNotes(){
    They live in their own drawer rather than the chat thread because a thread
    is read once and a report is read back: eleven dailies between two of his
    messages would bury the conversation Chat exists to be. */
-/* "Daily Newsletter - 07 October 2026", in his words. The long date, not the
-   board's usual "7 Oct 26": this is the title of an edition, and an edition is
-   named by its date in full. */
+/* "Daily Brief - 07 October 2026". It shipped as "Daily Newsletter" and he
+   renamed it on 2026-10-06: a newsletter is something you subscribe to, a
+   brief is something written for you. The long date, not the board's usual
+   "7 Oct 26" -- this is the title of an edition, and an edition is named by
+   its date in full. */
 var MONTHF=["January","February","March","April","May","June","July","August","September","October","November","December"];
 function fmtLong(d){
   var x=D(d); if(!x) return d||"";
@@ -3576,7 +3571,7 @@ function fmtLong(d){
   return (dd<10?"0":"")+dd+" "+MONTHF[x.getMonth()]+" "+x.getFullYear();
 }
 function newsTitle(n){
-  return (n.period==="weekly" ? "Weekly Report" : "Daily Newsletter")+" \u2014 "+fmtLong(n.date||(n.at||"").slice(0,10));
+  return (n.period==="weekly" ? "Weekly Report" : "Daily Brief")+" \u2014 "+fmtLong(n.date||(n.at||"").slice(0,10));
 }
 /* The body is plain text with one piece of markup: a line beginning "## " is a
    heading. A brief is three or four sections and a run of equal-weight
@@ -3591,7 +3586,7 @@ function openNews(){
   dMode="news"; openId=null;
   titleEdit(false);
   document.getElementById("dPen").classList.add("off");
-  document.getElementById("dTitle").textContent="Newsletters";
+  document.getElementById("dTitle").textContent="Briefs";
   var h;
   if(!news.length){
     h='<p class="hint">Nothing yet. A daily brief arrives every morning except Sunday, and a weekly report on Sunday.</p>';
@@ -3726,9 +3721,9 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
 
 /* Bump on every deploy. An iPhone home-screen app holds its cached copy until
    it is force-quit, which is why a fix did not arrive until he cleared it. The
-   page asks the server what the live build is, with caching off, and reloads
+var BUILD="2026-10-06-0420";
    itself past the cache when they differ. */
-var BUILD="2026-10-05-2313";
+var BUILD="2026-10-06-0405";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

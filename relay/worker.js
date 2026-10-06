@@ -338,7 +338,8 @@ export class Board {
   async maybeNotify(payload, by){
     if(by !== "claude") return;
     /* A newsletter is the second thing worth a banner, and the first one he
-       asked for by name: "Gavin, today's command newsletter is ready". It is
+       asked for by name: "Gavin, today's command newsletter is ready", renamed to the brief it
+       actually is on 2026-10-06. It is
        written by the job on a schedule, so it is news by construction, and it
        goes out ahead of a nudge in the same payload because it is the thing he
        is expecting at that hour. */
@@ -351,7 +352,7 @@ export class Board {
       var wage = Date.now() - Date.parse(w.at || w.createdAt || "");
       if(wage >= 0 && wage <= NOTIFY_FRESH){
         await this.ctx.storage.put("latest", {
-          title: "Gavin, today's command newsletter is ready",
+          title: "Gavin, today's daily brief is ready",
           body: w.period === "weekly" ? "Your weekly report is in." : "Your daily brief is in.",
           /* one tag for all of them: a second edition replaces the first on the
              lock screen rather than stacking up behind it */

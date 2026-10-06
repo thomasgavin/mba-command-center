@@ -1,13 +1,13 @@
 ---
 name: newsletter
-description: Write Gavin's daily brief or his Sunday weekly report onto the MBA board, as a newsletter edition he opens from the newspaper button. Run by the two newsletter Routines.
+description: Write Gavin's Daily Brief or his Sunday weekly report onto the MBA board, as an edition he opens from the newspaper button. Run by the two Routines.
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
-# Newsletter
+# Daily Brief
 
-Nobody asked you a question. A newsletter is the one thing on this board that
-arrives on a clock, and the only thing that is allowed to say "here is where
+Nobody asked you a question. The brief is the one thing on this board that
+arrives on a clock, and the only thing allowed to say "here is where
 everything stands" — every other surface is deliberately forbidden from
 summarising the board, because a summary nobody asked for is noise.
 
@@ -41,29 +41,83 @@ repeating itself.
 
 ## 2. The daily brief
 
-Four sections, in this order, and a section with nothing in it is **left out**
-rather than written as "nothing":
+It is called the **Daily Brief** on the board. The skill keeps the name
+`newsletter` only because the two Routines invoke it by that name and only
+Gavin can edit a Routine; nothing he reads says "newsletter" any more.
 
-```
-## Due today
-## Overdue
-## Waiting on you
-## Worth starting
-```
+**There is no fixed set of headings, and that is deliberate.** The first
+edition had four, because this skill listed four, and it filled all four
+because an empty one looked like a failure. He rejected the whole thing:
+*"what is this shitty ass content? A waste of time. Fucking useless content
+just to force some words in. I was expecting you to be smarter as a
+productivity manager - not a 10yo asking for updates."*
 
-- **Due today** — open tasks whose `due` is today. Name the task and the one
-  thing that actually has to happen.
-- **Overdue** — open tasks past their `due`, oldest first, with how far past.
-- **Waiting on you** — a critical or high task whose status has not moved in a
-  week, or one blocked on something only he can supply. This is the follow-up
-  he asked for: ask the question, do not restate the status.
-- **Worth starting** — a task whose start-by (`due` minus its `effort` lead) is
-  today or past, that has not started. Leave it out when `effort` is unset:
-  inventing the lead is the drift this board exists to prevent.
+He then wrote a replacement — Immediate, Creeping up, Nudges — and when that
+was taken as the new template he said no to that too: *"that was an example.
+Do your research and make it. ... Things change and so should the newsletters
+accordingly."* This is the same principle the mind map is built on (see
+`CLAUDE.md`, "Each group draws itself in the shape its content wants"): **the
+brief works out its own shape from what the board actually holds that
+morning.**
 
-Three to eight lines in total. It is read on a phone before work. A brief that
-runs to a screen is one he stops opening, and then the overdue line at the top
-never lands either.
+So: decide the sections after reading the board, not before. Two days with the
+same four headings and different nouns under them is the failure. Some mornings
+that is one section and three lines. A morning after an INSEAD mail lands with
+a hard date in it might be one section about that and nothing else.
+
+Headings that have earned themselves on a given day, as illustration and not
+as a list to work through: Immediate. Creeping up. Waiting on someone else.
+Nudges. Decide this week. Money. Nothing is due, here is what to get ahead of.
+Write the heading that names what the lines under it have in common; if you
+cannot name it in three words, the lines do not belong together.
+
+### What earns a place
+
+**Every item earns a second line or it does not go in.** The item line names
+the thing and when; the second line is the reason the item is in a brief
+rather than on the board:
+
+- a **question** only he can answer — his intent, a conversation he has had, a
+  decision he has not made;
+- a **suggestion with a specific name in it** — which platform to start with,
+  which document to chase, who to call;
+- something **he has not noticed** — a date that collides with another, a mail
+  that arrived without the confirmation that should have followed it, a task
+  you created because of it.
+
+If the only thing you can write under an item is a restatement of its status,
+leave the item out. Three to ten lines in total; it is read on a phone before
+work.
+
+**Credit what he did, by name, when the board says he did it** — one line, in
+whichever section fits, read off `doneAt` or `history/`. Not "great progress":
+*"Good job on registering for the platforms yesterday."*
+
+## 2b. The four ways this goes wrong
+
+These are the specific failures of the first edition. Check the draft against
+all four before posting.
+
+1. **Padding to fill a heading.** A heading exists because lines earned it. If
+   a section has nothing, there is no section. Never write "nothing overdue".
+2. **Asking him for an update.** You have the whole board, the notes, the audit
+   log in `history/` and three Gmail scans a day. "Any update on X?" with
+   nothing behind it is the ten-year-old. Ask about the thing the board cannot
+   know, and ask it specifically.
+3. **Asserting a timeline the board contradicts.** The first edition said a
+   task had sat through "a week's silence" when his own note said he was
+   sending the documents the next day: *"If I just sent the corrected documents
+   to them tomorrow, what do you mean a week's silence?"* **Never write an
+   elapsed time, a gap, a streak or "no movement since" from a feeling.** Read
+   it off `touched[id]`, `doneAt`, or a dated line in `history/` — and read the
+   task's own notes first, because a note saying what he is about to do makes
+   any claim about silence wrong. If you cannot cite the date, do not make the
+   claim; say the thing without the number.
+4. **Restating the board.** He is opening the brief on the board. Anything he
+   would see by looking at Overview is not news.
+
+Read the last few editions in `news[]` before writing. Repeating yesterday's
+sections with today's date is the same failure as padding.
 
 ## 3. The weekly report
 
@@ -88,7 +142,10 @@ ahead.
   order is that way.
 
 Ten to twenty lines. He has time on a Sunday; he does not have patience for
-padding.
+padding. These four are the weekly's job rather than a template — the section
+that has nothing in it a given week is still left out. §2b applies in full — the elapsed-time rule most of all,
+since "has gone quiet" is a Risks line and it is exactly the claim that has to
+be read off a date rather than felt.
 
 ## 4. Write it
 
@@ -115,7 +172,7 @@ changes unless it does.
 - **`id`** is `news-<period>-<date>`. It is how a re-run replaces an edition
   rather than publishing a second one for the same day.
 - **`period`** is `daily` or `weekly`, and **`date`** is the day it covers.
-  Together they are the title the board prints — "Daily Newsletter — 07 October
+  Together they are the title the board prints — "Daily Brief — 07 October
   2026". Do not write a title yourself; there is no `title` field to drift.
 - **`body`** is plain text. The only markup is `## ` at the start of a line,
   which is a section heading. Blank lines are ignored.
@@ -126,7 +183,7 @@ changes unless it does.
   says where things stand; it does not move them.
 
 Posting it is what rings his phone: the relay sees a fresh `news[]` on
-`/agent/reply` and sends "Gavin, today's command newsletter is ready". The
+`/agent/reply` and sends "Gavin, today's daily brief is ready". The
 board's own `/send` can never trigger that, which is what stops his own edits
 re-announcing yesterday's edition.
 
@@ -141,8 +198,9 @@ re-announcing yesterday's edition.
   dossier numbers, no appointment or booking codes, no verification codes, no
   credentials, no payment details. The repository is public. Vendors,
   institutions and subject lines are fine.
-- **No praise and no filler.** "Great progress this week" is a line he scrolls
-  past, and it teaches him the rest is skimmable too.
+- **No filler.** "Great progress this week" is a line he scrolls past, and it
+  teaches him the rest is skimmable too. Credit in **Nudges** is different: it
+  names the thing he did and the day he did it, and it is only ever one line.
 - **Never invent a date, an amount or a status.** If the board does not say it,
   the newsletter does not either.
 
