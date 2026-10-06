@@ -676,7 +676,16 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .grow.done .glab{color:var(--green)}
 .gnow{position:absolute;top:0;bottom:0;width:2px;background:var(--orange);z-index:5;pointer-events:none}
 .gnow::before{content:"";position:absolute;top:0;left:-3px;width:8px;height:8px;border-radius:50%;background:var(--orange)}
-.gnow::after{content:"today";position:absolute;top:10px;left:6px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)}
+/* The word sat on the month axis and printed straight over "OCT": two things
+   in one place, and the one that was a label rather than a date. It carries
+   the date instead (set in the markup, so it cannot be a second copy of a
+   day that drifts), one row lower, in the empty half of the section row --
+   *"add today date next to the line in orange in the empty space in the
+   header row below"*. --axh is the axis row's measured height rather than a
+   number guessed off the font, so the line sits in that row whatever the
+   text does. */
+.gnow::after{content:attr(data-d);position:absolute;top:calc(var(--axh, 31px) + 8px);left:7px;
+  font-size:10px;font-weight:800;letter-spacing:.04em;white-space:nowrap;color:var(--orange)}
 
 /* ---------- calendar ---------- */
 .calh{display:flex;align-items:center;gap:9px;margin-bottom:13px}
@@ -2704,8 +2713,23 @@ function renderPlan(){
     document.getElementById("gantt").innerHTML='<p class="tip" style="padding:16px">Nothing in this category.</p>';
     return;
   }
-  h+='<div class="gnow" style="left:calc(var(--lw) + (100% - var(--lw)) * '+(pos(iso(todayD()))/100).toFixed(4)+')"></div>';
-  document.getElementById("gantt").innerHTML=h;
+  h+='<div class="gnow" data-d="'+esc(fmtD(iso(todayD())))+'" style="left:calc(var(--lw) + (100% - var(--lw)) * '+(pos(iso(todayD()))/100).toFixed(4)+')"></div>';
+  var g=document.getElementById("gantt");
+  g.innerHTML=h;
+  fitAxh();
+}
+
+/* The date under the today line sits in the row below the month axis, so the
+   offset is that row's own height -- measured, not a number guessed off the
+   font. render() paints this view while another one is still open and a
+   hidden view measures 0, which would put the date back on the axis, so the
+   CSS fallback stands until there is a real number: setView calls this again
+   on the way in, when there is one. */
+function fitAxh(){
+  var g=document.getElementById("gantt");
+  if(!g) return;
+  var ax=g.querySelector(".gax");
+  if(ax && ax.offsetHeight) g.style.setProperty("--axh", ax.offsetHeight+"px");
 }
 
 /* ---------- calendar ---------- */
@@ -3785,7 +3809,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0756";
+var BUILD="2026-10-06-0912";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4296,6 +4320,7 @@ function setView(v){
      thread scrolls to the newest message. */
   /* both the chat and the map own their own scrolling, so the stage must not also scroll */
   document.getElementById("stage").classList.toggle("chatmode",v==="chat"||v==="map");
+  if(v==="time") fitAxh();   /* the axis can only be measured once it is on screen */
   syncDots();   /* the open section's dot goes out now, not at the next render */
   syncVSub();
   if(v==="chat") renderChat();

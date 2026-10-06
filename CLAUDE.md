@@ -952,6 +952,16 @@ never be a tab apart again.
   stylesheet *and* a `LW` constant in JS, and the phone breakpoint changed only
   the first, so "today" sat in the wrong place on a phone for as long as that
   breakpoint existed.
+- **The today line carries today's date, not the word "today".** The word sat
+  on the month axis and printed straight over "OCT" -- two things in one place,
+  and the one that was a label rather than a date. It is the date now, in
+  orange, one row lower in the empty half of the section header: *"add today
+  date next to the line in orange in the empty space in the header row below"*.
+  It is `content:attr(data-d)` off the markup rather than a second copy of a
+  day that could drift, and the offset is `--axh`, the axis row's **measured**
+  height. `render()` paints this view while another one is open and a hidden
+  view measures 0, so `fitAxh()` runs again from `setView` on the way in and
+  the CSS fallback stands until there is a real number.
 - At 720px the column is 186px. The tick is `flex:none` and the title and
   priority share a `.gtx` that wraps inside it: letting the tick wrap is what
   turned a one-line row into a three-line one.
@@ -1350,7 +1360,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 311 invariants, three widths, a real browser. Every one of them was a
+that runs: 313 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

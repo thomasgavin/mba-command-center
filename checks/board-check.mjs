@@ -2475,6 +2475,29 @@ for (var bw of [390, 1280]) {
   /* "it says you're on the latest version" is only useful with the number on
      it; without one, which build he is looking at can only be worked out by
      measuring a screenshot. */
+  /* "Remove the today word on the timeline chart - instead, add today date
+     next to the line in orange". The word printed over the month it stood on,
+     and said less than the date it was marking. */
+  /* The view's key is "time", not "plan" -- setView with a key that is in no
+     section hides every view, and then the axis it is measuring is 0 tall and
+     the assertion is comparing nothing to nothing. */
+  await s39.p.evaluate(function () { setView("time"); });
+  await s39.p.waitForTimeout(120);
+  var now = await s39.p.evaluate(function () {
+    var n = document.querySelector(".gnow");
+    if (!n) return null;
+    var cs = getComputedStyle(n, "::after");
+    var ax = document.querySelector(".gax");
+    return { d: n.getAttribute("data-d"), content: cs.content,
+             colour: cs.color, top: parseFloat(cs.top),
+             axh: ax ? ax.offsetHeight : 0,
+             sech: document.querySelector(".gsec") ? document.querySelector(".gsec").offsetHeight : 0 };
+  });
+  ok("the today line carries the date, not the word",
+     now && /^\d/.test(now.d || "") && !/today/i.test(now.content || ""), JSON.stringify(now));
+  ok("in orange, in the row under the month axis",
+     now && now.colour === "rgb(255, 100, 41)"
+       && now.top >= now.axh && now.top < now.axh + now.sech, JSON.stringify(now));
   ok("the version toast names the build", /latest version \("\+BUILD\+"\)/.test(src), "");
   /* The readout belongs in the log, not over the top of the board on every
      sync -- and it only goes when a number actually changed. */
