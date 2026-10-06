@@ -704,6 +704,12 @@ export class Board {
           f:"layout", a:"", b:line, by:"build "+String((d&&d.build)||"?").slice(0,24)
         });
         await this.ctx.storage.put("hist", hd);
+        /* Written through to the repo straight away rather than waiting for
+           the daily archive. The whole point of this route is that a layout
+           question gets answered from a file the same minute he opens the
+           board; a line sitting in Durable Object storage until midnight is
+           no better than no line at all. */
+        try{ await this.writeHistory(); }catch(e){}
         await this.armArchive();
       }
       return out(200, {ok:true});

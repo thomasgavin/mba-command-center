@@ -3761,7 +3761,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0702";
+var BUILD="2026-10-06-0719";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4902,6 +4902,16 @@ function fitBar(){
 /* What the board actually resolved, in one line he can screenshot. Six
    rounds of this bug were spent measuring his screenshots in pixels to
    work out which of the numbers was wrong; the device knows all of them. */
+/* What `height:100%` on a fixed box actually comes out as here. Nothing else
+   can answer it: it is the one number both failed fixes assumed. */
+function pctH(){
+  var d=document.createElement("div");
+  d.style.cssText="position:fixed;top:0;left:0;width:0;height:100%;visibility:hidden;pointer-events:none";
+  document.body.appendChild(d);
+  var h=d.getBoundingClientRect().height;
+  d.parentNode.removeChild(d);
+  return h;
+}
 function layoutLine(){
   var a=document.querySelector(".app").getBoundingClientRect();
   var b=document.querySelector(".vbar"), r=b.getBoundingClientRect();
@@ -4911,6 +4921,14 @@ function layoutLine(){
     +" gap"+Math.round(innerHeight-r.bottom)
     +" ins"+Math.round(insTop)+"/"+Math.round(insBot)
     +" vtop"+getComputedStyle(document.documentElement).getPropertyValue("--vtop").trim()
+    /* Which box each ruler is actually measuring. The bar was fixed twice off
+       an inference about what a percentage height resolves against, and the
+       inference was wrong both times in opposite directions, so the page
+       reports every candidate rather than one of them. */
+    +" cl"+document.documentElement.clientHeight
+    +" vv"+(window.visualViewport?Math.round(visualViewport.height)+"@"+Math.round(visualViewport.offsetTop):"-")
+    +" pct"+Math.round(pctH())
+    +" appTop"+Math.round(a.top)+" barBot"+Math.round(r.bottom)
     +(navigator.standalone?" app-mode":" browser");
 }
 /* The readout earned its keep and then became clutter: a line of numbers over
