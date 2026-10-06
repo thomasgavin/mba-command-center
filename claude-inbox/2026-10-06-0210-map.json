@@ -1,0 +1,59 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-06T02:10:00.000Z",
+ "source": "Claude",
+ "why": "File the two career platforms that arrived yesterday with no task to hang on",
+ "changed": [],
+ "notes": [],
+ "kb": [
+  {
+   "id": "k-mbax",
+   "label": "MBA-Exchange.com",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "body": "The CDC's third-party global careers platform, premium access through INSEAD's partnership: vetted postings, industry and country reports, employer profiles with Talent Radar visibility, and Talent Talks with recruiters. The welcome mail arrived on 5 October with a login of your INSEAD address and a password in plain text, so change that password on first login \u2014 the password itself is deliberately not recorded here, because this repository is public. Bilal Ojjeh, their founder, offers himself as the direct contact.",
+   "cat": "work",
+   "rel": [
+    "k-careerglobe"
+   ],
+   "at": "2026-10-06T02:10:00.000Z",
+   "createdAt": "2026-10-06T02:10:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-aced",
+   "label": "Aced, formerly Exponent",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "body": "Technical interview preparation, free through an INSEAD invitation that landed on 5 October: courses in software engineering, SQL and data analytics and system design, mock technical interviews, a question bank of recently asked questions, and company-by-company hiring guides. Sign up at aced.io with the INSEAD address the invitation was sent to. It is the one career platform aimed at technical interviews rather than the consulting-and-finance case track that CaseCoach covers.",
+   "cat": "work",
+   "rel": [
+    "k-casecoach",
+    "k-mbax"
+   ],
+   "at": "2026-10-06T02:10:00.000Z",
+   "createdAt": "2026-10-06T02:10:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-casecoach",
+   "label": "CaseCoach",
+   "group": "Platforms and tools",
+   "ord": 40,
+   "shape": "cards",
+   "body": "Case interview preparation, free on the INSEAD subscription, which you registered for on 5 October. Their own course opens with what to expect from a case interview and is reading rather than a task; the founder, Enguerran Loos, is a former consultant and headhunter for the top three firms. It is the consulting-and-finance counterpart to Aced's technical track, and the one to work through if consulting stays on your list.",
+   "cat": "work",
+   "item": "casecoach",
+   "rel": [
+    "k-aced",
+    "k-cvbook"
+   ],
+   "at": "2026-10-06T02:10:00.000Z",
+   "createdAt": "2026-10-06T02:10:00.000Z",
+   "by": "claude"
+  }
+ ]
+}
