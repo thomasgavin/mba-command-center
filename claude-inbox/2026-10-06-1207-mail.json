@@ -1,0 +1,31 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-06T12:07:30.000Z",
+ "source": "Claude",
+ "why": "You paid the Campus France EEF fee",
+ "changed": [
+  {
+   "id": "cf-eef-pay",
+   "at": "2026-10-06T12:07:30.000Z",
+   "status": "done",
+   "manual": true,
+   "doneAt": "2026-10-06"
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-1791288660001",
+   "from": "claude",
+   "itemId": "cf-eef-pay",
+   "itemTitle": "Pay the Campus France EEF fee",
+   "title": "EEF fee paid",
+   "text": "You paid the Campus France EEF fee this morning and sent Fitria the receipt. Marking this done, which clears the last step holding up your VFS appointment. - Their auto-reply says two to three working days, so expect confirmation later this week.",
+   "createdAt": "2026-10-06T12:07:30.000Z",
+   "state": "new"
+  }
+ ],
+ "acted": [
+  "Pay the Campus France EEF fee: To-do -> Done"
+ ]
+}
