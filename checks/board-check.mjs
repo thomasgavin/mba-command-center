@@ -1216,6 +1216,16 @@ for (var tw26 of [390, 1280]) {
              tui: top(".hero.b"), pipe: top(".pipe"),
              attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right) };
   });
+  var st28 = await s28.p.evaluate(function () {
+    setView("over");
+    var e = document.querySelector(".bstamp");
+    return e ? { t: e.textContent, h: e.offsetHeight } : null;
+  });
+  /* Which build the app is running has been the unanswerable question behind
+     three separate bugs, and the toast that answers it only answers when a
+     toast appears. */
+  ok("Overview prints the build it is running",
+     st28 && /^build \d{4}-\d{2}-\d{2}/.test(st28.t) && st28.h > 0, JSON.stringify(st28));
   ok("Overview puts the deadline and Needs attention on one row at 1280",
      ov28.hero !== null && ov28.hero === ov28.att, JSON.stringify(ov28));
   ok("and tuition shares its row with the critical path",

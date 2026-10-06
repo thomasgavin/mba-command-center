@@ -1334,6 +1334,14 @@ a fresh query string and one attempt left him on a board that knew it was stale
 and would not do anything about it. After the third the toast names the one
 thing that always works: force-quit the app and open it again.
 
+**The stamp is also on screen, at the foot of Overview.** A toast answers
+"which build is this" only when a toast appears, and on his phone pressing
+Sync produced nothing at all -- which is also why a check that cannot reach
+the site now says so instead of failing silently. Three separate bugs have
+turned on that question (a cache that would not let go, a status bar that
+would not change, a fix that had shipped hours earlier), so the answer is a
+quiet line that depends on nothing.
+
 **Every version toast carries the stamp**, both of them: *"You are on the
 latest version (2026-10-06-0508)."* He refreshed, read "you are on the latest
 version", and it was not — and with no number on it the only way to work out
@@ -1450,7 +1458,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 321 invariants, three widths, a real browser. Every one of them was a
+that runs: 322 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

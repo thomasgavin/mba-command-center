@@ -381,6 +381,10 @@ body::before{
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
 /* ---------- bento ---------- */
+/* the foot of Overview, quiet: one line nobody reads until it is the only
+   thing that can answer the question */
+.bstamp{grid-column:1/-1;text-align:center;font-size:10.5px;font-weight:600;
+  letter-spacing:.04em;color:var(--ink4);opacity:.6;padding:4px 0 2px}
 .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;grid-auto-rows:minmax(92px,auto)}
 .tile{
   min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
@@ -2588,6 +2592,14 @@ function renderOverview(){
   /* last, not first: see the note at the top of this function */
   h+=renderMiles();
 
+  /* Which build this app is actually running has been the unanswerable
+     question behind three separate bugs -- a cache that would not let go, a
+     status bar that would not change, a fix that had shipped hours earlier.
+     The version toast answers it only if a toast appears at all, and on his
+     phone one did not. A line at the foot of the first view answers it
+     without depending on anything. */
+  h+='<div class="bstamp">build '+esc(BUILD)+'</div>';
+
   document.getElementById("bento").innerHTML=h;
 }
 
@@ -3867,7 +3879,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1115";
+var BUILD="2026-10-06-1145";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3898,7 +3910,10 @@ function checkBuild(announce){
         location.replace(location.pathname+"?v="+encodeURIComponent(m[1])+"-"+Date.now());
       },900);
     })
-    .catch(function(){});
+    /* a check that could not run used to say nothing at all, which reads as
+       a Sync button that does nothing -- the state he was in when the build
+       number was the one thing worth knowing. */
+    .catch(function(){ if(announce) toast("Could not reach the site to check the version. You are running "+BUILD+"."); });
 }
 function autoSend(){
   if(!RELAY||sending) return;
