@@ -682,12 +682,27 @@ thumb's reach.
   **93px**, where a simulated inset on the same layout gives 34, and taking it
   at face value made the bar 131px tall — so the bar still read as floating
   even once it genuinely reached the bottom of the screen, which is the fifth
-  report and the one that was no longer about the viewport at all. Measuring
-  his screenshot is what separated the two: the band under the bar had become
-  bar colour rather than board, so the layout was right and only the height
-  was wrong. The home indicator itself sits 8–13px up, so `--barpad` is
-  `min(20px, max(4px, inset − 14px))`: 20px on his phone, the 4px floor
-  everywhere with no inset at all.
+  report and the one that was no longer about the viewport at all. The home
+  indicator itself sits 8–13px up, so the clearance is 20px on his phone and
+  a 4px floor everywhere with no inset at all.
+- **That clamp is done in JS, because CSS would not do it.** It was written
+  three times — `max(4px, inset − 14px)`, then `clamp(4px, …, 20px)`, then
+  `min(20px, max(4px, …))` — and his installed app rendered all three
+  **identically**: a 131px bar, which is `1 + 52 + (93 − 14)`, the raw inset
+  with the cap having no effect at all. Two different clamping syntaxes
+  producing byte-identical screenshots is not a coincidence; it is WebKit
+  declining to clamp an `env()` it has wrapped in a `calc()`. So `--barpad`
+  is a plain `20px` in CSS and `fitBar()` reads the inset off a probe element
+  and sets the real value with `Math.min`. **No `env()` may go back into that
+  property**, and the check asserts it.
+- **`layoutLine()` is why there was no seventh round.** Six reports were spent
+  measuring his screenshots in pixels to work out which number was wrong —
+  the viewport, the bar's height, the padding or the build — and the device
+  knew all four. The Sync toast now prints them: `vp`, `app`, `bar`, `pad`,
+  `gap`, `ins` and whether it is running as an installed app. One screenshot
+  of a toast replaces a pass with `pillow`. The same move as putting the
+  build stamp in the version toast, which settled that question in one
+  message.
 - **A dot goes out on the section he has opened, and stays out.** It says
   "something in here is past its date", which is not worth saying about the
   screen he is already reading: *"they should go away once I open the
@@ -1334,7 +1349,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 302 invariants, three widths, a real browser. Every one of them was a
+that runs: 305 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

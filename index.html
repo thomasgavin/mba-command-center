@@ -70,7 +70,17 @@
      under the glyphs, which is what an iOS tab bar does, and anything on top
      of that is the band of nothing he has now asked about twice --
      *"the bottom nav bar went up now"*. */
-  --barpad:min(20px, max(4px, calc(env(safe-area-inset-bottom) - 14px)));
+  /* Set by fitBar() in JS, and 20px until it runs -- which is the right
+     answer on his phone and merely 16px generous on a desktop, so the
+     pre-script value is never wrong in the direction that matters.
+     It used to read the inset here, wrapped first in max(), then clamp(),
+     then min(max()). All three rendered identically on his installed app:
+     a 131px bar, which is 1 + 52 + (93 - 14) -- the raw inset, uncapped,
+     with the clamp having no effect at all. Two different clamping syntaxes
+     producing byte-identical screenshots is not a coincidence, it is
+     WebKit not clamping an env() it has wrapped in a calc(). So the
+     arithmetic moved to JS, where Math.min cannot be ignored. */
+  --barpad:20px;
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -2203,13 +2213,13 @@ function undelItem(id){
 }
 
 /* ---------- toast ---------- */
-function toast(msg,undo){
+function toast(msg,undo,hold){
   var t=document.getElementById("toast");
   t.innerHTML='<span>'+esc(msg)+'</span>'+(undo?'<button id="undoB">Undo</button>':'');
   undoFn=undo||null;
   if(undo) document.getElementById("undoB").onclick=function(){ var f=undoFn; undoFn=null; hideToast(); if(f) f(); };
   t.classList.add("on");
-  clearTimeout(toastT); toastT=setTimeout(hideToast,undo?6000:2800);
+  clearTimeout(toastT); toastT=setTimeout(hideToast,hold||(undo?6000:2800));
 }
 function hideToast(){ document.getElementById("toast").classList.remove("on"); }
 
@@ -3731,7 +3741,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0508";
+var BUILD="2026-10-06-0612";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3742,7 +3752,7 @@ function checkBuild(announce){
     .then(function(t){
       if(!t) return;
       var m=t.match(/var BUILD="([^"]+)"/);
-      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version ("+BUILD+")."); return; }
+      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version ("+BUILD+"). "+layoutLine(),null,11000); return; }
       /* One attempt was not enough: iOS standalone can serve the same copy
          back even through a fresh query string, and giving up after one try
          left him looking at a board that knew it was stale and would not do
@@ -4843,8 +4853,45 @@ function askPush(){
    calls it while the board has nothing to diagnose. */
 document.getElementById("pbnB").addEventListener("click",askPush);
 
+/* ---------- the one measurement the CSS could not be trusted with ----------
+   His installed app reports env(safe-area-inset-bottom) at about 93px where
+   a simulated inset on the same layout gives 34, and no CSS clamp around it
+   held (see --barpad). A probe element is read once and the clamp is done
+   here: the home indicator itself sits 8-13px up, so 20px clears it and the
+   4px floor covers every screen that has no inset at all. */
+var insTop=0, insBot=0;
+function fitBar(){
+  var pr=document.getElementById("probe");
+  if(!pr){
+    pr=document.createElement("div"); pr.id="probe";
+    pr.style.cssText="position:fixed;left:0;bottom:0;width:0;visibility:hidden;pointer-events:none;"
+      +"padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
+    document.body.appendChild(pr);
+  }
+  var cs=getComputedStyle(pr);
+  insTop=parseFloat(cs.paddingTop)||0;
+  insBot=parseFloat(cs.paddingBottom)||0;
+  document.documentElement.style.setProperty("--barpad", Math.min(20,Math.max(4,insBot-14))+"px");
+}
+/* What the board actually resolved, in one line he can screenshot. Six
+   rounds of this bug were spent measuring his screenshots in pixels to
+   work out which of the numbers was wrong; the device knows all of them. */
+function layoutLine(){
+  var a=document.querySelector(".app").getBoundingClientRect();
+  var b=document.querySelector(".vbar"), r=b.getBoundingClientRect();
+  return "vp"+Math.round(innerHeight)+"/"+((window.screen&&screen.height)||0)
+    +" app"+Math.round(a.top)+"+"+Math.round(a.height)
+    +" bar"+Math.round(r.height)+" pad"+Math.round(parseFloat(getComputedStyle(b).paddingBottom))
+    +" gap"+Math.round(innerHeight-r.bottom)
+    +" ins"+Math.round(insTop)+"/"+Math.round(insBot)
+    +(navigator.standalone?" app-mode":" browser");
+}
+addEventListener("resize",fitBar);
+addEventListener("orientationchange",fitBar);
+
 /* ---------- boot ---------- */
 load();
+fitBar();
 render();
 checkBuild(false);
 setView("over");
