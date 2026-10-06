@@ -2434,9 +2434,13 @@ for (var bw of [390, 1280]) {
      !!barSrc && !/\d(dv|sv|lv|v)h/.test(barSrc[1]), barSrc && barSrc[1]);
   /* The inset's magnitude cannot be trusted -- his installed app reports about
      93px where a simulated one gives 34 -- so the clearance is clamped. */
-  ok("the section bar's clearance is clamped, not whatever the inset claims",
-     /--barpad:clamp\(4px, calc\(env\(safe-area-inset-bottom\) - 14px\), 20px\)/.test(src),
+  ok("the section bar's clearance is capped, not whatever the inset claims",
+     /--barpad:min\(20px, max\(4px, calc\(env\(safe-area-inset-bottom\) - 14px\)\)\)/.test(src),
      String(bar.pad));
+  /* "it says you're on the latest version" is only useful with the number on
+     it; without one, which build he is looking at can only be worked out by
+     measuring a screenshot. */
+  ok("the version toast names the build", /latest version \("\+BUILD\+"\)/.test(src), "");
 
   /* "the pencil icon of all notes is too small" */
   var pen = await s39.p.evaluate(function () {

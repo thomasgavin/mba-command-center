@@ -686,7 +686,7 @@ thumb's reach.
   his screenshot is what separated the two: the band under the bar had become
   bar colour rather than board, so the layout was right and only the height
   was wrong. The home indicator itself sits 8–13px up, so `--barpad` is
-  `clamp(4px, inset − 14px, 20px)`: 20px on his phone, the 4px floor
+  `min(20px, max(4px, inset − 14px))`: 20px on his phone, the 4px floor
   everywhere with no inset at all.
 - **A dot goes out on the section he has opened, and stays out.** It says
   "something in here is past its date", which is not worth saying about the
@@ -1218,6 +1218,12 @@ a fresh query string and one attempt left him on a board that knew it was stale
 and would not do anything about it. After the third the toast names the one
 thing that always works: force-quit the app and open it again.
 
+**Every version toast carries the stamp**, both of them: *"You are on the
+latest version (2026-10-06-0508)."* He refreshed, read "you are on the latest
+version", and it was not — and with no number on it the only way to work out
+which build his phone was actually running was to measure the nav bar in a
+screenshot. A reassurance that cannot be checked is worse than none.
+
 ## Categories
 
 The owner thinks in four buckets, so `CATS` maps the six tracks onto
@@ -1328,7 +1334,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 301 invariants, three widths, a real browser. Every one of them was a
+that runs: 302 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

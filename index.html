@@ -70,7 +70,7 @@
      under the glyphs, which is what an iOS tab bar does, and anything on top
      of that is the band of nothing he has now asked about twice --
      *"the bottom nav bar went up now"*. */
-  --barpad:clamp(4px, calc(env(safe-area-inset-bottom) - 14px), 20px);
+  --barpad:min(20px, max(4px, calc(env(safe-area-inset-bottom) - 14px)));
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -3731,7 +3731,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0446";
+var BUILD="2026-10-06-0508";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3742,7 +3742,7 @@ function checkBuild(announce){
     .then(function(t){
       if(!t) return;
       var m=t.match(/var BUILD="([^"]+)"/);
-      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version."); return; }
+      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version ("+BUILD+")."); return; }
       /* One attempt was not enough: iOS standalone can serve the same copy
          back even through a fresh query string, and giving up after one try
          left him looking at a board that knew it was stale and would not do
@@ -3754,7 +3754,7 @@ function checkBuild(announce){
            if(sv[0]===m[1]) tried=parseInt(sv[1],10)||0; }catch(e){}
       if(tried>=3){ if(announce) toast("A newer version exists but the cache will not let go. Force-quit the app and open it again."); return; }
       try{ sessionStorage.setItem("mbacc_ver",m[1]+"|"+(tried+1)); }catch(e){}
-      toast("A new version is live. Loading it now…");
+      toast("A new version is live ("+m[1]+"). Loading it now…");
       /* the query string is what actually defeats the cache; a plain reload
          on iOS standalone will happily serve the same stale copy, and so will
          a query string it has already stored -- hence the timestamp */
