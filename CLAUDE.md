@@ -1117,6 +1117,41 @@ and it said so in `acted[]` — "No board changes: the flight task being Done is
 what ticks the milestone" — which rendered under **What I changed** as a change
 that did not happen. The box now appears only when something did.
 
+## How a note reads
+
+He rejected the house style on 2026-10-06: *"The notes and replies are too
+wording. Make them simpler and smarter."* The note he quoted ran a hundred
+words about one email from his bank and he rewrote it in four lines, so the
+target is his own sentence, not a word count invented here:
+
+> *"Your SBI branch sent an email this morning saying they had no confirmation
+> from you about recovery of legal and valuation charges. You correctly replied
+> that you have already sent the email on 3rd Oct. - Might be worth a call to
+> the branch so things don't get stalled."*
+
+- **Every note and nudge carries a `title`**, two to five plain words, because
+  a wall of same-sized paragraphs is *"a T&C document and not inviting to
+  read"*. It is a label and not a sentence — "SBI wants confirmation", not
+  "SBI has written asking for confirmation" — and it carries no date, since
+  the note already prints one.
+- **Three short sentences, under sixty words.** Past that he is reading an
+  essay about something he could have been told.
+- **Second person, plain words.** "your branch", "you replied", "worth a
+  call". The old style stacked clauses — *"so the sanction is stalled on a
+  crossed wire rather than on anything substantive"* — and every one of them
+  was a sentence about the sentence rather than about the bank.
+- **No clock readings and no elapsed gaps.** "this morning", "yesterday", "on
+  3 Oct". Not "at 10:58 Jakarta", and never "thirteen minutes later": minute
+  precision on his own mail is accuracy nobody asked for, and it reads as the
+  board showing its working.
+- **One suggestion, last, after a dash.** Cut any sentence that does not
+  change what he does next, and if nothing survives the cut the note should
+  not be written at all.
+
+This is one rule in four places: the Routine's prompt, `.claude/skills/nudge`,
+`.claude/skills/answer-notes`, and here. A reply in Chat is held to it too —
+he said "notes and replies", and a reply is the half he reads most.
+
 ## Nudges: Claude speaking first
 
 Everything else on this board reacts to him. A nudge does not: it is Claude

@@ -93,6 +93,7 @@ One file, `claude-inbox/<YYYY-MM-DD-HHMM>.json`:
   "notes": [
     {"id": "claude-<ts>", "from": "claude", "itemId": "<item or null>",
      "itemTitle": "<that item's title, or null>",
+     "title": "<two to five words, this note's own label>",
      "text": "<the reply he reads in Chat>",
      "createdAt": "<ISO now>", "state": "new",
      "acted": ["Pay EUR 53,000 tuition instalment: 5 Oct \u2192 5 Nov",
@@ -118,9 +119,12 @@ Four things the board depends on, each of which has already been got wrong once:
 - **List only what changes.** A patch layers over his board; anything omitted
   is left exactly as it is, which is the point.
 
-Write `text` as a reply to a person, not a report: what you did and why, in a
-couple of sentences. Put the mechanical detail in `acted[]`, one short line per
-change — that renders under your message as the receipt.
+Write `text` the way CLAUDE.md's **How a note reads** says, because he said
+"notes and replies" and the reply is the half he reads most: a `title` of two
+to five plain words, then at most three short sentences under sixty words,
+second person, no clock readings, one suggestion last. What you did and why,
+not a report about having done it. Put the mechanical detail in `acted[]`, one
+short line per change — that renders under your message as the receipt.
 
 ### The shape of an `acted[]` line
 
@@ -149,8 +153,9 @@ something it depended on slipped, a task you deleted — carries a note on **tha
 task** (`itemId` set) giving the reason, not just a line in `acted[]`.
 
 The receipt says what changed; the note says why, and it is the half that is
-still there in three weeks when he is looking at the task and wondering. One or
-two sentences, his vocabulary, the evidence named: *"Closed this because VMock
+still there in three weeks when he is looking at the task and wondering. It
+carries a `title` and the same style rules as any other note — one or two
+sentences, his vocabulary, the evidence named: *"Closed this because VMock
 sent the welcome mail to your INSEAD address this morning."* A change he asked
 for in the message you are answering needs no such note — he knows why, he just
 said so.

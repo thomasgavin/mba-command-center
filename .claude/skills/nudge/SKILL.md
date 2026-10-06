@@ -103,9 +103,11 @@ Four kinds, in his own numbering:
    word and it is the only way the board learns anything.
 4. **A follow-up.** Section 5.
 
-Write it as one person to another. Two sentences at most, lead with the thing
-he has to do, and no preamble about having reviewed his board. He is reading it
-on a phone between meetings.
+Write it the way CLAUDE.md's **How a note reads** says: a `title` of two to
+five plain words, then at most three short sentences under sixty words, second
+person, no clock readings, one suggestion last. Lead with the thing he has to
+do and never open with a preamble about having reviewed his board. He is
+reading it on a phone between meetings.
 
 Never congratulate, never summarise the board, never open with "just checking
 in". A nudge that does not change what he does next should not have been sent.
@@ -120,6 +122,7 @@ A nudge is an ordinary note with `kind:"nudge"`, posted the same way a reply is
   "id": "claude-<ts>", "from": "claude", "kind": "nudge",
   "about": "<item id>", "itemId": "<the same id>",
   "itemTitle": "<that item's title>",
+  "title": "<two to five words, the note's own label>",
   "text": "<the nudge he reads>",
   "createdAt": "<ISO now, read off the clock>", "state": "new",
   "round": 1,
@@ -132,6 +135,8 @@ A nudge is an ordinary note with `kind:"nudge"`, posted the same way a reply is
 - **`was`** is the whole follow-up mechanism. It records what the task looked
   like when you raised it, so the next run can tell whether anything happened.
   Get it from the board state you just read, not from memory.
+- **`title`** is the note's own label, not the task's name: `itemTitle` already
+  carries that. Two to five words, no date.
 - **`round`** is 1 for a first ask.
 - **`createdAt` is the real time now**, off the clock. A run once invented one
   six hours ahead and pinned its message to the bottom of the thread for a day.
@@ -171,7 +176,8 @@ task outright — the welcome message arrived, so the task is done; the school
 moved a deadline, so the date moves. **Make the change, and put a note on that
 task saying why**, with `itemId` set, in one or two sentences naming the
 evidence: *"Closed this because VMock sent the welcome mail to your INSEAD
-address this morning."*
+address this morning."* It carries a `title` and the same style rules as any
+other note.
 
 He asked for it in those words on 2026-10-05 — *"whenever there is an action
 you take yourself on a task, add a note under it and mention the reasoning"* —
