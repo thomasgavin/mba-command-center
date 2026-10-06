@@ -1649,7 +1649,7 @@ var MILES=[
 
 /* The visa is a sequence, not a task: these are its steps in order, and the
    last one issuing is what "visa in hand" means. */
-var VISA_STEPS=["eef-init","attest","cf-interview","docs-apost","cf-validation","vfs-appt"];
+var VISA_STEPS=["eef-init","attest","cf-interview","docs-apost","cf-validation","cf-eef-pay","vfs-appt"];
 
 /* Housing is a coverage problem, not a checkbox: Club 8 covers the first six
    months and the rest of the programme is uncovered. */
@@ -1685,7 +1685,9 @@ var SEED=[
  {id:"cf-validation",t:"Campus France EEF validated",                 k:"visa",  s:"blocked",p:"Critical",d:"2026-10-25", ef:"wait", dep:["cf-interview","docs-apost"]},
  {id:"cf-indonesia",t:"Follow up with Campus France Indonesia team",  k:"visa",  s:"todo", p:"High",     d:"2026-10-14", ef:"quick",
    n:"Check where the EEF validation stands. Added from Chat; the date is a placeholder to move."},
- {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", ef:"day", dep:["cf-validation"]},
+ {id:"cf-eef-pay", t:"Pay the Campus France EEF fee",                 k:"visa",  s:"todo", p:"Critical", d:"2026-10-13", ef:"hours", dep:["cf-validation"],
+   n:"Campus France Jakarta asked for this the moment the file was validated, following their payment guideline. It gates the VFS appointment. The date is Claude's, not theirs: they named no deadline, so move it."},
+ {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", ef:"day", dep:["cf-eef-pay"]},
  {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", ef:"hours",},
 
  /* housing and move */
@@ -3809,7 +3811,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0912";
+var BUILD="2026-10-06-1030";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

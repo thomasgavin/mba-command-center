@@ -1,0 +1,74 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-06T08:12:00.000Z",
+ "source": "Claude",
+ "why": "Campus France validated the file and asked for the EEF fee; SBI is stalled on a crossed wire",
+ "changed": [
+  {
+   "id": "cf-validation",
+   "at": "2026-10-06T08:12:00.000Z",
+   "status": "done",
+   "manual": true,
+   "doneAt": "2026-10-06"
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-1791287520001",
+   "from": "claude",
+   "itemId": "cf-validation",
+   "itemTitle": "Campus France EEF validated",
+   "text": "\u2709 You file has been validated (6 Oct, Etudes en France)\n\n\"Your application file for INSEAD has been validated by Espace Campus France Indon\u00e9sie.\" This came through at 11:53 Jakarta, about twenty-two hours after you re-submitted the corrections. Marking the task done. Dossier reference left out of this note on purpose.",
+   "createdAt": "2026-10-06T04:53:55.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791287520002",
+   "from": "claude",
+   "itemId": "cf-eef-pay",
+   "itemTitle": "Pay the Campus France EEF fee",
+   "text": "\u2709 RE: Account Verification (6 Oct, Fitria, Campus France Jakarta)\n\n\"Please proceed to EEF payment by following payment guideline on drive.\" One minute after the validation mail, so this is the next step and it is yours. I added this task because nothing on the board held it; the 13 October date is mine rather than theirs, since they named no deadline. Their auto-reply still says messages take two to three working days, so ask anything you need to ask in the same message as the payment proof rather than in a separate one.",
+   "createdAt": "2026-10-06T04:54:57.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791287520003",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Book Campus France interview",
+   "text": "Worth a look: your file is validated and this task is still open, due 10 October. Campus France Indonesia validated without any interview appearing in the mail thread, so either they waived it for this route or it is still to come. I have not changed the task, because guessing which it is would be the kind of invention this board exists to prevent \u2014 but if they skipped it, this is one to close.",
+   "createdAt": "2026-10-06T08:12:00.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791287520004",
+   "from": "claude",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "text": "\u2709 Re: Request for Certificate of Delay in Education Loan (6 Oct, SBI Sahibabad branch)\n\nThe branch wrote at 10:58 Jakarta saying they have had no confirmation from you about recovery of the legal and valuation charges, and you replied thirteen minutes later pointing out you sent exactly that on 3 October and asking whether it should go to a different address. So the sanction is stalled on a crossed wire rather than on anything substantive. Their 27 September mail is still the stated reason for the delay: collateral verification takes longer. Worth a phone call to the branch if the reply does not land in a day or two, since email is clearly not reaching whoever is waiting on it.",
+   "createdAt": "2026-10-06T05:28:26.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791287520005",
+   "from": "claude",
+   "itemId": "cf-eef-pay",
+   "itemTitle": "Pay the Campus France EEF fee",
+   "text": "Campus France validated your file this morning and asked for the EEF fee in the next breath. It is the only thing standing between you and the VFS appointment now, and VFS in Indonesia runs to fifteen working days from the appointment, which is the part nobody can speed up. Their payment guideline is on the drive they pointed you at.",
+   "createdAt": "2026-10-06T08:12:00.000Z",
+   "state": "new",
+   "kind": "nudge",
+   "about": "cf-eef-pay",
+   "round": 1,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-13"
+   }
+  }
+ ],
+ "acted": [
+  "Campus France EEF validated: Upcoming -> Done",
+  "Board: added \"Pay the Campus France EEF fee\" to the visa sequence, ahead of the VFS appointment, which now waits on it instead of on validation"
+ ]
+}
