@@ -129,6 +129,21 @@
    black one, which is the other half of "why are some lines still grey". */
 :root[data-theme="dark"] .gbar{opacity:.52}
 html,body{height:100%}
+/* The white strip at the top, reported half a dozen times and never once
+   caused by what the fix of the day assumed. Nothing this page declares is
+   white: the status-bar meta is `black`, the manifest and `--sbar` are
+   `#280a38`, the theme-color is orange or Gmail grey. What he was looking at
+   was the *canvas* -- `html` has no background of its own, so it is white by
+   default, and inside an installed iOS app `body{position:fixed;inset:0}`
+   resolves against the safe-area box rather than the screen, leaving the
+   strip above it painted by nobody.
+   So stop trying to tell iOS what colour to paint and take the white out of
+   the page instead. Whatever box iOS hands the page, and whichever of the
+   three install paths captured which meta, the only thing that can show
+   through is this. It is colour alone and touches no geometry, which is what
+   makes it safe here: every previous attempt at this strip moved a height or
+   an inset and cost seven rounds at the other end of the screen. */
+html{background:var(--sbar)}
 body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--page); color:var(--ink);
@@ -3879,7 +3894,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1145";
+var BUILD="2026-10-06-1105";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

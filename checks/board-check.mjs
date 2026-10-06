@@ -1920,6 +1920,30 @@ for (var bw of [390, 1280]) {
   ok("and the strip that only existed to fill it is gone",
      !/class="sbar"/.test(html35), "sbar");
 
+  /* The one that actually mattered, and the reason this is measured rather
+     than read: nothing the page *declares* was ever white, so every check
+     that read a meta or a token passed while his phone showed a white strip.
+     `html` carried no background at all -- the default canvas -- and inside
+     an installed iOS app the fixed body does not always reach the top of the
+     screen. The canvas is the only thing that can show there, in either
+     theme, so the canvas is what is asserted. */
+  {
+    var canv = await s35.p.evaluate(function () {
+      var r = {};
+      setTheme("light"); r.light = getComputedStyle(document.documentElement).backgroundColor;
+      setTheme("dark");  r.dark  = getComputedStyle(document.documentElement).backgroundColor;
+      setTheme("light");
+      return r;
+    });
+    var lum35 = function (c) {
+      var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(c || "");
+      if (!m) return 255;
+      return (+m[1] * 0.299 + +m[2] * 0.587 + +m[3] * 0.114);
+    };
+    ok("the html canvas is dark in both themes, so an uncovered strip can never be white",
+       lum35(canv.light) < 60 && lum35(canv.dark) < 60, JSON.stringify(canv));
+  }
+
   /* "the daily brief section looks too plane - it should read like a actual
      magazine editorial-level with colours and good spacing". The body already
      carried the structure; it was drawn as one grey paragraph run. */

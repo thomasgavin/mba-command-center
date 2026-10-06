@@ -684,6 +684,23 @@ thumb's reach.
   it.
   **The rule this leaves: do not get clever about height here.** Seven
   attempts, none of them right, against one plain declaration that was.
+- **The white strip was the canvas, not the status bar.** It was reported half
+  a dozen times and every fix was a guess at which file iOS was reading --
+  the Safari meta, then the manifest, then a re-add from the other browser --
+  while the one thing nobody checked was that *nothing this page declares is
+  white*. The meta is `black`, the manifest and `--sbar` are `#280a38`, the
+  `theme-color` is orange or Gmail grey: none of those can paint a white
+  strip. `html` carried **no background at all**, so it was the default white
+  canvas, and inside an installed iOS app `body{position:fixed;inset:0}`
+  resolves against the safe-area box rather than the screen -- leaving the
+  strip above the body painted by nobody and showing the canvas through.
+  `html{background:var(--sbar)}` is the whole fix. It stops telling iOS what
+  colour to paint and takes the white out of the page, so it holds whichever
+  of the three install paths captured which value, and it touches no geometry
+  -- which is the point, since every earlier attempt moved a height or an
+  inset and cost seven rounds at the other end of the screen. The check
+  **measures the computed canvas in both themes** rather than reading a token,
+  because reading tokens is exactly what passed while his phone was white.
 - **`layoutLine()` is why there was no seventh round, and it lives in the
   log.** Six reports were spent measuring his screenshots in pixels to work
   out which number was wrong — the viewport, the bar's height, the padding or
@@ -1458,7 +1475,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 322 invariants, three widths, a real browser. Every one of them was a
+that runs: 323 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
