@@ -88,9 +88,12 @@
      inset. Anything anchored to the viewport's bottom -- the section bar
      first of all -- therefore floated 62px up. fitBar() sets this; 0 is
      right everywhere the window and the viewport agree.
-     A box sized from the top adds it; a box placed by `bottom` subtracts it,
-     because that offset is measured from the viewport's bottom edge, which
-     is --vtop above the real one. */
+     The two bases disagree, which is the whole of this bug: a PERCENTAGE
+     height resolves against the window (874), while `bottom` resolves
+     against the layout viewport (812). So a box sized from the top wants a
+     plain height:100% and no correction at all -- adding --vtop to it
+     overshot by the same 62px and put the bar just under the screen -- and
+     only a box placed by `bottom` subtracts it. */
   --vtop:0px;
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
@@ -178,7 +181,7 @@ body::before{
    board showed through underneath. .app is anchored the same way body
    already is, inset:0 on a fixed box, so it is the layout viewport by
    construction and there is no "below the bar" left to paint over. */
-.app{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
+.app{position:fixed;top:0;left:0;right:0;height:100%;z-index:1;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 /* The status-bar inset, which is zero everywhere but an installed iOS app. */
 .sbar{flex:none;height:env(safe-area-inset-top);background:var(--sbar)}
 
@@ -938,10 +941,10 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .fab.off{transform:translateY(96px) scale(.86);opacity:0;pointer-events:none}
 
 /* ---------- drawer ---------- */
-.scrim{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));background:rgba(40,10,56,.3);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(1px)}
+.scrim{position:fixed;top:0;left:0;right:0;height:100%;background:rgba(40,10,56,.3);z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(1px)}
 .scrim.on{opacity:1;pointer-events:auto}
 .drawer{
-  position:fixed;right:0;top:0;height:calc(100% + var(--vtop));width:min(432px,100%);background:var(--panel);z-index:510;
+  position:fixed;right:0;top:0;height:100%;width:min(432px,100%);background:var(--panel);z-index:510;
   display:flex;flex-direction:column;box-shadow:-22px 0 60px -26px rgba(40,10,56,.4);
   transform:translateX(102%);transition:transform .28s var(--ease);
 }
@@ -1185,7 +1188,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .dep .dd{width:7px;height:7px;border-radius:50%;flex:none}
 
 /* ---------- command palette ---------- */
-.pal{position:fixed;top:0;left:0;right:0;height:calc(100% + var(--vtop));z-index:600;display:none;padding:76px 20px 20px;justify-content:center;align-items:flex-start}
+.pal{position:fixed;top:0;left:0;right:0;height:100%;z-index:600;display:none;padding:76px 20px 20px;justify-content:center;align-items:flex-start}
 .pal.on{display:flex}
 .pal-bg{position:absolute;inset:0;background:rgba(40,10,56,.34);backdrop-filter:blur(3px)}
 .pal-box{
@@ -1345,6 +1348,12 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      room for it in the row. */
   .tbtn .lbl{display:none}
   .tbtn{width:36px;padding:0;justify-content:center;position:relative}
+  /* Here the badge hangs off the corner of the button and over the page, so
+     the translucent white it wears on a wide screen -- which only ever worked
+     because it sat ON the orange button -- came out as a grey smudge on the
+     dark board. It carries the brand orange instead, and the :not(.hot) rule
+     has to be beaten by name or it would paint it --wash again. */
+  .tbtn .n,.tbtn:not(.hot) .n{background:var(--orange);color:#fff}
   .tbtn .n{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;
     display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--page)}
   .subs{padding:9px 13px}
@@ -3752,7 +3761,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0631";
+var BUILD="2026-10-06-0702";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -3763,7 +3772,7 @@ function checkBuild(announce){
     .then(function(t){
       if(!t) return;
       var m=t.match(/var BUILD="([^"]+)"/);
-      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version ("+BUILD+"). "+layoutLine(),null,11000); return; }
+      if(!m || m[1]===BUILD){ if(announce) toast("You are on the latest version ("+BUILD+")."); return; }
       /* One attempt was not enough: iOS standalone can serve the same copy
          back even through a fresh query string, and giving up after one try
          left him looking at a board that knew it was stale and would not do
@@ -4898,11 +4907,27 @@ function layoutLine(){
   var b=document.querySelector(".vbar"), r=b.getBoundingClientRect();
   return "vp"+Math.round(innerHeight)+"/"+((window.screen&&screen.height)||0)
     +" app"+Math.round(a.top)+"+"+Math.round(a.height)
-    +" bar"+Math.round(r.height)+" pad"+Math.round(parseFloat(getComputedStyle(b).paddingBottom))
+    +" bar"+Math.round(r.height)+"@"+Math.round(r.bottom)+" pad"+Math.round(parseFloat(getComputedStyle(b).paddingBottom))
     +" gap"+Math.round(innerHeight-r.bottom)
     +" ins"+Math.round(insTop)+"/"+Math.round(insBot)
     +" vtop"+getComputedStyle(document.documentElement).getPropertyValue("--vtop").trim()
     +(navigator.standalone?" app-mode":" browser");
+}
+/* The readout earned its keep and then became clutter: a line of numbers over
+   the top of the board every time he pressed Sync, saying the same thing. It
+   belongs where every other record of this board lives -- history/, written by
+   the relay -- so it is posted once per device and again only when a number
+   actually changes. Nothing is on screen and the next layout bug is still one
+   file away instead of six screenshots away. */
+function sendDiag(){
+  if(!RELAY || !window.fetch) return;
+  var line=layoutLine(), was="";
+  try{ was=localStorage.getItem("mbacc_diag")||""; }catch(e){}
+  if(line===was) return;
+  fetch(RELAY+"/diag",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({line:line, build:BUILD})})
+    .then(function(r){ if(r.ok){ try{ localStorage.setItem("mbacc_diag",line); }catch(e){} } })
+    .catch(function(){});
 }
 addEventListener("resize",fitBar);
 addEventListener("orientationchange",fitBar);
@@ -4910,6 +4935,7 @@ addEventListener("orientationchange",fitBar);
 /* ---------- boot ---------- */
 load();
 fitBar();
+sendDiag();
 render();
 checkBuild(false);
 setView("over");

@@ -2446,12 +2446,18 @@ for (var bw of [390, 1280]) {
      top inset. A translucent status bar puts the window above the layout
      viewport, and innerHeight stops short of the screen by exactly that much,
      so everything anchored to the viewport's bottom floated 62px up. */
-  ok("the app is as tall as the window, not as tall as the viewport",
-     /height:calc\(100% \+ var\(--vtop\)\)/.test(src), "");
+  /* A percentage height resolves against the WINDOW on his device (874) while
+     `bottom` resolves against the layout viewport (812). Adding --vtop to the
+     height as well overshot by the same 62px and put the bar under the screen,
+     so the height is a plain 100% and only `bottom` offsets are corrected. */
+  ok("the app is sized by a plain percentage, with no inset correction",
+     /\.app\{[^}]*height:100%[^}]*\}/.test(src) && !/height:calc\(100% \+ var\(--vtop\)\)/.test(src),
+     "");
   ok("and --vtop is only trusted when the two numbers agree",
      /Math\.abs\(over-insTop\)<=2 \? insTop : 0/.test(src), "");
   var vtopUsers = (src.match(/var\(--vtop\)/g) || []).length;
-  ok("every surface hung off the bottom edge reads it", vtopUsers >= 7, String(vtopUsers));
+  ok("every surface placed by `bottom` reads it", vtopUsers >= 3, String(vtopUsers));
+  ok("and nothing sized from the top does", !/height:calc\([^)]*--vtop/.test(src), "");
   /* Six rounds of this bug went on measuring his screenshots in pixels to work
      out which number was wrong. The device knows all of them. */
   ok("and Sync reports what the layout actually resolved to",
@@ -2460,7 +2466,22 @@ for (var bw of [390, 1280]) {
   /* "it says you're on the latest version" is only useful with the number on
      it; without one, which build he is looking at can only be worked out by
      measuring a screenshot. */
-  ok("the version toast names the build", /latest version \("\+BUILD\+"\)\. "\+layoutLine\(\)/.test(src), "");
+  ok("the version toast names the build", /latest version \("\+BUILD\+"\)/.test(src), "");
+  /* The readout belongs in the log, not over the top of the board on every
+     sync -- and it only goes when a number actually changed. */
+  ok("and says nothing else", !/latest version[^;]*layoutLine/.test(src), "");
+  ok("the layout readout goes to the audit log instead",
+     /RELAY\+"\/diag"/.test(src) && /line===was\) return/.test(src), "");
+  /* A badge that hangs off the corner of its button is over the page, not
+     over the orange, so translucent white came out as a grey smudge. */
+  var badge = await s39.p.evaluate(function () {
+    var n = document.getElementById("notesN");
+    n.classList.remove("off"); n.textContent = "3";
+    var c = getComputedStyle(n);
+    return { bg: c.backgroundColor, fg: c.color };
+  });
+  ok("the notes badge carries the brand orange on a phone",
+     badge.bg === "rgb(255, 100, 41)" && badge.fg === "rgb(255, 255, 255)", JSON.stringify(badge));
 
   /* "the pencil icon of all notes is too small" */
   var pen = await s39.p.evaluate(function () {

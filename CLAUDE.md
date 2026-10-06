@@ -705,20 +705,32 @@ thumb's reach.
   `position:fixed; inset:0` box ends 62px high and everything anchored to it
   floated. `--vtop` is that difference, set by `fitBar()` and only when
   `screen.height − innerHeight` actually agrees with the measured top inset.
-  **A box sized from the top adds it** (`.app`, `.scrim`, `.pal`, the drawer:
-  `height:calc(100% + var(--vtop))`); **a box placed by `bottom` subtracts
-  it** (`.fab`, the toast, the snooze rail), because that offset is measured
-  from the viewport's bottom edge, which is `--vtop` above the real one. The
-  check asserts both, and simulating a 62px `--vtop` puts the bar's bottom at
-  874 — his screen, not his viewport.
-- **`layoutLine()` is why there was no seventh round.** Six reports were spent
-  measuring his screenshots in pixels to work out which number was wrong —
-  the viewport, the bar's height, the padding or the build — and the device
-  knew all four. The Sync toast now prints them: `vp`, `app`, `bar`, `pad`,
-  `gap`, `ins` and whether it is running as an installed app. One screenshot
-  of a toast replaces a pass with `pillow`. The same move as putting the
-  build stamp in the version toast, which settled that question in one
-  message.
+  **The two bases disagree, and that is the whole of it.** A percentage
+  height resolves against the **window** (874), while `bottom` resolves
+  against the **layout viewport** (812). So a box sized from the top wants a
+  plain `height:100%` and no correction at all — adding `--vtop` to it as
+  well overshot by the same 62px and put the bar just under the bottom of the
+  screen, with only the 2.5px orange tab indicator showing — and **only a box
+  placed by `bottom` subtracts it** (`.fab`, the toast, the snooze rail). The
+  check asserts both directions.
+- **`layoutLine()` is why there was no seventh round, and it lives in the
+  log.** Six reports were spent measuring his screenshots in pixels to work
+  out which number was wrong — the viewport, the bar's height, the padding or
+  the build — and the device knew all four. It reports `vp`, `app`,
+  `bar@bottom`, `pad`, `gap`, `ins`, `vtop` and whether it is running as an
+  installed app. It was printed in the Sync toast for exactly as long as that
+  was useful: it answered the question in one tap and then became a wall of
+  digits over the top of the board on every sync. **It posts to the relay's
+  `/diag` now and lands in `history/`**, once per device and again only when
+  a number actually changes — nothing on screen, and the next layout bug is
+  still one file away instead of six screenshots away.
+- **A badge that hangs off the corner of its button needs its own colour.**
+  `.tbtn .n` is translucent white, which works only while it is sitting *on*
+  the orange button; at phone width it is `position:absolute` on the corner
+  and half of it is over the page, so on the dark board it read as a grey
+  smudge: *"the new note count bubble is trasparent now"*. It carries
+  `--orange` there, and the rule has to name `.tbtn:not(.hot) .n` too or that
+  more specific selector paints it `--wash` again.
 - **A dot goes out on the section he has opened, and stays out.** It says
   "something in here is past its date", which is not worth saying about the
   screen he is already reading: *"they should go away once I open the
@@ -1365,7 +1377,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 308 invariants, three widths, a real browser. Every one of them was a
+that runs: 312 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

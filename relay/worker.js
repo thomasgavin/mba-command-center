@@ -492,8 +492,12 @@ export class Board {
         HIST_DAYS+" days, then deleted.\n\n"+
         "| Time (UTC) | Task | Change | By |\n|---|---|---|---|\n"+
         rows.map(function(h){
+          /* a layout line has no previous value to diff against, so it reads
+             as a statement rather than a move; an arrow from nothing is noise */
+          var what = h.a === "" ? md(h.f)+" "+md(h.b)
+                                : md(h.f)+" "+md(h.a)+" \u2192 "+md(h.b);
           return "| "+(h.at||"").slice(11,16)+" | "+md(h.title)+" | "+
-                 md(h.f)+" "+md(h.a)+" \u2192 "+md(h.b)+" | "+md(h.by)+" |";
+                 what+" | "+md(h.by)+" |";
         }).join("\n")+"\n";
       var path = HIST+"/"+d+".md";
       /* a day already on disk is replaced, so an alarm that fires twice in one
@@ -679,6 +683,30 @@ export class Board {
         devices:Object.keys((await this.ctx.storage.get("subs"))||{}).length,
         lastPush:(await this.ctx.storage.get("lastPush"))||null,
         evs:await this.backlog(s)});
+    }
+
+    /* What a device's layout actually resolved to. It used to be printed in
+       the Sync toast, which answered the question it was built for -- a nav
+       bar that floated for six rounds because nobody could see the numbers --
+       and then became a wall of digits over the board on every sync. The log
+       is where every other record of this board already lives, and a line
+       only lands when something about the device changed. */
+    if(p === "/diag"){
+      var d = await request.json();
+      var line = String((d && d.line) || "").slice(0, 200);
+      if(!line) return out(400, {error:"no line"});
+      var hd = (await this.ctx.storage.get("hist")) || [];
+      var last = null;
+      for(var i=hd.length-1; i>=0; i--) if(hd[i].f === "layout"){ last = hd[i]; break; }
+      if(!last || last.b !== line){
+        if(hd.length < HIST_MAX) hd.push({
+          at: new Date().toISOString(), id:"device", title:"This device",
+          f:"layout", a:"", b:line, by:"build "+String((d&&d.build)||"?").slice(0,24)
+        });
+        await this.ctx.storage.put("hist", hd);
+        await this.armArchive();
+      }
+      return out(200, {ok:true});
     }
 
     if(p === "/send" || p === "/agent/reply"){
