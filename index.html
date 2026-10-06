@@ -20,7 +20,7 @@
      above the app, read at launch, so a theme switch at runtime cannot repaint
      it -- a dark board under a white bar, which is what he saw. Translucent
      hands the inset to the page, and `.sbar` fills it from a token. -->
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="27D">
 <meta name="theme-color" content="#ff6429">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,7 +160,11 @@ body::before{
    boxes, and nothing in CSS says which. The status-bar style went back to
    `default` in the same change: it is what made the two disagree, and it is
    worth more to have the bar in the right place than the strip at the top
-   painted. */
+   painted. `black` is the third option and the one that gives both: an opaque
+   dark strip iOS paints itself, with the page starting under it, so nothing
+   about the bottom of the screen is in question. `default` came out white
+   (*"the top went back to white"*) and `black-translucent` is what floated
+   the bar seven times. */
 .app{position:relative;z-index:1;height:100%;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column}
 
 /* ---------- top bar ---------- */
@@ -1029,12 +1033,28 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .nwh i{flex:none;font-style:normal;color:var(--ink4);font-size:12px;transition:transform .18s var(--ease)}
 .nwi.open .nwh i{transform:rotate(90deg)}
 .nwi.open .nwh{background:var(--wash2)}
-.nwb{display:none;padding:2px 13px 12px;border-top:1px solid var(--line)}
+.nwb{display:none;padding:4px 15px 18px;border-top:1px solid var(--line)}
 .nwi.open .nwb{display:block}
-.nwb p{font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:6px;overflow-wrap:anywhere}
-.nwb h4{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--ink4);margin-top:13px}
-.nwb h4:first-child{margin-top:9px}
+/* An edition, not a text file. The section's colour is its position in the
+   brief, the same trick the mind map groups use: nobody picks it, nothing
+   stores it, and a section invented next week is coloured by existing. */
+.nwb p{font-size:13px;line-height:1.68;color:var(--ink2);margin-top:7px;overflow-wrap:anywhere}
+.nwsec{margin-top:22px}
+.nwsec:first-child{margin-top:14px}
+.nwb h4{
+  font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:rgb(var(--nt));display:flex;align-items:center;gap:9px;margin:0;
+}
+/* the rule runs out from the heading to the edge: a magazine's section mark,
+   and the one thing that makes a run of headings read as an issue */
+.nwb h4::after{content:"";flex:1;height:1px;background:rgba(var(--nt),.3)}
+/* the item is the line with the weight; its prose hangs off a ruled column so
+   two items under one heading cannot read as one paragraph */
+.nwit{margin-top:12px;padding-left:13px;border-left:2px solid rgba(var(--nt),.38)}
+.nwit .nwl{
+  font-size:14.5px;line-height:1.4;font-weight:650;letter-spacing:-.014em;
+  color:var(--ink);margin-top:0;
+}
 
 /* ---------- task details: the note feed ---------- */
 /* Every flex child here can shrink below its longest word, because the drawer
@@ -3585,11 +3605,38 @@ function newsTitle(n){
 /* The body is plain text with one piece of markup: a line beginning "## " is a
    heading. A brief is three or four sections and a run of equal-weight
    paragraphs is the "all in one paragraph" he already objected to once. */
+/* *"it should read like a actual magazine editorial-level with colours and
+   good spacing"*. The markup it is built from has more structure than it was
+   drawing: a "## " line is a section, a line opening "- " is the item that
+   section is about, and the lines under it are the prose earning the item its
+   place. Rendering all three as the same grey paragraph threw that away. So a
+   section takes a colour by position, the way a mind map group does -- nobody
+   picks it and nothing stores it -- the item is the line that carries weight,
+   and its prose hangs off a ruled column beneath it. */
 function newsBody(t){
-  return String(t||"").split("\n").map(function(l){
-    l=l.trim(); if(!l) return "";
-    return /^##\s+/.test(l) ? '<h4>'+esc(l.replace(/^##\s+/,""))+'</h4>' : '<p>'+esc(l)+'</p>';
-  }).join("");
+  var out=[], sec=-1, open=false;
+  function shutItem(){ if(open){ out.push("</div>"); open=false; } }
+  function shutSec(){ shutItem(); if(sec>=0) out.push("</section>"); }
+  String(t||"").split("\n").forEach(function(l){
+    l=l.trim(); if(!l) return;
+    if(/^##\s+/.test(l)){
+      shutSec(); sec++;
+      out.push('<section class="nwsec" style="--nt:'+mapTint(sec).join(",")+'">'+
+               '<h4>'+esc(l.replace(/^##\s+/,""))+'</h4>');
+      return;
+    }
+    if(sec<0){ sec=0; out.push('<section class="nwsec" style="--nt:'+mapTint(0).join(",")+'">'); }
+    if(/^[-\u2013\u2022]\s+/.test(l)){
+      shutItem();
+      out.push('<div class="nwit"><p class="nwl">'+esc(l.replace(/^[-\u2013\u2022]\s+/,""))+'</p>');
+      open=true;
+      return;
+    }
+    if(!open){ out.push('<div class="nwit">'); open=true; }
+    out.push('<p>'+esc(l)+'</p>');
+  });
+  shutSec();
+  return out.join("");
 }
 function openNews(){
   dMode="news"; openId=null;
@@ -3738,7 +3785,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0738";
+var BUILD="2026-10-06-0756";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

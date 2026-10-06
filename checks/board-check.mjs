@@ -1826,10 +1826,41 @@ for (var bw of [390, 1280]) {
      is worth more than the strip at the top being painted, so both went back
      to what 09e98bd had. */
   var html35 = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  ok("the iOS status bar is back to the style that never floated the bar",
-     /apple-mobile-web-app-status-bar-style" content="default"/.test(html35), "meta");
+  ok("the iOS status bar is opaque and dark, not translucent and not white",
+     /apple-mobile-web-app-status-bar-style" content="black"/.test(html35), "meta");
   ok("and the strip that only existed to fill it is gone",
      !/class="sbar"/.test(html35), "sbar");
+
+  /* "the daily brief section looks too plane - it should read like a actual
+     magazine editorial-level with colours and good spacing". The body already
+     carried the structure; it was drawn as one grey paragraph run. */
+  var brief = await s35.p.evaluate(function () {
+    var h = newsBody("## Tomorrow\n- Plan Locus exit, due 7 Oct.\nThere is no resignation date on the board.\n## Not yours right now\n- SBI sanction letter, due 24 Oct.\nThe PoA was executed on 3 Oct.");
+    var d = document.createElement("div"); d.className = "nwb"; d.style.display = "block";
+    d.innerHTML = h; document.getElementById("dBody").appendChild(d);
+    var secs = d.querySelectorAll(".nwsec");
+    var hs = d.querySelectorAll("h4"), leads = d.querySelectorAll(".nwl");
+    var r = {
+      secs: secs.length, heads: hs.length, leads: leads.length,
+      items: d.querySelectorAll(".nwit").length,
+      tints: [].map.call(secs, function (x) { return getComputedStyle(x.querySelector("h4")).color; }),
+      leadSize: parseFloat(getComputedStyle(leads[0]).fontSize),
+      bodySize: parseFloat(getComputedStyle(leads[0].nextElementSibling).fontSize),
+      lead: parseFloat(getComputedStyle(leads[0].nextElementSibling).lineHeight),
+      rule: getComputedStyle(d.querySelector(".nwit")).borderLeftWidth
+    };
+    d.parentNode.removeChild(d);
+    return r;
+  });
+  ok("a brief is sections, items and prose, not one run of paragraphs",
+     brief.secs === 2 && brief.heads === 2 && brief.leads === 2 && brief.items === 2,
+     JSON.stringify(brief));
+  ok("each section takes its own colour by position",
+     brief.tints[0] !== brief.tints[1] && !/128, 128, 128/.test(brief.tints.join()),
+     JSON.stringify(brief.tints));
+  ok("the item outweighs its prose, and the prose is set to be read",
+     brief.leadSize > brief.bodySize && brief.lead / brief.bodySize >= 1.6
+       && parseFloat(brief.rule) >= 2, JSON.stringify(brief));
 
   /* "Too much grey and it is hard to see" -- every ink has to clear 4.5:1 on
      the surface it is actually drawn on, which is what the first dark palette

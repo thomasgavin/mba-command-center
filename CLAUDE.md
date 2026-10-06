@@ -652,7 +652,11 @@ thumb's reach.
   it.** `.app` is an ordinary block filling the fixed body —
   `position:relative; height:100%`, no viewport unit, no percentage of a
   fixed box, no inset correction — and
-  `apple-mobile-web-app-status-bar-style` is `default` again. The bar was
+  `apple-mobile-web-app-status-bar-style` is **`black`** — the third option,
+  and the only one that gives both halves: an opaque dark strip iOS paints
+  itself, with the page starting under it, so nothing about the bottom of the
+  screen is in question. `default` came back white (*"the top went back to
+  white"*) and `black-translucent` is what floated the bar seven times. The bar was
   reported floating **seven times** over two days, and each fix was a
   different guess at a number nobody had measured: `height:100%` on a fixed
   body, then `100dvh`, then `100dvh` with a `.vbar::after` painting bar
@@ -852,10 +856,20 @@ summary nobody asked for is the noise this board exists to cut.
 - **The title is derived, never stored.** `newsTitle()` builds "Daily
   Newsletter &mdash; 07 October 2026" from `period` and `date`; there is no
   `title` field, because a second copy of a date is a date that can drift.
-- **The body is plain text with one piece of markup**: a line starting `## ` is
-  a section heading. A brief is three or four sections and a run of
-  equal-weight paragraphs is the "all in one paragraph" he objected to on the
-  mind map.
+- **The body is plain text with two pieces of markup**: a line starting `## `
+  is a section, and a line starting `- ` is the item that section is about.
+  Everything under an item is the prose that earns it its place.
+- **It is drawn as an edition, not a text file.** *"it should read like a
+  actual magazine editorial-level with colours and good spacing"*. All three
+  kinds of line used to render as the same grey paragraph, which threw the
+  structure away and is what made it read flat. Now the section heading is
+  small-capped and letterspaced in a colour **taken by position** — the mind
+  map's trick, so nobody picks it, nothing stores it, and a section invented
+  next week is coloured by existing — with a rule running out from it to the
+  edge, which is the thing that makes a run of headings read as an issue. The
+  item is the line that carries the weight (14.5px, 650) and its prose hangs
+  off a ruled column in the same tint, so two items under one heading cannot
+  read as one paragraph.
 - **Every edition is shut**, in a drawer of its own behind the newspaper button
   beside Notes. Sixty open reports is the wall the collapse prevents, and the
   thread is the wrong home for them: eleven dailies between two of his messages
@@ -1336,7 +1350,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 308 invariants, three widths, a real browser. Every one of them was a
+that runs: 311 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
