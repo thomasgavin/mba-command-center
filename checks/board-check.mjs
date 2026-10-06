@@ -2432,8 +2432,11 @@ for (var bw of [390, 1280]) {
   var barSrc = /\.app\{([^}]*)\}/.exec(src);
   ok("no viewport-height unit decides the app's height",
      !!barSrc && !/\d(dv|sv|lv|v)h/.test(barSrc[1]), barSrc && barSrc[1]);
-  ok("the section bar keeps clearance for the home indicator",
-     /--barpad:max\(4px, calc\(env\(safe-area-inset-bottom\)/.test(src), String(bar.pad));
+  /* The inset's magnitude cannot be trusted -- his installed app reports about
+     93px where a simulated one gives 34 -- so the clearance is clamped. */
+  ok("the section bar's clearance is clamped, not whatever the inset claims",
+     /--barpad:clamp\(4px, calc\(env\(safe-area-inset-bottom\) - 14px\), 20px\)/.test(src),
+     String(bar.pad));
 
   /* "the pencil icon of all notes is too small" */
   var pen = await s39.p.evaluate(function () {

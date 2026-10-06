@@ -70,7 +70,7 @@
      under the glyphs, which is what an iOS tab bar does, and anything on top
      of that is the band of nothing he has now asked about twice --
      *"the bottom nav bar went up now"*. */
-  --barpad:max(4px, calc(env(safe-area-inset-bottom) - 14px));
+  --barpad:clamp(4px, calc(env(safe-area-inset-bottom) - 14px), 20px);
   --r:14px; --r2:10px; --r3:8px;
   --sh:0 1px 2px rgba(40,10,56,.05), 0 10px 26px -14px rgba(40,10,56,.14);
   --sh2:0 2px 6px rgba(40,10,56,.07), 0 20px 44px -18px rgba(40,10,56,.22);
@@ -250,11 +250,13 @@ body::before{
   position:relative;flex:none;display:flex;align-items:stretch;
   border-top:1px solid var(--line);background:var(--glass);
   backdrop-filter:saturate(1.6) blur(14px);
-  /* The home indicator wants clearance, not the whole 34px it declares. Now
-     that the bar really does reach the bottom of the screen, this padding is
-     the only thing between the icons and the indicator, so it cannot be 0 --
-     but 34px under a 52px bar is 86px of chrome on an 844px screen, which is
-     the "lot of space left on the bottom". 20px clears the indicator. */
+  /* The home indicator wants clearance, and nothing more. The inset is NOT a
+     number to trust: his installed app reports about 93px, not the 34px a
+     simulated inset gives, which made the bar 131px tall and still read as
+     floating even once it genuinely reached the bottom of the screen. The
+     indicator itself sits 8-13px up, so the padding is clamped at 20px: that
+     clears it on his phone and falls to the 4px floor everywhere there is no
+     inset at all. */
   padding-bottom:var(--barpad);
   position:relative;z-index:30;
 }
@@ -3729,7 +3731,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-0432";
+var BUILD="2026-10-06-0446";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

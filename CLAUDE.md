@@ -677,9 +677,17 @@ thumb's reach.
   the bar and the floating button both read it, so the two cannot be guessed
   apart. It went to 0 while the bar was floating, which only hid the real
   bug — now that the bar reaches the foot of the screen this padding is the
-  only thing between the icons and the home indicator, so it cannot be 0. It
-  is the inset less 14px, floored at 4: 20px on his phone, which clears the
-  indicator without the 86px of chrome a full 34px would cost.
+  only thing between the icons and the home indicator, so it cannot be 0.
+  **The inset is not a number to trust.** His installed app reports about
+  **93px**, where a simulated inset on the same layout gives 34, and taking it
+  at face value made the bar 131px tall — so the bar still read as floating
+  even once it genuinely reached the bottom of the screen, which is the fifth
+  report and the one that was no longer about the viewport at all. Measuring
+  his screenshot is what separated the two: the band under the bar had become
+  bar colour rather than board, so the layout was right and only the height
+  was wrong. The home indicator itself sits 8–13px up, so `--barpad` is
+  `clamp(4px, inset − 14px, 20px)`: 20px on his phone, the 4px floor
+  everywhere with no inset at all.
 - **A dot goes out on the section he has opened, and stays out.** It says
   "something in here is past its date", which is not worth saying about the
   screen he is already reading: *"they should go away once I open the
