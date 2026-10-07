@@ -1385,6 +1385,38 @@ a task reopens, so it is a record of what happened and never an estimate. A fiel
 load and never reached the other device, and the in-memory check passed the
 whole time. Any new field goes in both, and the check for it reloads the page.
 
+## Moving `SEED` under a diff is not an edit he made
+
+A task's clock is the moment **he** last changed it, and `save()` worked that
+out by comparing the sparse diff it is about to write against the one already
+in storage. That reading breaks the moment `SEED` moves: once a pass dates a
+task to the value he had already set, that value is the baseline, `diffOf`
+stops emitting the field, and two diffs stop matching although nothing on the
+board moved.
+
+The Locus exit date is what this cost. The morning pass read his resignation
+email, set the task to 6 December in both `SEED` and a patch file, and the
+device that pulled the folder showed 6 December. The other device never read
+the patch, but it did take the new build -- where `SEED`'s status for that task
+had gone from `todo` to `doing`, so its own diff lost a field. Its next
+`save()` read that as an edit and stamped the **stale 7 October** with the
+current clock, which then outranked the correction everywhere. From his side
+the task left the next-10-days list in the morning and was back on today by
+lunchtime.
+
+So the comparison is on what the two diffs **resolve to**, never on the diffs
+themselves: `storedAsNow()` lays the stored diff over today's `SEED` and runs
+`diffOf` on the result, so a field the baseline absorbed is a no-op and a field
+he actually moved still takes the clock. `sameDiff` stays as it is, on resolved
+input.
+
+Two things follow for any pass that corrects a task. A `SEED` edit alone
+reaches nobody who already has a local diff for that id, so the patch file is
+what carries it -- and a patch is deliberately **not clock-gated**, which is
+the only reason a correction can beat a stale value at all. And the relay never
+hears a patch committed as a file, so its snapshot keeps serving the old value
+until his board next publishes; `/state` is where that shows.
+
 ## Status, and who decides it
 
 A task's status is his to set, and the dependency cascade is only a default.

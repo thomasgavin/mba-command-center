@@ -1,0 +1,33 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T04:58:12.000Z",
+ "source": "Claude",
+ "why": "Putting the Locus exit back on 6 December, where this morning's pass set it",
+ "changed": [
+  {
+   "id": "locus-exit",
+   "at": "2026-10-07T04:58:12.000Z",
+   "due": "2026-12-06",
+   "status": "doing",
+   "manual": true,
+   "effort": "multi"
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-20261007T0458120",
+   "from": "claude",
+   "itemId": "locus-exit",
+   "itemTitle": "Plan Locus exit: notice, LWD, handover",
+   "title": "Date put back to 6 Dec",
+   "text": "This task showed 6 December this morning and then slid back to today. Your other device was still holding the 7 October date you set on 4 October, and a change in the board's own baseline made it look newly edited, so it won. Fixed in the code, and the date is 6 December again.",
+   "createdAt": "2026-10-07T04:58:12.000Z",
+   "state": "new"
+  }
+ ],
+ "acted": [
+  "Plan Locus exit: notice, LWD, handover: 07 Oct -> 06 Dec",
+  "Board: save() no longer treats a change in the baseline as an edit he made, which is what let a stale date overwrite a correction"
+ ]
+}

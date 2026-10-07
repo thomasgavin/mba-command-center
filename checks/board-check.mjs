@@ -2793,6 +2793,76 @@ for (var bw of [390, 1280]) {
   await s39.ctx.close();
 }
 
+/* ---- 40. a SEED change is not an edit he made ----
+   The Locus exit date came back to the day he had dropped it on, hours after
+   the morning pass had corrected it. The correction moved the task to the date
+   SEED now carries, so `diffOf` stopped emitting that field -- and on the
+   device that had not read the patch, `save()` saw two sparse diffs disagree,
+   read it as a fresh edit, and stamped a STALE value with the current clock.
+   That then outranked the correction everywhere. The clock means "when he
+   changed this", so it may only move when the resolved values move. */
+{
+  var s40 = await open(390);
+  var seedy = await s40.p.evaluate(function () {
+    var sd = SEED.filter(function (x) { return x.d && x.s; })[0];
+    return { id: sd.id, status: sd.s, due: sd.d };
+  });
+  /* a stored diff that names a field SEED has since absorbed, beside one it
+     has not: exactly the shape a SEED move leaves behind */
+  var held = await s40.p.evaluate(function (q) {
+    var blob = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
+    blob.v = 3;
+    blob.items = {};
+    blob.items[q.id] = { status: q.status, due: "2026-10-07" };
+    blob.touched = {}; blob.touched[q.id] = "2026-10-04T13:02:54.344Z";
+    localStorage.setItem("mbacc_v3", JSON.stringify(blob));
+    return true;
+  }, seedy);
+  await s40.p.goto(URL_ + "?v=seedmove-" + Date.now(), { waitUntil: "load" });
+  await s40.p.waitForTimeout(600);
+  var kept = await s40.p.evaluate(function (q) {
+    save();
+    var blob = JSON.parse(localStorage.getItem("mbacc_v3") || "{}");
+    return { mem: touched[q.id], stored: (blob.touched || {})[q.id],
+             due: items[q.id].due,
+             sent: changedItems().filter(function (c) { return c.id === q.id; })[0] };
+  }, seedy);
+  ok("a field SEED absorbed does not restamp the item's clock",
+     kept.mem === "2026-10-04T13:02:54.344Z" && kept.stored === "2026-10-04T13:02:54.344Z",
+     JSON.stringify(kept));
+  ok("and the value it still holds travels with that same old clock",
+     kept.sent && kept.sent.at === "2026-10-04T13:02:54.344Z" && kept.sent.due === "2026-10-07",
+     JSON.stringify(kept.sent));
+  /* and the clock still has to move for a change he really made, or the
+     two-device merge loses every edit instead of only this one */
+  var moved = await s40.p.evaluate(function (q) {
+    patch(q.id, { due: "2027-01-09" });
+    save();
+    return { mem: touched[q.id], due: items[q.id].due };
+  }, seedy);
+  ok("an edge he really moved still takes the current clock",
+     moved.due === "2027-01-09" && moved.mem > "2026-10-04T13:02:54.344Z", JSON.stringify(moved));
+  /* the whole point: a patch dated after the stale clock survives the other
+     device publishing what it still holds */
+  var won = await s40.p.evaluate(function (q) {
+    mergePayload({ op: "patch", exportedAt: "2026-10-07T02:08:40.000Z",
+      changed: [{ id: q.id, at: "2026-10-07T02:08:40.000Z", due: "2026-12-06" }], notes: [] });
+    save();
+    var before = items[q.id].due;
+    mergePayload({ exportedAt: new Date().toISOString(),
+      changed: [{ id: q.id, title: items[q.id].title, status: items[q.id].status,
+                  due: "2026-10-07", priority: items[q.id].priority, snoozes: 0,
+                  origDue: null, manual: true, effort: null, deleted: false,
+                  at: "2026-10-04T13:02:54.344Z" }], notes: [] });
+    save();
+    return { before: before, after: items[q.id].due };
+  }, seedy);
+  ok("a correction is not undone by a device republishing the old value",
+     won.before === "2026-12-06" && won.after === "2026-12-06", JSON.stringify(won));
+  ok("no console errors through the clock checks", s40.errs.length === 0, s40.errs.join(" | "));
+  await s40.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

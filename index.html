@@ -2002,6 +2002,22 @@ function sameDiff(a,b){
   for(var n=0;n<DFIELDS.length;n++){ var f=DFIELDS[n]; if((a[f]===undefined?null:a[f])!==(b[f]===undefined?null:b[f])) return false; }
   return true;
 }
+/* What a stored diff would be written as against the SEED in THIS build.
+   A SEED change rewrites every diff that mentioned the field it moved: once
+   Claude dates a task to the value he had already set, that value is the
+   baseline and `diffOf` stops emitting it, so two sparse diffs stop matching
+   although nothing on the board moved. `save()` read that as an edit and
+   stamped a stale value with a fresh clock -- which then beat the patch that
+   had just corrected the same task on the other device, and the Locus exit
+   date came back to the day he had dropped it on hours after it was fixed.
+   So compare what the two diffs RESOLVE to, never the diffs themselves. */
+function storedAsNow(k,had){
+  var sd=seedOf(k); if(!sd) return null;
+  var t={id:k,title:sd.t,status:sd.s,due:sd.d,priority:sd.p,snoozes:0,origDue:null,
+         manual:false,deleted:false,effort:sd.ef||null,doneAt:null};
+  DFIELDS.forEach(function(f){ if(had && had[f]!==undefined) t[f]=had[f]; });
+  return diffOf(t);
+}
 /* Put an item back to SEED and lay a stored diff over it. Used when another
    tab's copy of an item is newer than this one's: the diff is partial, so the
    item has to be reset first or a field the other tab cleared would survive. */
@@ -2045,7 +2061,7 @@ function save(){
     if(Object.keys(diff).length){
       /* only move the clock when the values really moved, or every save would
          make this device look like the most recent authority on everything */
-      if(!had || !sameDiff(had,diff)) touched[k]=fromMerge[k]||now;
+      if(!had || !sameDiff(storedAsNow(k,had),diff)) touched[k]=fromMerge[k]||now;
       out[k]=diff;
     }else if(had && Object.keys(had).length){
       /* back to its SEED value: that is an edit too, and it has to be able to
@@ -3950,7 +3966,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-0215";
+var BUILD="2026-10-07-0505";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
