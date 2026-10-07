@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 442 checks, three widths, a real browser
+node checks/board-check.mjs          # 457 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -494,6 +494,23 @@ on by a caller that forgot. Chat with no remembered offset opens at its
 after `renderChat`'s jump to the foot and undid it.
 *Checked: `Chat offers a way back to the newest message only when there is
 one`, `and tapping it lands at the foot of the thread`.*
+
+### Overview is his to arrange
+Long press to wobble, drag to reorder, a cross to remove, a bar to put back,
+Reset to undo the lot. The key (`data-ov`) is what is stored, never a
+position; the order is read out of the DOM after a drop; a key the stored
+order has never heard of goes back to its natural place rather than to the
+end. A custom order turns the hand-placed 1181px rows off, or a drag there
+would look like it did nothing. The mode ends on Done, Escape, or leaving the
+view, and while it is on nothing else on the view answers a tap. The check
+measures the cross's box, not its presence.
+*Checked: `a long press wobbles the view and puts a cross on every block`, `a
+drag down the view is a scroll and never arms the mode`, `dragging a block
+past another swaps them, and the order is written out`, `the cross takes a
+block off the view and remembers it`, `and the bar puts it back`, `a repaint
+keeps his order and does not stack a second bar`, `leaving Overview ends the
+mode`, `and the arrangement survives a reload`, `Reset puts it back the way it
+was built`, `1280px: his order wins over the hand-placed rows`.*
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can
