@@ -710,8 +710,14 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
 - **`gotoKb()` is the one way into a fact**, the way `gotoNote()` is the one
   way into a message. The "see also" link, a quoted reply in Chat and a row of
   Overview's News tile all go through it: open the group (scrolling to a row
-  that is not drawn lands nowhere), `glide` the map's scroller so the node is
-  centred, and flash it for 1.7s. The scroller is **`#v-map .mapw`, not
+  that is not drawn lands nowhere), `glide` the map's scroller, and flash the
+  node for 1.7s. **The group's heading goes to the top**, not the node to the
+  middle: *"it should also open the news dropdown and position the news like
+  in my ss."* Centring alone left the heading off the top, so what he was
+  reading had no name on it. The heading wins only while the node would still
+  be on screen under it; past that the node is centred as before, because a
+  heading at the top is worth nothing if the row it was meant to reach is
+  below the fold. The scroller is **`#v-map .mapw`, not
   `#mapw`** -- the id is on the `.mbox` inside it and the class is what carries
   `overflow-y:auto`, so reading the id meant the map's remembered offset was
   always 0 and a jump could not move anything.
@@ -1000,13 +1006,19 @@ answering more than "what is due".
   chevron follows it at a fixed gap, which is also why **every `data-vgo`
   heading carries a `.more`** -- one without it would leave the chevron
   against the title. The wording is his: "17 tasks completed".
-- **The order is the calendar, what has gone, progress, News, then tuition.**
-  *"Also move the on the calendar, progress by tasks before the tuition card
-  in that order."* Recently completed travels with the agenda rather than
-  staying behind it, because sitting directly under it is what he asked for in
-  the first place. The desktop placement had to move with the markup: those
-  rows are explicit, so reordering the tiles in `renderOverview` alone would
-  have changed the phone and left the laptop exactly as it was.
+- **The order is the calendar, progress, News, the workload chart, then
+  tuition -- and what has gone is at the foot.** *"Also move the on the
+  calendar, progress by tasks before the tuition card in that order."* Then,
+  the same day: *"Move the recently completed box in overview to the bottom
+  just above milestones. And move the workload by week below news."* Recently
+  completed sat under the agenda first, and it is the one tile on the first
+  screen that answers nothing about today, so it ends up beside the
+  milestones, which are the other thing here that is context rather than
+  work. It is built where its `doneAt` reasoning lives and appended at the
+  end as `rcH`, rather than being moved and leaving its comment behind. The
+  desktop placement had to move with the markup both times: those rows are
+  explicit, so reordering the tiles in `renderOverview` alone would have
+  changed the phone and left the laptop exactly as it was.
 - **News on the first screen reads the map, not the `nw:true` tasks.** *"Add a
   news section to overview above the tuition card. Don't add all news - just
   recent few with a small description and date (if applicable). Clicking on the
@@ -1166,6 +1178,19 @@ note thread and a clock. What `nw:true` adds is presentation and one question.
 - **The title starts `[NEWS] `.** That is the half of the distinction a screen
   reader, a plain-text export and the audit log still get, so it is written
   as well as the colour, not instead of it.
+- **And the tag keeps the news colour after he accepts**, when the rest of
+  the title has gone ordinary ink like any other task: *"still keep the pink
+  colour for [news] in the title everywhere. To be able to know which is
+  non-insead."* `ttl()` is the one place that becomes markup -- the Timeline,
+  the agenda, Recently completed, the board card, the Calendar and the drawer
+  header all read it, so none of them can disagree about a tag the others are
+  drawing. The drawer header had to stop being `textContent` for it.
+- **Accepting does not touch Overview's News tile.** *"Even if I accept a news
+  decision tasks - it should still keep the news in the news section in
+  overview."* It reads the map's NEWS group, which an answer on a task cannot
+  reach, so this was already true -- it is a check now rather than a change,
+  because "already true" is exactly the kind of thing a later refactor
+  quietly breaks.
 - **Accept and Reject sit at the top of its card**, above the property rows: a
   deadline he has not agreed to is not yet a property worth reading. Accepting
   records `newsState:"accept"` and the banner stops asking -- a question
@@ -1523,6 +1548,13 @@ it has only its colour to say which is which. They replaced the full-width
 "Delete this task" at the foot of the card, which was the loudest control on
 it for the rarest action: *"similar size as the close and note button but
 bright coloured"*.
+
+**A closed task keeps only the bin.** *"When a task is completed, remove the
+green tick and +2 icons. Only keep the delete."* A tick on a done task
+re-asserts the state it is already in and `+2d` offers to move a date that no
+longer decides anything, so both were controls that could only be pressed by
+mistake. The status row above is still how he reopens it, which is where that
+belongs.
 
 **A Done task is never late.** The countdown is advice about what is left to do,
 so it is suppressed once the status is done -- it only ever read as the board
@@ -1934,7 +1966,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 428 invariants, three widths, a real browser. Every one of them was a
+that runs: 436 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

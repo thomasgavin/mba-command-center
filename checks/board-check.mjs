@@ -1291,6 +1291,7 @@ for (var tw26 of [390, 1280]) {
     return { hero: top(".hero.a"), att: top(".att"),
              tui: top(".hero.b"), pipe: top(".pipe"), mst: top(".mstack"),
              agd: top(".agd"), rcent: top(".rcent"), trk: top(".trk"),
+             load: top(".load"), nwst: top(".nwst"), miles: top(".miles"),
              attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right) };
   });
   var st28 = await s28.p.evaluate(function () {
@@ -1310,11 +1311,16 @@ for (var tw26 of [390, 1280]) {
      the thing to measure. */
   ok("and the two rings share their row with the critical path",
      ov28.mst !== null && ov28.mst === ov28.pipe, JSON.stringify(ov28));
-  /* and the order he asked for on 2026-10-07: the calendar, then what has
-     gone, then progress, all of it above tuition */
-  ok("the calendar and progress sit above tuition at 1280",
-     ov28.agd > ov28.hero && ov28.rcent > ov28.agd && ov28.trk > ov28.rcent &&
-     ov28.tui > ov28.trk, JSON.stringify(ov28));
+  /* and the order he asked for on 2026-10-07: the calendar, then progress,
+     then the workload chart, all of it above tuition -- with what has gone
+     moved to the foot, *"to the bottom just above milestones"*. The explicit
+     rows in the 1181px query mean DOM order is not what a desktop sees, so
+     this has to be measured here as well as at 390. */
+  ok("the calendar, progress and the workload chart sit above tuition at 1280",
+     ov28.agd > ov28.hero && ov28.trk > ov28.agd && ov28.load > ov28.trk &&
+     ov28.tui >= ov28.load, JSON.stringify(ov28));
+  ok("and what has gone is at the foot, above the milestones, at 1280",
+     ov28.rcent > ov28.pipe && ov28.miles > ov28.rcent, JSON.stringify(ov28));
   await s28.ctx.close();
 }
 
@@ -3048,6 +3054,7 @@ for (var ew of [390, 1280]) {
       function (t) { return t.className; });
     var ag = cls.findIndex(function (c) { return /\bagd\b/.test(c); });
     var rc = cls.findIndex(function (c) { return /\brcent\b/.test(c); });
+    var ml = cls.findIndex(function (c) { return /\bmiles\b/.test(c); });
     var none = Array.prototype.map.call(document.querySelectorAll(".rcent .rcd"),
       function (e) { return e.textContent; });
     /* close something now, with a real doneAt, and it has to lead the list */
@@ -3056,7 +3063,7 @@ for (var ew of [390, 1280]) {
     render();
     var first = document.querySelector(".rcent .rcrow");
     return {
-      order: rc === ag + 1, agd: ag, rcent: rc,
+      order: ml === rc + 1 && rc > ag, agd: ag, rcent: rc, miles: ml,
       rows: document.querySelectorAll(".rcent .rcrow").length,
       undatedSaid: none.filter(function (t) { return /not recorded/.test(t); }).length,
       datedSaid: none.filter(function (t) { return !/not recorded/.test(t); }).length,
@@ -3075,7 +3082,10 @@ for (var ew of [390, 1280]) {
         ? document.querySelector(".rcent .rct").getBoundingClientRect().width : 0
     };
   });
-  ok("Recently completed comes directly after On the calendar",
+  /* It sat under the agenda until 2026-10-07: *"Move the recently completed
+     box in overview to the bottom just above milestones."* What has gone is
+     the one tile on the first screen that answers nothing about today. */
+  ok("Recently completed sits directly above the milestones",
      r43.order, JSON.stringify(r43));
   ok("it lists what has been closed", r43.rows > 0, JSON.stringify(r43));
   /* *"only include the last 5 completed tasks"*. The heading still carries the
@@ -3284,13 +3294,17 @@ for (var nw of [390, 1280]) {
     var b = document.querySelector("#bento").getBoundingClientRect();
     var a = document.querySelector(".agd").getBoundingClientRect();
     return { w: t.width, b: b.width, agd: a.width,
-             /* it shares its row with the agenda rather than stacking under
-                a column of nothing: same two-column placement as the rest */
-             beside: t.left > a.right - 1 };
+             /* It ran opposite the agenda until 2026-10-07 and now runs the
+                full width at the foot: *"Move the recently completed box in
+                overview to the bottom just above milestones."* Every wide
+                tile here declares its span, and the one that forgot rendered
+                as a ribbon of clipped dots -- so this measures the box. */
+             full: t.width > b.width * 0.9, below: t.top > a.bottom };
   });
   ok("1280px: Recently completed is half the bento, not a twelfth",
      r47.w > r47.b * 0.4, JSON.stringify(r47));
-  ok("1280px: and sits opposite the agenda", r47.beside, JSON.stringify(r47));
+  ok("1280px: and it runs the full width, below the agenda",
+     r47.full && r47.below, JSON.stringify(r47));
   await s47.ctx.close();
 }
 
@@ -3746,6 +3760,129 @@ var MAPSEED = { kb: [
   ok("no console error through the decision", s53.errs.concat(s53b.errs).length === 0,
      s53.errs.concat(s53b.errs).join(" | "));
   await s53.ctx.close(); await s53b.ctx.close();
+}
+
+/* ---- 54. a closed task, and the tag that survives accepting ----
+   "When a task is completed, remove the green tick and +2 icons. Only keep
+   the delete." And: "we are changing the title to white like any other task -
+   but still keep the pink colour for [news] in the title everywhere. To be
+   able to know which is non-insead." */
+{
+  var s54 = await open(390, MAPSEED);
+  var q54 = await s54.p.evaluate(function () {
+    var o = alive().filter(function (i) { return i.status !== "done" && !i.isNews && !i.isDec; })[0];
+    openItem(o.id);
+    var c = document.getElementById("dBody");
+    var before = { done: !!c.querySelector("[data-qdone]"), d2: !!c.querySelector("[data-q2d]"),
+                   del: !!c.querySelector("[data-del]") };
+    patch(o.id, { status: "done", manual: true });
+    openItem(o.id);
+    c = document.getElementById("dBody");
+    return { id: o.id, before: before,
+             after: { done: !!c.querySelector("[data-qdone]"), d2: !!c.querySelector("[data-q2d]"),
+                      del: !!c.querySelector("[data-del]"),
+                      /* the row is still there, carrying the one action left */
+                      row: !!c.querySelector(".qrow"),
+                      /* and the status row above is still how he reopens it */
+                      status: !!c.querySelector('[data-row="status"],[data-drow="status"]') } };
+  });
+  ok("an open task offers all three quick actions",
+     q54.before.done && q54.before.d2 && q54.before.del, JSON.stringify(q54));
+  /* A tick on a done task re-asserts the state it is already in and +2d
+     offers to move a date that no longer decides anything: both could only
+     ever be pressed by mistake. */
+  ok("a closed one keeps only the bin",
+     !q54.after.done && !q54.after.d2 && q54.after.del && q54.after.row,
+     JSON.stringify(q54));
+
+  var t54 = await s54.p.evaluate(function () {
+    var n = alive().filter(function (i) { return i.isNews; })[0];
+    if (!n) return { none: true };
+    /* accept it, so the rest of the title has gone ordinary ink */
+    patch(n.id, { newsState: "accept" });
+    render();
+    function tag(sel) {
+      var e = document.querySelector(sel);
+      if (!e) return null;
+      var g = e.querySelector(".tgn");
+      if (!g) return { has: false };
+      var rest = e.textContent.replace(g.textContent, "").trim();
+      return { has: true, c: getComputedStyle(g).color, text: g.textContent,
+               /* the tag alone, never the whole title */
+               rest: rest.length > 0 };
+    }
+    setView("time"); render();
+    var tl = tag('#gantt .grow[data-id="' + n.id + '"] .gt');
+    setView("board"); render();
+    var card = tag('.card[data-id="' + n.id + '"] .ct');
+    openItem(n.id);
+    var head = tag("#dTitle");
+    /* the news colour as the board itself resolves it, rather than a hex
+       typed in here that a theme change could leave behind */
+    var probe = document.createElement("span");
+    probe.style.color = "var(--news)";
+    document.body.appendChild(probe);
+    var want = getComputedStyle(probe).color;
+    probe.remove();
+    return { id: n.id, title: items[n.id].title, want: want,
+             tl: tl, card: card, head: head,
+             /* accepting is not a status change, and it is not magenta any
+                more either: the row has dropped `.nws` */
+             nws: (document.querySelector('#gantt .grow[data-id="' + n.id + '"]') || { classList: { contains: function () { return false; } } })
+               .classList.contains("nws") };
+  });
+  ok("the [NEWS] tag is drawn on the Timeline, the board card and the drawer header",
+     !t54.none && t54.tl && t54.tl.has && t54.card && t54.card.has &&
+     t54.head && t54.head.has, JSON.stringify(t54));
+  ok("and it is the tag alone that keeps the news colour",
+     t54.tl.c === t54.want && t54.card.c === t54.want && t54.head.c === t54.want &&
+     t54.tl.rest && /^\[NEWS\]$/.test(t54.tl.text) && !t54.nws, JSON.stringify(t54));
+
+  /* "Even if I accept a news decision tasks - it should still keep the news
+     in the news section in overview." The tile reads the map's NEWS group,
+     which an answer on a task cannot touch -- so this is the invariant that
+     says so rather than a change. */
+  var o54 = await s54.p.evaluate(function () {
+    setView("over"); render();
+    return { rows: document.querySelectorAll(".nwst .nwrow").length,
+             tile: !!document.querySelector(".nwst") };
+  });
+  ok("and Overview's News tile still carries it after accepting",
+     o54.tile && o54.rows > 0, JSON.stringify(o54));
+
+  /* "When I click on news title in overview, it opens mindmap which is fine
+     but it should also open the news dropdown and position the news like in
+     my ss." Centring the node alone left the group heading off the top, so
+     what he was reading had no name on it. */
+  var g54 = await s54.p.evaluate(async function () {
+    /* a map with seven nodes in it is not tall enough to scroll a group
+       heading to the top, so the thing being measured would never move.
+       Filler below the NEWS group gives the scroller somewhere to go. */
+    for (var f = 0; f < 30; f++) kb.push({ id: "zz" + f, group: "Filler", ord: 90,
+      shape: "list", label: "Filler " + f, body: "A row to give the map height.",
+      at: "2026-10-07T00:00:00.000Z" });
+    setView("over"); render();
+    document.querySelector(".nwrow").click();
+    await new Promise(function (r) { setTimeout(r, 700); });
+    var sc = scroller("map"), el = document.querySelector('[data-kb="kn1"]');
+    var root = el ? el.closest(".mroot") : null;
+    var sr = sc.getBoundingClientRect();
+    var rr = root ? root.getBoundingClientRect() : null;
+    var r = el ? el.getBoundingClientRect() : null;
+    return { open: !!(root && root.classList.contains("open")),
+             /* the group's heading at the top of the map's own scroller --
+                or as close as the scroller can get, since a map with only a
+                few nodes in it is not tall enough to scroll that far */
+             head: rr ? Math.round(rr.top - sr.top) : null,
+             atEnd: sc.scrollTop >= sc.scrollHeight - sc.clientHeight - 2,
+             seen: !!(r && r.top >= sr.top - 1 && r.bottom <= sr.bottom + 1),
+             flash: !!(el && el.classList.contains("mflash")) };
+  });
+  ok("tapping a News row opens the group with its heading at the top",
+     g54.open && g54.head !== null && (Math.abs(g54.head) <= 14 || g54.atEnd) &&
+     g54.seen && g54.flash, JSON.stringify(g54));
+  ok("no console error through any of it", s54.errs.length === 0, s54.errs.join(" | "));
+  await s54.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

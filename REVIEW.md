@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 428 checks, three widths, a real browser
+node checks/board-check.mjs          # 436 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -438,6 +438,44 @@ stale compositing layer on screen and the node drew twice.
 stays news-only, because it decides the colour and a decision is an INSEAD
 task. Accepting leaves an ordinary open task. Rejecting marks it Done with a
 note, never deleted, and the answer survives a reload -- the check reloads.
+
+### A closed task offers only the bin
+A tick on a done task re-asserts the state it is already in and `+2d` offers
+to move a date that no longer decides anything: two controls that could only
+be pressed by mistake. *"When a task is completed, remove the green tick and
++2 icons. Only keep the delete."* The status row above is still how he
+reopens it.
+*Checked: `a closed one keeps only the bin`.*
+
+### The `[NEWS]` tag keeps its colour after accepting
+Accepting turns the rest of the title ordinary ink, and the tag is the half of
+the distinction that has to survive: *"still keep the pink colour for [news]
+in the title everywhere. To be able to know which is non-insead."* `ttl()` is
+the one place it becomes markup, so no surface can draw it differently -- and
+the drawer header had to stop being `textContent` to carry it. Overview's News
+tile is unaffected by an answer on a task, because it reads the map.
+*Checked: `and it is the tag alone that keeps the news colour`,
+`and Overview's News tile still carries it after accepting`.*
+
+### A jump into the map puts the group's heading at the top
+Centring the node alone left the heading off the top, so what he was reading
+had no name on it. The heading wins while the node would still be on screen
+under it; past that the node is centred, because a heading at the top is
+worth nothing if the row it was meant to reach is below the fold. A map with
+a handful of nodes cannot scroll that far at all, so the check seeds filler
+rather than loosening what it measures.
+*Checked: `tapping a News row opens the group with its heading at the top`.*
+
+### Overview's order is measured at both widths
+The 1181px query places the tiles explicitly, so moving them in
+`renderOverview` alone changes the phone and leaves the laptop as it was. What
+has gone sits at the foot above the milestones and the workload chart follows
+News; every wide tile declares its own span, and the one that forgot rendered
+as a ribbon of clipped dots.
+*Checked: `the calendar, progress and the workload chart sit above tuition at
+1280`, `and what has gone is at the foot, above the milestones, at 1280`,
+`Recently completed sits directly above the milestones`, `1280px: and it runs
+the full width, below the agenda`.*
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

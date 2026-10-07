@@ -1330,6 +1330,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    colour is doing the job the "[NEWS]" prefix in the title cannot do on its
    own: a prefix has to be read, and a hue is seen while scrolling past. */
 .grow.nws .gt,.agr.nws .at,.calrow.nws b{color:var(--news)}
+/* the `[NEWS]` tag keeps the news colour once the rest of the title has gone
+   ordinary, so an accepted opportunity still says where it came from */
+.tgn{color:var(--news);font-weight:700}
 /* .calrow already carries a left edge painted by statusColour, which IS
    --news for these, so only the agenda row needs one drawing. */
 .agr.nws{border-left:2px solid var(--news);padding-left:7px}
@@ -1599,13 +1602,14 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* the agenda is nine rows tall and the tiles opposite it are short, so it
      spans their rows rather than leaving half a screen blank */
   .agd{grid-column:1/6;grid-row:2/5}
-  .rcent{grid-column:6/13;grid-row:3;align-self:start}
-  .trk{grid-column:6/13;grid-row:4;align-self:start}
+  .trk{grid-column:6/13;grid-row:3;align-self:start}
   /* News is the one tile here that may not exist -- it draws only when the
      map has something in its NEWS group -- so it is paired with tuition
      rather than given a row of its own, and its absence costs the layout
      nothing but the right half of one row. */
-  .nwst{grid-column:6/13;grid-row:5;align-self:start}
+  .nwst{grid-column:6/13;grid-row:4;align-self:start}
+  /* the workload chart follows News, as it does on the phone */
+  .load{grid-column:6/13;grid-row:5;align-self:start}
   .hero.b{grid-column:1/6;grid-row:5}
   .mstack{grid-column:1/6;grid-row:6;flex-direction:row}
   .pipe{grid-column:6/13;grid-row:6;align-self:start}
@@ -1613,6 +1617,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      visa list ended halfway up a card with the rest of it empty. */
   .seqt{grid-row:7;align-self:start}
   .seqt:nth-of-type(odd){grid-column:1/7} .seqt:nth-of-type(even){grid-column:7/13}
+  /* what has gone runs the full width at the foot, under the sequences and
+     above the milestones */
+  .rcent{grid-column:1/13;grid-row:8;align-self:start}
 }
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
@@ -2842,7 +2849,7 @@ function renderOverview(){
   h+= att.length? att.map(function(i){
         var n=dleft(i.due);
         return '<div class="arow" data-go="'+i.id+'"><span class="abar" style="background:'+tc(i.track)+'"></span>'+
-          '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+' &middot; '+esc(i.priority)+'</small></span>'+
+          '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+' &middot; '+esc(i.priority)+'</small></span>'+
           '<span class="chip d '+cCls(n)+'">'+cTxt(n)+'</span></div>';
       }).join("")
       : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>';
@@ -2860,7 +2867,7 @@ function renderOverview(){
         return '<div class="agr'+(newsAsk(i)?" nws":"")+'" data-go="'+i.id+'">'+
           '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
             '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
-          '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
+          '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
           '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
       }).join("")
       : '<p class="hint">Nothing dated in the next three weeks.</p>';
@@ -2882,16 +2889,20 @@ function renderOverview(){
      tasks"*. The count beside the heading is still the real total, so capping
      the list cannot make the board understate what he has done. */
   var rc=dated.concat(undated).slice(0,5);
-  h+='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
-  h+= rc.length? rc.map(function(i){
+  /* Built here, where the reasoning about `doneAt` lives, and appended at
+     the foot of the view: *"Move the recently completed box in overview to
+     the bottom just above milestones."* What has gone is the one tile on this
+     screen that answers nothing about today. */
+  var rcH='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
+  rcH+= rc.length? rc.map(function(i){
         var when=i.doneAt?fmtD(i.doneAt):null;
         return '<div class="rcrow" data-go="'+i.id+'">'+
           '<span class="rck" style="background:'+tc(i.track)+'"></span>'+
-          '<span class="rct">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
+          '<span class="rct">'+ttl(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
           '<span class="rcd'+(when?'':' none')+'">'+(when?esc(when):'date not recorded')+'</span></div>';
       }).join("")
       : '<p class="hint">Nothing closed yet.</p>';
-  h+='</div>';
+  rcH+='</div>';
 
   /* track progress */
   /* The heading is the way in to the section it is about: "the progress by
@@ -2935,6 +2946,26 @@ function renderOverview(){
     }).join("");
     h+='</div>';
   }
+
+  /* weekly load */
+  var mon=todayD(); mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
+  var weeks=[],max=1;
+  for(var w=0;w<12;w++){
+    var a=new Date(mon); a.setDate(a.getDate()+w*7);
+    var b=new Date(a); b.setDate(b.getDate()+7);
+    var bucket={};
+    live().forEach(function(i){ var d=D(i.due); if(d&&d>=a&&d<b) bucket[i.track]=(bucket[i.track]||0)+1; });
+    var tot2=0; Object.keys(bucket).forEach(function(k){tot2+=bucket[k];});
+    if(tot2>max) max=tot2;
+    weeks.push({a:a,b:bucket,n:tot2});
+  }
+  h+='<div class="tile load"><h3><span class="pin" style="background:#14b5f0"></span>Workload by week<span class="more">open items falling due, coloured by track</span></h3><div class="lchart">';
+  weeks.forEach(function(w,ix){
+    h+='<div class="lcol '+(ix===0?"nowk":"")+'"><div class="lstack">';
+    TORDER.forEach(function(k){ if(w.b[k]) h+='<i style="height:'+(w.b[k]/max*100)+'%;background:'+tc(k)+'" title="'+w.b[k]+' '+esc(tl(k))+'"></i>'; });
+    h+='</div><div class="ll">'+(ix===0?"this wk":(w.a.getDate()+"/"+(w.a.getMonth()+1)))+'</div></div>';
+  });
+  h+='</div></div>';
 
   /* hero B: money.
      This block used to print "2026-10-05" and "2027-04-15" as literals, so the
@@ -2990,25 +3021,9 @@ function renderOverview(){
   });
   h+='</div></div>';
 
-  /* weekly load */
-  var mon=todayD(); mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
-  var weeks=[],max=1;
-  for(var w=0;w<12;w++){
-    var a=new Date(mon); a.setDate(a.getDate()+w*7);
-    var b=new Date(a); b.setDate(b.getDate()+7);
-    var bucket={};
-    live().forEach(function(i){ var d=D(i.due); if(d&&d>=a&&d<b) bucket[i.track]=(bucket[i.track]||0)+1; });
-    var tot2=0; Object.keys(bucket).forEach(function(k){tot2+=bucket[k];});
-    if(tot2>max) max=tot2;
-    weeks.push({a:a,b:bucket,n:tot2});
-  }
-  h+='<div class="tile load"><h3><span class="pin" style="background:#14b5f0"></span>Workload by week<span class="more">open items falling due, coloured by track</span></h3><div class="lchart">';
-  weeks.forEach(function(w,ix){
-    h+='<div class="lcol '+(ix===0?"nowk":"")+'"><div class="lstack">';
-    TORDER.forEach(function(k){ if(w.b[k]) h+='<i style="height:'+(w.b[k]/max*100)+'%;background:'+tc(k)+'" title="'+w.b[k]+' '+esc(tl(k))+'"></i>'; });
-    h+='</div><div class="ll">'+(ix===0?"this wk":(w.a.getDate()+"/"+(w.a.getMonth()+1)))+'</div></div>';
-  });
-  h+='</div></div>';
+
+  /* what has gone, directly above the milestones */
+  h+=rcH;
 
   /* last, not first: see the note at the top of this function */
   h+=renderMiles();
@@ -3072,7 +3087,7 @@ function fitChain(keep){
 function cardHTML(i){
   var n=dleft(i.due), nn=notesFor(i.id).length;
   return '<div class="card p-'+i.priority+(n!==null&&n<0&&i.status!=="done"?" late-i":"")+'" data-id="'+i.id+'" style="--tcol:'+tc(i.track)+'">'+
-    '<div class="ct">'+esc(i.title)+'</div>'+
+    '<div class="ct">'+ttl(i.title)+'</div>'+
     '<div class="cm">'+
       dueChip(i)+
       '<span class="chip tr" style="color:'+tc(i.track)+';background:'+tc(i.track)+'1a">'+esc(tl(i.track))+'</span>'+
@@ -3113,6 +3128,21 @@ var NEWSC="#e0399b";
    thing to the Timeline and another to the drawer. A rejected item is deleted
    and painted by that; an accepted one is just a task. */
 function newsAsk(i){ return !!i.isNews && !i.newsState && !i.deleted; }
+/* A task title, with its `[NEWS]` prefix kept in the news colour. Accepting
+   an opportunity turns the rest of the title ordinary ink like any other
+   task, and he still has to be able to see at a glance which items came from
+   outside INSEAD: *"still keep the pink colour for [news] in the title
+   everywhere. To be able to know which is non-insead."* So the tag is the
+   half of the distinction that survives the answer, and this is the one place
+   it becomes markup -- the Timeline, the agenda, Recently completed, the
+   board card, the Calendar and the drawer header all read it, so none of them
+   can disagree about a tag the others are drawing. */
+function ttl(t){
+  t=String(t==null?"":t);
+  var m=/^\[NEWS\]\s*/.exec(t);
+  if(!m) return esc(t);
+  return '<span class="tgn">'+esc(m[0].trim())+'</span> '+esc(t.slice(m[0].length));
+}
 /* A question is open on this card, whichever kind it is. The colour stays
    news-only -- a decision is an ordinary INSEAD task and magenta would say it
    came from outside -- but everything about the card is the same question in
@@ -3197,7 +3227,7 @@ function renderPlan(){
         (i.deleted
           ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
           : '<button class="tick" data-act="tick" aria-label="Toggle done">&#10003;</button>')+
-        '<span class="gtx"><span class="gt">'+esc(i.title)+'</span>'+
+        '<span class="gtx"><span class="gt">'+ttl(i.title)+'</span>'+
           '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></span>'+
       '</div><div class="gtrack"><div class="gg">'+grid+'</div>';
     /* The due marker says when it was meant to land; this says when it did.
@@ -3393,7 +3423,7 @@ function calDone(P){
     '<em>'+d.length+' task'+(d.length===1?"":"s")+'</em></div><div class="arl">'+
     d.map(function(i){
       return '<div class="calrow done" data-id="'+i.id+'" style="border-left-color:#00a98f">'+
-        '<i style="background:#00a98f"></i><b>'+esc(i.title)+'</b>'+
+        '<i style="background:#00a98f"></i><b>'+ttl(i.title)+'</b>'+
         '<span>'+esc(tl(i.track))+' &middot; '+esc(fmtD(i.due))+'</span></div>';
     }).join("")+'</div></div>';
 }
@@ -3416,7 +3446,7 @@ function renderAgenda(evOn,evtOn,tIso){
          return '<div class="calrow'+(i.status==="done"?" done":"")+(newsAsk(i)?" nws":"")+'" data-id="'+i.id+'"'+
            ' style="border-left-color:'+sc+'">'+
            '<i style="background:'+sc+'"></i>'+
-           '<b>'+esc(i.title)+'</b>'+
+           '<b>'+ttl(i.title)+'</b>'+
            '<span>'+esc(tl(i.track))+(n!==null&&n<0&&i.status!=="done"?" &middot; late":"")+'</span></div>';
        }).join("")+
        et.map(function(e){
@@ -3530,7 +3560,21 @@ function gotoKb(id){
        against the nearest POSITIONED ancestor and the map's shapes have
        several */
     var r=el.getBoundingClientRect(), sr=sc.getBoundingClientRect();
-    glide(sc, Math.max(0, sc.scrollTop + (r.top-sr.top) - (sc.clientHeight/2 - r.height/2)));
+    /* Put the group's heading at the top, which is the shape he drew:
+       *"it should also open the news dropdown and position the news like in
+       my ss."* Centring the node alone lands him mid-group with the heading
+       off the top, so what he is reading has no name on it. The heading wins
+       while the node is still on screen under it; past that the node is
+       centred as before, because a heading at the top is worth nothing if
+       the row it was meant to reach is below the fold. */
+    var to=Math.max(0, sc.scrollTop + (r.top-sr.top) - (sc.clientHeight/2 - r.height/2));
+    var root=el.closest(".mroot");
+    if(root){
+      var rr=root.getBoundingClientRect();
+      if((r.top-rr.top) + r.height < sc.clientHeight - 16)
+        to=Math.max(0, sc.scrollTop + (rr.top-sr.top) - 8);
+    }
+    glide(sc, to);
     el.classList.remove("mflash");
     void el.offsetWidth;
     el.classList.add("mflash");
@@ -4216,7 +4260,7 @@ function renderDrawer(keepDraft){
   var i=items[openId]; if(!i) return;
   var ta=document.getElementById("nt");
   if(keepDraft&&ta) noteDraft=ta.value;
-  document.getElementById("dTitle").textContent=i.title;
+  document.getElementById("dTitle").innerHTML=ttl(i.title);
   /* a repaint while he is typing must not stamp the old name back over the
      field, and the pencil only exists for a task */
   if(!dEdit) document.getElementById("dTin").value=i.title;
@@ -4319,13 +4363,22 @@ function renderDrawer(keepDraft){
      ... similar size as the close and note button but bright coloured"*. The
      full-width "Delete this task" at the foot is gone -- it was the loudest
      control on the card for the rarest action. */
-  if(!i.deleted && !askOpen(i)) h+='<div class="qrow">'+
-    '<button class="qb ok" data-qdone="1" aria-label="Mark done" title="Mark done">'+
-      '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg></button>'+
-    '<button class="qb warn" data-q2d="1" aria-label="Push two days" title="Push two days"><b>+2d</b></button>'+
-    '<button class="qb bad" data-del="1" aria-label="Delete task" title="Delete task">'+
-      '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 4.3h10.4M6.3 4.3V2.8h3.4v1.5M4.2 4.3l.6 8.3a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9l.6-8.3"/><path d="M6.6 6.6v4.4M9.4 6.6v4.4"/></svg></button>'+
-    '</div>';
+  /* A closed task has nothing left to close and nothing left to push:
+     *"When a task is completed, remove the green tick and +2 icons. Only keep
+     the delete."* A tick on a done task re-asserts the state it is already in
+     and +2d offers to move a date that no longer decides anything, so both
+     were controls that could only ever be pressed by mistake. The status row
+     above is still how he reopens it, which is where that belongs. */
+  if(!i.deleted && !askOpen(i)){
+    var qd=i.status==="done";
+    h+='<div class="qrow">'+
+      (qd?'':'<button class="qb ok" data-qdone="1" aria-label="Mark done" title="Mark done">'+
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg></button>'+
+      '<button class="qb warn" data-q2d="1" aria-label="Push two days" title="Push two days"><b>+2d</b></button>')+
+      '<button class="qb bad" data-del="1" aria-label="Delete task" title="Delete task">'+
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.8 4.3h10.4M6.3 4.3V2.8h3.4v1.5M4.2 4.3l.6 8.3a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9l.6-8.3"/><path d="M6.6 6.6v4.4M9.4 6.6v4.4"/></svg></button>'+
+      '</div>';
+  }
 
   /* --- the thread, and a composer that is one line until he wants it --- */
   h+='<div class="fld"><label>Notes</label>';
@@ -4754,7 +4807,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1415";
+var BUILD="2026-10-07-1520";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
