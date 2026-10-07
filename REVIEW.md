@@ -587,7 +587,9 @@ never quietly.
 A data-only patch file into `claude-inbox/` goes straight to `main` as always.
 
 **If a code change also touches `claude-inbox/`, put `[skip ci]` in the commit
-message.** The Answer notes workflow fires on any push to that folder, so
+message, and that includes the merge commit.** The job reads the *head*
+commit's message, so a `[skip ci]` on the work commit under a bare "Merge
+main" does not save the run -- observed, 7 Oct. The Answer notes workflow fires on any push to that folder, so
 merging a code PR that happens to correct a file there spends a Claude run on
 nothing. Observed once, on the PR that wrote this document.
 
