@@ -74,6 +74,17 @@
   --orange:#ff6429; --blue:#3264ff; --purple:#b066ff;
   --cyan:#14b5f0;   --amber:#ff9f00; --green:#00a98f;
   --pink:#e5457f;   --red:#e0263c;
+  /* Two hues that are deliberately not track colours, because the things they
+     mark are deliberately not his INSEAD work.
+     --ev is the Timeline's webinar text: *"for webinars make the text colour
+     blue so it stands out from the tasks"*. It is a lighter blue than the
+     `doing` status (#3264ff) on purpose -- a bar in that exact blue already
+     means In progress, and two meanings for one colour on one view is the
+     drift the legend exists to prevent.
+     --news marks an industry opportunity Claude found. Magenta is the one
+     clear gap in the six track hues, so a [NEWS] row cannot be mistaken for
+     Financing orange or Visa blue at a glance. */
+  --ev:#1f8fff;     --news:#e0399b;
 
   /* the translucent chrome (top bar, title row, section bar, snooze rail) and
      the one hover edge that was a literal everywhere. Both are tokens so the
@@ -138,6 +149,10 @@
      clears AA. Hues are untouched: colour is load-bearing here.
      Research: Material 3 surface elevation, WCAG 4.5:1 body text. */
   --ink:#f3f3f4; --ink2:#d4d5d8; --ink3:#a9abb0; --ink4:#93959c;
+  /* The two non-track hues lift on black the way the track colours already
+     do: a mid blue and a mid magenta tuned for white are both under AA as
+     text on a dark panel, and these are read as text, not as a bar. */
+  --ev:#6fb4ff;     --news:#ff6fc0;
   /* Gmail's grey, not the pure black this shipped as: *"don't use pure black
      for the background, use gmail's dark mode shade"*. Pure black maximises
      OLED saving and costs the thing the surfaces were doing -- a panel one
@@ -442,7 +457,7 @@ body::before{
   align-items:center;gap:7px;padding:5px 8px 5px 6px;position:sticky;left:0;
   background:var(--panel);z-index:2}
 .evdot{flex:none;width:9px;height:9px;border-radius:50%;margin:0 4px 0 5px}
-.gerow .gt{font-weight:600;color:var(--ink2)}
+.gerow .gt{font-weight:600;color:var(--ev)}
 
 /* Recently completed. The date column shares one right edge down the tile,
    the same rule the countdown chips follow: a date sized by its own text puts
@@ -625,6 +640,12 @@ body::before{
 
 /* agenda */
 .agd{grid-column:span 5}
+/* Recently completed had no grid-column at all, so it took the auto-placement
+   default -- ONE of twelve columns -- and rendered as an 80px ribbon of dots
+   with every title clipped to nothing. It is the other seven of the row the
+   agenda starts. Every wide tile on this board declares its span; a new one
+   that does not is this bug again. */
+.rcent{grid-column:span 7;align-self:start}
 .agr{display:flex;align-items:center;gap:11px;padding:7px 0;border-top:1px solid var(--line2)}
 .agr:first-of-type{border-top:0}
 .agd-d{
@@ -1228,6 +1249,26 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .dgone{background:rgba(224,38,60,.07);border:1px solid rgba(224,38,60,.2);border-radius:var(--r3);
   padding:11px 13px;margin-bottom:16px;font-size:12px;line-height:1.5;color:var(--ink2)}
 .dgone b{display:block;margin-bottom:3px}
+/* The NEWS banner at the head of the card. Same shape as .dgone, which is the
+   other thing on this board that says "this task is not in its normal state",
+   so neither has to be learned twice. The tint is --news for the open
+   question, green once he has accepted and flat once he has rejected: the
+   banner is the answer after it is answered, not the question again. */
+.dnews{background:rgba(224,57,155,.09);border:1px solid rgba(224,57,155,.26);
+  border-radius:var(--r3);padding:11px 13px;margin-bottom:16px;font-size:12px;
+  line-height:1.5;color:var(--ink2)}
+.dnews b{display:block;margin-bottom:3px;color:var(--news)}
+.dnews.on{background:rgba(0,169,143,.09);border-color:rgba(0,169,143,.26)}
+.dnews.on b{color:var(--green)}
+.dnews.off{background:var(--wash);border-color:var(--line)}
+.dnews.off b{color:var(--ink3)}
+/* [NEWS] in the list, on the three surfaces that print a task's name. The
+   colour is doing the job the "[NEWS]" prefix in the title cannot do on its
+   own: a prefix has to be read, and a hue is seen while scrolling past. */
+.grow.nws .gt,.agr.nws .at,.calrow.nws b{color:var(--news)}
+/* .calrow already carries a left edge painted by statusColour, which IS
+   --news for these, so only the agenda row needs one drawing. */
+.agr.nws{border-left:2px solid var(--news);padding-left:7px}
 /* a deleted row still reads, it just stops competing with the live ones */
 .grow.dl{opacity:.72}
 .grow.dl .gt{color:var(--ink4);text-decoration:line-through}
@@ -1456,16 +1497,19 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   .mstack{grid-column:1/6;grid-row:2;flex-direction:row}
   .hero.b{grid-column:1/6;grid-row:3}
   .pipe{grid-column:6/13;grid-row:3;align-self:start}
-  .agd{grid-column:1/6;grid-row:4} .trk{grid-column:6/13;grid-row:4;align-self:start}
+  /* the agenda is nine rows tall and the two tiles opposite it are short, so
+     it spans both of their rows rather than leaving half a screen blank */
+  .agd{grid-column:1/6;grid-row:4/6} .trk{grid-column:6/13;grid-row:4;align-self:start}
+  .rcent{grid-column:6/13;grid-row:5;align-self:start}
   /* a short tile opposite a tall one keeps its own height: stretched, the
      visa list ended halfway up a card with the rest of it empty. */
-  .seqt{grid-row:5;align-self:start}
+  .seqt{grid-row:6;align-self:start}
   .seqt:nth-of-type(odd){grid-column:1/7} .seqt:nth-of-type(even){grid-column:7/13}
 }
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
   .mstack{grid-column:span 12;grid-row:span 1;flex-direction:row}
-  .pipe,.trk,.agd{grid-column:span 12} .seqt{grid-column:span 6}
+  .pipe,.trk,.agd,.rcent{grid-column:span 12} .seqt{grid-column:span 6}
   .cols{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:720px){
@@ -1903,7 +1947,22 @@ var SEED=[
    n:"Slots from November, 45 minutes, and the coach is allocated by P1 location with no changes later."},
  {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
- {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",}
+ {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",},
+
+ /* NEWS: industry opportunities Claude found, not things INSEAD asked of him.
+    *"I just realized McKinsey has a Make your mark pre-mba program which would
+    have been a major bonus if I applied and got through. But I simply did not
+    even know about it."* `nw:true` is what makes one of these draw in magenta
+    everywhere and carry Accept and Reject on its card; the "[NEWS]" prefix is
+    the half of that a screen reader and a plain-text export still get.
+    They are ordinary tasks on purpose -- the calendar, the timeline, the
+    notes and the merge rules all already know what a task is, and a second
+    kind of object would have had to be taught every one of them. Be selective
+    putting one here: a calendar he stops trusting is worse than a miss. */
+ {id:"news-amzn-path",t:"[NEWS] Apply to Amazon Pathways (MBA Operations LDP)", k:"career",s:"todo", p:"High", d:"2026-11-15", ef:"hours", nw:true,
+   n:"Amazon's three-year operations leadership track, open to MBA students and recent graduates. Rolling: no deadline, and the posting comes down when they have enough people, so early is the whole strategy."},
+ {id:"news-mbb-cal", t:"[NEWS] Pin down the MBB recruiting calendar for Dec'27", k:"career",s:"todo", p:"High", d:"2026-11-20", ef:"hours", nw:true,
+   n:"The MBB pre-MBA programmes (Make Your Mark, BCG Unlock, ExperienceBain) run over the summer for people starting in the autumn, so the January intake's window has closed. The equivalent from here is the on-campus cycle, which starts in P1."}
 ];
 
 var MONEY={total:109860,paid:12000,next:53000,last:44860,rate:109.75};
@@ -1977,7 +2036,12 @@ function load(){
   SEED.forEach(function(s){
     items[s.id]={id:s.id,title:s.t,track:s.k,status:s.s,priority:s.p,due:s.d,
                  deps:s.dep||[],brief:s.n||"",amount:s.amt||0,snoozes:0,origDue:null,manual:false,deleted:false,
-                 effort:s.ef||null};
+                 effort:s.ef||null,
+                 /* `nw` is a SEED property like `amt`: it says this task came
+                    out of a NEWS pass rather than off his INSEAD list, and it
+                    never changes. `newsState` is his answer to it and does
+                    change, so that one is a diff field. */
+                 isNews:!!s.nw,newsState:null};
   });
   var st=null; try{ st=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
   if(st&&st.items) Object.keys(st.items).forEach(function(k){
@@ -2044,7 +2108,13 @@ function load(){
    so it is a record of what happened, never an estimate, and it merges per item
    like any other field -- ticking something off on the phone has to show on the
    laptop at the date it happened, not the date it synced. */
-var DFIELDS=["title","status","due","priority","snoozes","origDue","manual","deleted","effort","doneAt"];
+/* `newsState` is his accept-or-reject on an opportunity Claude put on the
+   board. It has to merge and travel like any other decision: accepting on the
+   phone and then opening the laptop must not hand him the same question
+   twice. Rejecting also sets `deleted`, so a rejected item leaves every view
+   through the path a deletion already takes and is still recoverable from
+   Timeline -- nothing new had to learn how to hide a task. */
+var DFIELDS=["title","status","due","priority","snoozes","origDue","manual","deleted","effort","doneAt","newsState"];
 /* id -> the timestamp a merge just applied, consumed by the next save(). Without
    it save() sees a brand new diff and dates it "now", so taking the other
    device's change would make this device claim it as its own later edit. */
@@ -2069,6 +2139,7 @@ function diffOf(i){
   if(i.deleted) d.deleted=true;
   if(i.effort!==(s.ef||null)) d.effort=i.effort;
   if(i.doneAt) d.doneAt=i.doneAt;
+  if(i.newsState) d.newsState=i.newsState;
   return d;
 }
 function sameDiff(a,b){
@@ -2088,7 +2159,7 @@ function sameDiff(a,b){
 function storedAsNow(k,had){
   var sd=seedOf(k); if(!sd) return null;
   var t={id:k,title:sd.t,status:sd.s,due:sd.d,priority:sd.p,snoozes:0,origDue:null,
-         manual:false,deleted:false,effort:sd.ef||null,doneAt:null};
+         manual:false,deleted:false,effort:sd.ef||null,doneAt:null,newsState:null};
   DFIELDS.forEach(function(f){ if(had && had[f]!==undefined) t[f]=had[f]; });
   return diffOf(t);
 }
@@ -2098,7 +2169,7 @@ function storedAsNow(k,had){
 function applyStored(k,d){
   var sd=seedOf(k), i=items[k]; if(!sd||!i) return;
   i.title=sd.t; i.status=sd.s; i.due=sd.d; i.priority=sd.p;
-  i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null; i.doneAt=null;
+  i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null; i.doneAt=null; i.newsState=null;
   DFIELDS.forEach(function(f){ if(d && d[f]!==undefined) i[f]=d[f]; });
 }
 /* Notes are append-only and merge by id, so two tabs can only ever disagree
@@ -2710,7 +2781,7 @@ function renderOverview(){
            edge: the row had a date block, a title, and then two chips
            competing for the same corner, and the empty half of the date
            block was doing nothing -- "better use of space" */
-        return '<div class="agr" data-go="'+i.id+'">'+
+        return '<div class="agr'+(i.isNews?" nws":"")+'" data-go="'+i.id+'">'+
           '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
             '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
           '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
@@ -2731,7 +2802,10 @@ function renderOverview(){
   var dated=finished.filter(function(i){ return i.doneAt; })
     .sort(function(a,b){ return String(b.doneAt).localeCompare(String(a.doneAt)); });
   var undated=finished.filter(function(i){ return !i.doneAt; }).sort(byDue).reverse();
-  var rc=dated.concat(undated).slice(0,6);
+  /* Five, not six and not all of them: *"only include the last 5 completed
+     tasks"*. The count beside the heading is still the real total, so capping
+     the list cannot make the board understate what he has done. */
+  var rc=dated.concat(undated).slice(0,5);
   h+='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' done so far</span></h3>';
   h+= rc.length? rc.map(function(i){
         var when=i.doneAt?fmtD(i.doneAt):null;
@@ -2860,10 +2934,18 @@ function renderBoard(){
    for the one state worth spotting down a column of 35. */
 /* One function decides what colour a task is, so the legend and the bars can
    never drift apart -- a legend that lies is worse than no legend. */
+var NEWSC="#e0399b";
 function statusColour(i,late){
   if(i.deleted) return "#bdb6c6";
   if(i.status==="done") return "#00a98f";
   if(late) return "#e0263c";
+  /* A NEWS item keeps its own colour wherever a status would have painted it,
+     because the question it raises is not "what state is this in" but "is this
+     mine at all". Done and late still win: once he has accepted one it is an
+     ordinary commitment with an ordinary deadline. The legend says so, which
+     is the rule -- a colour on this board that the key does not explain is a
+     colour that means nothing. */
+  if(i.isNews) return NEWSC;
   var c=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) c=x.c; });
   return c||"#8b8095";
 }
@@ -2872,7 +2954,9 @@ function statusColour(i,late){
 function renderLegend(){
   var h=STATUS.map(function(x){
     return '<span class="lgi"><i style="background:'+x.c+'"></i>'+esc(x.label)+'</span>';
-  }).join("")+'<span class="lgi"><i style="background:#e0263c"></i>Late</span>';
+  }).join("")+'<span class="lgi"><i style="background:#e0263c"></i>Late</span>'+
+    (all().some(function(i){ return i.isNews; })
+      ? '<span class="lgi"><i style="background:'+NEWSC+'"></i>News</span>' : '');
   document.getElementById("glg").innerHTML=h;
 }
 function renderPlan(){
@@ -2920,7 +3004,7 @@ function renderPlan(){
        clutter. Late overrides, because an open task past its date is the thing
        worth seeing first, and the legend says so. */
     var col=statusColour(i,late);
-    var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+'" data-id="'+i.id+'">'+
+    var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+(i.isNews?" nws":"")+'" data-id="'+i.id+'">'+
       '<div class="gl">'+
         (i.deleted
           ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
@@ -2948,10 +3032,18 @@ function renderPlan(){
      Timeline now: he wanted the webinars off the task list and still visible
      in time. No tick, no priority and no bar running back to the start -- an
      event is a moment, not work accumulating towards a deadline, so it is a
-     dot and its date. */
+     dot and its date.
+
+     It sits in the SAME run as the tasks, in date order, rather than in a
+     section of its own: *"don't create a seperate section for webinar - it
+     breaks the whole continuos timeline flow. Keep it in one table but for
+     webinars make the text colour blue so it stands out from the tasks."* A
+     heading does the separating a colour can do without cutting the sequence
+     in half, and what this view is for is reading one line of dates down the
+     page. The blue is --ev; everything else about the row is unchanged. */
   function evrow(e){
     var x=pos(e.d), col=tc(e.k);
-    return '<div class="gerow">'+
+    return '<div class="gerow" data-d="'+esc(e.d||"")+'">'+
       '<div class="gl"><span class="evdot" style="background:'+col+'"></span>'+
         '<span class="gtx"><span class="gt">'+esc(e.t)+'</span></span>'+
       '</div><div class="gtrack"><div class="gg">'+grid+'</div>'+
@@ -2966,30 +3058,36 @@ function renderPlan(){
   var opn=P.filter(function(i){return i.status!=="done";});
   var shut=P.filter(function(i){return i.status==="done";}).sort(byDue);
 
+  /* Tasks and events, one sequence. An undated task still sorts last, the way
+     byDue has always put it; an event always carries a date. */
+  function mix(ts,es){
+    return ts.map(function(i){ return {d:i.due||"",h:row(i)}; })
+      .concat(es.map(function(e){ return {d:e.d||"",h:evrow(e)}; }))
+      .sort(function(a,b){
+        if(!a.d) return 1; if(!b.d) return -1;
+        return a.d<b.d?-1:a.d>b.d?1:0;
+      }).map(function(x){ return x.h; }).join("");
+  }
+  function evCount(n){ return n?' &middot; '+n+' event'+(n===1?"":"s"):''; }
+
   if(cat==="all"){
     /* Everything means everything: one list in date order. Grouping by track
        here answered "what kind of thing is this", which the sub-tabs already
        answer, at the cost of the question this view is for -- what is next. */
     h+='<div class="gsec"><i style="background:var(--ink3)"></i>Open'+
-       '<em>'+opn.length+' task'+(opn.length===1?"":"s")+'</em></div>';
-    opn.sort(byDue).forEach(function(i){ h+=row(i); });
+       '<em>'+opn.length+' task'+(opn.length===1?"":"s")+evCount(EV.length)+'</em></div>';
+    h+=mix(opn.slice(), EV);
   }else{
     TORDER.forEach(function(k){
       var all=P.filter(function(i){return i.track===k;});
-      var rows=all.filter(function(i){return i.status!=="done";}).sort(byDue);
-      if(!all.length) return;
+      var rows=all.filter(function(i){return i.status!=="done";});
+      var evk=EV.filter(function(e){ return e.k===k; });
+      if(!all.length&&!evk.length) return;
       var dn=all.length-rows.length;
       h+='<div class="gsec"><i style="background:'+tc(k)+'"></i>'+esc(tl(k))+
-         '<em>'+dn+' of '+all.length+' done</em></div>';
-      rows.forEach(function(i){ h+=row(i); });
+         '<em>'+dn+' of '+all.length+' done'+evCount(evk.length)+'</em></div>';
+      h+=mix(rows,evk);
     });
-  }
-
-  if(EV.length){
-    h+='<div class="gsec"><i style="background:var(--orange)"></i>Events'+
-       '<em>'+EV.length+' in the diary</em></div>';
-    EV.slice().sort(function(a,b){ return String(a.d).localeCompare(String(b.d)); })
-      .forEach(function(e){ h+=evrow(e); });
   }
 
   if(shut.length){
@@ -3071,7 +3169,7 @@ function renderCal(){
     h+='<div class="day'+(out?" out":"")+(k===tIso?" today":"")+'" data-day="'+k+'"><div class="dn">'+d.getDate()+'</div>'+
        evOn(k).map(function(i){
          var late=!i.deleted&&k<tIso;
-         return '<div class="ev" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
+         return '<div class="ev'+(i.isNews?" nws":"")+'" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
            esc(i.title.length>22?i.title.slice(0,21)+"…":i.title)+'</div>';
        }).join("")+
        evtOn(k).map(function(e){
@@ -3118,7 +3216,7 @@ function renderAgenda(evOn,evtOn,tIso){
        ev.map(function(i){
          var n=dleft(i.due), lt=i.status!=="done"&&!i.deleted&&n!==null&&n<0;
          var sc=statusColour(i,lt);
-         return '<div class="calrow'+(i.status==="done"?" done":"")+'" data-id="'+i.id+'"'+
+         return '<div class="calrow'+(i.status==="done"?" done":"")+(i.isNews?" nws":"")+'" data-id="'+i.id+'"'+
            ' style="border-left-color:'+sc+'">'+
            '<i style="background:'+sc+'"></i>'+
            '<b>'+esc(i.title)+'</b>'+
@@ -3733,6 +3831,31 @@ function renderDrawer(keepDraft){
        '<div class="row-b" style="margin-top:9px"><button class="btn" data-undel="1">Put it back</button></div></div>';
   }
 
+  /* A NEWS item is something Claude put on the board, not something he asked
+     for, so the card has to let him say no as plainly as it let the board say
+     it. The two buttons are the first thing on it, above the properties: a
+     deadline he has not agreed to is not yet a property worth reading. Once
+     he has answered, the banner states the answer and stops asking -- a
+     question re-asked every time he opens the card is one he learns to
+     ignore. Notes work here exactly as they do on any other task, which is
+     the whole reason a NEWS item is a task rather than a new kind of object. */
+  if(i.isNews){
+    if(!i.newsState&&!i.deleted){
+      h+='<div class="dnews"><b>Found for you</b>'+
+         '<div>Not on the INSEAD list. Claude put it here from a NEWS pass; '+
+         'accept it to keep it on your board and calendar, or reject it to drop it.</div>'+
+         '<div class="row-b" style="margin-top:9px">'+
+           '<button class="btn o" data-nacc="1">Accept</button>'+
+           '<button class="btn" data-nrej="1">Reject</button></div></div>';
+    }else if(i.newsState==="accept"){
+      h+='<div class="dnews on"><b>Accepted</b><div>You took this one on. It counts '+
+         'like any other task from here.</div></div>';
+    }else if(i.newsState==="reject"){
+      h+='<div class="dnews off"><b>Rejected</b><div>It is off every view. '+
+         '"Put it back" above restores it if you change your mind.</div></div>';
+    }
+  }
+
   if(i.brief) h+='<div class="dsub">'+esc(i.brief)+'</div>';
 
   /* --- what the task is, then the things that can change --- */
@@ -4063,7 +4186,8 @@ function changedItems(){
     if(Object.keys(d).length){
       out.push({id:i.id,title:i.title,status:i.status,due:i.due,priority:i.priority,
                 snoozes:i.snoozes,origDue:i.origDue,manual:!!i.manual,
-                effort:i.effort||null,deleted:!!i.deleted,at:touched[i.id]||null});
+                effort:i.effort||null,deleted:!!i.deleted,newsState:i.newsState||null,
+                at:touched[i.id]||null});
     }else if(touched[i.id]){
       out.push({id:i.id,title:i.title,at:touched[i.id],seed:true});
     }
@@ -4157,7 +4281,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-0620";
+var BUILD="2026-10-07-1105";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4418,6 +4542,14 @@ document.getElementById("dBody").addEventListener("click",function(e){
     return; }
   if(b.dataset.qdone){ var q=items[openId]; patch(openId,{status:"done",manual:true},"Closed: "+q.title); return; }
   if(b.dataset.q2d){ snooze(openId,2); return; }
+  /* Accept only records the decision: the task is already on the board with a
+     real date, so there is nothing to create. Reject sets `deleted` in the
+     same patch, which is how it leaves every view, and `manual` so the
+     dependency cascade does not read the status it leaves behind as its own. */
+  if(b.dataset.nacc){ var na=items[openId];
+    patch(openId,{newsState:"accept"},"Accepted: "+na.title); return; }
+  if(b.dataset.nrej){ var nr=items[openId], nz=openId; hideDrawer();
+    patch(nz,{newsState:"reject",deleted:true,manual:true},"Rejected: "+nr.title); return; }
   if(b.dataset.del){ var dz=openId; hideDrawer(); delItem(dz); return; }
   if(b.dataset.undel){ undelItem(openId); return; }
   if(b.dataset.gsave){
@@ -4938,7 +5070,7 @@ function mergePayload(pay){
     if(!isPatch && mine && theirs <= mine) return;
 
     if(c.seed){
-      i.title=sd.t; i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null; i.doneAt=null;
+      i.title=sd.t; i.status=sd.s; i.due=sd.d; i.priority=sd.p; i.snoozes=0; i.origDue=null; i.manual=false; i.deleted=false; i.effort=sd.ef||null; i.doneAt=null; i.newsState=null;
     }else{
       DFIELDS.forEach(function(f){ if(c[f]!==undefined) i[f]=c[f]; });
     }

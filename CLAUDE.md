@@ -862,7 +862,14 @@ answering more than "what is due".
   recorded" rather than borrowing its due date, which would be the board
   inventing a fact about his own week. On his board today **every** done task
   is in that state, which is exactly why the empty case had to be honest
-  rather than clever.
+  rather than clever. It shows **the last five**, with the real total beside
+  the heading: *"only include the last 5 completed tasks"*.
+  **It shipped with no `grid-column` at all**, so auto-placement gave it one
+  of the bento's twelve and it rendered as an 80px ribbon of coloured dots
+  with every title clipped away -- *"the recently completed section is messed
+  up"*. Every wide tile on this board declares its span; the next one that
+  does not is this bug again, which is why the check measures the tile's box
+  rather than reading the rule.
 - **A tile heading opens the section it is about.** *"the progress by task
   header should be clickable and should open the board section. Similar, on
   the calendar should open the calendar."* `data-vgo` goes on the **heading,
@@ -981,6 +988,53 @@ waiting to see whether a third is coming.
   dim his laptop because he dimmed his phone at midnight.
 - The `theme-color` meta moves with it, or a dark board sits under a white iOS
   status bar.
+
+## NEWS: the opportunities he would otherwise never hear about
+
+He asked for this on 2026-10-07, and the reason is the whole specification:
+*"I just realized McKinsey has a Make your mark pre-mba program which would
+have been a major bonus if I applied and got through. But I simply did not
+even know about it."* So the Sunday weekly report researches the open web for
+pre-MBA and in-programme opportunities against his actual targets -- Big Tech
+LDP and management-track roles, MBB consulting, consumer LDPs -- and carries
+them under a `## NEWS` heading. `.claude/skills/newsletter/SKILL.md` §3b holds
+the procedure, the targets and the bar.
+
+**A NEWS item that he should definitely do is an ordinary task carrying
+`nw:true`**, and that is the design decision. It could have been a fifth
+whole-blob field beside `kb` and `news[]`, and then the Calendar, the
+Timeline, the notes thread, the merge rules and `save()` would each have had
+to be taught a second kind of object. A task already has a date, a drawer, a
+note thread and a clock. What `nw:true` adds is presentation and one question.
+
+- **It draws in `--news`, a magenta that is deliberately not a track colour.**
+  `statusColour()` returns it ahead of the status, so the Timeline bar, the
+  Calendar chip and the agenda row all agree, and the legend carries a News
+  swatch whenever one exists -- a colour on this board that the key does not
+  explain is a colour that means nothing.
+- **The title starts `[NEWS] `.** That is the half of the distinction a screen
+  reader, a plain-text export and the audit log still get, so it is written
+  as well as the colour, not instead of it.
+- **Accept and Reject sit at the top of its card**, above the property rows: a
+  deadline he has not agreed to is not yet a property worth reading. Accepting
+  records `newsState:"accept"` and the banner stops asking -- a question
+  re-asked every time he opens the card is one he learns to ignore. Rejecting
+  sets `deleted` in the same patch, so it leaves every view by the path a
+  deletion already takes and is still recoverable from Timeline.
+- **`newsState` is in `DFIELDS` and in `diffOf`**, like every other field: in
+  one and not the other fails silently and completely, which is the `deleted`
+  bug. The check for it reloads the page.
+- **Notes work on it because it is a task.** He asked to be able to add them;
+  nothing had to be built.
+- **Be selective.** *"Be selective about the dates you add to calendar -
+  shouldn't be a spam and clutter my calendar."* Two or three a term, not two
+  a week. A calendar he stops trusting loses the item he would have acted on
+  along with the ones he would not.
+- **Never put back one he rejected.** His answer travels to his other device;
+  re-seeding it next Sunday is the board arguing with him.
+
+The first pass ran on 2026-10-07 rather than waiting for Sunday, because a
+NEWS section introduced empty reads as a feature that does not work.
 
 ## The newsletters
 
@@ -1150,6 +1204,18 @@ never be a tab apart again.
   axis **pins to its left edge** at 40% opacity (`.pre`) rather than being
   drawn off it, and its label still prints the real date -- a clamped marker
   must never be able to say a task happened later than it did.
+- **An event sits in the run, not in a section after it.** It had a block of
+  its own under the tasks, and that is what he threw out on 2026-10-07:
+  *"don't create a seperate section for webinar - it breaks the whole
+  continuos timeline flow. Keep it in one table but for webinars make the text
+  colour blue so it stands out from the tasks."* A heading was doing work a
+  colour can do without cutting the sequence in half, and reading one line of
+  dates down the page is what this view is for. So tasks and events are mixed
+  by date in the same list -- in Everything and inside each track group alike
+  -- and `--ev` is the blue. It is a lighter blue than the `doing` status
+  (#3264ff) on purpose: a bar in that exact blue already means In progress,
+  and two meanings for one colour on one view is the drift the legend exists
+  to prevent.
 - **An event row is `.gerow`, not `.grow`.** `.grow` means "a task row" and
   the checks count it against `pool()`, so an event wearing it made the view
   claim four tasks that are not tasks. It borrows the geometry and none of the

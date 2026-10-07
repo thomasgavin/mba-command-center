@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 359 checks, three widths, a real browser
+node checks/board-check.mjs          # 381 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -313,6 +313,35 @@ holds both halves, `.gl` and `.gtrack`. The check asserts, at 390 and 1280,
 that there is no List tab, that every task in `pool()` is a row, that a row
 carries the state, the tick, the note button and the timeline together, and
 that a done task is green on both halves.
+
+### Every wide tile declares its grid span
+
+`Recently completed` shipped with no `grid-column` at all, so auto-placement
+gave it one column of the bento's twelve: an 80px ribbon of coloured dots with
+every title clipped away. The check measures the tile's own box against the
+bento's -- nearly the full row at 390, better than 40% and opposite the agenda
+at 1280 -- because reading the stylesheet is what passed while his screen was
+broken. It also asserts the list never shows more than five, while the heading
+still counts them all.
+
+### A webinar is a row in the timeline, not a section after it
+
+Events sit in the same date-ordered run as the tasks, in Everything and inside
+each track group alike, and the only thing separating them is `--ev` blue on
+the title. The check asserts there is no `Events` heading, that every event is
+still a row, that at least one of them falls *between* two tasks rather than
+after all of them, and that the measured colour of an event title is blue
+while no task's is.
+
+### A NEWS item is a task, and his answer to it survives a reload
+
+`nw:true` makes a task draw in `--news` everywhere and puts Accept and Reject
+on its card; `newsState` is his answer. It is in `DFIELDS` **and** `diffOf`,
+which is the rule a field in one and not the other breaks silently -- the
+`deleted` bug. So the check accepts one, rejects another, reloads the page,
+and asserts both answers are still there and the rejected one is still gone.
+It also asserts the legend carries a News swatch exactly when a NEWS item is
+on the board, and nothing else is in that key.
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

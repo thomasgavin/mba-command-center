@@ -156,7 +156,11 @@ var HIST_FIELDS = [
   {k:"due",      label:"Due",      show:plain},
   {k:"priority", label:"Priority", show:plain},
   {k:"effort",   label:"Effort",   show:function(v){ return plain(EFFORT_LABEL[v]||v); }},
-  {k:"deleted",  label:"Deleted",  show:function(v){ return v ? "yes" : "no"; }}
+  {k:"deleted",  label:"Deleted",  show:function(v){ return v ? "yes" : "no"; }},
+  /* His answer to a NEWS item. It is exactly the kind of decision this log is
+     for: a magenta task that quietly stopped appearing is otherwise a thing
+     he cannot reconstruct a week later. */
+  {k:"newsState",label:"News",     show:function(v){ return plain(v==="accept"?"accepted":v==="reject"?"rejected":v); }}
 ];
 /* An item at its SEED value has no entry for the field at all, and an item
    reset to SEED travels as {id,at,seed:true}. Both mean "whatever the baseline

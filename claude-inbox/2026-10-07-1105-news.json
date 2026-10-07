@@ -1,0 +1,30 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T11:05:00.000Z",
+ "notes": [
+  {
+   "id": "claude-20261007T110500000Z-newsamzn",
+   "itemId": "news-amzn-path",
+   "itemTitle": "[NEWS] Apply to Amazon Pathways (MBA Operations LDP)",
+   "from": "claude",
+   "title": "Amazon's LDP is open",
+   "text": "Pathways is Amazon's three-year operations leadership track for MBA students and recent graduates, and your presales and ops background reads straight onto it. There is no deadline: they pull the posting once they have enough people. - Set your own date rather than waiting for theirs.",
+   "state": "new",
+   "createdAt": "2026-10-07T11:05:00.000Z",
+   "at": "2026-10-07T11:05:00.000Z"
+  },
+  {
+   "id": "claude-20261007T110500000Z-newsmbb",
+   "itemId": "news-mbb-cal",
+   "itemTitle": "[NEWS] Pin down the MBB recruiting calendar for Dec'27",
+   "from": "claude",
+   "title": "Why Make Your Mark closed",
+   "text": "Make Your Mark, BCG Unlock and ExperienceBain all run over the summer for people starting that autumn, so the January intake's window shut before you were admitted. The route from here is the on-campus cycle in P1. - Ask the CDC for the MBB dates for the Dec'27 class.",
+   "state": "new",
+   "createdAt": "2026-10-07T11:05:00.000Z",
+   "at": "2026-10-07T11:05:00.000Z"
+  }
+ ],
+ "changed": []
+}

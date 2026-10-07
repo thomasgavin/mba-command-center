@@ -1100,7 +1100,8 @@ for (var tw of [390, 1280]) {
       noteCount: !!document.querySelector("#gantt .chip.nt"),
       legend: Array.prototype.map.call(document.querySelectorAll("#glg .lgi"), function (e) { return e.textContent; }),
       doneTick: done ? getComputedStyle(done.querySelector(".tick")).backgroundColor : null,
-      donePoint: done ? (done.querySelector(".gpt") || {}).style.background : null
+      donePoint: done ? (done.querySelector(".gpt") || {}).style.background : null,
+      anyNews: all().some(function (i) { return i.isNews; })
     };
   });
   ok(tw + "px: there is one Tasks tab and no List tab",
@@ -1112,10 +1113,14 @@ for (var tw of [390, 1280]) {
      note count" -- all four, and the key is what makes that readable. */
   ok(tw + "px: the row is the title and nothing it already shows elsewhere",
      !k25.pill && !k25.dateChip && !k25.noteBtn && !k25.noteCount, JSON.stringify(k25));
+  /* Every status, plus Late, plus News while any NEWS item is on the board --
+     a NEWS task draws in its own colour, and a colour the key does not
+     explain is a colour that means nothing. Nothing else may be in here. */
   ok(tw + "px: a key maps every state to its colour",
-     k25.legend.length === STATUS_LABELS.length + 1 &&
+     k25.legend.length === STATUS_LABELS.length + (k25.anyNews ? 2 : 1) &&
      STATUS_LABELS.every(function (l) { return k25.legend.indexOf(l) >= 0; }) &&
-     k25.legend.indexOf("Late") >= 0, JSON.stringify(k25.legend));
+     k25.legend.indexOf("Late") >= 0 &&
+     (k25.anyNews === (k25.legend.indexOf("News") >= 0)), JSON.stringify(k25.legend));
   /* green, not grey: done is the one state worth spotting down a column of 35 */
   ok(tw + "px: a done task is green on both halves",
      k25.doneTick === "rgb(0, 169, 143)" && k25.donePoint === "rgb(0, 169, 143)", JSON.stringify(k25));
@@ -1187,11 +1192,12 @@ for (var tw26 of [390, 1280]) {
       groupedHeads: grouped, dues: dues.length
     };
   });
-  /* one list, so the only headings are Open, Events, Done and Deleted -- no
-     track names. Events joined them when the webinars stopped being tasks:
-     it is a section of the same view and still not a track. */
-  ok(tw26 + "px: Everything is not split by track", 
-     k26.heads.every(function (h) { return /^(Open|Events|Done|Deleted)/.test(h); }), JSON.stringify(k26.heads));
+  /* one list, so the only headings are Open, Done and Deleted -- no track
+     names, and no Events either: *"don't create a seperate section for
+     webinar - it breaks the whole continuos timeline flow"*. An event is a
+     row inside Open now, in its date's place. */
+  ok(tw26 + "px: Everything is not split by track",
+     k26.heads.every(function (h) { return /^(Open|Done|Deleted)/.test(h); }), JSON.stringify(k26.heads));
   ok(tw26 + "px: the open tasks are in due-date order", k26.openSorted && k26.openCount > 0, JSON.stringify(k26));
   ok(tw26 + "px: done tasks are all at the bottom, in a Done section",
      k26.doneHead && k26.doneLast && k26.doneCount > 0, JSON.stringify(k26));
@@ -2994,16 +3000,33 @@ for (var ew of [390, 1280]) {
       datedSaid: none.filter(function (t) { return !/not recorded/.test(t); }).length,
       leadTitle: first ? (first.querySelector(".rct").textContent || "") : "",
       leadDate: first ? (first.querySelector(".rcd").textContent || "") : "",
-      want: open1.title, wantDate: fmtD(items[open1.id].doneAt)
+      want: open1.title, wantDate: fmtD(items[open1.id].doneAt),
+      allDone: alive().filter(function (i) { return i.status === "done"; }).length,
+      headCount: parseInt((document.querySelector(".rcent h3 .more").textContent || "")
+        .replace(/\D+/g, ""), 10),
+      /* the bug in the screenshot: the tile carried no grid-column at all, so
+         auto-placement gave it ONE of twelve and it rendered as a ribbon of
+         dots with every title clipped away. Measure the box, not the rule. */
+      tileW: document.querySelector(".rcent").getBoundingClientRect().width,
+      stageW: document.querySelector("#bento").getBoundingClientRect().width,
+      titleW: document.querySelector(".rcent .rct")
+        ? document.querySelector(".rcent .rct").getBoundingClientRect().width : 0
     };
   });
   ok("Recently completed comes directly after On the calendar",
      r43.order, JSON.stringify(r43));
   ok("it lists what has been closed", r43.rows > 0, JSON.stringify(r43));
+  /* *"only include the last 5 completed tasks"*. The heading still carries the
+     real total, so capping the list cannot understate what he has done. */
+  ok("and never more than five of them", r43.rows <= 5, JSON.stringify(r43));
+  ok("while the heading still counts them all",
+     r43.headCount === r43.allDone && r43.allDone > 5, JSON.stringify(r43));
   ok("a task closed before doneAt existed borrows no date",
      r43.undatedSaid > 0 && r43.datedSaid === 0, JSON.stringify(r43));
   ok("and the one just closed leads it, with the day it closed",
      r43.leadTitle.indexOf(r43.want) === 0 && r43.leadDate === r43.wantDate, JSON.stringify(r43));
+  ok("the tile takes the width of the row, not one column of twelve",
+     r43.tileW > r43.stageW * 0.9 && r43.titleW > 120, JSON.stringify(r43));
   await s43.ctx.close();
 }
 
@@ -3037,6 +3060,146 @@ for (var ew of [390, 1280]) {
      !!hv.rowId && hv.opened === hv.rowId, JSON.stringify(hv));
   ok("no console errors through the heading checks", s44.errs.length === 0, s44.errs.join(" | "));
   await s44.ctx.close();
+}
+
+/* ---- 45. a webinar is a row in the one list, not a section after it ----
+   "In the timeline view, don't create a seperate section for webinar - it
+   breaks the whole continuos timeline flow. Keep it in one table but for
+   webinars make the text colour blue so it stands out from the tasks."
+   Two halves, and the second is what lets the first be safe: without the
+   colour, merging the two kinds of row would lose the distinction a heading
+   was carrying. The colour is measured, not read off the stylesheet, because
+   a token renamed in one theme and not the other passes a text search. */
+for (var nw of [390, 1280]) {
+  var s45 = await open(nw);
+  var r45 = await s45.p.evaluate(function () {
+    setView("time"); render();
+    var out = { heads: [], order: [], blue: [], taskInk: [] };
+    Array.prototype.forEach.call(
+      document.querySelectorAll("#gantt .gsec,#gantt .grow,#gantt .gerow"), function (e) {
+        if (/gsec/.test(e.className)) { out.heads.push(e.textContent || ""); return; }
+        var ev = /gerow/.test(e.className);
+        var d = ev ? e.getAttribute("data-d")
+                   : (items[e.getAttribute("data-id")] || {}).due || "";
+        out.order.push({ ev: ev, d: d });
+        var t = e.querySelector(".gt");
+        if (t) (ev ? out.blue : out.taskInk).push(getComputedStyle(t).color);
+      });
+    /* an event has to appear between two tasks somewhere, or "interleaved"
+       is being satisfied by every event happening to be last anyway */
+    var firstEv = out.order.findIndex(function (x) { return x.ev; });
+    var lastTask = out.order.map(function (x) { return x.ev; }).lastIndexOf(false);
+    return {
+      heads: out.heads, evRows: out.blue.length,
+      events: EVENTS.length,
+      /* dates never go backwards inside the run before Done */
+      sorted: out.order.every(function (x, n) {
+        return n === 0 || !out.order[n - 1].d || !x.d || out.order[n - 1].d <= x.d
+               || out.heads.length > 1;   /* Done/Deleted restart the sequence */
+      }),
+      mixed: firstEv >= 0 && firstEv < lastTask,
+      blue: out.blue, taskInk: out.taskInk.slice(0, 3)
+    };
+  });
+  ok(nw + "px: no Events section", r45.heads.every(function (h) { return !/^Events/.test(h); }),
+     JSON.stringify(r45.heads));
+  ok(nw + "px: every event is still a row", r45.evRows === r45.events, JSON.stringify(r45));
+  ok(nw + "px: and sits between the tasks rather than after them", r45.mixed, JSON.stringify(r45));
+  ok(nw + "px: a webinar's title is blue, and no task's is",
+     r45.blue.length > 0 &&
+     r45.blue.every(function (c) {
+       var m = c.match(/\d+/g).map(Number);
+       return m[2] > m[0] + 40 && m[2] > m[1] + 20;    /* blue dominates */
+     }) &&
+     r45.taskInk.every(function (c) { return r45.blue.indexOf(c) < 0; }),
+     JSON.stringify(r45));
+  ok(nw + "px: no console error merging them", s45.errs.length === 0, s45.errs.join(" | "));
+  await s45.ctx.close();
+}
+
+/* ---- 46. NEWS: an opportunity Claude found, and his answer to it ----
+   "These News items should have accept or reject button in the on-click
+   details popup. Should also be able to add notes." A NEWS item is an
+   ordinary task carrying `nw:true`, which is the whole reason notes, the
+   calendar and the merge rules needed nothing new. What had to be checked is
+   the part that is new: the two buttons, that reject actually removes it, and
+   that the answer SURVIVES A RELOAD -- `newsState` in DFIELDS but not in
+   diffOf would merge and never save, which is the `deleted` bug exactly. */
+{
+  var s46 = await open(390);
+  var r46 = await s46.p.evaluate(function () {
+    var n = alive().filter(function (i) { return i.isNews; });
+    if (!n.length) return { none: true };
+    var id = n[0].id;
+    openItem(id);
+    var card = document.getElementById("dBody");
+    var acc = card.querySelector("[data-nacc]"), rej = card.querySelector("[data-nrej]");
+    var seen = { acc: !!acc, rej: !!rej,
+                 accBox: acc ? acc.getBoundingClientRect().width : 0,
+                 notes: !!card.querySelector("[data-nadd],#nt") };
+    /* the colour it draws in is its own, not a status colour */
+    setView("time"); render();
+    var row = document.querySelector('#gantt .grow[data-id="' + id + '"]');
+    seen.rowInk = row ? getComputedStyle(row.querySelector(".gt")).color : "";
+    seen.plainInk = getComputedStyle(
+      document.querySelector('#gantt .grow:not(.nws) .gt')).color;
+    seen.legendNews = (document.getElementById("glg").textContent || "").indexOf("News") >= 0;
+    /* accept, then reject a second one */
+    openItem(id);
+    document.querySelector("[data-nacc]").click();
+    seen.accepted = items[id].newsState;
+    seen.stillThere = !!alive().filter(function (i) { return i.id === id; }).length;
+    seen.asked = !!document.querySelector("[data-nacc]");
+    var two = alive().filter(function (i) { return i.isNews && i.id !== id; });
+    seen.second = two.length > 0;
+    if (two.length) {
+      openItem(two[0].id);
+      document.querySelector("[data-nrej]").click();
+      seen.rejected = items[two[0].id].newsState;
+      seen.gone = !alive().filter(function (i) { return i.id === two[0].id; }).length;
+      seen.rejId = two[0].id;
+    }
+    seen.id = id;
+    return seen;
+  });
+  ok("a NEWS task exists on the board", !r46.none && r46.second, JSON.stringify(r46));
+  ok("its card offers Accept and Reject, and they are on screen",
+     r46.acc && r46.rej && r46.accBox > 0, JSON.stringify(r46));
+  ok("and it takes a note like any other task", r46.notes, JSON.stringify(r46));
+  ok("it draws in its own colour, which the legend explains",
+     r46.rowInk && r46.rowInk !== r46.plainInk && r46.legendNews, JSON.stringify(r46));
+  ok("accepting records the answer and stops asking",
+     r46.accepted === "accept" && r46.stillThere && !r46.asked, JSON.stringify(r46));
+  ok("rejecting takes it off the board", r46.rejected === "reject" && r46.gone, JSON.stringify(r46));
+  /* the half an in-memory assertion cannot see */
+  await s46.p.reload({ waitUntil: "load" });
+  await s46.p.waitForTimeout(500);
+  var k46 = await s46.p.evaluate(function (x) {
+    return { acc: (items[x.id] || {}).newsState, rej: (items[x.rejId] || {}).newsState,
+             del: !!(items[x.rejId] || {}).deleted };
+  }, { id: r46.id, rejId: r46.rejId });
+  ok("and both answers survive a reload",
+     k46.acc === "accept" && k46.rej === "reject" && k46.del, JSON.stringify(k46));
+  await s46.ctx.close();
+}
+
+/* ---- 47. Recently completed is a row wide on a desktop too ---- */
+{
+  var s47 = await open(1280);
+  var r47 = await s47.p.evaluate(function () {
+    setView("over"); render();
+    var t = document.querySelector(".rcent").getBoundingClientRect();
+    var b = document.querySelector("#bento").getBoundingClientRect();
+    var a = document.querySelector(".agd").getBoundingClientRect();
+    return { w: t.width, b: b.width, agd: a.width,
+             /* it shares its row with the agenda rather than stacking under
+                a column of nothing: same two-column placement as the rest */
+             beside: t.left > a.right - 1 };
+  });
+  ok("1280px: Recently completed is half the bento, not a twelfth",
+     r47.w > r47.b * 0.4, JSON.stringify(r47));
+  ok("1280px: and sits opposite the agenda", r47.beside, JSON.stringify(r47));
+  await s47.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */
