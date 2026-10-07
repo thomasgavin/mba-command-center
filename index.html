@@ -593,7 +593,6 @@ body::before{
    what makes them stand out; what shrinks is the number and the dead space
    under it, so they size to their content like every other tile. */
 .hero{grid-column:span 5;color:#fff;border:0;display:flex;flex-direction:column;padding:14px 15px}
-.hero.a{background:linear-gradient(142deg,#ff5a1f 0%,#ff7a3d 48%,#ff9558 100%);box-shadow:0 2px 8px rgba(255,100,41,.2),0 24px 48px -22px rgba(255,100,41,.65)}
 .hero.b{grid-column:span 4;background:linear-gradient(145deg,#2a0b3a 0%,#431a59 55%,#5a2676 100%);box-shadow:0 2px 8px rgba(40,10,56,.22),0 24px 48px -22px rgba(40,10,56,.7)}
 .hero::after{
   content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;
@@ -605,8 +604,6 @@ body::before{
 /* A step above the title under it and in caps, so it reads as the card's
    headline rather than another line of text: *"make the 1d late slightly
    bigger than the text below and all caps"*. */
-.hero .hcd{font-size:17px;font-weight:800;letter-spacing:.02em;line-height:1;text-transform:uppercase}
-.hero .sub{font-size:13.5px;font-weight:650;margin-top:6px;letter-spacing:-.015em;line-height:1.3}
 .hero .met{font-size:11.5px;color:rgba(255,255,255,.76);margin-top:3px;font-weight:500}
 .hero .foot{margin-top:auto;padding-top:11px;display:flex;gap:6px;flex-wrap:wrap}
 .hbtn{
@@ -669,19 +666,45 @@ body::before{
 
 /* the two sections of the calendar */
 /* Needs attention was a tile of its own and listed the same tasks as the
-   agenda under it. It is a section now, and it keeps the colour it had --
-   *"the needs attention block doesn't stand out enough - needs more colour"*,
-   then *"should still be highlight a similar way in red"* -- which is the hue
-   the countdown chips inside it already use. */
+   agenda under it. It is a section now, and it wears what the Next deadline
+   hero wore: *"just keep the needs attention but make it in bright solid
+   orange exactly like next deadline card. And remove the next deadline
+   card."* The hero said one thing about one task in a whole tile and this
+   section already says the same thing about seven, so the gradient moves to
+   the list and the tile goes. Red had the section for an evening -- it was
+   the hue of the countdown chips inside it -- and orange is the board's own
+   "this is the thing to look at". */
 .asecs{display:flex;flex-direction:column;gap:12px}
 .asec{min-width:0}
 .asec h4{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink3);margin:0 0 4px;display:flex;align-items:baseline;gap:7px}
 .asec h4 span{font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;
   color:var(--ink4);margin-left:auto}
-.asec.att{border-left:3px solid var(--red);padding:8px 0 8px 9px;border-radius:6px;
-  background:linear-gradient(180deg,rgba(224,38,60,.09),transparent 120px)}
-.asec.att h4{color:var(--red)}
+/* The gradient is the deadline hero's own, to the stop -- it has to be the same orange he
+   is used to, not a second one a shade off it. Everything inside goes white:
+   a tint picked to read on the panel is a smudge on a solid colour, and the
+   priority chip carries an inline colour from PRI, so that one needs the
+   !important the rest do not. */
+.asec.att{color:#fff;border:0;border-radius:var(--r2);padding:11px 12px;
+  background:linear-gradient(142deg,#ff5a1f 0%,#ff7a3d 48%,#ff9558 100%);
+  box-shadow:0 2px 8px rgba(255,100,41,.2),0 18px 34px -22px rgba(255,100,41,.6)}
+.asec.att h4{color:rgba(255,255,255,.8)}
+.asec.att h4 span{color:rgba(255,255,255,.74)}
+.asec.att .agr{border-top-color:rgba(255,255,255,.24)}
+.asec.att .at{color:#fff}
+.asec.att .at small{color:rgba(255,255,255,.78)}
+.asec.att .agd-d,.asec.att .agd-d.hot{background:rgba(255,255,255,.15)}
+.asec.att .agd-d b,.asec.att .agd-d span,
+.asec.att .agd-d.hot b,.asec.att .agd-d.hot span{color:#fff}
+/* The countdown chip has a rule per urgency and a dark-theme rule per
+   urgency on top of that, all at the same weight as anything scoped to this
+   section, so the last one in the file wins and that is the theme's. This
+   surface is solid orange in both themes, so no theme may re-tint what sits
+   on it: that is what the !important says. */
+.asec.att .chip.d,.asec.att .chip.d.late,
+.asec.att .chip.d.soon,.asec.att .chip.d.near{background:none!important;color:#fff!important}
+.asec.att .chip.p{color:#fff!important;border-color:rgba(255,255,255,.5)}
+.asec.att .hint{color:rgba(255,255,255,.82)}
 /* *"align the statuses across the board - they are a bit left or right to
    each other in some places"*. A chip sized by its own text puts "today" and
    "in 5d" and "24d late" at three different left edges down a column of
@@ -1662,15 +1685,21 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      is still the order he asked for -- progress, News, the workload chart,
      then tuition -- because the explicit rows mean DOM order is not what a
      desktop sees. */
-  .hero{grid-column:1/6;grid-row:1}
-  .agd{grid-column:6/13;grid-row:1/4}
-  .agd .asecs{flex-direction:row;gap:18px}
+  /* The deadline hero is gone, so the left column now opens with the track
+     bars and the calendar spans the two short tiles opposite it rather than
+     three. Leaving the hero's row in place left row 1 of the left column
+     empty, which is a hole at the top of the first screen. */
+  .agd{grid-column:6/13;grid-row:1/3}
+  /* align-items, because a section that is now a solid colour must be the
+     height of what is in it: stretched to the tile, Needs attention came out
+     as a half-screen slab of orange with three lines at the top of it. */
+  .agd .asecs{flex-direction:row;gap:18px;align-items:flex-start}
   .agd .asec{flex:1;min-width:0}
-  .trk{grid-column:1/6;grid-row:2;align-self:start}
+  .trk{grid-column:1/6;grid-row:1;align-self:start}
   /* the two rings are short and go under the track bars, because the column
      opposite the calendar has to be about as tall as the calendar or the
      page opens on a hole */
-  .mstack{grid-column:1/6;grid-row:3;flex-direction:row}
+  .mstack{grid-column:1/6;grid-row:2;flex-direction:row}
   /* News is the one tile here that may not exist -- it draws only when the
      map has something in its NEWS group -- so it is paired with tuition
      rather than given a row of its own, and its absence costs the layout
@@ -1678,22 +1707,22 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* News draws only when the map has something in its NEWS group, so it
      takes a full row of its own rather than half of one it would leave
      half empty */
-  .nwst{grid-column:1/13;grid-row:4;align-self:start}
+  .nwst{grid-column:1/13;grid-row:3;align-self:start}
   /* the workload chart follows News, as it does on the phone */
-  .load{grid-column:1/13;grid-row:5;align-self:start}
-  .hero.b{grid-column:1/6;grid-row:6}
-  .pipe{grid-column:6/13;grid-row:6;align-self:start}
+  .load{grid-column:1/13;grid-row:4;align-self:start}
+  .hero.b{grid-column:1/6;grid-row:5}
+  .pipe{grid-column:6/13;grid-row:5;align-self:start}
   /* a short tile opposite a tall one keeps its own height: stretched, the
      visa list ended halfway up a card with the rest of it empty. */
-  .seqt{grid-row:7;align-self:start}
+  .seqt{grid-row:6;align-self:start}
   .seqt:nth-of-type(odd){grid-column:1/7} .seqt:nth-of-type(even){grid-column:7/13}
   /* what has gone runs the full width at the foot, under the sequences and
      above the milestones */
-  .rcent{grid-column:1/13;grid-row:8;align-self:start}
+  .rcent{grid-column:1/13;grid-row:7;align-self:start}
   /* and the rail of dates is last, as it is on the phone. Without a row of
      its own it auto-places into the first gap -- which is wherever News is
      not drawing today, halfway up the view. */
-  .miles{grid-column:1/13;grid-row:9}
+  .miles{grid-column:1/13;grid-row:8}
   /* Once he has arranged the view himself the hand-placed rows above are off.
      They name specific tiles in specific rows, so they cannot survive a
      reorder -- a tile moved in the markup would stay exactly where its rule
@@ -2904,29 +2933,7 @@ function renderHousing(){
 
 function renderOverview(){
   var L=live().slice().sort(byDue);
-  /* There is no Confirmed/Target/Awaiting field to pick a "hard" date out of
-     any more -- every open task said Target, which told him nothing -- so the
-     next deadline is simply the soonest one still open. */
-  var next=(L.filter(function(i){return i.due&&i.status!=="done";})[0]||L[0]||null);
   var h="";
-
-  /* Next deadline leads the view and Needs attention follows it: *"move next
-     deadline to the top and needs attention second"*. The one thing with a
-     date on it outranks the list of seven things that have dates. */
-  /* hero A: the next hard deadline */
-  if(next){
-    var n=dleft(next.due);
-    /* No 60px number and no row of buttons. The countdown reads at the size
-       of a sentence -- *"make the 'd late' normal size again, looks weird"* --
-       and the whole tile opens the task, which is what the Open button did;
-       Push and Mark done are two taps away in the card that opens. Tuition
-       keeps its buttons: he said that one is fine. */
-    h+='<div class="tile hero a" data-ov="deadline" data-go="'+next.id+'">'+
-       '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
-       '<div class="hcd">'+cTxt(n)+'</div>'+
-       '<div class="sub">'+esc(next.title)+'</div>'+
-       '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div></div>';
-  }
 
   /* One block, two sections. The next ten days and the three weeks after
      them were two tiles listing the same tasks, so the top of Overview said
@@ -3160,7 +3167,7 @@ var ovOrder=[], ovHide=[], ovEdit=false;
 /* The names he reads when a block is in the bar waiting to be put back. A
    key with no name here still works; it just shows its key, which is the
    right failure for a block added later and not yet named. */
-var OVNAME={deadline:"Next deadline",agenda:"On the calendar",
+var OVNAME={agenda:"On the calendar",
   tracks:"Progress by track",news:"News",workload:"Workload by week",tuition:"Tuition",
   rings:"Days and tasks",visa:"Student visa",housing:"Accommodation",
   path:"Critical path",done:"Recently completed",miles:"Milestones"};
@@ -5113,7 +5120,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1805";
+var BUILD="2026-10-07-1930";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

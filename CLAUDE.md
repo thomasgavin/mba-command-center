@@ -1028,9 +1028,23 @@ answering more than "what is due".
   anything inside ten days was on screen twice before he had scrolled. One
   tile now, two `.asec` sections, and **both draw the same `.agr` row** --
   that is what makes them read as one list, since a task crossing the ten-day
-  line changes section and does not change shape. The first keeps the red it
-  had as a tile (*"should still be highlight a similar way in red"*), now as
-  a left edge and a wash on the section.
+  line changes section and does not change shape.
+  **It wears the Next deadline card's orange, and that card is gone.**
+  *"Changed my mind, just keep the needs attention but make it in bright
+  solid orange exactly like next deadline card. And remove the next deadline
+  card."* The hero said one thing about one task in a whole tile, and the
+  section under it already said the same thing about seven; so the gradient
+  moved to the list and the tile went. It is `.hero.a`'s gradient to the
+  stop -- a second orange a shade off it would read as a mistake -- and
+  everything inside goes white, because a tint chosen to read on the panel
+  is a smudge on a solid colour. Two of those need forcing: the priority
+  chip carries an inline colour from `PRI`, and the countdown chip has a
+  rule per urgency *per theme* at the same weight as anything scoped to the
+  section, so the theme's would win on source order. Red had it for an
+  evening in between (*"should still be highlight a similar way in red"*).
+  **A solid block must be the height of what is in it.** Side by side at
+  1181px the sections stretch to the tile by default, which drew Needs
+  attention as a half-screen slab of orange with three lines at the top.
   **"This month" is the rest of the calendar month, and never less than a
   fortnight.** On the 28th the month holds three days, and a section that
   empties itself at the end of every month is one he stops reading. The
@@ -1038,9 +1052,11 @@ answering more than "what is due".
   without the block being able to lie about what is in it.
   At 1181px the two sections sit **side by side** inside the tile, which is
   the whole of what a desktop buys here, and the tile takes the right column
-  opposite the hero, the track bars and the rings -- a column shorter than
-  the calendar is a hole in the first screen, which is what News being
-  absent used to leave.
+  opposite the track bars and the rings -- a column shorter than the
+  calendar is a hole in the first screen, which is what News being absent
+  used to leave. The hero held the left half of row 1, so removing it meant
+  moving every row up by one: leaving its row in place opened the first
+  screen on an empty half-row.
 - **"Recently completed" sits directly under "On the calendar"**, where he
   asked for it: the agenda says what is coming and this says what has gone.
   The order is **`doneAt`**, the day a task was actually closed, and a task
@@ -1636,8 +1652,9 @@ audit log is for, since every other row in that file names its task by title.
 task on the board said "Target", which is a word that distinguishes nothing, and
 it cost a chip on two views, a line on the card and a three-button segment in
 the Due row. Overview's "Next hard deadline" was the only thing reading it; it
-is now **"Next deadline"**, the soonest open task, which is what he thought it
-meant anyway.
+became **"Next deadline"**, the soonest open task, which is what he thought it
+meant anyway -- and that tile is gone too, on 2026-10-07, for saying about one
+task what the calendar's first section says about seven.
 
 ## Status, and the word for a task that cannot start yet
 
@@ -2095,7 +2112,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 468 invariants, three widths, a real browser. Every one of them was a
+that runs: 469 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

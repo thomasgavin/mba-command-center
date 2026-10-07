@@ -794,11 +794,15 @@ for (var w2 of [390, 1280]) {
    2026-10-05 (see 35) and Needs attention took the top. */
 {
   var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile agd"'), iHero = src.indexOf('class="tile hero a"');
-  /* "move next deadline to the top and needs attention second": the one
-     thing with a date outranks the list of seven things that have dates, and
-     the milestone rail is still the last tile on the view. */
-  ok("the next deadline opens the view, then the calendar", iHero > 0 && iHero < iAtt && iMiles > iAtt, iMiles + "/" + iAtt + "/" + iHero);
+  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile agd"');
+  /* *"just keep the needs attention but make it in bright solid orange
+     exactly like next deadline card. And remove the next deadline card."* The
+     hero said one thing about one task in a whole tile, which the calendar's
+     first section already says about seven, so the calendar opens the view
+     and the milestone rail is still the last tile on it. */
+  ok("the calendar opens the view and the milestones close it", iAtt > 0 && iMiles > iAtt, iMiles + "/" + iAtt);
+  ok("and there is no Next deadline card left to say it twice",
+     src.indexOf('tile hero a') < 0 && src.indexOf('data-ov="deadline"') < 0, "");
 }
 
 /* ---- 17. nudges reach the lock screen, and the worker stays out of the way ----
@@ -1288,15 +1292,18 @@ for (var tw26 of [390, 1280]) {
     function top(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().top):null; }
     function right(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().right):null; }
     var st=document.getElementById("stage");
-    return { hero: top(".hero.a"), att: top(".asec.att"),
+    return { att: top(".asec.att"),
              tui: top(".hero.b"), pipe: top(".pipe"), mst: top(".mstack"),
              agd: top(".agd"), rcent: top(".rcent"), trk: top(".trk"),
              load: top(".load"), nwst: top(".nwst"), miles: top(".miles"),
              attR: right(".agd"), stageR: Math.round(st.getBoundingClientRect().right),
              /* the two sections sit side by side at this width */
              secs: Array.prototype.map.call(document.querySelectorAll(".agd .asec"), function (e) {
-               var r = e.getBoundingClientRect(); return { t: Math.round(r.top), l: Math.round(r.left) };
-             }) };
+               var r = e.getBoundingClientRect();
+               return { t: Math.round(r.top), l: Math.round(r.left), h: Math.round(r.height) };
+             }),
+             agdH: (function(){ var e=document.querySelector(".agd");
+               return e?Math.round(e.getBoundingClientRect().height):0; })() };
   });
   var st28 = await s28.p.evaluate(function () {
     setView("over");
@@ -1308,13 +1315,22 @@ for (var tw26 of [390, 1280]) {
      toast appears. */
   ok("Overview prints the build it is running",
      st28 && /^build \d{4}-\d{2}-\d{2}/.test(st28.t) && st28.h > 0, JSON.stringify(st28));
-  ok("Overview puts the deadline and the calendar on one row at 1280",
-     ov28.hero !== null && ov28.hero === ov28.agd, JSON.stringify(ov28));
+  /* The deadline hero held the left half of row 1 and is gone, so the track
+     bars moved up into it: leaving the hero's row in place opened the first
+     screen on an empty half-row. */
+  ok("Overview puts the calendar and the track bars on one row at 1280",
+     ov28.agd !== null && ov28.agd === ov28.trk, JSON.stringify(ov28));
   /* a column of two sections in a tile that has half the screen is a column
      of two half-empty sections */
   ok("and the calendar's two sections sit side by side at 1280",
      ov28.secs.length === 2 && ov28.secs[0].t === ov28.secs[1].t &&
      ov28.secs[0].l < ov28.secs[1].l, JSON.stringify(ov28.secs));
+  /* and each is the height of what is in it. Needs attention is a solid
+     colour now, so stretching it to the tile drew a half-screen slab of
+     orange with three lines at the top of it. */
+  ok("and neither is stretched to the height of the tile",
+     ov28.secs.every(function (x) { return x.h < ov28.agdH - 20; }),
+     JSON.stringify({ secs: ov28.secs, agd: ov28.agdH }));
   /* The pairing that always holds, whatever is on the board: News may be
      absent (it draws only when the map has one), so tuition's own row is not
      the thing to measure. */
@@ -1326,8 +1342,8 @@ for (var tw26 of [390, 1280]) {
      rows in the 1181px query mean DOM order is not what a desktop sees, so
      this has to be measured here as well as at 390. */
   ok("the calendar, progress and the workload chart sit above tuition at 1280",
-     ov28.agd <= ov28.hero && ov28.trk > ov28.hero && ov28.load > ov28.trk &&
-     ov28.tui >= ov28.load, JSON.stringify(ov28));
+     ov28.agd <= ov28.trk && ov28.load > ov28.mst && ov28.tui >= ov28.load,
+     JSON.stringify(ov28));
   ok("and what has gone is at the foot, above the milestones, at 1280",
      ov28.rcent > ov28.pipe && ov28.miles > ov28.rcent, JSON.stringify(ov28));
   ok("and the two rings fill the column beside the calendar",
@@ -2365,38 +2381,56 @@ for (var bw of [390, 1280]) {
 {
   var s36 = await open(390);
 
-  /* "the next deadline and tuition cards are too big - make them still stand
-     out but smaller" -- smaller, but still the gradient tiles */
+  /* *"just keep the needs attention but make it in bright solid orange
+     exactly like next deadline card. And remove the next deadline card."* The
+     gradient moved off the tile that said one thing about one task and onto
+     the list that says it about seven. */
   var hero = await s36.p.evaluate(function () {
     setView("over");
-    var h = document.querySelector(".tile.hero.a");
     var t = document.querySelector(".agd .asec.att");
+    var cs = getComputedStyle(t);
+    function lum(c) {
+      var m = c.match(/(\d+), (\d+), (\d+)/); if (!m) return 0;
+      return (0.2126 * +m[1] + 0.7152 * +m[2] + 0.0722 * +m[3]) / 255;
+    }
+    /* in both themes: the section is solid orange either way, and the chips
+       inside it carry a rule per urgency per theme that would otherwise
+       out-rank anything scoped to this section */
+    var inks = [];
+    ["light", "dark"].forEach(function (th) {
+      document.documentElement.setAttribute("data-theme", th);
+      Array.prototype.forEach.call(t.querySelectorAll("h4,.at,.at small,.agd-d b,.agd-d span,.chip.d,.chip.p"),
+        function (e) { inks.push({ s: th + ":" + (e.className || e.tagName), l: lum(getComputedStyle(e).color) }); });
+    });
+    document.documentElement.removeAttribute("data-theme");
     return {
-      big: parseFloat(getComputedStyle(h.querySelector(".hcd")).fontSize),
-      btns: h.querySelectorAll(".hbtn").length,
-      opens: h.dataset.go || "",
-      h: h.getBoundingClientRect().height,
-      grad: /gradient/.test(getComputedStyle(h).backgroundImage),
-      attEdge: getComputedStyle(t).borderLeftColor,
-      attW: parseFloat(getComputedStyle(t).borderLeftWidth),
-      attH3: getComputedStyle(t.querySelector("h4")).color,
-      /* and it is a section of the calendar now, not a tile of its own */
-      attIn: !!t.closest(".tile.agd"), attTile: document.querySelectorAll(".tile.att").length
+      grad: cs.backgroundImage,
+      /* the hero's own gradient, to the stop */
+      same: cs.backgroundImage.indexOf("rgb(255, 90, 31)") >= 0 &&
+            cs.backgroundImage.indexOf("rgb(255, 149, 88)") >= 0,
+      edge: parseFloat(cs.borderLeftWidth),
+      inks: inks,
+      rows: t.querySelectorAll(".agr").length,
+      /* and it is a section of the calendar, not a tile of its own */
+      attIn: !!t.closest(".tile.agd"), attTile: document.querySelectorAll(".tile.att").length,
+      /* nothing is left of the card it took the colour from */
+      heroes: document.querySelectorAll(".tile.hero.a").length,
+      dl: document.querySelectorAll('[data-ov="deadline"]').length
     };
   });
-  /* "make the 'd late' normal size again - looks weird", and the three action
-     buttons off it; the tile itself opens the task in their place. */
-  ok("the countdown reads at sentence size", hero.big <= 18 && hero.big >= 12, String(hero.big));
-  ok("the deadline hero carries no action buttons", hero.btns === 0 && !!hero.opens, JSON.stringify(hero));
-  ok("and the hero still stands out", hero.grad && hero.h < 300, JSON.stringify(hero));
-  /* "the needs attention block doesn't stand out enough - needs more colour" */
-  ok("Needs attention carries the red it is about",
-     hero.attW >= 3 && hero.attEdge === "rgb(224, 38, 60)" && hero.attH3 === "rgb(224, 38, 60)",
-     JSON.stringify(hero));
+  ok("Needs attention is the solid orange the deadline card was",
+     /gradient/.test(hero.grad) && hero.same && hero.edge === 0, JSON.stringify(hero.grad));
+  /* a tint picked to read on the panel is a smudge on a solid colour, and the
+     priority chip carries an inline colour from PRI */
+  ok("and everything inside it is lettered white",
+     hero.inks.length > 3 && hero.inks.every(function (i) { return i.l > 0.68; }),
+     JSON.stringify(hero.inks));
+  ok("and the Next deadline card is gone with its gradient",
+     hero.heroes === 0 && hero.dl === 0, JSON.stringify(hero));
   /* *"combining the next 10 and on the calendar blocks"*: two tiles listing
      the same tasks said the same thing twice at the top of the view. */
   ok("and it is a section inside On the calendar, not a tile of its own",
-     hero.attIn && hero.attTile === 0, JSON.stringify(hero));
+     hero.attIn && hero.attTile === 0 && hero.rows > 0, JSON.stringify(hero));
 
   /* "the 'tomorrow' bubble on due tasks are too dark" */
   var chips = await s36.p.evaluate(function () {
@@ -2706,17 +2740,21 @@ for (var bw of [390, 1280]) {
   ok("and it is that view's alone, with no paragraph under the map",
      sub.offMap === "" && sub.tip === false, JSON.stringify(sub));
 
-  /* "make the 1d late slightly bigger than the text below and all caps" */
+  /* The countdown used to lead the deadline hero in caps; that card is gone
+     and the countdown is the chip under each date in Needs attention, where
+     what matters is that it is still legible against the orange and still
+     reads as a countdown rather than a second date. */
   var cd = await s38.p.evaluate(function () {
     setView("over");
-    var h = document.querySelector(".tile.hero.a");
-    return {
-      cd: parseFloat(getComputedStyle(h.querySelector(".hcd")).fontSize),
-      caps: getComputedStyle(h.querySelector(".hcd")).textTransform,
-      sub: parseFloat(getComputedStyle(h.querySelector(".sub")).fontSize)
-    };
+    var c = document.querySelector(".asec.att .agd-d .chip.d");
+    if (!c) return { none: true };
+    var day = c.parentNode.querySelector("b");
+    return { txt: c.textContent.trim(),
+             cd: parseFloat(getComputedStyle(c).fontSize),
+             day: parseFloat(getComputedStyle(day).fontSize) };
   });
-  ok("the countdown leads the card, in caps", cd.caps === "uppercase" && cd.cd > cd.sub, JSON.stringify(cd));
+  ok("the countdown sits under the day it counts to, and smaller",
+     !cd.none && cd.cd < cd.day && /today|tomorrow|late|in |^\d/.test(cd.txt), JSON.stringify(cd));
 
   /* "center them on their boxes" */
   var ms = await s38.p.evaluate(function () {
@@ -4040,13 +4078,18 @@ var MAPSEED = { kb: [
   /* drag the first block past the second */
   var pts = await s56.p.evaluate(function () {
     var el = document.querySelectorAll('#bento > [data-ov]');
-    function mid(e){ var r=e.getBoundingClientRect(); return {x:Math.round(r.left+r.width/2), y:Math.round(r.top+r.height/2)}; }
-    /* the calendar is the tall block now, so its middle is off the bottom of
-       a 390x844 screen and elementFromPoint there returns nothing: aim just
-       inside its top edge, which is over it and on screen either way */
-    function into(e){ var r=e.getBoundingClientRect(); return {x:Math.round(r.left+r.width/2), y:Math.round(r.top+30)}; }
-    return { a: mid(el[0]), b: into(el[1]), first: el[0].dataset.ov, second: el[1].dataset.ov,
-             bh: Math.round(el[1].getBoundingClientRect().height), vh: window.innerHeight };
+    var st = document.getElementById("stage");
+    /* The calendar opens the view now that the deadline card is gone, and it
+       is taller than a 390x844 screen, so the block after it starts well
+       below the fold and neither midpoint is a point he can drag to. Scroll
+       the next block into view and drag it *up* over the calendar instead:
+       same swap, and it is the case the rule has to survive. */
+    st.scrollTop = st.scrollTop + el[1].getBoundingClientRect().top - 300;
+    var r1 = el[1].getBoundingClientRect(), r0 = el[0].getBoundingClientRect();
+    return { a: { x: Math.round(r1.left + r1.width / 2), y: Math.round(r1.top + 20) },
+             b: { x: Math.round(r1.left + r1.width / 2), y: Math.round(r1.top - 160) },
+             first: el[0].dataset.ov, second: el[1].dataset.ov,
+             bh: Math.round(r0.height), vh: window.innerHeight };
   });
   await s56.p.mouse.move(pts.a.x, pts.a.y);
   await s56.p.mouse.down();

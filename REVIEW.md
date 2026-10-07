@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 468 checks, three widths, a real browser
+node checks/board-check.mjs          # 469 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -533,13 +533,36 @@ of Overview said everything inside ten days twice. One tile, two `.asec`
 sections drawing the same `.agr` row, the first carrying the red it had as a
 tile. "This month" runs to the end of the month and never less than a
 fortnight, and the heading prints the real end date. At 1181px the sections
-sit side by side and the tile takes the right column opposite the hero, the
-track bars and the rings.
+sit side by side and the tile takes the right column opposite the track bars
+and the rings.
 *Checked: `and it is a section inside On the calendar, not a tile of its
-own`, `Needs attention carries the red it is about`, `Overview puts the
-deadline and the calendar on one row at 1280`, `and the calendar's two
-sections sit side by side at 1280`, `and the two rings fill the column beside
-the calendar`.*
+own`, `Overview puts the calendar and the track bars on one row at 1280`,
+`and the calendar's two sections sit side by side at 1280`, `and the two
+rings fill the column beside the calendar`.*
+
+### The orange moved off the deadline card and onto the list
+The Next deadline hero said one thing about one task in a whole tile, which
+the calendar's first section already says about seven: *"just keep the needs
+attention but make it in bright solid orange exactly like next deadline card.
+And remove the next deadline card."* So `.asec.att` carries `.hero.a`'s
+gradient to the stop, and the hero, its `data-ov` key and its CSS are gone.
+
+Three things a solid colour inside a themed board costs. Everything on it
+goes white, because a tint chosen to read on the panel is a smudge on a
+gradient. Two of those inks have to be forced -- the priority chip carries an
+inline colour from `PRI`, and the countdown chip has a rule per urgency *per
+theme* at the same specificity as anything scoped to this section, so the
+theme's wins on source order and the chip came out orange-on-orange in the
+dark. And the section has to be the height of what is in it: side by side at
+1181px it stretched to the tile and drew a half-screen slab.
+
+Removing the hero also moved every desktop row up by one. Its row left in
+place is an empty half-row at the top of the first screen.
+*Checked: `Needs attention is the solid orange the deadline card was`, `and
+everything inside it is lettered white` (both themes), `and the Next deadline
+card is gone with its gradient`, `and there is no Next deadline card left to
+say it twice`, `and neither is stretched to the height of the tile`, `the
+countdown sits under the day it counts to, and smaller`.*
 
 ### A drag reads direction, not which half it landed in
 Reading the order ("it is before me, so put me after it") flips on every frame
