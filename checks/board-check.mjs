@@ -4137,6 +4137,70 @@ var MAPSEED = { kb: [
   await s57.ctx.close();
 }
 
+/* ---- 58. a send that never answers, and a note written while one is in
+     flight. His message sat on "sending…" for half an hour: `fetch` has no
+     timeout, so a request the network swallowed left `sending` true for ever
+     and every later autoSend() turned straight round at the door. ---- */
+{
+  var s58 = await open(390);
+  var r58 = await s58.p.evaluate(async function () {
+    var nap = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+    var real = window.fetch.bind(window);
+    /* a relay that takes the request and never answers, and honours an abort
+       the way a real one does */
+    window.fetch = function (u, o) {
+      if (String(u).indexOf("relaytest") >= 0) return new Promise(function (res, rej) {
+        if (o && o.signal) o.signal.addEventListener("abort", function () {
+          var e = new Error("aborted"); e.name = "AbortError"; rej(e);
+        });
+      });
+      return real(u, o);
+    };
+    RELAY = "http://127.0.0.1:1/relaytest";
+    AUTO_MS = 20; SEND_MS = 400; AUTO_RETRY = 100000;
+    notes.length = 0; autoTries = 0; autoAgain = false; sending = false;
+    addNote(null, "first message", true);
+    await nap(150);
+    var inflight = sending;
+    /* a note written while that one is in flight must not be dropped */
+    addNote(null, "second message", true);
+    var remembered = autoAgain;
+    await nap(700);
+    return { inflight: inflight, remembered: remembered,
+             stuck: sending, tries: autoTries,
+             /* nothing was delivered, so both notes are still unsent */
+             unsent: notes.filter(function (n) { return n.state !== "read"; }).length };
+  });
+  ok("a send is in flight while the relay is silent", r58.inflight === true, JSON.stringify(r58));
+  ok("a note written during a send is remembered, not dropped", r58.remembered === true, JSON.stringify(r58));
+  ok("a relay that never answers does not park the board on sending",
+     r58.stuck === false, JSON.stringify(r58));
+  ok("and it counts as a failed send, so the retry and the button come back",
+     r58.tries === 1, JSON.stringify(r58));
+  ok("nothing is marked delivered", r58.unsent === 2, JSON.stringify(r58));
+  await s58.ctx.close();
+
+  /* and the way back: autoSend() only ever runs off an edit, so a note that
+     never got out would sit on "sending…" until he happened to change
+     something else. The tab that comes back is what delivers it. */
+  var s58b = await open(390, [{ id: "owed", itemId: null, text: "never left the last session",
+                                from: "me", forClaude: true, state: "new",
+                                createdAt: "2026-10-07T15:12:00.000Z" }]);
+  var r58b = await s58b.p.evaluate(async function (port) {
+    var nap = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+    RELAY = "http://127.0.0.1:" + port; AUTO_MS = 20;
+    var before = (notes.filter(function (n) { return n.id === "owed"; })[0] || {}).state;
+    flushUnsent();
+    await nap(500);
+    return { before: before,
+             after: (notes.filter(function (n) { return n.id === "owed"; })[0] || {}).state };
+  }, PORT);
+  ok("a note that never left is sent on the next load",
+     r58b.before === "new" && r58b.after === "read", JSON.stringify(r58b));
+  ok("no console error through the send path", s58b.errs.length === 0, s58b.errs.join(" | "));
+  await s58b.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

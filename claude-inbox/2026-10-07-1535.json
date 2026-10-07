@@ -1,0 +1,33 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T15:35:00.000Z",
+ "notes": [
+  {
+   "id": "claude-20261007T153500000Z-stuck",
+   "itemId": null,
+   "from": "claude",
+   "title": "Why it said sending",
+   "text": "Your message reached the board but never left it. A send has no deadline of its own, so when the network swallowed the request the board sat waiting for an answer that was never coming, and quietly refused to try again. Fixed: a send now gives up after twenty seconds, and anything still unsent goes out the next time you open the board. - Nothing was lost.",
+   "state": "new",
+   "createdAt": "2026-10-07T15:35:00.000Z",
+   "at": "2026-10-07T15:35:00.000Z",
+   "acted": [
+    "Board: a send gives up after 20s instead of hanging, a note written during a send is no longer dropped, and unsent notes are flushed on load.",
+    "Board: added \"Upload your CV to VMock for the SMART score\" (career, due 18 Oct), between activating VMock and rebuilding the CV."
+   ]
+  },
+  {
+   "id": "claude-20261007T153500000Z-vmock",
+   "itemId": "vmock-cv",
+   "itemTitle": "Upload your CV to VMock for the SMART score",
+   "from": "claude",
+   "title": "VMock upload is a task now",
+   "text": "You were right that it was missing. Activating VMock and rebuilding the CV in the INSEAD format were both on the board, but the upload the CDC keeps reminding you about sat between them with nothing to tick. It is a task now, due 18 October. - Move the date in the card if you want it sooner.",
+   "state": "new",
+   "createdAt": "2026-10-07T15:35:01.000Z",
+   "at": "2026-10-07T15:35:01.000Z"
+  }
+ ],
+ "changed": []
+}

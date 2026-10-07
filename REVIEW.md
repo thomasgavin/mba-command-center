@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 457 checks, three widths, a real browser
+node checks/board-check.mjs          # 464 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -511,6 +511,21 @@ block off the view and remembers it`, `and the bar puts it back`, `a repaint
 keeps his order and does not stack a second bar`, `leaving Overview ends the
 mode`, `and the arrangement survives a reload`, `Reset puts it back the way it
 was built`, `1280px: his order wins over the hand-placed rows`.*
+
+### A send can fail, and a note that never left leaves on the next load
+`fetch` has no timeout, so a request a phone's network swallows leaves the
+promise pending for ever -- `sending` stays true, every later `autoSend()`
+turns round at the door, and his message sits on "sending…" with nothing on
+screen to say so. The request is aborted at `SEND_MS`; a note written while a
+send is in flight is remembered in `autoAgain` rather than dropped; and
+`flushUnsent()` on boot sends anything of his still undelivered, since
+`autoSend()` only ever runs off an edit. Nothing is marked delivered until the
+relay confirms it.
+*Checked: `a send is in flight while the relay is silent`, `a note written
+during a send is remembered, not dropped`, `a relay that never answers does
+not park the board on sending`, `and it counts as a failed send, so the retry
+and the button come back`, `nothing is marked delivered`, `a note that never
+left is sent on the next load`.*
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

@@ -64,6 +64,19 @@ bridge is `claude-inbox/`:
   notes stay unread until the relay confirms. Over 6000 URL characters the
   manual route falls back to a download; shift-click always downloads the full
   snapshot.
+- **A send has to be able to fail, and a note that never left has to leave.**
+  His message sat on "sending…" for half an hour and nothing on screen said
+  why. `fetch` has no timeout of its own, so a request the phone's network
+  swallowed left the promise pending for ever: `sending` stayed true, and
+  `autoSend()` turned straight round at the door for everything typed after
+  it. Three lines now, and each was its own half of the bug. The request is
+  aborted at `SEND_MS` (20s), so a silent network is a failure like any other
+  and the retry and the button already know what to do with one. A note
+  written while a send is in flight sets `autoAgain` and runs on the way out,
+  rather than being dropped on the floor. And `flushUnsent()` on boot sends
+  anything of his still marked undelivered, because `autoSend()` only ever
+  runs off an edit -- without it the recovery was "wait until he happens to
+  change something else".
 - **Pull:** on load, whenever the page returns to the foreground, and on a
   timer while it is open, the
   app lists `claude-inbox/` through GitHub's contents API (public repo,
@@ -2047,7 +2060,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 457 invariants, three widths, a real browser. Every one of them was a
+that runs: 464 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

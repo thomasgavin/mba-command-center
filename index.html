@@ -2147,8 +2147,13 @@ var SEED=[
  /* career */
  {id:"postmba",     t:"Write down post-MBA function, industry, geography", k:"career", s:"todo", p:"High", d:"2026-10-31", ef:"hours",
    n:"Shapes elective choice, exchange decision and recruiting timing. Not recorded anywhere yet."},
- {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", ef:"multi", dep:["vmock"],
+ {id:"cv",          t:"Rebuild CV in INSEAD format",                  k:"career",s:"todo", p:"Medium",   d:"2026-12-10", ef:"multi", dep:["vmock","vmock-cv"],
    n:"CDC route is VMock first, then the INSEAD CV, which is what gets into the CV Book."},
+ /* Activating the platform and rebuilding the CV were both on the board and the
+    step between them was not, which is the one the CDC keeps writing about:
+    upload what he has, read the score. He asked why it was not a task. */
+ {id:"vmock-cv",    t:"Upload your CV to VMock for the SMART score",  k:"career",s:"todo", p:"High",     d:"2026-10-18", ef:"hours", dep:["vmock"],
+   n:"VMock converts the document to the INSEAD format and scores it against your peers. The score is what tells you what to fix before the INSEAD CV itself."},
  {id:"vmock",       t:"Activate VMock CV platform access",             k:"career",s:"todo", p:"High",     d:"2026-10-06", ef:"quick",
    n:"Invitation has arrived. VMock is step one of the CDC CV process, before the INSEAD CV itself."},
  {id:"casecoach",   t:"Register for Case Coach",                       k:"career",s:"todo", p:"High",     d:"2026-10-06", ef:"quick",
@@ -5047,7 +5052,14 @@ function sendToClaude(){
    stays manual and the top-bar button remains the fallback.
    Debounced, because a burst of edits should be one file, not six -- the relay
    only has ten filenames per minute. */
-var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
+var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0, autoAgain=false;
+/* A send has to be able to fail. `fetch` has no timeout of its own, and a
+   phone that loses its network mid-request leaves the promise pending for
+   ever: `sending` stays true, every later autoSend() turns straight round,
+   and his message sits on "sending…" with nothing on screen to say anything
+   is wrong. Twenty seconds, then it is a failure like any other -- which the
+   retry and the "For Claude" button already know how to handle. */
+var SEND_MS=20000;
 
 /* Bump on every deploy. An iPhone home-screen app holds its cached copy until
    it is force-quit, which is why a fix did not arrive until he cleared it. The
@@ -5059,7 +5071,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1700";
+var BUILD="2026-10-07-1730";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5095,22 +5107,44 @@ function checkBuild(announce){
        number was the one thing worth knowing. */
     .catch(function(){ if(announce) toast("Could not reach the site to check the version. You are running "+BUILD+"."); });
 }
+/* A send already in flight used to make this a no-op, and the note it was
+   called for was never scheduled again -- so a message typed while the board
+   was publishing something else was simply dropped until the next edit
+   happened to carry it. Remember it instead and run on the way out. */
 function autoSend(){
-  if(!RELAY||sending) return;
+  if(!RELAY) return;
+  if(sending){ autoAgain=true; return; }
   clearTimeout(autoT);
   autoT=setTimeout(function(){ autoT=null; runAuto(); }, AUTO_MS);
 }
 function runAuto(){
-  if(!RELAY||sending) return;
+  if(!RELAY) return;
+  if(sending){ autoAgain=true; return; }
   var pay=leanPayload();
   if(!pay.notes.length && !pay.changed.length) return;   /* nothing to say */
   relaySend(pay, JSON.stringify(pay,null,2), true);
+}
+/* A note that never got out stays "sending…" until he happens to edit
+   something else, because autoSend() only ever runs off an edit. So the board
+   asks once on the way in: if anything of his is still undelivered, send it.
+   That is also the recovery path for a send the network swallowed -- the tab
+   that comes back is the one that finally delivers it. */
+function flushUnsent(){
+  if(!RELAY) return;
+  var owed=notes.some(function(n){ return !isClaude(n) && n.forClaude!==false && n.state!=="read"; });
+  if(owed) autoSend();
 }
 /* a pending send must not die with the tab */
 function flushAuto(){ if(autoT){ clearTimeout(autoT); autoT=null; runAuto(); } }
 window.addEventListener("pagehide",flushAuto);
 document.addEventListener("visibilitychange",function(){ if(document.hidden) flushAuto(); });
 var sending=false;
+/* the one place a send stops being in flight, so nothing can forget the
+   note that arrived while it was */
+function sendDone(){
+  sending=false;
+  if(autoAgain){ autoAgain=false; autoSend(); }
+}
 function relaySend(pay, json, quiet){
   /* both of these are about the payload, not the board: a note written while
      this is in flight is not in the file and has not been delivered. */
@@ -5126,11 +5160,15 @@ function relaySend(pay, json, quiet){
      answers 404, and then the old route -- commit it into claude-inbox/ -- is
      still exactly right. Trying both is what makes a half-deployed pair of
      devices keep working instead of silently failing to send. */
-  fetch(RELAY+"/send",{method:"POST",headers:hd,body:json})
-    .then(function(r){ return r.status===404 ? fetch(RELAY,{method:"POST",headers:hd,body:json}) : r; })
+  var ac=window.AbortController?new AbortController():null, late=false;
+  var killT=setTimeout(function(){ late=true; if(ac) ac.abort(); },SEND_MS);
+  var opt={method:"POST",headers:hd,body:json}; if(ac) opt.signal=ac.signal;
+  fetch(RELAY+"/send",opt)
+    .then(function(r){ return r.status===404 ? fetch(RELAY,opt) : r; })
     .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
     .then(function(res){
       if(!res.ok||!res.j.ok) throw res;
+      clearTimeout(killT);
       sending=false; autoTries=0;
       /* only what we actually sent: a note written while this was in flight
          has not reached the repo */
@@ -5141,11 +5179,14 @@ function relaySend(pay, json, quiet){
          to sent, and the board already shows the change he just made. Only a
          failure still speaks, because that is the case he cannot see. */
       if(!quiet) toast(n+" note"+(n===1?"":"s")+" sent. Claude picks them up on the next run.");
+      if(autoAgain){ autoAgain=false; autoSend(); }
     })
     .catch(function(err){
       /* notes deliberately stay unread: nothing was delivered */
-      sending=false;
-      var why=(err&&err.j&&err.j.error)||"the relay could not be reached";
+      clearTimeout(killT);
+      sendDone();
+      var why=late?"the relay did not answer"
+                  :((err&&err.j&&err.j.error)||"the relay could not be reached");
       if(quiet){
         /* never open a tab the owner did not ask for. Try again shortly, then
            say plainly that it needs the button. */
@@ -6354,6 +6395,7 @@ checkBuild(false);
 setView("over");
 pullFromRepo(false);   /* catch up with whatever another device published */
 openWS();              /* and stay caught up without asking again */
+flushUnsent();         /* and anything that never left the last session goes now */
 regSW();               /* the only way a nudge reaches a lock screen */
 /* a notification tapped from cold opens the thing it was about */
 (function(){
