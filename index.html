@@ -1787,8 +1787,10 @@ var SEED=[
  /* admin and exit */
  {id:"portal",      t:"Complete MyINSEAD profile and practical info",   k:"admin", s:"done", p:"High",     d:"2026-10-22",
    n:"Done ahead of the 22 October deadline: profile created and the INSEAD email is active. From 25 October the Sunday newsletters go only to that address."},
- {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"todo", p:"Critical", d:"2026-11-15", ef:"multi",
-   n:"Nothing on record: no resignation date, notice period or last working day."},
+ {id:"locus-exit",  t:"Plan Locus exit: notice, LWD, handover",       k:"admin", s:"doing",p:"Critical", d:"2026-12-06", ef:"multi",
+   n:"Resignation sent 6 October, full two-month notice, last working day 6 December. He works remotely from India from 7 November, when his KITAS expires."},
+ {id:"kitas-close", t:"Close the KITAS and withdraw BPJS",            k:"admin", s:"doing",p:"Critical", d:"2026-11-08", ef:"multi",
+   n:"Runs through InCorp, with Locus supporting it. The date is the KITAS expiry, which is the hard one: cancellation and the exit permit have to be done before it, not after. He pushed back on the first quote and is waiting on a revised one."},
  {id:"handover-hf", t:"Hand over HelloFresh FR and UK engagements",   k:"admin", s:"blocked",p:"High",   d:"2026-12-05", ef:"multi", dep:["locus-exit"]},
 
  /* academics */
@@ -3948,7 +3950,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-06-1330";
+var BUILD="2026-10-07-0215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

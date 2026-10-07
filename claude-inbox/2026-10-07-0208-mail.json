@@ -1,0 +1,48 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T02:08:40.000Z",
+ "source": "Claude",
+ "why": "You resigned yesterday, and the KITAS expiry was nowhere on the board",
+ "changed": [
+  {
+   "id": "locus-exit",
+   "at": "2026-10-07T02:08:40.000Z",
+   "status": "doing",
+   "manual": true,
+   "due": "2026-12-06"
+  },
+  {
+   "id": "kitas-close",
+   "at": "2026-10-07T02:08:40.000Z",
+   "status": "doing",
+   "manual": true
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-1791339360001",
+   "from": "claude",
+   "itemId": "locus-exit",
+   "itemTitle": "Plan Locus exit: notice, LWD, handover",
+   "title": "Notice sent, LWD 6 Dec",
+   "text": "You sent your resignation yesterday with a full two-month notice, so your last working day is 6 December. I moved this task from 15 November to that date, since the handover runs right up to it.",
+   "createdAt": "2026-10-07T02:08:40.000Z",
+   "state": "new"
+  },
+  {
+   "id": "claude-1791339360002",
+   "from": "claude",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "KITAS expires 8 Nov",
+   "text": "You move to India on 7 November because your KITAS expires the next day, and you asked Locus to handle the closure and your BPJS withdrawal through InCorp. None of that was on the board, so it is a task now, dated to the expiry. - You are still waiting on InCorp's revised quote.",
+   "createdAt": "2026-10-07T02:08:40.000Z",
+   "state": "new"
+  }
+ ],
+ "acted": [
+  "Plan Locus exit: notice, LWD, handover: To-do -> In progress",
+  "Board: added \"Close the KITAS and withdraw BPJS\" as a Critical task dated 8 November, and moved the Locus exit to 6 December, the last working day"
+ ]
+}
