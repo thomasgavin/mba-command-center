@@ -1,0 +1,37 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T08:06:34.000Z",
+ "notes": [
+  {
+   "id": "claude-20261007T080634000Z-eef",
+   "itemId": "cf-eef-pay",
+   "itemTitle": "Pay the Campus France EEF fee",
+   "from": "claude",
+   "title": "Campus France wants proof",
+   "text": "Campus France asked this morning for your transfer proof plus the bank and account holder's name. You sent the bank and the payment method, but not the holder's name. - Send that one line now, since each round with them takes two to three working days.",
+   "state": "new",
+   "createdAt": "2026-10-07T08:06:34.000Z",
+   "at": "2026-10-07T08:06:34.000Z"
+  },
+  {
+   "id": "claude-20261007T080634000Z-vfs",
+   "itemId": "vfs-appt",
+   "itemTitle": "VFS appointment in Indonesia",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "vfs-appt",
+   "round": 1,
+   "was": {
+    "status": "blocked",
+    "due": "2026-11-10"
+   },
+   "title": "Book VFS before you fly",
+   "text": "Your file is validated and the EEF fee is paid, so the VFS appointment is yours to book. It is dated 10 November, three days after you leave Jakarta on 7 November. - Take the earliest slot before you fly, and tell me the date so I can move this.",
+   "state": "new",
+   "createdAt": "2026-10-07T08:06:34.000Z",
+   "at": "2026-10-07T08:06:34.000Z"
+  }
+ ],
+ "changed": []
+}
