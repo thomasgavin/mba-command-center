@@ -1187,9 +1187,11 @@ for (var tw26 of [390, 1280]) {
       groupedHeads: grouped, dues: dues.length
     };
   });
-  /* one list, so the only headings are Open, Done and Deleted -- no track names */
+  /* one list, so the only headings are Open, Events, Done and Deleted -- no
+     track names. Events joined them when the webinars stopped being tasks:
+     it is a section of the same view and still not a track. */
   ok(tw26 + "px: Everything is not split by track", 
-     k26.heads.every(function (h) { return /^(Open|Done|Deleted)/.test(h); }), JSON.stringify(k26.heads));
+     k26.heads.every(function (h) { return /^(Open|Events|Done|Deleted)/.test(h); }), JSON.stringify(k26.heads));
   ok(tw26 + "px: the open tasks are in due-date order", k26.openSorted && k26.openCount > 0, JSON.stringify(k26));
   ok(tw26 + "px: done tasks are all at the bottom, in a Done section",
      k26.doneHead && k26.doneLast && k26.doneCount > 0, JSON.stringify(k26));
@@ -1740,7 +1742,7 @@ for (var bw of [390, 1280]) {
   });
   ok(bw + "px: the title names the open section, and only it",
      titles.over === "Overview" && titles.map === "Mind map" && titles.chat === "Chat" &&
-     titles.time === "Tasks", JSON.stringify(titles));
+     titles.time === "Timeline", JSON.stringify(titles));
 
   /* "Make the text boxes in mindmap and claude chat floating above the new
      bottom section bar" -- a gap under the box, and nothing welded to the bar */
@@ -2861,6 +2863,180 @@ for (var bw of [390, 1280]) {
      won.before === "2026-12-06" && won.after === "2026-12-06", JSON.stringify(won));
   ok("no console errors through the clock checks", s40.errs.length === 0, s40.errs.join(" | "));
   await s40.ctx.close();
+}
+
+/* ---- 41. a webinar is an event, not a task ----
+   "Remove all tasks for webinars - it should only be on the calendar as an
+   'event'. It is a schedule not a task. It should still show up on the
+   timeline view so rename that section to 'timeline'." Each of these was a
+   way to get half of it right: out of the task list, on the Calendar, on the
+   Timeline, and promising no tap it cannot honour. */
+for (var ew of [390, 1280]) {
+  var s41 = await open(ew);
+  var e41 = await s41.p.evaluate(function () {
+    setView("time");
+    var tl = document.getElementById("gantt").innerText || "";
+    var taskRows = document.querySelectorAll("#gantt .grow").length;
+    var eventRows = document.querySelectorAll("#gantt .gerow").length;
+    var poolN = pool().length;
+    /* walk the calendar forward far enough to pass every event's month */
+    setView("cal");
+    var found = {};
+    for (var n = 0; n < 5; n++) {
+      /* The wide grid truncates a chip's text at 21 characters, so reading
+         innerText found only the one short title and the check failed on its
+         own matching rather than on the board. The full text is in `title`
+         on the grid and in the row's own text on the agenda, so take both. */
+      var full = Array.prototype.map.call(
+        document.querySelectorAll("#cgrid .evt"), function (e) { return e.title || ""; })
+        .concat(Array.prototype.map.call(
+        document.querySelectorAll("#cgrid .evtr"), function (e) { return e.textContent || ""; }))
+        .join(" | ");
+      EVENTS.forEach(function (e) { if (full.indexOf(e.t) >= 0) found[e.id] = 1; });
+      calCur = new Date(calCur.getFullYear(), calCur.getMonth() + 1, 1);
+      renderCal();
+    }
+    return {
+      seedWebinars: SEED.filter(function (x) { return /webinar/i.test(x.t); }).length,
+      itemWebinars: all().filter(function (i) { return /webinar/i.test(i.title); }).length,
+      events: EVENTS.length,
+      onTimeline: EVENTS.filter(function (e) { return tl.indexOf(e.t) >= 0; }).length,
+      onCalendar: Object.keys(found).length,
+      taskRows: taskRows, eventRows: eventRows, poolN: poolN,
+      /* nothing an event draws may carry an id: `openItem` has no event to
+         open, and a row that answers a tap with silence is the Calendar bug
+         this board already shipped once */
+      tappable: document.querySelectorAll(".gerow[data-id],.evt[data-id],.evtr[data-id]").length
+    };
+  });
+  ok(ew + "px: no webinar is a task any more",
+     e41.seedWebinars === 0 && e41.itemWebinars === 0, JSON.stringify(e41));
+  ok(ew + "px: every event is on the Calendar",
+     e41.events > 0 && e41.onCalendar === e41.events, JSON.stringify(e41));
+  ok(ew + "px: and every event is on the Timeline",
+     e41.onTimeline === e41.events, JSON.stringify(e41));
+  ok(ew + "px: an event row is not counted as a task row",
+     e41.taskRows === e41.poolN && e41.eventRows === e41.events, JSON.stringify(e41));
+  ok(ew + "px: nothing an event draws promises a tap", e41.tappable === 0, JSON.stringify(e41));
+  ok(ew + "px: the events draw without a console error", s41.errs.length === 0, s41.errs.join(" | "));
+  await s41.ctx.close();
+}
+
+/* ---- 42. the critical path opens on the step he is on ----
+   "once step 1 is complete, the default view should be scrolled right to make
+   the next task the first one visible on mobile." It is a sideways rail, and
+   it opened on finished work with the live step off the right edge. */
+{
+  var s42 = await open(390);
+  var sc = await s42.p.evaluate(function () {
+    /* On the SEED board step one is still open, so the rail is already where
+       it should be and the assertion would pass without ever scrolling. His
+       case is the one after step one closes, so close it here: a check that
+       only covers the easy state is the check not being written. */
+    var closed = [];
+    for (var q = 0; q < 2 && q < CHAIN.length - 1; q++) {
+      if (items[CHAIN[q]]) { patch(CHAIN[q], { status: "done" }); closed.push(CHAIN[q]); }
+    }
+    setView("over"); render();
+    var c = document.getElementById("chain"), nx = null;
+    for (var n = 0; n < CHAIN.length; n++) {
+      var i = items[CHAIN[n]];
+      if (i && i.status !== "done") { nx = CHAIN[n]; break; }
+    }
+    var el = c.querySelector('.pn[data-go="' + nx + '"]');
+    var cr = c.getBoundingClientRect(), er = el.getBoundingClientRect();
+    var scrolled = c.scrollLeft, overflows = c.scrollWidth > c.clientWidth + 1;
+    /* and a repaint must not drag him back: Overview repaints on every pull.
+       `render()` replaces the whole bento, so the rail afterwards is a NEW
+       element -- measuring the old one here reported 0 for everything and
+       hid the very thing this check is for. */
+    c.scrollLeft = 0;
+    render();
+    var c2 = document.getElementById("chain");
+    return {
+      next: nx, closed: closed, overflows: overflows,
+      firstDone: !!(items[CHAIN[0]] && items[CHAIN[0]].status === "done"),
+      leading: er.left - cr.left, scrolled: scrolled, held: c2 ? c2.scrollLeft : -1
+    };
+  });
+  ok("390px: step one closes and the rail moves off it",
+     sc.firstDone && sc.next !== sc.closed[0] && (!sc.overflows || sc.scrolled > 0),
+     JSON.stringify(sc));
+  ok("390px: the critical path opens on the next step, not on step one",
+     sc.leading >= -1 && sc.leading < 40, JSON.stringify(sc));
+  ok("and a repaint does not drag the rail back", sc.held === 0, JSON.stringify(sc));
+  await s42.ctx.close();
+}
+
+/* ---- 43. recently completed ----
+   "After 'on the calendar', add a new section 'recently completed'." The
+   order is `doneAt`, and a task closed before that field existed prints no
+   date rather than borrowing its due date. */
+{
+  var s43 = await open(390);
+  var r43 = await s43.p.evaluate(function () {
+    setView("over"); render();
+    var cls = Array.prototype.map.call(document.querySelectorAll("#bento .tile"),
+      function (t) { return t.className; });
+    var ag = cls.findIndex(function (c) { return /\bagd\b/.test(c); });
+    var rc = cls.findIndex(function (c) { return /\brcent\b/.test(c); });
+    var none = Array.prototype.map.call(document.querySelectorAll(".rcent .rcd"),
+      function (e) { return e.textContent; });
+    /* close something now, with a real doneAt, and it has to lead the list */
+    var open1 = alive().filter(function (i) { return i.status !== "done"; })[0];
+    patch(open1.id, { status: "done" });
+    render();
+    var first = document.querySelector(".rcent .rcrow");
+    return {
+      order: rc === ag + 1, agd: ag, rcent: rc,
+      rows: document.querySelectorAll(".rcent .rcrow").length,
+      undatedSaid: none.filter(function (t) { return /not recorded/.test(t); }).length,
+      datedSaid: none.filter(function (t) { return !/not recorded/.test(t); }).length,
+      leadTitle: first ? (first.querySelector(".rct").textContent || "") : "",
+      leadDate: first ? (first.querySelector(".rcd").textContent || "") : "",
+      want: open1.title, wantDate: fmtD(items[open1.id].doneAt)
+    };
+  });
+  ok("Recently completed comes directly after On the calendar",
+     r43.order, JSON.stringify(r43));
+  ok("it lists what has been closed", r43.rows > 0, JSON.stringify(r43));
+  ok("a task closed before doneAt existed borrows no date",
+     r43.undatedSaid > 0 && r43.datedSaid === 0, JSON.stringify(r43));
+  ok("and the one just closed leads it, with the day it closed",
+     r43.leadTitle.indexOf(r43.want) === 0 && r43.leadDate === r43.wantDate, JSON.stringify(r43));
+  await s43.ctx.close();
+}
+
+/* ---- 44. a tile heading opens the section it is about ----
+   "In overview the progress by task header should be clickable and should
+   open the board section. Similar, on the calendar should open the
+   calendar." The heading sits inside a tile whose rows carry [data-go], so
+   the risk here is the tap opening a task instead. */
+{
+  var s44 = await open(390);
+  var hv = await s44.p.evaluate(function () {
+    setView("over"); render();
+    var out = {};
+    document.querySelector("#bento .trk h3").click();
+    out.trk = view;
+    setView("over"); render();
+    document.querySelector("#bento .agd h3").click();
+    out.agd = view;
+    /* and a row inside the same tile still opens its task */
+    setView("over"); render();
+    var row = document.querySelector("#bento .agd .agr");
+    out.rowId = row ? row.dataset.go : null;
+    if (row) row.click();
+    out.opened = openId;
+    out.drawer = document.getElementById("drawer").classList.contains("on");
+    return out;
+  });
+  ok("the Progress by track heading opens the Board", hv.trk === "board", JSON.stringify(hv));
+  ok("the On the calendar heading opens the Calendar", hv.agd === "cal", JSON.stringify(hv));
+  ok("and a row in the same tile still opens its task",
+     !!hv.rowId && hv.opened === hv.rowId, JSON.stringify(hv));
+  ok("no console errors through the heading checks", s44.errs.length === 0, s44.errs.join(" | "));
+  await s44.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

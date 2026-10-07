@@ -475,6 +475,25 @@ December 2027 is noise on a board about this month and nobody can tick it.
   the foot on 2026-10-05: the first screen should answer what to do today, and
   a rail of ten dates running out to graduation is context to scroll down to.
   Needs attention took the top.
+- **`EVENTS`** — a webinar is a schedule, not a task. Four of them sat in
+  `SEED` with a due date, an effort and a tick, and he threw that out on
+  2026-10-07: *"Remove all tasks for webinars - it should only be on the
+  calendar as an 'event'. It is a schedule not a task."* Nothing about one is
+  his to do, so the tick, the priority, the start-by and the place in Needs
+  attention were all answering a question nobody asked. Keeping them out of
+  `items` is what makes that true everywhere at once: `all()` is the task
+  list, so an event cannot reach the nudge caps, the track percentages, the
+  workload chart or the critical path by accident. They draw in the two places
+  a schedule belongs — the Calendar and the Timeline — and nowhere else. An
+  event carries its `n` as the line under its title rather than a drawer
+  behind a tap, and **nothing it draws carries an id**, because `openItem` has
+  no event to open and a row that answers a tap with silence is a bug this
+  board has already shipped once. On the Calendar it is outlined in its track
+  colour rather than filled: a filled chip there means a task with a status.
+  Retiring the four task ids was safe because no `claude-inbox/` file carried
+  a `changed[]` entry for any of them — the check named in that paragraph.
+  Four mind-map nodes still point at the old ids and simply draw no task chip,
+  which is the documented behaviour for a retired id.
 - **`VISA_STEPS`** — the visa is a sequence, not a checkbox. The tile shows the
   steps in order; "visa in hand" is the milestone that follows them, not a task.
 - **`HOUSING`** — accommodation is coverage, not a checkbox. Club 8 holds
@@ -805,6 +824,53 @@ thumb's reach.
   the rule was still refusing every vertical drag that began on a milestone:
   ten tiles at the top of Overview that the page would not scroll under.
 
+## Overview: the rail, the two headings, and what has gone
+
+Three changes he asked for on 2026-10-07, all of them about the first screen
+answering more than "what is due".
+
+- **The critical path opens on the step he is on.** *"once step 1 is complete,
+  the default view should be scrolled right to make the next task the first
+  one visible on mobile."* `.chain` is a sideways rail, and on a 390px screen
+  it opened on finished work with the live step off the right edge.
+  `fitChain()` scrolls to the first step that is not closed, and two things
+  have to be true at once. A repaint must leave him where he was — Overview
+  repaints on every publish and every pull, and a scroller that jumps back to
+  its own idea of the right place every few seconds is what makes the Chat
+  thread unreadable. But a repaint **replaces** the rail with a fresh element
+  at scroll zero, so staying put is not the default: `renderOverview()` reads
+  the old rail's `scrollLeft` before it overwrites the bento and hands it to
+  `fitChain`, which restores it. `chainAt` is the step last scrolled to, and
+  only a change in that — the work actually moving on — overrides the
+  restore. Guarding the scroll behind "has the step changed" *without*
+  carrying the position over was the first version, and it reset the rail to
+  the left on every paint and then refused to correct it; the check caught
+  that, not a screenshot.
+  Two more traps in eight lines of code, both caught the same way: the offset
+  is a **relative scroll off two `getBoundingClientRect()`s**, never
+  `offsetLeft`, which is measured against the nearest *positioned* ancestor
+  and `.chain` is not one — so the subtraction was against a different box and
+  the rail did not move at all. And a check that measures the rail *after*
+  `render()` must re-find the element, because the one it was holding is
+  detached and reports zero for everything.
+  `setView("over")` clears `chainAt` and calls it again, because a hidden view
+  measures zero and the paint that built the rail could not place it.
+- **"Recently completed" sits directly under "On the calendar"**, where he
+  asked for it: the agenda says what is coming and this says what has gone.
+  The order is **`doneAt`**, the day a task was actually closed, and a task
+  closed before that field existed carries none — so it prints "date not
+  recorded" rather than borrowing its due date, which would be the board
+  inventing a fact about his own week. On his board today **every** done task
+  is in that state, which is exactly why the empty case had to be honest
+  rather than clever.
+- **A tile heading opens the section it is about.** *"the progress by task
+  header should be clickable and should open the board section. Similar, on
+  the calendar should open the calendar."* `data-vgo` goes on the **heading,
+  never on the tile** — `closest` walks up, so a tile carrying it would
+  swallow every row tap inside it and open the section instead of the task.
+  The chevron takes `margin-left:auto` so it lands at the right edge whether
+  or not the heading also carries a `.more`.
+
 ## Overview on a wide screen
 
 The bento is twelve columns and every tile took the width it wanted, so a
@@ -984,13 +1050,18 @@ summary nobody asked for is the noise this board exists to cut.
   weekly) are the trigger. They fire into the same thread session the board
   pass uses, which is where the repo access lives.
 
-## One view for the tasks, not two
+## One view for the tasks, not two — and it is called Timeline
 
 Timeline and List were two tabs over the same 35 rows, grouped the same way by
 track and sorted the same way by date. What each added beside a title was a
 handful of fields -- the list had the state, the tick and the notes, the
 timeline had the date in time -- and he said so: *"Redundancy with only a few
-unique fields between these 2."* They are one view now, called **Tasks**,
+unique fields between these 2."* They are one view now, called **Timeline** —
+it was Tasks until the webinars became events and the view stopped being only
+tasks: *"It should still show up on the timeline view so rename that section
+to 'timeline'."* `VIEWS` is the one place that name lives, and the tab's
+`aria-label` has to move with it or the strip reads one name to a screen
+reader and another on screen. It is
 rendered by `renderPlan()`: `.grow` is one row holding the list entry in `.gl`
 and the same task's bar in `.gtrack`, so a state and the date it moves can
 never be a tab apart again.
@@ -1079,6 +1150,14 @@ never be a tab apart again.
   axis **pins to its left edge** at 40% opacity (`.pre`) rather than being
   drawn off it, and its label still prints the real date -- a clamped marker
   must never be able to say a task happened later than it did.
+- **An event row is `.gerow`, not `.grow`.** `.grow` means "a task row" and
+  the checks count it against `pool()`, so an event wearing it made the view
+  claim four tasks that are not tasks. It borrows the geometry and none of the
+  furniture: a dot where the tick would be, no priority chip, and no bar
+  running back to the start — a bar says work accumulating towards a deadline
+  and an event is a moment. The axis has to include the event dates too, or a
+  webinar past the last task date pins to the right edge and prints the wrong
+  month.
 - `renderPlan` reads `pool()`, so the sub-tab filter applies. A category with
   no dated task still has to draw: a zero-width axis divides by zero, so the
   month range falls back to the current month.
@@ -1582,7 +1661,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 331 invariants, three widths, a real browser. Every one of them was a
+that runs: 359 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
