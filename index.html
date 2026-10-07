@@ -667,21 +667,21 @@ body::before{
 .pn.late .pt{color:var(--red)}
 .arw{flex:none;width:22px;display:grid;place-items:center;color:var(--ink4);font-size:13px}
 
-/* attention list */
-/* It is the first thing on Overview and it looked like every other tile:
-   *"the needs attention block doesn't stand out enough - needs more colour"*.
-   A red edge, a red-tinted wash and a red heading, which is the hue the
-   countdown chips inside it already use -- colour that agrees with the
-   content rather than decorating the box. */
-.att{grid-column:span 12;border-left:3px solid var(--red);
-  background:linear-gradient(180deg,rgba(224,38,60,.09),transparent 120px),var(--panel)}
-.att h3{color:var(--red)}
-.att h3 .more{color:var(--ink3)}
-.arow{
-  display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line2);cursor:pointer;
-}
-.arow:first-of-type{border-top:0}
-.arow:hover .at{color:var(--orange)}
+/* the two sections of the calendar */
+/* Needs attention was a tile of its own and listed the same tasks as the
+   agenda under it. It is a section now, and it keeps the colour it had --
+   *"the needs attention block doesn't stand out enough - needs more colour"*,
+   then *"should still be highlight a similar way in red"* -- which is the hue
+   the countdown chips inside it already use. */
+.asecs{display:flex;flex-direction:column;gap:12px}
+.asec{min-width:0}
+.asec h4{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink3);margin:0 0 4px;display:flex;align-items:baseline;gap:7px}
+.asec h4 span{font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;
+  color:var(--ink4);margin-left:auto}
+.asec.att{border-left:3px solid var(--red);padding:8px 0 8px 9px;border-radius:6px;
+  background:linear-gradient(180deg,rgba(224,38,60,.09),transparent 120px)}
+.asec.att h4{color:var(--red)}
 /* *"align the statuses across the board - they are a bit left or right to
    each other in some places"*. A chip sized by its own text puts "today" and
    "in 5d" and "24d late" at three different left edges down a column of
@@ -689,9 +689,8 @@ body::before{
 /* The box and the text both: a chip padded to one width with its text left
    where its own length put it is still three ragged edges down a column --
    *"the new alignment aligns the boxes but not the text"*. */
-.arow .chip.d,.agr .chip.p{flex:none;min-width:66px;justify-content:center}
+.agr .chip.p{flex:none;min-width:66px;justify-content:center}
 .agd-d .chip.d{text-align:center}
-.abar{width:3px;align-self:stretch;border-radius:3px;flex:none;min-height:22px}
 .at{font-size:12.5px;font-weight:600;line-height:1.3;flex:1;min-width:0;transition:color .14s}
 .at small{display:block;font-size:10.5px;color:var(--ink4);font-weight:600;margin-top:1px}
 
@@ -1656,20 +1655,33 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      the tuition card in that order."* The explicit rows mean DOM order is not
      what a desktop sees, so moving the tiles in the markup without moving
      them here would have changed the phone and left the laptop alone. */
-  .hero{grid-column:1/6;grid-row:1} .att{grid-column:6/13;grid-row:1/3}
-  /* the agenda is nine rows tall and the tiles opposite it are short, so it
-     spans their rows rather than leaving half a screen blank */
-  .agd{grid-column:1/6;grid-row:2/5}
-  .trk{grid-column:6/13;grid-row:3;align-self:start}
+  /* The two lists became one tile, so the calendar is what the right column
+     opens with, and it is tall enough to span the short tiles opposite it.
+     Its two sections sit side by side at this width rather than stacked,
+     which is the whole of what a desktop buys here. The order down the left
+     is still the order he asked for -- progress, News, the workload chart,
+     then tuition -- because the explicit rows mean DOM order is not what a
+     desktop sees. */
+  .hero{grid-column:1/6;grid-row:1}
+  .agd{grid-column:6/13;grid-row:1/4}
+  .agd .asecs{flex-direction:row;gap:18px}
+  .agd .asec{flex:1;min-width:0}
+  .trk{grid-column:1/6;grid-row:2;align-self:start}
+  /* the two rings are short and go under the track bars, because the column
+     opposite the calendar has to be about as tall as the calendar or the
+     page opens on a hole */
+  .mstack{grid-column:1/6;grid-row:3;flex-direction:row}
   /* News is the one tile here that may not exist -- it draws only when the
      map has something in its NEWS group -- so it is paired with tuition
      rather than given a row of its own, and its absence costs the layout
      nothing but the right half of one row. */
-  .nwst{grid-column:6/13;grid-row:4;align-self:start}
+  /* News draws only when the map has something in its NEWS group, so it
+     takes a full row of its own rather than half of one it would leave
+     half empty */
+  .nwst{grid-column:1/13;grid-row:4;align-self:start}
   /* the workload chart follows News, as it does on the phone */
-  .load{grid-column:6/13;grid-row:5;align-self:start}
-  .hero.b{grid-column:1/6;grid-row:5}
-  .mstack{grid-column:1/6;grid-row:6;flex-direction:row}
+  .load{grid-column:1/13;grid-row:5;align-self:start}
+  .hero.b{grid-column:1/6;grid-row:6}
   .pipe{grid-column:6/13;grid-row:6;align-self:start}
   /* a short tile opposite a tall one keeps its own height: stretched, the
      visa list ended halfway up a card with the rest of it empty. */
@@ -1678,6 +1690,10 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* what has gone runs the full width at the foot, under the sequences and
      above the milestones */
   .rcent{grid-column:1/13;grid-row:8;align-self:start}
+  /* and the rail of dates is last, as it is on the phone. Without a row of
+     its own it auto-places into the first gap -- which is wherever News is
+     not drawing today, halfway up the view. */
+  .miles{grid-column:1/13;grid-row:9}
   /* Once he has arranged the view himself the hand-placed rows above are off.
      They name specific tiles in specific rows, so they cannot survive a
      reorder -- a tile moved in the markup would stay exactly where its rule
@@ -2912,40 +2928,49 @@ function renderOverview(){
        '<div class="met">'+fmtD(next.due)+' &middot; '+esc(tl(next.track))+' &middot; '+esc(next.priority)+'</div></div>';
   }
 
-  /* Needs attention opens the view now. Milestones used to, as the tile that
-     answers "is this whole thing on track", and he moved them to the foot on
-     2026-10-05: the first screen of Overview should answer what to do today,
-     and a rail of ten dates out to graduation is context to scroll down to,
-     not the thing to read first. renderMiles() is appended last, below. */
-  /* needs attention */
-  var att=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n<=10; }).slice(0,7);
-  h+='<div class="tile att" data-ov="attention"><h3><span class="pin" style="background:#e0263c"></span>Needs attention<span class="more">next 10 days</span></h3>';
-  h+= att.length? att.map(function(i){
-        var n=dleft(i.due);
-        return '<div class="arow" data-go="'+i.id+'"><span class="abar" style="background:'+tc(i.track)+'"></span>'+
-          '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+' &middot; '+esc(i.priority)+'</small></span>'+
-          '<span class="chip d '+cCls(n)+'">'+cTxt(n)+'</span></div>';
-      }).join("")
-      : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>';
-  h+='</div>';
+  /* One block, two sections. The next ten days and the three weeks after
+     them were two tiles listing the same tasks, so the top of Overview said
+     the same thing twice over: *"There is a lot of redundancy of tasks in the
+     first 3 blocks. I am thinking of combining the next 10 and on the
+     calendar blocks."* The calendar is one tile now and urgency is a section
+     inside it rather than a second copy of the rows below it.
 
-  /* agenda */
-  var ag=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n>=-30&&n<=21; }).slice(0,9);
-  h+='<div class="tile agd" data-ov="agenda"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
-  h+= ag.length? ag.map(function(i){
-        var d=D(i.due), n=dleft(i.due);
-        /* the countdown goes under the date rather than out at the right
-           edge: the row had a date block, a title, and then two chips
-           competing for the same corner, and the empty half of the date
-           block was doing nothing -- "better use of space" */
-        return '<div class="agr'+(newsAsk(i)?" nws":"")+'" data-go="'+i.id+'">'+
-          '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
-            '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
-          '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
-          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
-      }).join("")
-      : '<p class="hint">Nothing dated in the next three weeks.</p>';
-  h+='</div>';
+     Both sections draw the same `.agr` row, which is what makes them read as
+     one list: a task crossing the ten-day line changes section and does not
+     change shape. The first keeps the red it had as a tile -- a red edge, a
+     red wash and a red heading -- because that is what he asked for: *"The
+     needs attention sub-section should still be highlight a similar way in
+     red"*. */
+  /* "This month" is the rest of the current month, and never less than a
+     fortnight: on the 28th the month holds three days and a section that
+     empties itself at the end of every month is a section he stops reading.
+     The heading prints the real end date either way, so the label can be the
+     word he used without the block being able to lie about what is in it. */
+  var tdy=iso(todayD());
+  var eom=iso(new Date(todayD().getFullYear(),todayD().getMonth()+1,0));
+  var horiz=eom<shift(tdy,14)?shift(tdy,14):eom;
+  var att =L.filter(function(i){ var n=dleft(i.due); return n!==null&&n<=10; }).slice(0,7);
+  var soon=L.filter(function(i){ return i.due&&dleft(i.due)>10&&i.due<=horiz; }).slice(0,9);
+  /* one row, two callers: the countdown goes under the date rather than out
+     at the right edge, since the row had a date block, a title and then two
+     chips competing for the same corner while the lower half of the date
+     block did nothing. */
+  function agRow(i){
+    var d=D(i.due), n=dleft(i.due);
+    return '<div class="agr'+(newsAsk(i)?" nws":"")+'" data-go="'+i.id+'">'+
+      '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
+        '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
+      '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
+      '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
+  }
+  h+='<div class="tile agd" data-ov="agenda"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(horiz)+'</span></h3><div class="asecs">';
+  h+='<div class="asec att"><h4>Needs attention<span>next 10 days</span></h4>'+
+     (att.length? att.map(agRow).join("")
+       : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>')+'</div>';
+  h+='<div class="asec"><h4>This month</h4>'+
+     (soon.length? soon.map(agRow).join("")
+       : '<p class="hint">Nothing else dated this month.</p>')+'</div>';
+  h+='</div></div>';
 
   /* Recently completed, directly under the agenda: the agenda says what is
      coming and this says what has gone, which is the half of "where do I
@@ -3135,7 +3160,7 @@ var ovOrder=[], ovHide=[], ovEdit=false;
 /* The names he reads when a block is in the bar waiting to be put back. A
    key with no name here still works; it just shows its key, which is the
    right failure for a block added later and not yet named. */
-var OVNAME={deadline:"Next deadline",attention:"Needs attention",agenda:"On the calendar",
+var OVNAME={deadline:"Next deadline",agenda:"On the calendar",
   tracks:"Progress by track",news:"News",workload:"Workload by week",tuition:"Tuition",
   rings:"Days and tasks",visa:"Student visa",housing:"Accommodation",
   path:"Critical path",done:"Recently completed",miles:"Milestones"};
@@ -3143,7 +3168,10 @@ function ovLoad(){
   try{
     var o=JSON.parse(localStorage.getItem(OVKEY)||"{}");
     ovOrder=Array.isArray(o.order)?o.order:[];
-    ovHide=Array.isArray(o.hide)?o.hide:[];
+    /* a key no block answers to any more -- `attention`, folded into the
+       calendar -- would otherwise sit in the put-back bar for ever offering
+       to restore something that no longer exists */
+    ovHide=(Array.isArray(o.hide)?o.hide:[]).filter(function(k){ return !!OVNAME[k]; });
   }catch(e){ ovOrder=[]; ovHide=[]; }
 }
 function ovSave(){
@@ -3230,7 +3258,7 @@ function ovMode(on){
 (function(){
   var b=document.getElementById("bento");
   if(!b) return;
-  var hold=0, row=null, sx=0, sy=0, pressed=null;
+  var hold=0, row=null, sx=0, sy=0, pressed=null, ly=0, dir=1;
   function clear(){ if(hold){ clearTimeout(hold); hold=0; } }
   b.addEventListener("pointerdown",function(e){
     if(e.button) return;
@@ -3238,7 +3266,7 @@ function ovMode(on){
     sx=e.clientX; sy=e.clientY;
     if(ovEdit){
       if(e.target.closest(".ovbar")||e.target.closest(".ovx")) return;
-      row=pressed;
+      row=pressed; ly=e.clientY; dir=1;
       if(row){ row.classList.add("ovdrag"); row.setPointerCapture&&row.setPointerCapture(e.pointerId); }
       return;
     }
@@ -3253,11 +3281,25 @@ function ovMode(on){
     if(hold && (Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10)) clear();
     if(!row) return;
     e.preventDefault();
+    /* a 3px deadzone, or a thumb resting still would flip the direction on
+       its own jitter */
+    if(Math.abs(e.clientY-ly)>=3){ dir=e.clientY>ly?1:-1; ly=e.clientY; }
     var over=document.elementFromPoint(e.clientX,e.clientY);
     over=over&&over.closest?over.closest("[data-ov]"):null;
     if(!over||over===row||over.parentNode!==row.parentNode) return;
-    var after=over.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_PRECEDING;
-    row.parentNode.insertBefore(row, after?over.nextSibling:over);
+    /* Which way he is dragging, never which side of the block he has
+       reached. Reading the order instead -- "it comes before me, so put me
+       after it" -- flips on every frame once the neighbour is taller than
+       the drag: the swap happens, the cursor is still inside the same block,
+       and the next move reads the new order and swaps it straight back, so
+       whether it ended up moved came down to how many frames the pointer
+       happened to fire. Reading the block's own midpoint is stable but
+       unreachable: the calendar is taller than the screen, and its middle is
+       a point he cannot drag to. The direction of travel is both -- the move
+       after a swap asks for the position the row is already in, and the
+       whole of a tall block is somewhere to drop. */
+    var ref=dir>0?over.nextSibling:over;
+    if(ref!==row) row.parentNode.insertBefore(row, ref);
   },{passive:false});
   function drop(){
     clear();
@@ -5071,7 +5113,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1730";
+var BUILD="2026-10-07-1805";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

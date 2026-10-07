@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 464 checks, three widths, a real browser
+node checks/board-check.mjs          # 468 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -526,6 +526,28 @@ during a send is remembered, not dropped`, `a relay that never answers does
 not park the board on sending`, `and it counts as a failed send, so the retry
 and the button come back`, `nothing is marked delivered`, `a note that never
 left is sent on the next load`.*
+
+### One calendar block, two sections
+Needs attention and the agenda listed the same tasks in two tiles, so the top
+of Overview said everything inside ten days twice. One tile, two `.asec`
+sections drawing the same `.agr` row, the first carrying the red it had as a
+tile. "This month" runs to the end of the month and never less than a
+fortnight, and the heading prints the real end date. At 1181px the sections
+sit side by side and the tile takes the right column opposite the hero, the
+track bars and the rings.
+*Checked: `and it is a section inside On the calendar, not a tile of its
+own`, `Needs attention carries the red it is about`, `Overview puts the
+deadline and the calendar on one row at 1280`, `and the calendar's two
+sections sit side by side at 1280`, `and the two rings fill the column beside
+the calendar`.*
+
+### A drag reads direction, not which half it landed in
+Reading the order ("it is before me, so put me after it") flips on every frame
+once the neighbour is taller than the drag, so the result was a coin toss.
+Reading the block's midpoint is stable and unreachable -- a block taller than
+the screen has no midpoint he can drag to. The direction of travel is both.
+*Checked: `the block dragged past is taller than the screen`, `dragging a
+block past another swaps them, and the order is written out`.*
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

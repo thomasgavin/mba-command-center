@@ -794,11 +794,11 @@ for (var w2 of [390, 1280]) {
    2026-10-05 (see 35) and Needs attention took the top. */
 {
   var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"'), iHero = src.indexOf('class="tile hero a"');
+  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile agd"'), iHero = src.indexOf('class="tile hero a"');
   /* "move next deadline to the top and needs attention second": the one
      thing with a date outranks the list of seven things that have dates, and
      the milestone rail is still the last tile on the view. */
-  ok("the next deadline opens the view, then Needs attention", iHero > 0 && iHero < iAtt && iMiles > iAtt, iMiles + "/" + iAtt + "/" + iHero);
+  ok("the next deadline opens the view, then the calendar", iHero > 0 && iHero < iAtt && iMiles > iAtt, iMiles + "/" + iAtt + "/" + iHero);
 }
 
 /* ---- 17. nudges reach the lock screen, and the worker stays out of the way ----
@@ -1288,11 +1288,15 @@ for (var tw26 of [390, 1280]) {
     function top(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().top):null; }
     function right(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().right):null; }
     var st=document.getElementById("stage");
-    return { hero: top(".hero.a"), att: top(".att"),
+    return { hero: top(".hero.a"), att: top(".asec.att"),
              tui: top(".hero.b"), pipe: top(".pipe"), mst: top(".mstack"),
              agd: top(".agd"), rcent: top(".rcent"), trk: top(".trk"),
              load: top(".load"), nwst: top(".nwst"), miles: top(".miles"),
-             attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right) };
+             attR: right(".agd"), stageR: Math.round(st.getBoundingClientRect().right),
+             /* the two sections sit side by side at this width */
+             secs: Array.prototype.map.call(document.querySelectorAll(".agd .asec"), function (e) {
+               var r = e.getBoundingClientRect(); return { t: Math.round(r.top), l: Math.round(r.left) };
+             }) };
   });
   var st28 = await s28.p.evaluate(function () {
     setView("over");
@@ -1304,23 +1308,30 @@ for (var tw26 of [390, 1280]) {
      toast appears. */
   ok("Overview prints the build it is running",
      st28 && /^build \d{4}-\d{2}-\d{2}/.test(st28.t) && st28.h > 0, JSON.stringify(st28));
-  ok("Overview puts the deadline and Needs attention on one row at 1280",
-     ov28.hero !== null && ov28.hero === ov28.att, JSON.stringify(ov28));
+  ok("Overview puts the deadline and the calendar on one row at 1280",
+     ov28.hero !== null && ov28.hero === ov28.agd, JSON.stringify(ov28));
+  /* a column of two sections in a tile that has half the screen is a column
+     of two half-empty sections */
+  ok("and the calendar's two sections sit side by side at 1280",
+     ov28.secs.length === 2 && ov28.secs[0].t === ov28.secs[1].t &&
+     ov28.secs[0].l < ov28.secs[1].l, JSON.stringify(ov28.secs));
   /* The pairing that always holds, whatever is on the board: News may be
      absent (it draws only when the map has one), so tuition's own row is not
      the thing to measure. */
-  ok("and the two rings share their row with the critical path",
-     ov28.mst !== null && ov28.mst === ov28.pipe, JSON.stringify(ov28));
+  ok("and tuition shares its row with the critical path",
+     ov28.tui !== null && ov28.tui === ov28.pipe, JSON.stringify(ov28));
   /* and the order he asked for on 2026-10-07: the calendar, then progress,
      then the workload chart, all of it above tuition -- with what has gone
      moved to the foot, *"to the bottom just above milestones"*. The explicit
      rows in the 1181px query mean DOM order is not what a desktop sees, so
      this has to be measured here as well as at 390. */
   ok("the calendar, progress and the workload chart sit above tuition at 1280",
-     ov28.agd > ov28.hero && ov28.trk > ov28.agd && ov28.load > ov28.trk &&
+     ov28.agd <= ov28.hero && ov28.trk > ov28.hero && ov28.load > ov28.trk &&
      ov28.tui >= ov28.load, JSON.stringify(ov28));
   ok("and what has gone is at the foot, above the milestones, at 1280",
      ov28.rcent > ov28.pipe && ov28.miles > ov28.rcent, JSON.stringify(ov28));
+  ok("and the two rings fill the column beside the calendar",
+     ov28.mst > ov28.trk && ov28.mst < ov28.load, JSON.stringify(ov28));
   await s28.ctx.close();
 }
 
@@ -2359,7 +2370,7 @@ for (var bw of [390, 1280]) {
   var hero = await s36.p.evaluate(function () {
     setView("over");
     var h = document.querySelector(".tile.hero.a");
-    var t = document.querySelector(".tile.att");
+    var t = document.querySelector(".agd .asec.att");
     return {
       big: parseFloat(getComputedStyle(h.querySelector(".hcd")).fontSize),
       btns: h.querySelectorAll(".hbtn").length,
@@ -2368,7 +2379,9 @@ for (var bw of [390, 1280]) {
       grad: /gradient/.test(getComputedStyle(h).backgroundImage),
       attEdge: getComputedStyle(t).borderLeftColor,
       attW: parseFloat(getComputedStyle(t).borderLeftWidth),
-      attH3: getComputedStyle(t.querySelector("h3")).color
+      attH3: getComputedStyle(t.querySelector("h4")).color,
+      /* and it is a section of the calendar now, not a tile of its own */
+      attIn: !!t.closest(".tile.agd"), attTile: document.querySelectorAll(".tile.att").length
     };
   });
   /* "make the 'd late' normal size again - looks weird", and the three action
@@ -2380,12 +2393,16 @@ for (var bw of [390, 1280]) {
   ok("Needs attention carries the red it is about",
      hero.attW >= 3 && hero.attEdge === "rgb(224, 38, 60)" && hero.attH3 === "rgb(224, 38, 60)",
      JSON.stringify(hero));
+  /* *"combining the next 10 and on the calendar blocks"*: two tiles listing
+     the same tasks said the same thing twice at the top of the view. */
+  ok("and it is a section inside On the calendar, not a tile of its own",
+     hero.attIn && hero.attTile === 0, JSON.stringify(hero));
 
   /* "the 'tomorrow' bubble on due tasks are too dark" */
   var chips = await s36.p.evaluate(function () {
     document.documentElement.setAttribute("data-theme", "dark");
     var out = [];
-    Array.prototype.forEach.call(document.querySelectorAll(".tile.att .chip.d"), function (e) {
+    Array.prototype.forEach.call(document.querySelectorAll(".asec.att .chip.d"), function (e) {
       var cs = getComputedStyle(e);
       out.push({ bg: cs.backgroundColor, fg: cs.color });
     });
@@ -2407,7 +2424,7 @@ for (var bw of [390, 1280]) {
     if (!rows.length) return { none: true };
     var inDate = !!rows[0].querySelector(".agd-d .chip.d");
     var atRight = !!rows[0].querySelector(":scope > .chip.d");
-    var lefts = Array.prototype.map.call(document.querySelectorAll(".tile.att .chip.d"), function (e) {
+    var lefts = Array.prototype.map.call(document.querySelectorAll(".asec.att .chip.d"), function (e) {
       return Math.round(e.getBoundingClientRect().left);
     });
     return { inDate: inDate, atRight: atRight, lefts: lefts, n: rows.length };
@@ -2578,7 +2595,7 @@ for (var bw of [390, 1280]) {
   /* "the new alignment aligns the boxes but not the text" */
   var chip = await s37.p.evaluate(function () {
     setView("over");
-    var c = document.querySelector(".arow .chip.d");
+    var c = document.querySelector(".agr .chip.p");
     var st = getComputedStyle(c);
     return { just: st.justifyContent, min: parseFloat(st.minWidth) };
   });
@@ -3980,14 +3997,14 @@ var MAPSEED = { kb: [
              stampLast: b.lastElementChild.className };
   });
   ok("every block on Overview carries a key, and the build line stays last",
-     k56.keys.length >= 10 && k56.keys.indexOf("attention") >= 0 &&
+     k56.keys.length >= 10 && k56.keys.indexOf("agenda") >= 0 &&
      /bstamp/.test(k56.stampLast), JSON.stringify(k56));
   ok("and nothing of the arranging mode shows until it is asked for",
      !k56.wig && k56.x === 0 && k56.bar === 0, JSON.stringify(k56));
 
   /* a long press on a block is what starts it, and a drag must not */
   var box = await s56.p.evaluate(function () {
-    var e = document.querySelector('#bento [data-ov="attention"]').getBoundingClientRect();
+    var e = document.querySelector('#bento [data-ov="agenda"]').getBoundingClientRect();
     return { x: Math.round(e.left + e.width / 2), y: Math.round(e.top + 14) };
   });
   await s56.p.mouse.move(box.x, box.y);
@@ -4024,7 +4041,12 @@ var MAPSEED = { kb: [
   var pts = await s56.p.evaluate(function () {
     var el = document.querySelectorAll('#bento > [data-ov]');
     function mid(e){ var r=e.getBoundingClientRect(); return {x:Math.round(r.left+r.width/2), y:Math.round(r.top+r.height/2)}; }
-    return { a: mid(el[0]), b: mid(el[1]), first: el[0].dataset.ov, second: el[1].dataset.ov };
+    /* the calendar is the tall block now, so its middle is off the bottom of
+       a 390x844 screen and elementFromPoint there returns nothing: aim just
+       inside its top edge, which is over it and on screen either way */
+    function into(e){ var r=e.getBoundingClientRect(); return {x:Math.round(r.left+r.width/2), y:Math.round(r.top+30)}; }
+    return { a: mid(el[0]), b: into(el[1]), first: el[0].dataset.ov, second: el[1].dataset.ov,
+             bh: Math.round(el[1].getBoundingClientRect().height), vh: window.innerHeight };
   });
   await s56.p.mouse.move(pts.a.x, pts.a.y);
   await s56.p.mouse.down();
@@ -4036,6 +4058,12 @@ var MAPSEED = { kb: [
     return { first: el[0].dataset.ov, second: el[1].dataset.ov,
              order: (stored.order || []).slice(0, 2) };
   });
+  /* and the block it was dragged past is taller than the screen, which is
+     the case that decides the rule: its midpoint is a point he cannot drag
+     to, so "which half of it am I on" would make it impossible to move
+     anything past the calendar at all. */
+  ok("the block dragged past is taller than the screen", pts.bh > pts.vh,
+     JSON.stringify({ bh: pts.bh, vh: pts.vh }));
   ok("dragging a block past another swaps them, and the order is written out",
      dr56.first === pts.second && dr56.second === pts.first &&
      dr56.order[0] === pts.second, JSON.stringify({ was: pts, now: dr56 }));
