@@ -3353,6 +3353,39 @@ for (var nw of [390, 1280]) {
      damp.far > damp.near && damp.far <= damp.max + 1, JSON.stringify(damp));
   ok("a cancelled drag springs back and commits nothing",
      Math.abs(damp.back) < 1 && !damp.armed, JSON.stringify(damp));
+  /* "Left swipe is very weird. Enable only right swipe." swTravel is an
+     exponential, so a negative dx does not ease towards zero -- it grows the
+     other way without limit, and a 100px drag left threw the bubble 255px off
+     the side of the screen. */
+  var left = await s48.p.evaluate(async function (b) {
+    function t(type, x, y) {
+      var el = document.querySelector('.cmsg[data-nid="q1"]');
+      var tt = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [tt], changedTouches: [tt] }));
+    }
+    function tx() {
+      var m = getComputedStyle(document.querySelector('.cmsg[data-nid="q1"]')).transform;
+      var p = /matrix\(([^)]+)\)/.exec(m);
+      return p ? parseFloat(p[1].split(",")[4]) : 0;
+    }
+    /* straight left */
+    t("touchstart", b.x, b.y); t("touchmove", b.x - 100, b.y + 1);
+    await new Promise(function (r) { requestAnimationFrame(function () { r(); }); });
+    var out = tx();
+    t("touchend", b.x - 100, b.y + 1);
+    /* right far enough to arm, then back past the start: it must not invert */
+    t("touchstart", b.x, b.y); t("touchmove", b.x + 30, b.y + 1);
+    await new Promise(function (r) { requestAnimationFrame(function () { r(); }); });
+    t("touchmove", b.x - 60, b.y + 1);
+    await new Promise(function (r) { requestAnimationFrame(function () { r(); }); });
+    var back = tx();
+    t("touchend", b.x - 60, b.y + 1);
+    await new Promise(function (r) { setTimeout(r, 280); });
+    return { out: out, back: back, strip: !document.getElementById("crep").classList.contains("off") };
+  }, box);
+  ok("a leftward drag moves nothing and arms nothing",
+     Math.abs(left.out) < 1 && left.back <= 0.5 && !left.strip, JSON.stringify(left));
   /* first a vertical drag on the same bubble: it must NOT arm.
      Real Touch objects, not plain literals -- TouchEventInit refuses to
      convert one and the whole run dies on the constructor rather than on the
@@ -3575,6 +3608,19 @@ var MAPSEED = { kb: [
   ok("the note carries the fact it answers, and the bubble taps back to it",
      sw51.rek === "kl1" && sw51.quote && sw51.back === "kl1" && sw51.cleared,
      JSON.stringify(sw51));
+  /* "Swipe to duplicates the box in mindmap." `will-change:transform` put the
+     row on its own compositing layer for the drag and iOS kept the old layer
+     on screen once the class came off, so the node drew twice 40px apart. The
+     chat bubbles never carried it and never ghosted. */
+  var ghost = await s51.p.evaluate(function () {
+    var el = document.querySelector('[data-kb="kl1"]');
+    el.classList.add("cdrag");
+    var wc = getComputedStyle(el).willChange;
+    el.classList.remove("cdrag");
+    return { wc: wc, rest: getComputedStyle(el).willChange };
+  });
+  ok("a swiped map row is not promoted to a layer of its own",
+     ghost.wc === "auto" && ghost.rest === "auto", JSON.stringify(ghost));
   ok("no console error through the map gesture", s51.errs.length === 0, s51.errs.join(" | "));
   await s51.ctx.close();
 }
@@ -3621,6 +3667,85 @@ var MAPSEED = { kb: [
      jump.view === "map" && jump.drawn && jump.seen && jump.flash, JSON.stringify(jump));
   ok("no console error through the jump", s52.errs.length === 0, s52.errs.join(" | "));
   await s52.ctx.close();
+}
+
+/* ---- 53. an INSEAD decision is the same question in the same shape ----
+   "INSEAD Decision tasks should also behave like news decisions. If I accept
+   convert it to a regular task and if I reject mark it done with the note
+   'you rejected this'. similarly, remove the redundant action buttons."
+   Reject differs from NEWS on purpose: a NEWS item he never asked for leaves
+   the board, and an INSEAD offer he declined is a decision he made and
+   closed, so it is Done and it belongs in Recently completed. */
+{
+  var s53 = await open(390);
+  var r53 = await s53.p.evaluate(function () {
+    var d = alive().filter(function (i) { return i.isDec; });
+    if (!d.length) return { none: true };
+    var id = d[0].id;
+    openItem(id);
+    var card = document.getElementById("dBody");
+    var seen = { id: id, n: d.length, title: d[0].title,
+                 acc: !!card.querySelector("[data-nacc]"),
+                 rej: !!card.querySelector("[data-nrej]"),
+                 n2d: !!card.querySelector("[data-n2d]"),
+                 quick: !!card.querySelector(".qrow"),
+                 notes: !!card.querySelector("[data-nadd],#nt"),
+                 /* an INSEAD task, so it is never painted as something found
+                    outside: no magenta and no NEWS swatch earned by it */
+                 dec: !!card.querySelector(".dnews.dec"),
+                 tagged: /^\[NEWS\]/.test(d[0].title) };
+    setView("time"); render();
+    var row = document.querySelector('#gantt .grow[data-id="' + id + '"]');
+    seen.nws = row ? row.classList.contains("nws") : true;
+    return seen;
+  });
+  ok("a decision task exists and offers the same three buttons",
+     !r53.none && r53.acc && r53.rej && r53.n2d, JSON.stringify(r53));
+  ok("its quick actions wait for his answer, and it still takes a note",
+     !r53.quick && r53.notes, JSON.stringify(r53));
+  ok("it reads as an INSEAD task, not as something found outside",
+     r53.dec && !r53.nws && !r53.tagged, JSON.stringify(r53));
+  var acc53 = await s53.p.evaluate(function (id) {
+    openItem(id);
+    document.querySelector("[data-nacc]").click();
+    return { state: items[id].newsState, status: items[id].status,
+             quick: !!document.querySelector("#dBody .qrow"),
+             rej: !!document.querySelector("[data-nrej]"),
+             on: !!document.querySelector("#dBody .dnews.on") };
+  }, r53.id);
+  ok("accepting it leaves an ordinary open task with its actions back",
+     acc53.state === "accept" && acc53.status !== "done" &&
+     acc53.quick && !acc53.rej && acc53.on, JSON.stringify(acc53));
+  /* and now reject one from scratch, in its own session */
+  var s53b = await open(390);
+  var rej53 = await s53b.p.evaluate(function (id) {
+    openItem(id);
+    document.querySelector("[data-nrej]").click();
+    var n = notesFor(id);
+    return { state: items[id].newsState, status: items[id].status,
+             gone: !alive().filter(function (i) { return i.id === id; }).length,
+             doneAt: !!items[id].doneAt,
+             note: n.length ? n[0].text : "",
+             /* his own note: it records what he did, it is not a question
+                for Claude */
+             mine: n.length ? (n[0].from !== "claude" && n[0].forClaude === false) : false,
+             off: !!document.querySelector("#dBody .dnews.off") };
+  }, r53.id);
+  ok("rejecting it closes it as done rather than deleting it",
+     rej53.state === "reject" && rej53.status === "done" && !rej53.gone &&
+     rej53.doneAt && rej53.off, JSON.stringify(rej53));
+  ok("and it says so on the task, in his words",
+     /rejected this/i.test(rej53.note) && rej53.mine, JSON.stringify(rej53));
+  await s53b.p.reload({ waitUntil: "load" });
+  await s53b.p.waitForTimeout(500);
+  var k53 = await s53b.p.evaluate(function (id) {
+    return { state: (items[id] || {}).newsState, status: (items[id] || {}).status };
+  }, r53.id);
+  ok("and the answer survives a reload",
+     k53.state === "reject" && k53.status === "done", JSON.stringify(k53));
+  ok("no console error through the decision", s53.errs.concat(s53b.errs).length === 0,
+     s53.errs.concat(s53b.errs).join(" | "));
+  await s53.ctx.close(); await s53b.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

@@ -960,7 +960,12 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 /* a swiped row answers the finger and springs back, the same way a chat
    bubble does -- one rule for every shape, since they all carry data-kb */
 .mbox [data-kb]{transition:transform .16s ease-out}
-.mbox [data-kb].cdrag{transition:none;will-change:transform}
+/* No `will-change` here. It promotes the row to its own compositing layer for
+   the length of the drag and iOS kept the old layer on screen after the class
+   came off -- the node drew twice, 40px apart: *"Swipe to duplicates the box
+   in mindmap."* The chat bubbles never carried it and never ghosted, which is
+   what named the cause. A transform alone is fast enough for one row. */
+.mbox [data-kb].cdrag{transition:none}
 /* Every node is a box, in every shape: *"Some mindmap sections don't use
    blocks and some do. Use blocks for all sections including deadlines and
    programme calendar. I understand it's because there are images/infographics
@@ -1313,6 +1318,10 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   border-radius:var(--r3);padding:11px 13px;margin-bottom:16px;font-size:12px;
   line-height:1.5;color:var(--ink2)}
 .dnews b{display:block;margin-bottom:3px;color:var(--news)}
+/* A decision is an INSEAD task, so its box wears the accent rather than the
+   NEWS magenta -- the colour on this board says where a thing came from. */
+.dnews.dec{background:rgba(255,100,41,.08);border-color:rgba(255,100,41,.26)}
+.dnews.dec b{color:var(--orange)}
 .dnews.on{background:rgba(0,169,143,.09);border-color:rgba(0,169,143,.26)}
 .dnews.on b{color:var(--green)}
 .dnews.off{background:var(--wash);border-color:var(--line)}
@@ -2044,7 +2053,14 @@ var SEED=[
  {id:"prereads",    t:"INSEAD pre-course work and pre-reading",       k:"acad",  s:"todo", p:"High",     d:"2026-12-20", ef:"multi",},
  {id:"lms-start",   t:"Work through the LMS tutorials",                k:"acad",  s:"todo", p:"Medium",   d:"2026-10-26", ef:"hours",
    n:"P0 opens 26 October and the LMS is where every academic and some CDC item is delivered."},
- {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30", ef:"hours", dep:["sbi-sanction"],
+ /* `dc:true` is a decision INSEAD is putting to him, not work he owes: the
+    course is optional and declining it is a real answer. It gets the same
+    Accept / Reject box a NEWS item gets, without the magenta -- it IS an
+    INSEAD task, so it draws like one. It goes only on something he may
+    genuinely decline: "Decide and register the third language" is required
+    for graduation, so it is a choice of which, never whether, and it carries
+    no flag. */
+ {id:"bizfound",    t:"Decide on Business Foundations and register",   k:"acad",  s:"todo", p:"Medium",   d:"2026-10-30", ef:"hours", dep:["sbi-sanction"], dc:true,
    n:"Optional one-week quant primer, 16-20 November online. He is holding it until the SBI sanction lands, which leaves six days between the sanction date and the 30 October registration close -- so a late sanction is what makes this urgent, not the course."},
  {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28", ef:"multi",
    n:"Must do, on the LMS. The coach prepares from what is submitted, so late means a wasted first session."},
@@ -2163,7 +2179,7 @@ function load(){
                     out of a NEWS pass rather than off his INSEAD list, and it
                     never changes. `newsState` is his answer to it and does
                     change, so that one is a diff field. */
-                 isNews:!!s.nw,newsState:null};
+                 isNews:!!s.nw,isDec:!!s.dc,newsState:null};
   });
   var st=null; try{ st=JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
   if(st&&st.items) Object.keys(st.items).forEach(function(k){
@@ -3097,6 +3113,12 @@ var NEWSC="#e0399b";
    thing to the Timeline and another to the drawer. A rejected item is deleted
    and painted by that; an accepted one is just a task. */
 function newsAsk(i){ return !!i.isNews && !i.newsState && !i.deleted; }
+/* A question is open on this card, whichever kind it is. The colour stays
+   news-only -- a decision is an ordinary INSEAD task and magenta would say it
+   came from outside -- but everything about the card is the same question in
+   the same shape: *"INSEAD Decision tasks should also behave like news
+   decisions ... similarly, remove the redundant action buttons."* */
+function askOpen(i){ return (!!i.isNews||!!i.isDec) && !i.newsState && !i.deleted; }
 function statusColour(i,late){
   if(i.deleted) return "#bdb6c6";
   if(i.status==="done") return "#00a98f";
@@ -4031,13 +4053,24 @@ function setMapReply(id){
    the layout the last one just forced. One write per frame, batched through
    requestAnimationFrame, is the fix for that and it is why `dxl` exists. */
 var SW_ARM=12, SW_GO=52, SW_MAX=40;
-function swTravel(dx){ return SW_MAX*(1-Math.exp(-dx/(SW_MAX*1.25))); }
+/* Right only, and the clamp is on the INPUT, not on the output. `swTravel` is
+   an exponential, so a negative `dx` does not ease towards zero -- it grows
+   without limit in the other direction: a drag 100px to the left came out as
+   -255px of transform and carried the bubble clean off the side of the
+   screen. *"Left swipe is very weird. Enable only right swipe."* */
+function swTravel(dx){ return SW_MAX*(1-Math.exp(-Math.max(0,dx)/(SW_MAX*1.25))); }
 function swipeReply(host,sel,pick){
   if(!host) return;
   var row=null, x0=0, y0=0, dxl=0, live=false, armed=false, raf=0;
   function draw(){ raf=0; if(row) row.style.transform="translateX("+swTravel(dxl).toFixed(1)+"px)"; }
   /* true once it has armed and the drag belongs to this gesture */
   function move(dx,dy){
+    /* a leftward drag belongs to nothing on this board, so it is handed back
+       for the rest of the gesture rather than merely ignored -- otherwise a
+       drag left and then right still armed, which is the other half of "very
+       weird". It is checked while armed too: once armed, pulling back past
+       the start ends the gesture instead of inverting it. */
+    if(dx<-6){ end(false); return false; }
     if(!armed){
       /* a vertical drag is the view scrolling and is handed straight back,
          for the rest of this gesture */
@@ -4208,8 +4241,20 @@ function renderDrawer(keepDraft){
      question re-asked every time he opens the card is one he learns to
      ignore. Notes work here exactly as they do on any other task, which is
      the whole reason a NEWS item is a task rather than a new kind of object. */
-  if(i.isNews){
-    if(newsAsk(i)){
+  if(i.isNews||i.isDec){
+    /* The words are the only thing that differs between the two. A NEWS item
+       is something Claude found and he may never have heard of; a decision is
+       something INSEAD is offering him and he already knows what it is. The
+       box, the buttons and what each answer does are the same, because they
+       are the same question. */
+    var dq=i.isNews
+      ? {h:"Found for you",
+         b:"Not on the INSEAD list. Claude put it here from a NEWS pass; "+
+           "accept it to take it on, or reject it to drop it."}
+      : {h:"Your call",
+         b:"INSEAD is offering this and it is not required. Accept it to keep "+
+           "it as an ordinary task, or reject it to close it."};
+    if(askOpen(i)){
       /* The offer box is the whole offer while the offer is open: *"Since you
          are already showing a message asking me to accept or reject, the
          other action buttons are becoming redundant - remove that. Add the +2
@@ -4218,9 +4263,8 @@ function renderDrawer(keepDraft){
          before deciding whether it is his, and deleting one when Reject is
          the word for that here. Pushing the date is the one of the three that
          still means something, so it comes along into this box. */
-      h+='<div class="dnews"><b>Found for you</b>'+
-         '<div>Not on the INSEAD list. Claude put it here from a NEWS pass; '+
-         'accept it to take it on, or reject it to drop it.</div>'+
+      h+='<div class="dnews'+(i.isDec?" dec":"")+'"><b>'+esc(dq.h)+'</b>'+
+         '<div>'+esc(dq.b)+'</div>'+
          '<div class="row-b" style="margin-top:9px">'+
            '<button class="btn o" data-nacc="1">Accept</button>'+
            '<button class="btn" data-nrej="1">Reject</button>'+
@@ -4234,8 +4278,16 @@ function renderDrawer(keepDraft){
       h+='<div class="dnews on"><b>Accepted</b><div>You took this one on. It counts '+
          'like any other task from here.</div></div>';
     }else if(i.newsState==="reject"){
-      h+='<div class="dnews off"><b>Rejected</b><div>It is off every view. '+
-         '"Put it back" above restores it if you change your mind.</div></div>';
+      /* Rejecting means two different things, because the two came from
+         different places. A NEWS item he did not ask for leaves the board
+         entirely; an INSEAD offer he declined is a decision he made and
+         closed, so it is Done -- it belongs in Recently completed and in the
+         track's count, not in the bin. */
+      h+= i.isDec
+        ? '<div class="dnews off"><b>Rejected</b><div>You turned this down, so it '+
+          'is closed as done. Set the status back if you change your mind.</div></div>'
+        : '<div class="dnews off"><b>Rejected</b><div>It is off every view. '+
+          '"Put it back" above restores it if you change your mind.</div></div>';
     }
   }
 
@@ -4267,7 +4319,7 @@ function renderDrawer(keepDraft){
      ... similar size as the close and note button but bright coloured"*. The
      full-width "Delete this task" at the foot is gone -- it was the loudest
      control on the card for the rarest action. */
-  if(!i.deleted && !newsAsk(i)) h+='<div class="qrow">'+
+  if(!i.deleted && !askOpen(i)) h+='<div class="qrow">'+
     '<button class="qb ok" data-qdone="1" aria-label="Mark done" title="Mark done">'+
       '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg></button>'+
     '<button class="qb warn" data-q2d="1" aria-label="Push two days" title="Push two days"><b>+2d</b></button>'+
@@ -4702,7 +4754,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1340";
+var BUILD="2026-10-07-1415";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4963,7 +5015,19 @@ document.getElementById("dBody").addEventListener("click",function(e){
      dependency cascade does not read the status it leaves behind as its own. */
   if(b.dataset.nacc){ var na=items[openId];
     patch(openId,{newsState:"accept"},"Accepted: "+na.title); return; }
-  if(b.dataset.nrej){ var nr=items[openId], nz=openId; hideDrawer();
+  if(b.dataset.nrej){
+    var nr=items[openId], nz=openId;
+    /* An INSEAD offer he declined is closed, not deleted, and it says so on
+       the task: he asked for the note in those words. It is his own note, not
+       Claude's -- he is the one who decided -- so it does not travel to
+       Claude; the banner, which is derived from `newsState`, is what says the
+       same thing on his other device. */
+    if(nr.isDec){
+      patch(nz,{newsState:"reject",status:"done",manual:true},"Rejected: "+nr.title);
+      addNote(nz,"You rejected this.",true,false);
+      return;
+    }
+    hideDrawer();
     patch(nz,{newsState:"reject",deleted:true,manual:true},"Rejected: "+nr.title); return; }
   if(b.dataset.del){ var dz=openId; hideDrawer(); delItem(dz); return; }
   if(b.dataset.undel){ undelItem(openId); return; }

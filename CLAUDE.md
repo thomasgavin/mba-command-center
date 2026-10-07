@@ -219,6 +219,20 @@ Two gestures from every messaging app he already uses, added 2026-10-07.
   other half of "not smoothly" was writing a transform on every `touchmove`,
   three or four style writes a frame each invalidating the last; it is one
   write per frame through `requestAnimationFrame` now.
+  **It is right-only, and the clamp is on the input.** `swTravel` is an
+  exponential, so a negative `dx` does not ease towards zero -- it grows
+  without limit the other way, and a drag 100px left came out as 255px of
+  transform with the bubble clean off the side of the screen: *"Left swipe is
+  very weird. Enable only right swipe."* A leftward drag now ends the gesture
+  outright rather than being ignored, armed or not, because a drag left and
+  then right still armed otherwise.
+  **No `will-change` on the dragged row.** It promotes the row to its own
+  compositing layer for the length of the drag, and iOS kept the old layer on
+  screen after the class came off -- the map node drew twice, 40px apart:
+  *"Swipe to duplicates the box in mindmap."* The chat bubbles never carried
+  it and never ghosted, which is what named the cause: the rule was written
+  for the map alone and the map alone had the bug. A transform on one row is
+  fast enough without it.
   **`swipeReply()` is the one implementation**, and the map uses it too:
   *"Add a similar swipe to reply function on the mindmap section."* What it
   quotes there is a fact rather than a message, so the note carries
@@ -1190,6 +1204,33 @@ note thread and a clock. What `nw:true` adds is presentation and one question.
 The first pass ran on 2026-10-07 rather than waiting for Sunday, because a
 NEWS section introduced empty reads as a feature that does not work.
 
+## A decision INSEAD is putting to him
+
+`dc:true` is the same question in the same shape, for something the school is
+offering rather than something Claude found: *"INSEAD Decision tasks should
+also behave like news decisions. If I accept convert it to a regular task and
+if I reject mark it done with the note 'you rejected this'. similarly, remove
+the redundant action buttons."*
+
+- **`askOpen()` is the predicate the card reads**, covering both kinds, and it
+  is what suppresses the quick actions while the question is open. `newsAsk()`
+  stays news-only and keeps its job: the **colour**. A decision is an INSEAD
+  task and magenta would say it came from outside, so its box wears the accent
+  and nothing else about it is painted differently.
+- **It carries no `[NEWS]` prefix**, for the same reason.
+- **Rejecting is Done, not deleted.** That is the one place the two diverge,
+  and it is deliberate: a NEWS item he never asked for leaves the board, and
+  an offer he declined is a decision he made and closed -- it belongs in
+  Recently completed and in the track's count, not in the bin. It carries
+  `manual` so the cascade cannot reopen it, `doneAt` is stamped by `patch()`
+  like any other close, and the task gets a note saying *"You rejected this."*
+  That note is **his**, not Claude's, so it does not travel to Claude; the
+  banner is derived from `newsState` and is what says the same thing on his
+  other device.
+- **It goes only on something he may genuinely decline.** "Decide and register
+  the third language" is required for graduation -- a choice of which, never
+  whether -- so it carries no flag. Today `bizfound` is the only one.
+
 ## The newsletters
 
 Twice the board speaks without being asked: a nudge, and a newsletter. A nudge
@@ -1893,7 +1934,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 418 invariants, three widths, a real browser. Every one of them was a
+that runs: 428 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

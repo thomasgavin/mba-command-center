@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 418 checks, three widths, a real browser
+node checks/board-check.mjs          # 428 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -424,6 +424,20 @@ the pairing the check measures is one that always holds.
 `gotoKb()` is the only way in, from "see also", from a quoted reply and from a
 News row alike. The map's scroller is `#v-map .mapw`, not `#mapw`. The check
 asserts the node is inside the scroller's viewport, not merely in the DOM.
+
+### A swipe is right-only, and it promotes nothing
+
+`swTravel` clamps its INPUT at zero: an exponential fed a negative `dx` grows
+without limit the other way rather than easing to nothing. A leftward drag ends
+the gesture, armed or not. No `will-change` on the dragged row -- iOS kept the
+stale compositing layer on screen and the node drew twice.
+
+### An INSEAD decision answers like a NEWS item, and closes like a task
+
+`askOpen()` covers both and is what suppresses the quick actions; `newsAsk()`
+stays news-only, because it decides the colour and a decision is an INSEAD
+task. Accepting leaves an ordinary open task. Rejecting marks it Done with a
+note, never deleted, and the answer survives a reload -- the check reloads.
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can
