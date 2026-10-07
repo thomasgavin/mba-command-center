@@ -3885,6 +3885,84 @@ var MAPSEED = { kb: [
   await s54.ctx.close();
 }
 
+/* ---- 55. the keyboard takes the section bar with it, and the way back down ----
+   "When chat box is open the nav icons also move up - fix this. Check this
+   behaviour for all typing screens." And: "Add a scroll to bottom arrow on
+   chat." */
+{
+  var MANY = [];
+  for (var m = 0; m < 40; m++) MANY.push({
+    id: "m" + m, text: "Message number " + m + ", long enough to take a line of its own.",
+    createdAt: new Date(Date.UTC(2026, 9, 7, 1, m)).toISOString(),
+    state: "read", forClaude: true
+  });
+  var s55 = await open(390, { notes: MANY });
+  var k55 = await s55.p.evaluate(function () {
+    setView("chat");
+    function bar(){ var e=document.querySelector(".vbar"); return e?e.getBoundingClientRect().height:0; }
+    var before = bar();
+    document.getElementById("cin").focus();
+    var typing = bar();
+    document.getElementById("cin").blur();
+    return { before: before, typing: typing, back: 0 };
+  });
+  /* The bar cannot be measured against the keyboard here -- no container has
+     one -- so what is checked is that focusing a field takes it off the
+     layout at all, which is the whole of the fix. */
+  ok("the section bar is off screen while he is typing in Chat",
+     k55.before > 0 && k55.typing === 0, JSON.stringify(k55));
+  var k55b = await s55.p.evaluate(async function () {
+    document.getElementById("cin").blur();
+    await new Promise(function (r) { setTimeout(r, 30); });
+    var back = document.querySelector(".vbar").getBoundingClientRect().height;
+    /* every other place he types: the map's composer, and the drawer's note
+       box and rename field */
+    setView("map");
+    document.getElementById("min").focus();
+    var map = document.querySelector(".vbar").getBoundingClientRect().height;
+    document.getElementById("min").blur();
+    await new Promise(function (r) { setTimeout(r, 30); });
+    openItem(alive()[0].id);
+    /* the rename field is hidden until the pencil opens it, and focusing a
+       hidden element does nothing at all */
+    titleEdit(true);
+    var ren = document.querySelector(".vbar").getBoundingClientRect().height;
+    document.getElementById("dTin").blur();
+    await new Promise(function (r) { setTimeout(r, 30); });
+    return { back: back, map: map, ren: ren,
+             after: document.querySelector(".vbar").getBoundingClientRect().height };
+  });
+  ok("and it comes back the moment he stops",
+     k55b.back > 0 && k55b.after > 0, JSON.stringify(k55b));
+  ok("the same holds on every other typing screen",
+     k55b.map === 0 && k55b.ren === 0, JSON.stringify(k55b));
+
+  var d55 = await s55.p.evaluate(async function () {
+    hideDrawer();
+    setView("chat"); render();
+    await new Promise(function (r) { setTimeout(r, 60); });
+    var w = document.getElementById("chatw"), b = document.getElementById("cdn");
+    var atFoot = b.classList.contains("off");
+    w.scrollTop = 0;
+    w.dispatchEvent(new Event("scroll"));
+    var away = !b.classList.contains("off");
+    var box = b.getBoundingClientRect(), foot = document.querySelector("#v-chat .cbox").getBoundingClientRect();
+    b.click();
+    await new Promise(function (r) { setTimeout(r, 1400); });
+    var landed = w.scrollHeight - w.scrollTop - w.clientHeight;
+    return { atFoot: atFoot, away: away, landed: landed,
+             /* clear of the composer, not over it */
+             clear: box.bottom <= foot.top + 1, w: Math.round(box.width),
+             gone: b.classList.contains("off") };
+  });
+  ok("Chat offers a way back to the newest message only when there is one",
+     d55.atFoot && d55.away && d55.clear && d55.w >= 30, JSON.stringify(d55));
+  ok("and tapping it lands at the foot of the thread",
+     d55.landed < 4 && d55.gone, JSON.stringify(d55));
+  ok("no console error through either", s55.errs.length === 0, s55.errs.join(" | "));
+  await s55.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

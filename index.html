@@ -331,6 +331,16 @@ body::before{
   padding-bottom:var(--barpad);
   position:relative;z-index:30;
 }
+/* iOS shrinks the app to the visual viewport the moment the keyboard opens,
+   so the bar rides up with it and sits in the middle of the screen between
+   the composer and the keys: *"When chat box is open the nav icons also move
+   up - fix this. Check this behaviour for all typing screens."* Every
+   messaging app on his phone answers this the same way -- the tab bar is not
+   on screen while you are typing -- and taking it out is the one fix that
+   cannot be wrong about a height, which is the mistake this board has
+   already made seven times at this end of the screen. `.kbd` goes on `.app`
+   from focus, not from a measurement. */
+.app.kbd .vbar{display:none}
 .vt{
   position:relative;flex:1 1 0;min-width:0;border:0;background:none;font:inherit;
   color:var(--ink4);cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -1566,6 +1576,19 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 .csend{flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
   background:var(--orange);color:#fff;font-size:15px;line-height:1;transition:opacity .14s}
 .csend:disabled{opacity:.35;cursor:default}
+/* Back to the newest message, the way every thread he reads has it: a round
+   button over the thread and clear of the composer, drawn only while there is
+   somewhere to go. `.cfoot` is already absolute, so it is the containing
+   block and `bottom:100%` puts this directly above the box without a row of
+   its own. */
+.cdn{position:absolute;right:4px;bottom:100%;margin-bottom:9px;
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink2);cursor:pointer;
+  display:grid;place-items:center;
+  box-shadow:0 2px 6px rgba(40,10,56,.09),0 8px 20px -12px rgba(40,10,56,.5);
+  transition:opacity .16s var(--ease),transform .16s var(--ease)}
+.cdn svg{width:16px;height:16px}
+.cdn.off{display:none}
 .cempty{text-align:center;color:var(--ink4);font-size:13px;padding:38px 18px;line-height:1.55}
 /* the waiting bubble: same shape as a reply, because that is what is coming */
 .cwb{display:flex;align-items:center;gap:4px;color:var(--ink3);font-size:12.5px}
@@ -1799,6 +1822,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
       <div class="pbn off" id="pbn"><span id="pbnT"></span><button id="pbnB"></button></div>
       <div class="chatw" id="chatw"></div>
       <div class="cfoot">
+        <!-- back to the newest message; it draws only when the thread is
+             scrolled away from the foot -->
+        <button class="cdn off" id="cdn" aria-label="Jump to the newest message" title="Jump to the newest message"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.6v10.2M3.6 8.6L8 13l4.4-4.4"/></svg></button>
         <!-- what he swiped to reply to, above the box and not in it: a line
              of the message, the way WhatsApp shows it, so he can see what he
              is answering without the quote eating the composer. -->
@@ -4035,8 +4061,9 @@ function renderChat(){
      would otherwise drag him back down while he was reading something older. */
   if(view==="chat" && msgs.length!==chatN){
     chatN=msgs.length;
-    setTimeout(function(){ w.scrollTop=w.scrollHeight; },0);
+    setTimeout(function(){ w.scrollTop=w.scrollHeight; syncCdn(); },0);
   }
+  setTimeout(syncCdn,0);
 }
 /* --- swipe a message to reply to it ---
    *"Add a drag to reply to a specific message function on chat. Similar to
@@ -4166,8 +4193,37 @@ function swipeReply(host,sel,pick){
   });
   document.addEventListener("mouseup",function(){ if(row) end(armed && dxl>=SW_GO); });
 }
+/* The arrow is drawn from the thread's own position rather than being told
+   when to appear, so a new caller cannot forget to turn it off -- the same
+   reason `syncFab()` reads its own state. 160px is about a message and a
+   half: below that he can see the foot of the thread and the button would be
+   pointing at what is already on screen. */
+function syncCdn(){
+  var b=document.getElementById("cdn"), w=document.getElementById("chatw");
+  if(!b||!w) return;
+  var away=w.scrollHeight-w.scrollTop-w.clientHeight;
+  b.classList.toggle("off", view!=="chat" || away<160);
+}
+/* A focused text field is the only thing that opens the keyboard, so that is
+   what the class follows. The timeout is for moving from one field to the
+   next -- focusout fires before focusin, and without it the bar would blink
+   back for a frame between the two. */
+function typingEl(e){
+  return !!e && (e.tagName==="TEXTAREA" ||
+    (e.tagName==="INPUT" && !/^(button|submit|checkbox|radio)$/i.test(e.type||"text")));
+}
+function syncKbd(){
+  var a=document.querySelector(".app");
+  if(a) a.classList.toggle("kbd", typingEl(document.activeElement));
+}
+document.addEventListener("focusin",syncKbd);
+document.addEventListener("focusout",function(){ setTimeout(syncKbd,0); });
 (function(){
   var w=document.getElementById("chatw");
+  w.addEventListener("scroll",syncCdn,{passive:true});
+  document.getElementById("cdn").addEventListener("click",function(){
+    glide(w,w.scrollHeight);
+  });
   swipeReply(w,".cmsg[data-nid]",function(r){
     setReply(r.dataset.nid);
     var ta=document.getElementById("cin"); if(ta) ta.focus();
@@ -4807,7 +4863,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1520";
+var BUILD="2026-10-07-1605";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5392,10 +5448,19 @@ function setView(v){
   if(v==="chat") renderChat();
   /* restore after the view is on screen and painted: a hidden element cannot
      be scrolled, and the paint above is what gives it a scrollHeight */
-  var sc=scroller(v), want=scrollAt[v]||0;
+  /* A thread he has never opened in this session has no remembered offset,
+     and 0 is the wrong default for a conversation: Chat opened on the oldest
+     message with the newest a screenful below, and the restore ran after
+     renderChat's own jump to the foot, so it undid it. A conversation opens
+     at the latest message. */
+  var sc=scroller(v), want=scrollAt[v];
+  if(want==null) want=(v==="chat"&&sc)?sc.scrollHeight:0;
   if(sc){ sc.scrollTop=want; setTimeout(function(){ if(view===v) sc.scrollTop=want; },0); }
   viewReady=true;
   syncFab();
+  /* the restore above moves the thread, and a hidden view measured zero, so
+     the arrow's state is only real once both have happened */
+  setTimeout(syncCdn,0);
   if(!drag) killGhosts();   /* never carry a stray ghost across to another tab */
 }
 /* The swipe between sections is gone. It was a deliberately narrow gesture and

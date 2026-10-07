@@ -182,6 +182,18 @@ arrived as an unread badge on a drawer he had no reason to open.
   the thread -- "Got your note, working on it", then "Still working on it" -- and
   takes it away once a reply is in, or after twelve minutes, because past that
   claiming one is coming would be a guess.
+- **There is a way back to the newest message.** *"Add a scroll to bottom
+  arrow on chat."* A round button over the thread and clear of the composer,
+  drawn only once the foot is more than about a message and a half away --
+  below that it would be pointing at what is already on screen. `syncCdn()`
+  reads the thread's own position rather than being told, the way `syncFab()`
+  does, so a new caller cannot forget to turn it off.
+- **Chat opens on the latest message.** `scrollAt` had no entry for a thread
+  he had not opened yet, and 0 is the wrong default for a conversation: the
+  restore ran *after* `renderChat`'s own jump to the foot and undid it, so
+  Chat opened on the oldest message with the newest a screenful below. Only
+  Chat defaults to its own `scrollHeight`; every other view still opens at the
+  top.
 - The thread scrolls inside the view and the composer does not. It was sticky in
   the page scroller first, which looks right until the thread is taller than a
   screen and the messages render straight over the top of it.
@@ -946,6 +958,19 @@ thumb's reach.
   not negotiable, but the zoom is read off the input's own size, never the
   placeholder's -- which is how *"message claude placeholder smaller font"*
   gets done without the page zooming on focus.
+- **The bar is off screen while he is typing.** *"When chat box is open the
+  nav icons also move up - fix this. Check this behaviour for all typing
+  screens."* iOS shrinks the app to the visual viewport the moment the
+  keyboard opens, so the bar rides up with it and sits in the middle of the
+  screen between the composer and the keys. `.kbd` goes on `.app` from
+  **focus**, not from a measurement, and `.app.kbd .vbar{display:none}` is the
+  whole of it -- which is the point, since every earlier attempt at this end
+  of the screen moved a height or an inset and cost seven rounds. Every app on
+  his phone hides its tab bar the same way. It follows a focused `textarea` or
+  text `input`, so the map's composer and the task card's note and rename
+  fields are covered by the same rule rather than by three of them, and the
+  blur handler waits a tick because `focusout` fires before `focusin` and the
+  bar would otherwise blink back between two fields.
 - **`.mline` drops `touch-action:pan-x` on a phone.** At that width it is a
   two-column grid rather than the sideways rail the rule was written for, and
   the rule was still refusing every vertical drag that began on a milestone:
@@ -1966,7 +1991,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 436 invariants, three widths, a real browser. Every one of them was a
+that runs: 442 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

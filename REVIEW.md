@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 436 checks, three widths, a real browser
+node checks/board-check.mjs          # 442 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -476,6 +476,24 @@ as a ribbon of clipped dots.
 1280`, `and what has gone is at the foot, above the milestones, at 1280`,
 `Recently completed sits directly above the milestones`, `1280px: and it runs
 the full width, below the agenda`.*
+
+### The section bar is off screen while he is typing
+iOS shrinks the app to the visual viewport when the keyboard opens, so the bar
+rides up and sits between the composer and the keys. `.kbd` goes on `.app`
+from focus, never from a measured height -- this end of the screen has already
+cost seven rounds of guessing at heights and insets. It follows any focused
+textarea or text input, so Chat, the map and the task card are one rule.
+*Checked: `the section bar is off screen while he is typing in Chat`, `the
+same holds on every other typing screen`, `and it comes back the moment he
+stops`.*
+
+### Chat has a way back to the newest message, and opens on it
+The arrow reads the thread's own position (`syncCdn()`), so it cannot be left
+on by a caller that forgot. Chat with no remembered offset opens at its
+`scrollHeight`: 0 is the wrong default for a conversation, and the restore ran
+after `renderChat`'s jump to the foot and undid it.
+*Checked: `Chat offers a way back to the newest message only when there is
+one`, `and tapping it lands at the foot of the thread`.*
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can
