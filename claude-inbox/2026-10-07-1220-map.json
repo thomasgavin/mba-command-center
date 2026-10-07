@@ -1,0 +1,118 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-07T12:20:00.000Z",
+ "notes": [],
+ "changed": [],
+ "kb": [
+  {
+   "id": "k-news-why",
+   "label": "Why the pre-MBA window had already closed",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "McKinsey's Make Your Mark, BCG Unlock and Bain's ExperienceBain are all aimed at people who have been admitted and have not started yet, and they run over the northern summer: registration falls roughly May to July, the programme itself August to December. That is built around an autumn intake. The January 2027 intake's equivalent window had passed before the admission letter arrived, which is why Make Your Mark was never a thing that could have been applied to from here. Nothing was missed through not looking; the calendar simply does not line up. What replaces it is the on-campus cycle, which starts in P1.",
+   "cat": "work",
+   "rel": [
+    "k-news-mym",
+    "k-news-unlock",
+    "k-news-xbain"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude",
+   "item": "news-mbb-cal"
+  },
+  {
+   "id": "k-news-mym",
+   "label": "McKinsey Make Your Mark",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "A pre-MBA mentorship programme for incoming MBA students at a named set of schools, INSEAD among them: one-to-one mentoring with a McKinsey consultant, recruiting workshops, networking and interview coaching, running from late August to the end of December. Applications have closed in July in recent cycles. It is a mentorship and a foot in the door rather than an offer, and the thing it actually buys is knowing how the firm recruits before everyone else does.",
+   "cat": "work",
+   "rel": [
+    "k-news-why"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-news-unlock",
+   "label": "BCG Unlock",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "BCG's pre-MBA virtual event series: sessions with BCG leaders and consultants on what consulting work is, plus skill-building and networking, over the summer before the programme starts. Registration has been encouraged by mid-May and then reviewed on a rolling basis after that. Virtual, so geography is not the constraint - the admission timing is.",
+   "cat": "work",
+   "rel": [
+    "k-news-why"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-news-xbain",
+   "label": "ExperienceBain",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "Bain's virtual pre-MBA programme for incoming first-years at eligible schools: interactive sessions with Bain teams around the world across the summer, flexible rather than a fixed week. Recent cycles have closed applications in early May. Same shape and the same timing problem as the other two.",
+   "cat": "work",
+   "rel": [
+    "k-news-why"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-news-pathways",
+   "label": "Amazon Pathways (MBA Operations LDP)",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "Amazon's three-year operations leadership development programme, open to people enrolled in an MBA or within 24 months of graduating, with cohorts tied to a start year rather than a single deadline. There is no closing date at all: applications are read on a rolling basis and the posting comes down when they have enough people, which makes early the whole strategy. It is the closest fit on the Big Tech list to five years of SaaS presales and operations - a management track rather than a functional hire.",
+   "cat": "work",
+   "rel": [
+    "k-news-bigtech"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude",
+   "item": "news-amzn-path"
+  },
+  {
+   "id": "k-news-bigtech",
+   "label": "How the Big Tech and consumer cycles are timed",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "Both run on graduation year, not on intake. The 2027 postings at Amazon, J&J and their peers say \"graduating between August 2026 and August 2027\", which a December 2027 graduation sits outside - so the cycle that matters is the one that opens in autumn 2027, and anything open now is worth applying to only where the eligibility text actually admits it. The practical consequence: the autumn 2027 window is the one to be ready for, and the preparation for it (CV, CareerGlobe, the CDC coach) is already on the board.",
+   "cat": "work",
+   "rel": [
+    "k-news-pathways"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude"
+  },
+  {
+   "id": "k-news-watch",
+   "label": "What the Sunday brief watches",
+   "group": "NEWS: industry opportunities",
+   "ord": 25,
+   "shape": "cards",
+   "body": "Every Sunday the weekly report carries a NEWS section: pre-MBA and in-programme opportunities researched against the three target groups - Big Tech LDP and management-track roles, MBB consulting, and consumer LDPs. Anything worth doing becomes a task titled [NEWS], drawn in magenta, with Accept and Reject on its card. A week with nothing says so rather than padding. This group is where the findings that are facts rather than tasks collect.",
+   "cat": "work",
+   "rel": [
+    "k-news-why"
+   ],
+   "at": "2026-10-07T12:20:00.000Z",
+   "createdAt": "2026-10-07T12:20:00.000Z",
+   "by": "claude"
+  }
+ ]
+}

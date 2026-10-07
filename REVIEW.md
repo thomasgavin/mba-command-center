@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 381 checks, three widths, a real browser
+node checks/board-check.mjs          # 398 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -342,6 +342,41 @@ which is the rule a field in one and not the other breaks silently -- the
 and asserts both answers are still there and the rejected one is still gone.
 It also asserts the legend carries a News swatch exactly when a NEWS item is
 on the board, and nothing else is in that key.
+
+### The Notes drawer holds Claude's own notes and takes nothing
+
+A Claude note anchored to a task, or a nudge. A reply in the thread and
+anything he wrote himself are the thread's: *"don't include your replies to
+regular chats."* The check seeds one of each, asserts only the first is drawn,
+that no composer or action button survives, and that opening the drawer marks
+read **only what it showed** -- marking a reply it never drew would put the
+badge out over something he has not opened. Tapping a note opens the thread on
+that message, highlighted and actually on screen.
+
+### A swipe to reply arms across, never down
+
+The one horizontal gesture on this board, and it is safe only because it hands
+the drag back: nothing arms until the pointer has moved 12px across *and*
+further across than down. The check drives real touch events -- a vertical drag
+on a bubble must leave the reply strip shut, a right drag must open it on that
+message, and the sent reply must carry `re` and draw its quote. The strip
+quotes a line, never the message.
+
+### A section comes back where he left it
+
+`scrollAt` per view, restored after the view is painted, and never written to
+`localStorage`. The check scrolls Timeline, leaves, returns and asserts the
+same offset; then clicks the tab of the open section and asserts it ends at
+the top. Boot calls `setView` with the current view, so the "already open"
+shortcut is guarded by `viewReady` or the first setup is skipped entirely.
+
+### A tile subtitle ends at the right edge of its heading
+
+Two `margin-left:auto` elements split the free space between them rather than
+one taking it, so "17 done so far" floated in the middle of its own heading.
+The check measures every heading's subtitle against the heading's right edge,
+and fails any `data-vgo` heading that has no subtitle at all -- that one would
+put the chevron against the title.
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

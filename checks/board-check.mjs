@@ -1775,8 +1775,18 @@ for (var bw of [390, 1280]) {
 
 /* ---- 32. a badge goes out where it was read ---- */
 {
-  var s32 = await open(390, [{ id: "r1", from: "claude", text: "a reply he has not read",
-                               createdAt: new Date().toISOString(), state: "new" }]);
+  /* Three kinds of note, and the drawer holds exactly one of them:
+     *"don't include your replies to regular chats. Only the independant notes
+     you add."* A Claude note on a task is in; a nudge is in; a reply in the
+     thread and anything he wrote himself are the thread's. */
+  var NOW32 = new Date().toISOString();
+  var s32 = await open(390, [
+    { id: "claude-onitem", from: "claude", itemId: "cv", itemTitle: "Rebuild CV in INSEAD format",
+      text: "a note on a task", createdAt: NOW32, state: "new" },
+    { id: "claude-reply", from: "claude", text: "a reply in the thread",
+      createdAt: NOW32, state: "new" },
+    { id: "mine", from: "me", text: "something he typed", createdAt: NOW32, state: "new" }
+  ]);
   var badge = await s32.p.evaluate(function () {
     return document.getElementById("notesN").textContent;
   });
@@ -1784,15 +1794,51 @@ for (var bw of [390, 1280]) {
   await s32.p.waitForTimeout(420);
   var after = await s32.p.evaluate(function () {
     var n = document.getElementById("notesN");
-    return { txt: n.textContent, off: n.classList.contains("off"), unread: unread(),
+    var txt = document.getElementById("dBody").innerText || "";
+    return { txt: n.textContent, unread: unread(),
              /* the ones that were new still say so on the list he is looking at */
-             tags: document.querySelectorAll("#dBody .tagnew").length };
+             tags: document.querySelectorAll("#dBody .tagnew").length,
+             cards: document.querySelectorAll("#dBody .nitem[data-nj]").length,
+             hasTask: txt.indexOf("a note on a task") >= 0,
+             hasReply: txt.indexOf("a reply in the thread") >= 0,
+             hasMine: txt.indexOf("something he typed") >= 0,
+             /* the composer and its two buttons are gone outright */
+             composer: !!document.getElementById("gn"),
+             btns: document.querySelectorAll("#dBody [data-gsave],#dBody [data-export]").length,
+             title: document.getElementById("dTitle").textContent,
+             /* the reply is still unread, because this drawer never showed it */
+             replyState: notes.filter(function (x) { return x.id === "claude-reply"; })[0].state,
+             itemState: notes.filter(function (x) { return x.id === "claude-onitem"; })[0].state };
   });
+  ok("the drawer lists only Claude's own notes",
+     after.cards === 1 && after.hasTask && !after.hasReply && !after.hasMine, JSON.stringify(after));
+  ok("and takes nothing: no composer, no action buttons",
+     !after.composer && after.btns === 0 && /from Claude/.test(after.title), JSON.stringify(after));
   /* "The all notes section on top right doesn't mark read once open - I need to
      open the chat section to mark it as read." */
-  ok("opening the notes drawer is reading them",
-     badge === "1" && after.unread === 0 && after.off, JSON.stringify({ badge: badge, after: after }));
-  ok("and the drawer still shows which of them were new", after.tags === 1, JSON.stringify(after));
+  ok("opening the notes drawer is reading what it showed",
+     badge === "2" && after.itemState === "read", JSON.stringify({ badge: badge, after: after }));
+  ok("but not a reply it never showed", after.replyState === "new" && after.unread === 1,
+     JSON.stringify(after));
+  ok("and it still shows which of them were new", after.tags === 1, JSON.stringify(after));
+  /* tapping one opens the thread on that message and marks it:
+     *"it should open the chat, scroll to that note message and highlight that
+     briefly. Like on WhatsApp."* */
+  await s32.p.click("#dBody .nitem[data-nj]");
+  await s32.p.waitForTimeout(600);
+  var jump = await s32.p.evaluate(function () {
+    var w = document.getElementById("chatw");
+    var el = w.querySelector('.cmsg[data-nid="claude-onitem"]');
+    var r = el ? el.getBoundingClientRect() : null, wr = w.getBoundingClientRect();
+    return { view: view, drawer: document.getElementById("drawer").classList.contains("on"),
+             found: !!el, flashed: !!el && el.classList.contains("cflash"),
+             /* and it is actually on screen, not merely in the DOM */
+             onScreen: !!r && r.top < wr.bottom && r.bottom > wr.top };
+  });
+  ok("tapping a note opens the thread on it, highlighted",
+     jump.view === "chat" && !jump.drawer && jump.found && jump.flashed && jump.onScreen,
+     JSON.stringify(jump));
+  ok("no console error through the notes drawer", s32.errs.length === 0, s32.errs.join(" | "));
   await s32.ctx.close();
 }
 
@@ -3200,6 +3246,137 @@ for (var nw of [390, 1280]) {
      r47.w > r47.b * 0.4, JSON.stringify(r47));
   ok("1280px: and sits opposite the agenda", r47.beside, JSON.stringify(r47));
   await s47.ctx.close();
+}
+
+/* ---- 48. swipe a message to reply to it ----
+   "Add a drag to reply to a specific message function on chat. Similar to
+   Whatsapp or Instagram. When I drag to reply, that message should show above
+   the chatbox (not the whole message but just a bit)."
+   The gesture itself is driven with real touch events, because the whole
+   design of it is about when it arms: a vertical drag has to be handed back
+   to the thread, and that cannot be asserted by reading the code. */
+{
+  var NOW48 = new Date().toISOString();
+  var s48 = await open(390, [
+    { id: "q1", from: "claude", text: "the message he is answering, which runs on for a while so the quote has something to cut", createdAt: NOW48, state: "read" },
+    { id: "q2", from: "me", text: "a later message of his own", createdAt: NOW48, state: "read" }
+  ]);
+  await s48.p.evaluate(function () { setView("chat"); });
+  await s48.p.waitForTimeout(350);
+  var box = await s48.p.evaluate(function () {
+    var el = document.querySelector('.cmsg[data-nid="q1"]');
+    var r = el.getBoundingClientRect();
+    return { x: Math.round(r.left + 10), y: Math.round(r.top + r.height / 2) };
+  });
+  /* first a vertical drag on the same bubble: it must NOT arm.
+     Real Touch objects, not plain literals -- TouchEventInit refuses to
+     convert one and the whole run dies on the constructor rather than on the
+     board. */
+  var vert = await s48.p.evaluate(function (b) {
+    function t(type, x, y) {
+      var el = document.querySelector('.cmsg[data-nid="q1"]');
+      var tt = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [tt], changedTouches: [tt] }));
+    }
+    t("touchstart", b.x, b.y); t("touchmove", b.x + 4, b.y - 40); t("touchmove", b.x + 50, b.y - 60);
+    t("touchend", b.x + 50, b.y - 60);
+    return { armed: !document.getElementById("crep").classList.contains("off") };
+  }, box);
+  ok("a vertical drag on a message is the thread scrolling, not a reply",
+     !vert.armed, JSON.stringify(vert));
+  var swipe = await s48.p.evaluate(function (b) {
+    function t(type, x, y) {
+      var el = document.querySelector('.cmsg[data-nid="q1"]');
+      var tt = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [tt], changedTouches: [tt] }));
+    }
+    t("touchstart", b.x, b.y); t("touchmove", b.x + 20, b.y + 2);
+    t("touchmove", b.x + 60, b.y + 3); t("touchend", b.x + 60, b.y + 3);
+    var strip = document.getElementById("crep");
+    return { open: !strip.classList.contains("off"),
+             who: document.getElementById("crepW").textContent,
+             /* one line of it, never the whole message */
+             quoted: document.getElementById("crepT").textContent,
+             replyTo: replyTo };
+  }, box);
+  ok("swiping a message right opens the reply strip on it",
+     swipe.open && swipe.replyTo === "q1" && swipe.who === "Claude", JSON.stringify(swipe));
+  ok("and the strip quotes a line, not the message",
+     swipe.quoted.length > 0 && swipe.quoted.length <= 81 &&
+     swipe.quoted.length < 95, JSON.stringify(swipe));
+  /* send it, and the reply carries the quote */
+  var sent = await s48.p.evaluate(function () {
+    var ta = document.getElementById("cin");
+    ta.value = "and the answer"; ta.dispatchEvent(new Event("input"));
+    document.getElementById("csend").click();
+    var n = notes.filter(function (x) { return x.text === "and the answer"; })[0];
+    return { re: n && n.re, strip: document.getElementById("crep").classList.contains("off"),
+             quote: !!document.querySelector('.cmsg[data-nid="' + (n ? n.id : "") + '"] .cq') };
+  });
+  ok("the reply carries what it answers, and the bubble shows it",
+     sent.re === "q1" && sent.quote, JSON.stringify(sent));
+  ok("and the strip clears once it is sent", sent.strip, JSON.stringify(sent));
+  ok("no console error through the reply gesture", s48.errs.length === 0, s48.errs.join(" | "));
+  await s48.ctx.close();
+}
+
+/* ---- 49. where he was when he left a section ----
+   "when I scroll down on a section, go to another section and come back - it
+   should be at the scroll position I left it earlier." And tapping the icon
+   of the section already open takes him back to the top, animated. */
+{
+  var s49 = await open(390);
+  var keep = await s49.p.evaluate(async function () {
+    var st = document.getElementById("stage");
+    setView("time"); await new Promise(function (r) { setTimeout(r, 250); });
+    st.scrollTop = 300;
+    var left = st.scrollTop;
+    setView("cal"); await new Promise(function (r) { setTimeout(r, 250); });
+    var other = st.scrollTop;
+    setView("time"); await new Promise(function (r) { setTimeout(r, 250); });
+    return { left: left, other: other, back: st.scrollTop };
+  });
+  ok("a section comes back where he left it",
+     keep.left > 100 && keep.other === 0 && keep.back === keep.left, JSON.stringify(keep));
+  var top = await s49.p.evaluate(async function () {
+    var st = document.getElementById("stage"), was = st.scrollTop;
+    /* the tab of the section already open: "take me to the top" */
+    document.querySelector('.vt[data-v="time"]').click();
+    await new Promise(function (r) { setTimeout(r, 700); });
+    return { was: was, now: st.scrollTop, view: view };
+  });
+  ok("tapping the open section's icon scrolls it back to the top",
+     top.was > 100 && top.now === 0 && top.view === "time", JSON.stringify(top));
+  ok("no console error through the scroll memory", s49.errs.length === 0, s49.errs.join(" | "));
+  await s49.ctx.close();
+}
+
+/* ---- 50. a tile heading ends with its subtitle and then the chevron ----
+   "why does the sub-title with date and 17 done so far look so weirdly
+   placed?" -- two `margin-left:auto` elements split the free space instead of
+   one taking it, so the subtitle floated in the middle of the heading. */
+{
+  var s50 = await open(390);
+  var hd = await s50.p.evaluate(function () {
+    setView("over"); render();
+    var bad = [], noMore = [];
+    Array.prototype.forEach.call(document.querySelectorAll("#bento .tile h3"), function (h) {
+      var m = h.querySelector(".more");
+      if (!m) { if (h.dataset.vgo) noMore.push(h.textContent); return; }
+      var hr = h.getBoundingClientRect(), mr = m.getBoundingClientRect();
+      /* the subtitle ends within ~22px of the heading's right edge: the
+         chevron's width and its gap, and nothing else */
+      if (hr.right - mr.right > 22) bad.push(h.textContent + " @" + Math.round(hr.right - mr.right));
+    });
+    return { bad: bad, noMore: noMore,
+             rcent: (document.querySelector(".rcent h3 .more") || {}).textContent || "" };
+  });
+  ok("every subtitle sits at the right end of its heading", hd.bad.length === 0, JSON.stringify(hd.bad));
+  ok("and every heading that opens a section has one", hd.noMore.length === 0, JSON.stringify(hd.noMore));
+  ok("Recently completed says it his way", /tasks? completed$/.test(hd.rcent), hd.rcent);
+  await s50.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

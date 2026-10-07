@@ -188,6 +188,77 @@ arrived as an unread badge on a drawer he had no reason to open.
 - It only follows the newest message when the thread actually grew. A publish or
   a pull repaints every few seconds and would otherwise drag him back down mid-read.
 
+## Chat: jumping to a message, and answering one
+
+Two gestures from every messaging app he already uses, added 2026-10-07.
+
+- **A note in the drawer opens the thread on that message.** *"if I click on
+  a note box, it should open the chat, scroll to that note message and
+  highlight that briefly. Like on WhatsApp."* `gotoNote()` is the one place
+  that happens, so the drawer and a tapped quote cannot behave differently.
+  Every `.cmsg` carries `data-nid`, the scroll is centred rather than flush to
+  the top (a message against the edge reads as the start of the thread), and
+  `.cflash` lights it for 1.7s -- without the highlight he lands mid-thread
+  with nothing marked and has to work out which bubble he was sent to.
+- **Swipe a message right to reply to it.** The board has a standing rule
+  against horizontal gestures -- the swipe between views was removed for being
+  the one you fire by accident -- and what makes this one safe is that it is
+  scoped to a single bubble and hands the drag back the moment it looks
+  vertical: nothing arms until the pointer has moved 12px *and* further across
+  than down, and `preventDefault` is not called until it has decided, so the
+  thread scrolls normally while it is still making up its mind.
+  The reply carries `re:<noteId>`. **That needed no merge rule and no
+  `DFIELDS` entry**: a note travels whole and merges by id, so a field added
+  to one reaches his other device by existing. The quote draws inside the
+  bubble, one line only (*"not the whole message but just a bit - also like
+  WhatsApp"*), and above the composer while he writes. A quoted message that
+  aged out leaves the line out rather than printing an apology for it.
+
+## The Notes drawer holds what Claude wrote, and takes nothing
+
+It was a composer, two buttons and every note on the board. All three went on
+2026-10-07.
+
+- **Only Claude's independent notes.** *"don't include your replies to regular
+  chats. Only the independant notes you add."* `claudeNotes()` is the whole
+  rule: a Claude note anchored to a task, or a nudge. A reply exists because
+  he asked something a minute earlier and he read it in the thread; putting it
+  here a second time made a drawer of seventy entries where fifteen were the
+  thing he came for.
+- **It marks read only what it showed.** It used to mark every note Claude had
+  written, which now would put the badge out over a reply he has never opened.
+  `unread()` still counts them all; Chat is what reads a reply.
+- **No composer and no buttons.** *"remove the entire add a note and action
+  button under from this section. Only the notes."* Chat is where he writes,
+  and the full-snapshot download is still a shift-click on "For Claude". The
+  title says "Notes from Claude", because a drawer that takes nothing is not
+  "for" anyone.
+- **The icon is a bell, not a pencil.** A pencil said "write one" next to a
+  drawer that no longer takes anything, and the replacement had to be
+  unmistakable beside the newspaper two pixels to its right -- which rules out
+  any second variation on lines-on-a-card.
+
+## Where he was when he left a section
+
+*"when I scroll down on a section, go to another section and come back - it
+should be at the scroll position I left it earlier."* `scrollAt` keeps one
+offset per view and `scroller(v)` answers which element actually scrolls --
+the stage for most views, `#chatw` for Chat and `#mapw` for the map, because
+those two scroll inside themselves. It is **view state and never reaches
+`localStorage`**: an offset from his laptop says nothing about his phone, and
+a stale one restored a day later is worse than the top.
+
+The restore runs after the view is on screen and painted, because a hidden
+element cannot be scrolled and the paint is what gives it a scrollHeight.
+
+**Tapping the icon of the section already open means "take me to the top"**,
+and `glide()` animates it: *"currently it just blinks to the top. Add a scroll
+animation (like on social media apps)."* `glide` is the one place a scroll is
+animated, so the section icon and the jump to a note cannot drift apart.
+`viewReady` guards the shortcut, because boot calls `setView` with the view
+that is already current and the shortcut would otherwise skip the whole first
+setup.
+
 ## Answering a note
 
 A note is a question for Claude, and until it is answered it is outstanding. A
@@ -870,6 +941,15 @@ answering more than "what is due".
   up"*. Every wide tile on this board declares its span; the next one that
   does not is this bug again, which is why the check measures the tile's box
   rather than reading the rule.
+- **The subtitle sits at the right end, beside the chevron.** It and the
+  chevron both carried `margin-left:auto`, and two auto margins split the free
+  space between them rather than pushing one to the end -- so "17 done so far"
+  floated in the middle of its own heading with a gap either side and nothing
+  to line up against: *"why does the sub-title with date and 17 done so far
+  look so weirdly placed?"* Only the subtitle takes the space now and the
+  chevron follows it at a fixed gap, which is also why **every `data-vgo`
+  heading carries a `.more`** -- one without it would leave the chevron
+  against the title. The wording is his: "17 tasks completed".
 - **A tile heading opens the section it is about.** *"the progress by task
   header should be clickable and should open the board section. Similar, on
   the calendar should open the calendar."* `data-vgo` goes on the **heading,

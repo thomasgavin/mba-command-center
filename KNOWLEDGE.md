@@ -93,6 +93,17 @@ are the authority for his cohort, so the map follows them.
 - **PLDP assignments window** — 06 Nov - 28 Dec 2026 — Delivered online through the LMS across roughly seven weeks. Your coach reads these before meeting you, so they are what shapes the coaching you get rather than a box to tick. INSEAD marks them MUST DO, and the window deliberately spans the December break because they are not a single sitting. — task: Complete the PLDP assignments `pldp-work` `k-pldp-p0` (see also: `k-pldp`, `k-pldp-web`)
 - **Launch Week career pre-work appears on the LMS** — Early December 2026 — Posted in early December, to be completed before Launch Week rather than during it. Launch Week is dense enough that anything left undone gets done badly or not at all, and the career workshop assumes the pre-work is behind you. — task: Pre-work for the Launch Week career workshop `launch-prework` `k-launchprep` (see also: `k-launch`)
 
+## NEWS: industry opportunities  
+*Draws as: `cards`*
+
+- **Why the pre-MBA window had already closed** — McKinsey's Make Your Mark, BCG Unlock and Bain's ExperienceBain are all aimed at people who have been admitted and have not started yet, and they run over the northern summer: registration roughly May to July, the programme August to December. That is built around an autumn intake. The January 2027 intake's equivalent window had passed before the admission letter arrived, which is why Make Your Mark was never a thing that could have been applied to from here. What replaces it is the on-campus cycle, which starts in P1. — task: `news-mbb-cal` `k-news-why` (see also: `k-news-mym`, `k-news-unlock`, `k-news-xbain`)
+- **McKinsey Make Your Mark** — A pre-MBA mentorship programme for incoming MBA students at a named set of schools, INSEAD among them: one-to-one mentoring, recruiting workshops, networking and interview coaching, late August to end December. Applications have closed in July in recent cycles. `k-news-mym`
+- **BCG Unlock** — BCG's pre-MBA virtual event series with BCG leaders and consultants over the summer before the programme starts; registration encouraged by mid-May, rolling after that. `k-news-unlock`
+- **ExperienceBain** — Bain's virtual pre-MBA programme for incoming first-years, flexible sessions across the summer; recent cycles closed in early May. `k-news-xbain`
+- **Amazon Pathways (MBA Operations LDP)** — A three-year operations leadership development programme for people in an MBA or within 24 months of graduating. No closing date: rolling, and the posting comes down when they have enough people. The closest fit on the Big Tech list to five years of SaaS presales and operations. — task: `news-amzn-path` `k-news-pathways`
+- **How the Big Tech and consumer cycles are timed** — Both run on graduation year, not intake. The 2027 postings say "graduating between August 2026 and August 2027", which a December 2027 graduation sits outside, so the autumn 2027 window is the one to be ready for. `k-news-bigtech`
+- **What the Sunday brief watches** — The weekly report carries a NEWS section researched against the three target groups; anything worth doing becomes a `[NEWS]` task with Accept and Reject on its card. A week with nothing says so. `k-news-watch`
+
 ## Programme calendar  
 *Draws as: `calendar`*
 
