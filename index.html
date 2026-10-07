@@ -456,10 +456,21 @@ body::before{
    because there is nothing behind it to open. */
 .gerow{display:flex;border-bottom:1px solid var(--line2);min-height:34px;cursor:default}
 .gerow:last-child{border-bottom:0}
+/* The geometry has to be the TASK row's geometry, to the pixel: *"The webinar
+   items are not aligned and the text seems to be a different size."* It was
+   its own padding (5px 8px 5px 6px against 6px 10px) and its own gap (7
+   against 8) over a dot 18px wide where the tick is 19 -- four small
+   disagreements that put every event title at a different left edge from
+   every task title above and below it, which is exactly what reads as a
+   different size at 12px. It inherits now and overrides nothing about the box. */
 .gerow .gl{width:var(--lw);flex:none;border-right:1px solid var(--line);display:flex;
-  align-items:center;gap:7px;padding:5px 8px 5px 6px;position:sticky;left:0;
-  background:var(--panel);z-index:2}
-.evdot{flex:none;width:9px;height:9px;border-radius:50%;margin:0 4px 0 5px}
+  align-items:center;gap:8px;padding:6px 10px;min-width:0;
+  position:sticky;left:0;background:var(--panel);z-index:2}
+/* the dot occupies the tick's 19px footprint and draws 9 of it, so the column
+   lines up without the dot growing into a button */
+.evdot{flex:none;width:19px;height:19px;border-radius:50%;
+  background:none !important;display:grid;place-items:center}
+.evdot::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--ec)}
 .gerow .gt{font-weight:600;color:var(--ev)}
 
 /* Recently completed. The date column shares one right edge down the tile,
@@ -658,6 +669,22 @@ body::before{
    agenda starts. Every wide tile on this board declares its span; a new one
    that does not is this bug again. */
 .rcent{grid-column:span 7;align-self:start}
+/* News on Overview: what the NEWS pass found, four rows, each one a tap into
+   the fact on the map. It declares its span like every other wide tile --
+   the one that did not is the bug the paragraph above is about. */
+.nwst{grid-column:span 7;align-self:start}
+.nwrow{display:flex;align-items:flex-start;gap:10px;padding:8px 0;
+  border-top:1px solid var(--line2);cursor:pointer}
+.nwrow:first-of-type{border-top:0}
+.nwrow:active{opacity:.7}
+.nwt{flex:1;min-width:0;font-size:12.5px;font-weight:650;line-height:1.35;
+  color:var(--ink);overflow-wrap:anywhere}
+/* the description is small and under the name, not beside it: the name is
+   what he scans and the line under it is what makes it worth a tap */
+.nwt small{display:block;font-size:11.5px;font-weight:500;color:var(--ink3);
+  line-height:1.45;padding-top:2px}
+.nwd{flex:none;font-size:10.5px;font-weight:750;color:var(--news);
+  font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:1px}
 .agr{display:flex;align-items:center;gap:11px;padding:7px 0;border-top:1px solid var(--line2)}
 .agr:first-of-type{border-top:0}
 .agd-d{
@@ -930,10 +957,23 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
 
 /* one row: a title with its date, and the paragraph that says what it is. No
    twisty -- the only thing that collapses is the group header above it. */
-.mn{padding:3px 0 5px}
-.mn+.mn{border-top:1px solid var(--line2)}
+/* a swiped row answers the finger and springs back, the same way a chat
+   bubble does -- one rule for every shape, since they all carry data-kb */
+.mbox [data-kb]{transition:transform .16s ease-out}
+.mbox [data-kb].cdrag{transition:none;will-change:transform}
+/* Every node is a box, in every shape: *"Some mindmap sections don't use
+   blocks and some do. Use blocks for all sections including deadlines and
+   programme calendar. I understand it's because there are images/infographics
+   but keep them without and outside the boxes."* Two of the four shapes drew
+   cards and two drew rows separated by a hairline, so the same kind of thing
+   looked like two kinds of thing depending on which group it had been filed
+   under. The infographic each of those shapes adds -- the rail, the month
+   chart -- stays OUTSIDE the box it belongs to, which is the only part of
+   this that needed care: the rail's dot is absolutely positioned clear of the
+   box and the chart is a block of its own above the rows. */
+.mn{padding:8px 11px;margin-top:7px;border:1px solid var(--line2);
+  border-radius:var(--r3);background:var(--panel)}
 .mkids{margin-left:4px;padding-left:11px;border-left:1px solid var(--line2)}
-.mn.sub+.mn.sub{border-top:1px solid var(--line2)}
 .mnh{display:flex;align-items:flex-start;gap:7px;padding:5px 0 2px;min-width:0}
 /* the label has to shrink below its longest word, or one long node sets the
    width of the whole card and the drawer's sideways-scroll bug comes back here */
@@ -959,11 +999,14 @@ body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
    representing each items."* The rail is a pseudo-element on the container so
    it cannot drift from the dots, and the last item clips it short so the line
    ends on the final dot rather than running past it into the padding. */
-.mtl{position:relative;padding:2px 0 0 21px}
-.mtl:before{content:"";position:absolute;left:5px;top:12px;bottom:14px;width:2px;
+.mtl{position:relative;padding:5px 0 0 21px}
+/* the rail runs behind the boxes and between the dots, never inside one */
+.mtl:before{content:"";position:absolute;left:5px;top:18px;bottom:22px;width:2px;
   background:var(--rail);border-radius:2px}
-.mtli{position:relative;padding:3px 0 11px}
-.mtli>i{position:absolute;left:-21px;top:4px;width:11px;height:11px;border-radius:50%;
+.mtli{position:relative;padding:8px 11px;margin-bottom:9px;border:1px solid var(--line2);
+  border-radius:var(--r3);background:var(--panel)}
+.mtli:last-child{margin-bottom:2px}
+.mtli>i{position:absolute;left:-21px;top:11px;width:11px;height:11px;border-radius:50%;
   border:2px solid;box-sizing:border-box;background:var(--panel)}
 /* a date already gone is a hollow dot, so where he is in the sequence is the
    first thing the block says and nothing had to be stored to say it */
@@ -1433,6 +1476,9 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
    scroll. */
 @keyframes cflash{0%{background:transparent}18%{background:var(--flash)}100%{background:transparent}}
 .cmsg.cflash{animation:cflash 1.7s ease-out;border-radius:15px}
+/* the same flash on a map node, so arriving from the News tile or from a
+   quoted reply marks where he landed */
+.mbox [data-kb].mflash{animation:cflash 1.7s ease-out}
 /* The quoted message inside a reply: one line, the author in the tint of the
    bubble it points at, with the bar down the left every app uses for a quote. */
 .cq{border-left:2.5px solid currentColor;padding:2px 0 2px 8px;margin:0 0 6px;
@@ -1535,23 +1581,34 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      (the deadline, the two rings, the tuition), the wide right one carries
      the lists, and the tall tile on one side spans the rows the short ones
      opposite it occupy. */
+  /* Re-placed when the agenda, Recently completed and the track bars moved
+     ahead of tuition: *"move the on the calendar, progress by tasks before
+     the tuition card in that order."* The explicit rows mean DOM order is not
+     what a desktop sees, so moving the tiles in the markup without moving
+     them here would have changed the phone and left the laptop alone. */
   .hero{grid-column:1/6;grid-row:1} .att{grid-column:6/13;grid-row:1/3}
-  .mstack{grid-column:1/6;grid-row:2;flex-direction:row}
-  .hero.b{grid-column:1/6;grid-row:3}
-  .pipe{grid-column:6/13;grid-row:3;align-self:start}
-  /* the agenda is nine rows tall and the two tiles opposite it are short, so
-     it spans both of their rows rather than leaving half a screen blank */
-  .agd{grid-column:1/6;grid-row:4/6} .trk{grid-column:6/13;grid-row:4;align-self:start}
-  .rcent{grid-column:6/13;grid-row:5;align-self:start}
+  /* the agenda is nine rows tall and the tiles opposite it are short, so it
+     spans their rows rather than leaving half a screen blank */
+  .agd{grid-column:1/6;grid-row:2/5}
+  .rcent{grid-column:6/13;grid-row:3;align-self:start}
+  .trk{grid-column:6/13;grid-row:4;align-self:start}
+  /* News is the one tile here that may not exist -- it draws only when the
+     map has something in its NEWS group -- so it is paired with tuition
+     rather than given a row of its own, and its absence costs the layout
+     nothing but the right half of one row. */
+  .nwst{grid-column:6/13;grid-row:5;align-self:start}
+  .hero.b{grid-column:1/6;grid-row:5}
+  .mstack{grid-column:1/6;grid-row:6;flex-direction:row}
+  .pipe{grid-column:6/13;grid-row:6;align-self:start}
   /* a short tile opposite a tall one keeps its own height: stretched, the
      visa list ended halfway up a card with the rest of it empty. */
-  .seqt{grid-row:6;align-self:start}
+  .seqt{grid-row:7;align-self:start}
   .seqt:nth-of-type(odd){grid-column:1/7} .seqt:nth-of-type(even){grid-column:7/13}
 }
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
   .mstack{grid-column:span 12;grid-row:span 1;flex-direction:row}
-  .pipe,.trk,.agd,.rcent{grid-column:span 12} .seqt{grid-column:span 6}
+  .pipe,.trk,.agd,.rcent,.nwst{grid-column:span 12} .seqt{grid-column:span 6}
   .cols{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:720px){
@@ -1709,6 +1766,12 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
         <div class="mbox" id="mapw"></div>
       </div>
       <div class="cfoot">
+        <!-- what he swiped to reply to on the map: the fact, one line of it,
+             above the box rather than inside it -->
+        <div class="crep off" id="mrep">
+          <div class="crx"><b id="mrepW"></b><span id="mrepT"></span></div>
+          <button class="crc" id="mrepX" aria-label="Cancel reply">&times;</button>
+        </div>
         <div class="cbox">
           <textarea id="min" rows="1" placeholder="Note or question…"></textarea>
           <button class="csend" id="msend" aria-label="Send">&#8593;</button>
@@ -1897,12 +1960,17 @@ var MILES=[
    under its title rather than a drawer behind a tap, because there is
    nothing on it to change. */
 var EVENTS=[
-  {id:"ev-pldp",   t:"PLDP webinar",                        k:"acad",   d:"2026-11-05",
+  /* `p` is how much it matters that he is in the room, not a priority he set:
+     an event is nobody's task. The CV webinar is High because it has to be
+     registered for in advance and the CV gates the career track; PLDP is High
+     because the assignments it explains start the next day; the academics
+     overview is the one of the four he could read the deck for instead. */
+  {id:"ev-pldp",   t:"PLDP webinar",                        k:"acad",   d:"2026-11-05", p:"High",
     n:"Zoom. Explains the assignments that run 6 November to 28 December."},
-  {id:"ev-cv",     t:"INSEAD CV and cover letter webinar",  k:"career", d:"2026-11-13",
+  {id:"ev-cv",     t:"INSEAD CV and cover letter webinar",  k:"career", d:"2026-11-13", p:"High",
     n:"13:00 Paris. Needs registering in advance."},
-  {id:"ev-acad",   t:"Academics overview webinar",          k:"acad",   d:"2026-11-26"},
-  {id:"ev-summer", t:"Summer experience webinar",           k:"career", d:"2026-12-04",
+  {id:"ev-acad",   t:"Academics overview webinar",          k:"acad",   d:"2026-11-26", p:"Medium"},
+  {id:"ev-summer", t:"Summer experience webinar",           k:"career", d:"2026-12-04", p:"High",
     n:"The 8-week summer project, the startup tour, and taking the break to recruit."}
 ];
 function evCat(e){ return cat==="all" || TRACK_CAT[e.k]===cat; }
@@ -2534,13 +2602,18 @@ function snooze(id,n){
 /* `re` is the id of the message this one answers. It needed no merge rule and
    no DFIELDS entry: a note travels whole and merges by id, so a field added to
    one reaches his other device by existing. */
-function addNote(itemId,text,quiet,forClaude,kind,re){
+function addNote(itemId,text,quiet,forClaude,kind,re,rek){
   var ask = forClaude!==false;
   var n={id:"n"+Date.now()+Math.floor(Math.random()*999),itemId:itemId||null,
     itemTitle:itemId&&items[itemId]?items[itemId].title:null,text:text,
     createdAt:new Date().toISOString(),state:ask?"new":"read",from:"me",forClaude:ask};
   if(kind) n.kind=kind;
   if(re) n.re=re;
+  /* a reply to a fact on the map rather than to a message. It needed no
+     DFIELDS entry and no merge rule for the same reason `re` did not: a note
+     travels whole and merges by id, so a field added to one reaches his other
+     device by existing. */
+  if(rek) n.rek=rek;
   notes.unshift(n);
   save(); render();
   if(ask) autoSend();
@@ -2759,6 +2832,94 @@ function renderOverview(){
       : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>';
   h+='</div>';
 
+  /* agenda */
+  var ag=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n>=-30&&n<=21; }).slice(0,9);
+  h+='<div class="tile agd"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
+  h+= ag.length? ag.map(function(i){
+        var d=D(i.due), n=dleft(i.due);
+        /* the countdown goes under the date rather than out at the right
+           edge: the row had a date block, a title, and then two chips
+           competing for the same corner, and the empty half of the date
+           block was doing nothing -- "better use of space" */
+        return '<div class="agr'+(newsAsk(i)?" nws":"")+'" data-go="'+i.id+'">'+
+          '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
+            '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
+          '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
+          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
+      }).join("")
+      : '<p class="hint">Nothing dated in the next three weeks.</p>';
+  h+='</div>';
+
+  /* Recently completed, directly under the agenda: the agenda says what is
+     coming and this says what has gone, which is the half of "where do I
+     stand" the first screen never answered. He asked for it in that position.
+
+     The order is `doneAt`, the day a task was actually closed, and a task
+     closed before that field existed carries none -- so it prints no date
+     rather than borrowing its due date, which would be the board inventing a
+     fact about his own week. Those collect at the end under one line. */
+  var finished=alive().filter(function(i){ return i.status==="done"; });
+  var dated=finished.filter(function(i){ return i.doneAt; })
+    .sort(function(a,b){ return String(b.doneAt).localeCompare(String(a.doneAt)); });
+  var undated=finished.filter(function(i){ return !i.doneAt; }).sort(byDue).reverse();
+  /* Five, not six and not all of them: *"only include the last 5 completed
+     tasks"*. The count beside the heading is still the real total, so capping
+     the list cannot make the board understate what he has done. */
+  var rc=dated.concat(undated).slice(0,5);
+  h+='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
+  h+= rc.length? rc.map(function(i){
+        var when=i.doneAt?fmtD(i.doneAt):null;
+        return '<div class="rcrow" data-go="'+i.id+'">'+
+          '<span class="rck" style="background:'+tc(i.track)+'"></span>'+
+          '<span class="rct">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
+          '<span class="rcd'+(when?'':' none')+'">'+(when?esc(when):'date not recorded')+'</span></div>';
+      }).join("")
+      : '<p class="hint">Nothing closed yet.</p>';
+  h+='</div>';
+
+  /* track progress */
+  /* The heading is the way in to the section it is about: "the progress by
+     task header should be clickable and should open the board section.
+     Similar, on the calendar should open the calendar." A tile that
+     summarises a view and does not reach it makes him go and find the tab. */
+  h+='<div class="tile trk"><h3 data-vgo="board"><span class="pin" style="background:#00a98f"></span>Progress by track<span class="more">'+alive().filter(function(i){return i.status==="done";}).length+' of '+alive().length+' done</span></h3><div class="tbars">';
+  TORDER.forEach(function(k){
+    var ti=alive().filter(function(i){return i.track===k;});
+    if(!ti.length) return;
+    var dn=ti.filter(function(i){return i.status==="done";}).length;
+    var pct=Math.round(dn/ti.length*100);
+    h+='<div class="tbar"><div class="tl"><span class="sw" style="background:'+tc(k)+'"></span>'+esc(tl(k))+
+       '<span class="pc">'+dn+'/'+ti.length+'</span></div>'+
+       '<div class="tt"><i style="width:'+pct+'%;background:'+tc(k)+'"></i></div></div>';
+  });
+  h+='</div></div>';
+
+  /* NEWS on the first screen: *"Add a news section to overview above the
+     tuition card. Don't add all news - just recent few with a small
+     description and date (if applicable). Clicking on the news should take me
+     to the relevant mindmap note."*
+
+     It reads the MAP, not the `nw:true` tasks. A NEWS task is one he is meant
+     to do something about and it already has a date, a drawer and a place in
+     Needs attention; what this answers is the other thing the NEWS pass
+     produces -- what Claude found out there -- which lives as facts in the
+     map's NEWS group. So the row goes where the fact is rather than opening a
+     task card that does not exist, and the tile is a window on the group
+     rather than a second copy of it. Four, newest first by the clock each
+     node carries. */
+  var nwn=newsNodes();
+  if(nwn.length){
+    h+='<div class="tile nwst"><h3 data-vgo="map"><span class="pin" style="background:'+NEWSC+'"></span>'+
+       'News<span class="more">'+nwn.length+' found for you</span></h3>';
+    h+=nwn.slice(0,4).map(function(n){
+      return '<div class="nwrow" data-kbg="'+esc(n.id)+'">'+
+        '<span class="nwt">'+esc(n.label||"")+
+          (n.body?'<small>'+esc(snip(n.body,110))+'</small>':'')+'</span>'+
+        (n.when?'<span class="nwd">'+esc(n.when)+'</span>':'')+'</div>';
+    }).join("");
+    h+='</div>';
+  }
+
   /* hero B: money.
      This block used to print "2026-10-05" and "2027-04-15" as literals, so the
      instalment could move to 5 Nov on its own card while the tuition summary
@@ -2812,68 +2973,6 @@ function renderOverview(){
     if(ix<CHAIN.length-1) h+='<div class="arw">&rsaquo;</div>';
   });
   h+='</div></div>';
-
-  /* track progress */
-  /* The heading is the way in to the section it is about: "the progress by
-     task header should be clickable and should open the board section.
-     Similar, on the calendar should open the calendar." A tile that
-     summarises a view and does not reach it makes him go and find the tab. */
-  h+='<div class="tile trk"><h3 data-vgo="board"><span class="pin" style="background:#00a98f"></span>Progress by track<span class="more">'+alive().filter(function(i){return i.status==="done";}).length+' of '+alive().length+' done</span></h3><div class="tbars">';
-  TORDER.forEach(function(k){
-    var ti=alive().filter(function(i){return i.track===k;});
-    if(!ti.length) return;
-    var dn=ti.filter(function(i){return i.status==="done";}).length;
-    var pct=Math.round(dn/ti.length*100);
-    h+='<div class="tbar"><div class="tl"><span class="sw" style="background:'+tc(k)+'"></span>'+esc(tl(k))+
-       '<span class="pc">'+dn+'/'+ti.length+'</span></div>'+
-       '<div class="tt"><i style="width:'+pct+'%;background:'+tc(k)+'"></i></div></div>';
-  });
-  h+='</div></div>';
-
-  /* agenda */
-  var ag=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n>=-30&&n<=21; }).slice(0,9);
-  h+='<div class="tile agd"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
-  h+= ag.length? ag.map(function(i){
-        var d=D(i.due), n=dleft(i.due);
-        /* the countdown goes under the date rather than out at the right
-           edge: the row had a date block, a title, and then two chips
-           competing for the same corner, and the empty half of the date
-           block was doing nothing -- "better use of space" */
-        return '<div class="agr'+(i.isNews?" nws":"")+'" data-go="'+i.id+'">'+
-          '<div class="agd-d '+(n<=3?"hot":"")+'"><b>'+d.getDate()+'</b><span>'+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+'</span>'+
-            '<em class="chip d '+cCls(n)+'">'+cTxt(n)+'</em></div>'+
-          '<span class="at">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
-          '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
-      }).join("")
-      : '<p class="hint">Nothing dated in the next three weeks.</p>';
-  h+='</div>';
-
-  /* Recently completed, directly under the agenda: the agenda says what is
-     coming and this says what has gone, which is the half of "where do I
-     stand" the first screen never answered. He asked for it in that position.
-
-     The order is `doneAt`, the day a task was actually closed, and a task
-     closed before that field existed carries none -- so it prints no date
-     rather than borrowing its due date, which would be the board inventing a
-     fact about his own week. Those collect at the end under one line. */
-  var finished=alive().filter(function(i){ return i.status==="done"; });
-  var dated=finished.filter(function(i){ return i.doneAt; })
-    .sort(function(a,b){ return String(b.doneAt).localeCompare(String(a.doneAt)); });
-  var undated=finished.filter(function(i){ return !i.doneAt; }).sort(byDue).reverse();
-  /* Five, not six and not all of them: *"only include the last 5 completed
-     tasks"*. The count beside the heading is still the real total, so capping
-     the list cannot make the board understate what he has done. */
-  var rc=dated.concat(undated).slice(0,5);
-  h+='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
-  h+= rc.length? rc.map(function(i){
-        var when=i.doneAt?fmtD(i.doneAt):null;
-        return '<div class="rcrow" data-go="'+i.id+'">'+
-          '<span class="rck" style="background:'+tc(i.track)+'"></span>'+
-          '<span class="rct">'+esc(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
-          '<span class="rcd'+(when?'':' none')+'">'+(when?esc(when):'date not recorded')+'</span></div>';
-      }).join("")
-      : '<p class="hint">Nothing closed yet.</p>';
-  h+='</div>';
 
   /* weekly load */
   var mon=todayD(); mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
@@ -2993,17 +3092,26 @@ function renderBoard(){
 /* One function decides what colour a task is, so the legend and the bars can
    never drift apart -- a legend that lies is worse than no legend. */
 var NEWSC="#e0399b";
+/* An opportunity he has not answered yet. One predicate, read by the colour,
+   by every `.nws` class and by the card -- so "still asking" cannot mean one
+   thing to the Timeline and another to the drawer. A rejected item is deleted
+   and painted by that; an accepted one is just a task. */
+function newsAsk(i){ return !!i.isNews && !i.newsState && !i.deleted; }
 function statusColour(i,late){
   if(i.deleted) return "#bdb6c6";
   if(i.status==="done") return "#00a98f";
   if(late) return "#e0263c";
-  /* A NEWS item keeps its own colour wherever a status would have painted it,
-     because the question it raises is not "what state is this in" but "is this
-     mine at all". Done and late still win: once he has accepted one it is an
-     ordinary commitment with an ordinary deadline. The legend says so, which
-     is the rule -- a colour on this board that the key does not explain is a
-     colour that means nothing. */
-  if(i.isNews) return NEWSC;
+  /* A NEWS item keeps its own colour only while the question is open, because
+     the question it raises is not "what state is this in" but "is this mine at
+     all". *"When I accept a News from your pop-up message ... it should
+     convert to a task on all relevant sections with regular white colour but
+     still keep the [NEWS] tag."* So the moment he accepts, it is an ordinary
+     commitment with an ordinary status colour everywhere, and the `[NEWS]`
+     prefix on the title is what still says where it came from -- which is the
+     half a screen reader and a plain-text export were always reading anyway.
+     The legend follows the same rule, or the key would explain a colour that
+     is no longer on screen. */
+  if(newsAsk(i)) return NEWSC;
   var c=null; STATUS.forEach(function(x){ if(x.k===(i.status||"todo")) c=x.c; });
   return c||"#8b8095";
 }
@@ -3013,7 +3121,7 @@ function renderLegend(){
   var h=STATUS.map(function(x){
     return '<span class="lgi"><i style="background:'+x.c+'"></i>'+esc(x.label)+'</span>';
   }).join("")+'<span class="lgi"><i style="background:#e0263c"></i>Late</span>'+
-    (all().some(function(i){ return i.isNews; })
+    (all().some(newsAsk)
       ? '<span class="lgi"><i style="background:'+NEWSC+'"></i>News</span>' : '');
   document.getElementById("glg").innerHTML=h;
 }
@@ -3062,7 +3170,7 @@ function renderPlan(){
        clutter. Late overrides, because an open task past its date is the thing
        worth seeing first, and the legend says so. */
     var col=statusColour(i,late);
-    var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+(i.isNews?" nws":"")+'" data-id="'+i.id+'">'+
+    var o='<div class="grow'+(done?" done":"")+(i.deleted?" dl":"")+(newsAsk(i)?" nws":"")+'" data-id="'+i.id+'">'+
       '<div class="gl">'+
         (i.deleted
           ? '<button class="tick" data-act="undel" aria-label="Put it back" title="Put it back">&#8634;</button>'
@@ -3101,9 +3209,18 @@ function renderPlan(){
      page. The blue is --ev; everything else about the row is unchanged. */
   function evrow(e){
     var x=pos(e.d), col=tc(e.k);
+    /* It carries a priority chip now: *"Also add the same priority/importance
+       bubble under based on context."* Nothing about an event is his to do, so
+       the chip is not a property he set -- it is how much it matters that he
+       is there, which is a judgement made with the event when it is written
+       (`p` on EVENTS) and not derived from a date. The chip is the task row's
+       chip, in the task row's place, because its job is to be comparable with
+       the rows above it. */
     return '<div class="gerow" data-d="'+esc(e.d||"")+'">'+
-      '<div class="gl"><span class="evdot" style="background:'+col+'"></span>'+
-        '<span class="gtx"><span class="gt">'+esc(e.t)+'</span></span>'+
+      '<div class="gl"><span class="evdot" style="--ec:'+col+'"></span>'+
+        '<span class="gtx"><span class="gt">'+esc(e.t)+'</span>'+
+          (e.p?'<span class="chip p" style="color:'+PRI[e.p]+'">'+esc(e.p)+'</span>':'')+
+        '</span>'+
       '</div><div class="gtrack"><div class="gg">'+grid+'</div>'+
       '<div class="gpt'+(raw(e.d)<0?" pre":"")+'" style="left:'+x.toFixed(2)+'%;background:'+col+'"></div>'+
       '<div class="glab '+(x>60?"lft":"rgt")+'" style="left:'+x.toFixed(2)+'%">'+fmtD(e.d)+'</div>'+
@@ -3227,7 +3344,7 @@ function renderCal(){
     h+='<div class="day'+(out?" out":"")+(k===tIso?" today":"")+'" data-day="'+k+'"><div class="dn">'+d.getDate()+'</div>'+
        evOn(k).map(function(i){
          var late=!i.deleted&&k<tIso;
-         return '<div class="ev'+(i.isNews?" nws":"")+'" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
+         return '<div class="ev'+(newsAsk(i)?" nws":"")+'" data-id="'+i.id+'" style="background:'+statusColour(i,late)+'" title="'+esc(i.title)+'">'+
            esc(i.title.length>22?i.title.slice(0,21)+"…":i.title)+'</div>';
        }).join("")+
        evtOn(k).map(function(e){
@@ -3274,7 +3391,7 @@ function renderAgenda(evOn,evtOn,tIso){
        ev.map(function(i){
          var n=dleft(i.due), lt=i.status!=="done"&&!i.deleted&&n!==null&&n<0;
          var sc=statusColour(i,lt);
-         return '<div class="calrow'+(i.status==="done"?" done":"")+(i.isNews?" nws":"")+'" data-id="'+i.id+'"'+
+         return '<div class="calrow'+(i.status==="done"?" done":"")+(newsAsk(i)?" nws":"")+'" data-id="'+i.id+'"'+
            ' style="border-left-color:'+sc+'">'+
            '<i style="background:'+sc+'"></i>'+
            '<b>'+esc(i.title)+'</b>'+
@@ -3363,6 +3480,41 @@ function kbKids(id){
   return kbAlive().filter(function(n){ return n.parent===id; }).sort(kbSort);
 }
 function mapGroup(n){ return (n.group||"").trim() || MAP_ELSE; }
+/* What the NEWS pass found, newest first by the clock every node carries.
+   The group is matched by name rather than by a flag, because the groups are
+   free text chosen as Claude files -- a `news:true` on the node would be a
+   second place the same fact is recorded and a second place it can go wrong. */
+function newsNodes(){
+  return kbAlive().filter(function(n){ return /news/i.test(mapGroup(n)); })
+    .sort(function(a,b){ return String(b.at||"").localeCompare(String(a.at||"")); });
+}
+/* The one place a jump to a fact happens, so the "see also" link, a quoted
+   reply in Chat and the Overview News tile cannot behave differently. Its
+   group may be shut, and scrolling to a row that is not drawn lands nowhere,
+   so the group is opened first. The scroll is animated and the box flashes:
+   *"Clicking on the news should take me to the relevant mindmap note in the
+   same scroll and briefly highlight/animate box format."* Without the
+   highlight he arrives mid-view with nothing marked. */
+function gotoKb(id){
+  var n=kbOf(id); if(!n||n.deleted) return;
+  var top=(n.parent&&kbOf(n.parent)&&!kbOf(n.parent).deleted)?kbOf(n.parent):n;
+  mapOpen[mapGroup(top)]=true;
+  mapQ=""; hideDrawer(); setView("map"); renderMap();
+  setTimeout(function(){
+    var sc=scroller("map");
+    var el=sc?sc.querySelector('[data-kb="'+CSS.escape(id)+'"]'):null;
+    if(!sc||!el) return;
+    /* a relative scroll off two live rects, never offsetTop: that is measured
+       against the nearest POSITIONED ancestor and the map's shapes have
+       several */
+    var r=el.getBoundingClientRect(), sr=sc.getBoundingClientRect();
+    glide(sc, Math.max(0, sc.scrollTop + (r.top-sr.top) - (sc.clientHeight/2 - r.height/2)));
+    el.classList.remove("mflash");
+    void el.offsetWidth;
+    el.classList.add("mflash");
+    setTimeout(function(){ el.classList.remove("mflash"); },1800);
+  },90);
+}
 /* `when` is for reading ("13 November 2026", "Mar - May 2027") and sorts
    wrongly on its own -- "04 Dec" lands above "05 Nov". `w` is the ISO date it
    sorts by, and a node carrying one is why the webinars come out as a
@@ -3763,9 +3915,14 @@ function renderChat(){
          back to the original, since a quote you cannot follow is a
          screenshot. A quoted message deleted or aged out leaves the line out
          entirely rather than printing an apology for it. */
-      var q=n.re?noteById(n.re):null;
+      var q=n.re?noteById(n.re):null, qk=(!q&&n.rek)?kbOf(n.rek):null;
       var qh=q?'<div class="cq" data-nj="'+esc(q.id)+'"><b>'+esc(isClaude(q)?"Claude":"You")+'</b>'+
-              esc(snip(q.text||"",90))+'</div>':'';
+              esc(snip(q.text||"",90))+'</div>'
+            /* a reply to a fact rather than to a message: it quotes the node
+               and taps back to it on the map, which is where it came from */
+            :(qk&&!qk.deleted
+              ?'<div class="cq" data-kbg="'+esc(qk.id)+'"><b>Map</b>'+
+                esc(snip(qk.label||qk.body||"",90))+'</div>':'');
       /* A nudge arrives unprompted, so it has to say what it is about before
          he reads it -- a bubble appearing out of nowhere with no question
          above it reads as a glitch. The header is the way back to the task,
@@ -3839,64 +3996,104 @@ function setReply(id){
   document.getElementById("crepT").textContent=snip(n.text||"",80);
   box.classList.remove("off");
 }
-(function(){
-  var w=document.getElementById("chatw");
-  var row=null, x0=0, y0=0, live=false, armed=false;
+/* The same gesture on the map: *"Add a similar swipe to reply function on the
+   mindmap section."* What it quotes there is a fact rather than a message, so
+   the note carries `rek` instead of `re` and the strip says "Map" where the
+   other says who wrote it. */
+var mapReplyTo=null;
+function setMapReply(id){
+  mapReplyTo=id||null;
+  var box=document.getElementById("mrep"), n=mapReplyTo?kbOf(mapReplyTo):null;
+  if(!box) return;
+  if(!n||n.deleted){ mapReplyTo=null; box.classList.add("off"); return; }
+  document.getElementById("mrepW").textContent="Map";
+  document.getElementById("mrepT").textContent=snip(n.label||n.body||"",80);
+  box.classList.remove("off");
+}
+/* One gesture, two views, so they cannot drift apart in how they feel.
+
+   *"The swipe to reply - the box doesn't move smoothly. Maybe because it's
+   precisely move to my finger instead of smoothening out the drag. It also
+   currently drags too far - make the box stop after a small drag."* Both
+   halves of that were in `translateX(Math.min(dx,72)px)`: the travel was his
+   thumb's travel until it hit a wall at 72px, which is a long way for a
+   gesture whose whole message is "this one", and the clamp arrived as a stop
+   rather than as a slowing down.
+
+   `swTravel` is an asymptote instead -- it starts at roughly 1:1 so the
+   bubble answers the finger immediately, then gives less and less, and can
+   never pass SW_MAX however far he drags. The commit threshold is read off
+   the FINGER (SW_GO), not off the transform, because the transform no longer
+   reaches it.
+
+   The other half of "not smoothly" was the write itself: a transform set on
+   every touchmove is three or four style writes a frame, each one invalidating
+   the layout the last one just forced. One write per frame, batched through
+   requestAnimationFrame, is the fix for that and it is why `dxl` exists. */
+var SW_ARM=12, SW_GO=52, SW_MAX=40;
+function swTravel(dx){ return SW_MAX*(1-Math.exp(-dx/(SW_MAX*1.25))); }
+function swipeReply(host,sel,pick){
+  if(!host) return;
+  var row=null, x0=0, y0=0, dxl=0, live=false, armed=false, raf=0;
+  function draw(){ raf=0; if(row) row.style.transform="translateX("+swTravel(dxl).toFixed(1)+"px)"; }
+  /* true once it has armed and the drag belongs to this gesture */
+  function move(dx,dy){
+    if(!armed){
+      /* a vertical drag is the view scrolling and is handed straight back,
+         for the rest of this gesture */
+      if(Math.abs(dy)>Math.abs(dx)||Math.abs(dy)>14){ live=false; row=null; return false; }
+      if(dx<SW_ARM) return false;
+      armed=true; row.classList.add("cdrag");
+    }
+    dxl=dx;
+    if(!raf) raf=requestAnimationFrame(draw);
+    return true;
+  }
   function end(ok){
+    if(raf){ cancelAnimationFrame(raf); raf=0; }
     if(row){
-      row.style.transform=""; row.classList.remove("cdrag");
+      row.classList.remove("cdrag");   /* first, so the spring back transitions */
+      row.style.transform="";
       if(ok){
-        setReply(row.dataset.nid);
-        var ta=document.getElementById("cin"); if(ta) ta.focus();
+        pick(row);
         if(navigator.vibrate) try{ navigator.vibrate(8); }catch(e){}
       }
     }
-    row=null; live=false; armed=false;
+    row=null; live=false; armed=false; dxl=0;
   }
-  w.addEventListener("touchstart",function(e){
+  function grab(t,x,y){
+    var r=t&&t.closest?t.closest(sel):null;
+    if(!r) return false;
+    row=r; x0=x; y0=y; dxl=0; live=true; armed=false;
+    return true;
+  }
+  host.addEventListener("touchstart",function(e){
     if(e.touches.length!==1) return;
-    var r=e.target.closest?e.target.closest(".cmsg[data-nid]"):null;
-    if(!r) return;
-    row=r; x0=e.touches[0].clientX; y0=e.touches[0].clientY; live=true; armed=false;
+    grab(e.target,e.touches[0].clientX,e.touches[0].clientY);
   },{passive:true});
-  w.addEventListener("touchmove",function(e){
+  host.addEventListener("touchmove",function(e){
     if(!live||!row) return;
-    var dx=e.touches[0].clientX-x0, dy=e.touches[0].clientY-y0;
-    if(!armed){
-      /* a vertical drag is the thread scrolling and is handed straight back,
-         for the rest of this gesture */
-      if(Math.abs(dy)>Math.abs(dx)||Math.abs(dy)>14){ live=false; row=null; return; }
-      if(dx<12) return;
-      armed=true; row.classList.add("cdrag");
-    }
+    if(!move(e.touches[0].clientX-x0,e.touches[0].clientY-y0)) return;
     e.preventDefault();          /* only now: the scroll was still the scroll */
-    row.style.transform="translateX("+Math.min(dx,72)+"px)";
   },{passive:false});
-  w.addEventListener("touchend",function(){
-    if(!row) return;
-    var m=/translateX\(([-\d.]+)px\)/.exec(row.style.transform||"");
-    end(armed && m && parseFloat(m[1])>=44);
-  });
-  w.addEventListener("touchcancel",function(){ end(false); });
+  host.addEventListener("touchend",function(){ if(row) end(armed && dxl>=SW_GO); });
+  host.addEventListener("touchcancel",function(){ end(false); });
   /* and a mouse, so this is reachable on the laptop and testable at all */
-  w.addEventListener("mousedown",function(e){
-    var r=e.target.closest?e.target.closest(".cmsg[data-nid]"):null;
-    if(!r||e.button!==0) return;
-    row=r; x0=e.clientX; y0=e.clientY; live=true; armed=false;
+  host.addEventListener("mousedown",function(e){
+    if(e.button!==0) return;
+    grab(e.target,e.clientX,e.clientY);
   });
   document.addEventListener("mousemove",function(e){
     if(!live||!row) return;
-    var dx=e.clientX-x0, dy=e.clientY-y0;
-    if(!armed){
-      if(Math.abs(dy)>Math.abs(dx)||Math.abs(dy)>14){ live=false; row=null; return; }
-      if(dx<12) return;
-      armed=true; row.classList.add("cdrag");
-    }
-    row.style.transform="translateX("+Math.min(dx,72)+"px)";
+    move(e.clientX-x0,e.clientY-y0);
   });
-  document.addEventListener("mouseup",function(e){
-    if(!row) return;
-    end(armed && (e.clientX-x0)>=44);
+  document.addEventListener("mouseup",function(){ if(row) end(armed && dxl>=SW_GO); });
+}
+(function(){
+  var w=document.getElementById("chatw");
+  swipeReply(w,".cmsg[data-nid]",function(r){
+    setReply(r.dataset.nid);
+    var ta=document.getElementById("cin"); if(ta) ta.focus();
   });
   /* a tap on a quote goes to what it quotes, the same jump the Notes drawer
      makes -- a quote you cannot follow is a screenshot */
@@ -3905,6 +4102,12 @@ function setReply(id){
     if(q){ e.stopPropagation(); gotoNote(q.dataset.nj); }
   });
   document.getElementById("crepX").addEventListener("click",function(){ setReply(null); });
+  var m=document.getElementById("mapw");
+  swipeReply(m,"[data-kb]",function(r){
+    setMapReply(r.dataset.kb);
+    var ta=document.getElementById("min"); if(ta) ta.focus();
+  });
+  document.getElementById("mrepX").addEventListener("click",function(){ setMapReply(null); });
 })();
 
 /* the thread is otherwise only repainted when something arrives, and a silent
@@ -4006,14 +4209,28 @@ function renderDrawer(keepDraft){
      ignore. Notes work here exactly as they do on any other task, which is
      the whole reason a NEWS item is a task rather than a new kind of object. */
   if(i.isNews){
-    if(!i.newsState&&!i.deleted){
+    if(newsAsk(i)){
+      /* The offer box is the whole offer while the offer is open: *"Since you
+         are already showing a message asking me to accept or reject, the
+         other action buttons are becoming redundant - remove that. Add the +2
+         days to your offer text box as well."* Done and Delete answered a
+         question he had not been asked yet -- marking an opportunity complete
+         before deciding whether it is his, and deleting one when Reject is
+         the word for that here. Pushing the date is the one of the three that
+         still means something, so it comes along into this box. */
       h+='<div class="dnews"><b>Found for you</b>'+
          '<div>Not on the INSEAD list. Claude put it here from a NEWS pass; '+
-         'accept it to keep it on your board and calendar, or reject it to drop it.</div>'+
+         'accept it to take it on, or reject it to drop it.</div>'+
          '<div class="row-b" style="margin-top:9px">'+
            '<button class="btn o" data-nacc="1">Accept</button>'+
-           '<button class="btn" data-nrej="1">Reject</button></div></div>';
+           '<button class="btn" data-nrej="1">Reject</button>'+
+           '<button class="btn" data-n2d="1">+2 days</button></div></div>';
     }else if(i.newsState==="accept"){
+      /* The box stays after he says yes -- *"but keep the \"Accepted you took
+         this on..\" box"* -- and it stops being a question: there is no path
+         back to Reject from here, because rejecting something he has taken on
+         is deleting a task, which the ordinary delete already does and says
+         so in those words. */
       h+='<div class="dnews on"><b>Accepted</b><div>You took this one on. It counts '+
          'like any other task from here.</div></div>';
     }else if(i.newsState==="reject"){
@@ -4050,7 +4267,7 @@ function renderDrawer(keepDraft){
      ... similar size as the close and note button but bright coloured"*. The
      full-width "Delete this task" at the foot is gone -- it was the loudest
      control on the card for the rarest action. */
-  if(!i.deleted) h+='<div class="qrow">'+
+  if(!i.deleted && !newsAsk(i)) h+='<div class="qrow">'+
     '<button class="qb ok" data-qdone="1" aria-label="Mark done" title="Mark done">'+
       '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg></button>'+
     '<button class="qb warn" data-q2d="1" aria-label="Push two days" title="Push two days"><b>+2d</b></button>'+
@@ -4485,7 +4702,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1225";
+var BUILD="2026-10-07-1340";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -4654,20 +4871,10 @@ document.addEventListener("click",function(e){
        by hand ends it, or the next repaint would undo what he just did */
     mapQ=""; renderMap(); return;
   }
-  /* "see also": jump to the related fact. Its group may be shut, so open it --
-     scrolling to a row that is not drawn lands nowhere. */
+  /* "see also", a quoted reply, and a row of the Overview News tile all come
+     through here and all go through gotoKb. */
   var kbg=t.closest("[data-kbg]");
-  if(kbg){
-    var tgt=kbg.dataset.kbg, n3=kbOf(tgt);
-    if(n3){
-      var top3=(n3.parent&&kbOf(n3.parent)&&!kbOf(n3.parent).deleted)?kbOf(n3.parent):n3;
-      mapOpen[mapGroup(top3)]=true;
-    }
-    mapQ=""; setView("map"); renderMap();
-    var el=document.querySelector('[data-kb="'+tgt+'"]');
-    if(el) el.scrollIntoView({block:"center"});
-    return;
-  }
+  if(kbg){ gotoKb(kbg.dataset.kbg); return; }
 
   /* The marker goes on the heading, never on the tile: `closest` walks up, so
      a tile carrying it would swallow every row tap inside it and open the
@@ -4749,7 +4956,7 @@ document.getElementById("dBody").addEventListener("click",function(e){
     var nt=document.getElementById("nt"); if(nt) nt.focus();
     return; }
   if(b.dataset.qdone){ var q=items[openId]; patch(openId,{status:"done",manual:true},"Closed: "+q.title); return; }
-  if(b.dataset.q2d){ snooze(openId,2); return; }
+  if(b.dataset.q2d||b.dataset.n2d){ snooze(openId,2); return; }
   /* Accept only records the decision: the task is already on the board with a
      real date, so there is nothing to create. Reject sets `deleted` in the
      same patch, which is how it leaves every view, and `manual` so the
@@ -4978,7 +5185,8 @@ function asks(t){
   var send=function(){
     var t=ta.value.trim(); if(!t) return;
     var q=asks(t);
-    addNote(null,t,true,true,q?"ask":"fact");
+    addNote(null,t,true,true,q?"ask":"fact",null,mapReplyTo);
+    setMapReply(null);
     if(q){ mapAns=t; mapQ=t; }
     /* a fact puts the whole list back: a filtered map is the answer to a
        question he is no longer asking */
@@ -5018,7 +5226,11 @@ Array.prototype.forEach.call(document.querySelectorAll(".vt"),function(b){
 var scrollAt={};
 function scroller(v){
   if(v==="chat") return document.getElementById("chatw");
-  if(v==="map")  return document.getElementById("mapw");
+  /* `.mapw` is the scroller, NOT `#mapw`: the id is on the `.mbox` inside it,
+     and `#v-map .mapw{overflow-y:auto}` is the rule that makes one of them
+     scroll. Reading the wrong one meant the map's remembered offset was
+     always 0 and a jump to a node could not move anything. */
+  if(v==="map")  return document.querySelector("#v-map .mapw");
   return document.getElementById("stage");
 }
 /* The one place a scroll is animated, so the two callers -- the section icon

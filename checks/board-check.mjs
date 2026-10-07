@@ -104,10 +104,17 @@ async function open(width, seed) {
     if (m.type() === "error" && !/WebSocket|Failed to load resource/.test(m.text())) errs.push(m.text());
   });
   p.on("pageerror", function (e) { errs.push(String(e)); });
+  /* An array is notes, the back-compatible form. An object seeds whatever it
+     names -- the map has no SEED to fall back on, so a check about the map's
+     shapes or about the Overview News tile cannot exercise anything without
+     putting nodes in storage first. */
   if (seed) await p.addInitScript(function (s) {
     if (!sessionStorage.getItem("seeded")) {
       sessionStorage.setItem("seeded", "1");
-      localStorage.setItem("mbacc_v3", JSON.stringify({ v: 3, notes: s, changed: [], touched: {} }));
+      var blob = Array.isArray(s) ? { notes: s } : s;
+      blob.v = 3; blob.notes = blob.notes || []; blob.changed = blob.changed || [];
+      blob.touched = blob.touched || {};
+      localStorage.setItem("mbacc_v3", JSON.stringify(blob));
     }
   }, seed);
   await p.goto(URL_, { waitUntil: "load" });
@@ -1282,7 +1289,8 @@ for (var tw26 of [390, 1280]) {
     function right(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().right):null; }
     var st=document.getElementById("stage");
     return { hero: top(".hero.a"), att: top(".att"),
-             tui: top(".hero.b"), pipe: top(".pipe"),
+             tui: top(".hero.b"), pipe: top(".pipe"), mst: top(".mstack"),
+             agd: top(".agd"), rcent: top(".rcent"), trk: top(".trk"),
              attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right) };
   });
   var st28 = await s28.p.evaluate(function () {
@@ -1297,8 +1305,16 @@ for (var tw26 of [390, 1280]) {
      st28 && /^build \d{4}-\d{2}-\d{2}/.test(st28.t) && st28.h > 0, JSON.stringify(st28));
   ok("Overview puts the deadline and Needs attention on one row at 1280",
      ov28.hero !== null && ov28.hero === ov28.att, JSON.stringify(ov28));
-  ok("and tuition shares its row with the critical path",
-     ov28.tui !== null && ov28.tui === ov28.pipe, JSON.stringify(ov28));
+  /* The pairing that always holds, whatever is on the board: News may be
+     absent (it draws only when the map has one), so tuition's own row is not
+     the thing to measure. */
+  ok("and the two rings share their row with the critical path",
+     ov28.mst !== null && ov28.mst === ov28.pipe, JSON.stringify(ov28));
+  /* and the order he asked for on 2026-10-07: the calendar, then what has
+     gone, then progress, all of it above tuition */
+  ok("the calendar and progress sit above tuition at 1280",
+     ov28.agd > ov28.hero && ov28.rcent > ov28.agd && ov28.trk > ov28.rcent &&
+     ov28.tui > ov28.trk, JSON.stringify(ov28));
   await s28.ctx.close();
 }
 
@@ -3182,7 +3198,12 @@ for (var nw of [390, 1280]) {
     var acc = card.querySelector("[data-nacc]"), rej = card.querySelector("[data-nrej]");
     var seen = { acc: !!acc, rej: !!rej,
                  accBox: acc ? acc.getBoundingClientRect().width : 0,
-                 notes: !!card.querySelector("[data-nadd],#nt") };
+                 notes: !!card.querySelector("[data-nadd],#nt"),
+                 /* the push came into the offer box and the three quick
+                    actions went out of it: Done and Delete were answering a
+                    question he had not been asked yet */
+                 n2d: !!card.querySelector("[data-n2d]"),
+                 quick: !!card.querySelector(".qrow") };
     /* the colour it draws in is its own, not a status colour */
     setView("time"); render();
     var row = document.querySelector('#gantt .grow[data-id="' + id + '"]');
@@ -3196,6 +3217,19 @@ for (var nw of [390, 1280]) {
     seen.accepted = items[id].newsState;
     seen.stillThere = !!alive().filter(function (i) { return i.id === id; }).length;
     seen.asked = !!document.querySelector("[data-nacc]");
+    /* once he has taken it on it is a task with every ordinary action, the
+       box stays to say he took it on, and there is no way back to Reject */
+    seen.accOn = !!document.querySelector("#dBody .dnews.on");
+    seen.accRej = !!document.querySelector("[data-nrej]");
+    seen.accQuick = !!document.querySelector("#dBody .qrow");
+    seen.accTitle = items[id].title;
+    setView("time"); render();
+    var r2 = document.querySelector('#gantt .grow[data-id="' + id + '"]');
+    seen.accNws = r2 ? r2.classList.contains("nws") : true;
+    seen.accInk = r2 ? getComputedStyle(r2.querySelector(".gt")).color : "";
+    seen.accBar = r2 ? (getComputedStyle(r2.querySelector(".gbar")).backgroundColor || "") : "";
+    seen.newsBar = NEWSC;
+    openItem(id);
     var two = alive().filter(function (i) { return i.isNews && i.id !== id; });
     seen.second = two.length > 0;
     if (two.length) {
@@ -3212,10 +3246,22 @@ for (var nw of [390, 1280]) {
   ok("its card offers Accept and Reject, and they are on screen",
      r46.acc && r46.rej && r46.accBox > 0, JSON.stringify(r46));
   ok("and it takes a note like any other task", r46.notes, JSON.stringify(r46));
+  ok("the offer box carries the push, and the quick actions wait for his answer",
+     r46.n2d && !r46.quick, JSON.stringify(r46));
   ok("it draws in its own colour, which the legend explains",
      r46.rowInk && r46.rowInk !== r46.plainInk && r46.legendNews, JSON.stringify(r46));
   ok("accepting records the answer and stops asking",
      r46.accepted === "accept" && r46.stillThere && !r46.asked, JSON.stringify(r46));
+  /* "it should not mark it complete - I am accepting that as a task. It
+     should convert to a task on all relevant sections with regular white
+     colour but still keep the [NEWS] tag." */
+  ok("an accepted item is an ordinary task, in ordinary colours, still tagged",
+     r46.accepted === "accept" && !r46.accNws &&
+     r46.accInk === r46.plainInk &&
+     r46.accBar.indexOf("224, 57, 155") < 0 &&
+     /^\[NEWS\] /.test(r46.accTitle || ""), JSON.stringify(r46));
+  ok("and it gets its ordinary actions back, with no way left to reject it",
+     r46.accQuick && !r46.accRej && r46.accOn, JSON.stringify(r46));
   ok("rejecting takes it off the board", r46.rejected === "reject" && r46.gone, JSON.stringify(r46));
   /* the half an in-memory assertion cannot see */
   await s46.p.reload({ waitUntil: "load" });
@@ -3268,6 +3314,45 @@ for (var nw of [390, 1280]) {
     var r = el.getBoundingClientRect();
     return { x: Math.round(r.left + 10), y: Math.round(r.top + r.height / 2) };
   });
+  /* "the box doesn't move smoothly ... It also currently drags too far - make
+     the box stop after a small drag." The travel was his thumb's travel until
+     it hit a wall at 72px. It is damped now, so a 20px drag moves less than
+     20px and a 200px drag still cannot pass SW_MAX. Read after a frame,
+     because the transform is written in requestAnimationFrame -- one write
+     per frame was the other half of "not smoothly". */
+  var damp = await s48.p.evaluate(async function (b) {
+    function t(type, x, y) {
+      var el = document.querySelector('.cmsg[data-nid="q1"]');
+      var tt = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [tt], changedTouches: [tt] }));
+    }
+    function tx() {
+      var m = getComputedStyle(document.querySelector('.cmsg[data-nid="q1"]')).transform;
+      var p = /matrix\(([^)]+)\)/.exec(m);
+      return p ? parseFloat(p[1].split(",")[4]) : 0;
+    }
+    t("touchstart", b.x, b.y);
+    t("touchmove", b.x + 20, b.y + 1);
+    await new Promise(function (r) { requestAnimationFrame(function () { r(); }); });
+    var near = tx();
+    t("touchmove", b.x + 200, b.y + 2);
+    await new Promise(function (r) { requestAnimationFrame(function () { r(); }); });
+    var far = tx();
+    t("touchcancel", b.x + 200, b.y + 2);
+    /* long enough for the spring back to finish: it is a .16s transition, so
+       one frame catches it mid-flight -- which is itself the proof that
+       letting go is animated rather than a jump */
+    await new Promise(function (r) { setTimeout(r, 280); });
+    return { near: near, far: far, max: SW_MAX, back: tx(),
+             armed: !document.getElementById("crep").classList.contains("off") };
+  }, box);
+  ok("the drag is damped rather than tracking the finger",
+     damp.near > 2 && damp.near < 19, JSON.stringify(damp));
+  ok("and it stops after a small drag however far he goes",
+     damp.far > damp.near && damp.far <= damp.max + 1, JSON.stringify(damp));
+  ok("a cancelled drag springs back and commits nothing",
+     Math.abs(damp.back) < 1 && !damp.armed, JSON.stringify(damp));
   /* first a vertical drag on the same bubble: it must NOT arm.
      Real Touch objects, not plain literals -- TouchEventInit refuses to
      convert one and the whole run dies on the constructor rather than on the
@@ -3377,6 +3462,165 @@ for (var nw of [390, 1280]) {
   ok("and every heading that opens a section has one", hd.noMore.length === 0, JSON.stringify(hd.noMore));
   ok("Recently completed says it his way", /tasks? completed$/.test(hd.rcent), hd.rcent);
   await s50.ctx.close();
+}
+
+var MAPSEED = { kb: [
+  { id: "kd1", group: "Deadlines", ord: 10, shape: "timeline", label: "Campus France dossier closes",
+    when: "20 Nov 2026", w: "2026-11-20", body: "The dossier has to be validated before the visa slot.",
+    at: "2026-10-07T01:00:00.000Z" },
+  { id: "kd2", group: "Deadlines", ord: 10, shape: "timeline", label: "Visa appointment window opens",
+    when: "02 Dec 2026", w: "2026-12-02", body: "Slots go in days once it opens.",
+    at: "2026-10-07T01:01:00.000Z" },
+  { id: "kc1", group: "Programme calendar", ord: 20, shape: "calendar", label: "P1",
+    when: "Jan - Mar 2027", w: "2027-01-04", body: "The first period, five courses and the launch week.",
+    rows: [{ t: "P1", a: "2027-01-04", b: "2027-03-12", k: "period" }],
+    at: "2026-10-07T01:02:00.000Z" },
+  { id: "kc2", group: "Programme calendar", ord: 20, shape: "calendar", label: "Break",
+    when: "Mar 2027", w: "2027-03-13", body: "Two weeks between P1 and P2.",
+    rows: [{ t: "Break", a: "2027-03-13", b: "2027-03-27", k: "break" }],
+    at: "2026-10-07T01:03:00.000Z" },
+  { id: "kn1", group: "NEWS: industry opportunities", ord: 25, shape: "cards",
+    label: "Amazon Pathways", when: "Rolling",
+    body: "A three-year operations leadership track, open to MBA students, with no fixed deadline.",
+    at: "2026-10-07T05:00:00.000Z" },
+  { id: "kn2", group: "NEWS: industry opportunities", ord: 25, shape: "cards",
+    label: "BCG Unlock", when: "May 2027",
+    body: "The pre-MBA programme for incoming students, which runs over the northern summer.",
+    at: "2026-10-07T04:00:00.000Z" },
+  { id: "kl1", group: "Platforms and tools", ord: 30, shape: "list", label: "VMock",
+    body: "Scores a CV against the school's own rubric and says what to fix.",
+    at: "2026-10-07T01:04:00.000Z" }
+] };
+
+/* ---- 51. every group on the map draws its nodes as blocks ----
+   "Some mindmap sections don't use blocks and some do. Use blocks for all
+   sections including deadlines and programme calendar. I understand it's
+   because there are images/infographics but keep them without and outside
+   the boxes. The line in deadlines for example - can be outside and each
+   deadline in its own box." Two of the four shapes drew cards and two drew
+   rows separated by a hairline, so the same kind of thing looked like two
+   kinds of thing depending on which group it had been filed under. */
+{
+  var s51 = await open(390, MAPSEED);
+  var r51 = await s51.p.evaluate(function () {
+    setView("map");
+    /* open every group: a shut one draws no nodes at all */
+    mapGroups().forEach(function (g) { mapOpen[g.name] = true; });
+    renderMap();
+    var flat = [], groups = {};
+    Array.prototype.forEach.call(
+      document.querySelectorAll("#mapw .mn, #mapw .mtli, #mapw .mcard"), function (n) {
+        var c = getComputedStyle(n), g = n.closest(".mroot").querySelector(".mrt").textContent;
+        groups[g] = (groups[g] || 0) + 1;
+        if (parseFloat(c.borderTopWidth) < 0.5 || parseFloat(c.borderRadius) < 2 ||
+            /transparent|rgba\(0, 0, 0, 0\)/.test(c.backgroundColor))
+          flat.push(g + ": " + (n.querySelector(".mnl") || {}).textContent);
+      });
+    /* the rail's dot and the month chart are the infographics, and both have
+       to be OUTSIDE the box they describe */
+    var tli = document.querySelector("#mapw .mtli");
+    var dot = tli ? tli.querySelector("i") : null;
+    var cal = document.querySelector("#mapw .mcal");
+    return { flat: flat, groups: groups, nodes: Object.keys(groups).length,
+             dotOut: !!(dot && tli &&
+               dot.getBoundingClientRect().left < tli.getBoundingClientRect().left - 1),
+             rail: !!document.querySelector("#mapw .mtl"),
+             calOut: !!(cal && !cal.closest(".mn") && !cal.closest(".mcard") && !cal.closest(".mtli")) };
+  });
+  ok("every shape on the map draws its nodes in blocks", r51.flat.length === 0, JSON.stringify(r51));
+  ok("and all four groups seeded drew some", r51.nodes === 4, JSON.stringify(r51.groups));
+  ok("the deadline rail runs outside the boxes it marks",
+     r51.rail && r51.dotOut, JSON.stringify(r51));
+  ok("and the month chart sits outside them too", r51.calOut, JSON.stringify(r51));
+
+  /* "Add a similar swipe to reply function on the mindmap section." Same
+     gesture, same arming rules; what it quotes is a fact, so the note carries
+     `rek` and the bubble taps back to the node. */
+  var sw51 = await s51.p.evaluate(async function () {
+    function t(type, x, y) {
+      var el = document.querySelector('[data-kb="kl1"]');
+      var tt = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+        touches: type === "touchend" ? [] : [tt], changedTouches: [tt] }));
+    }
+    var r = document.querySelector('[data-kb="kl1"]').getBoundingClientRect();
+    var x = Math.round(r.left + 8), y = Math.round(r.top + r.height / 2);
+    /* a vertical drag is the map scrolling */
+    t("touchstart", x, y); t("touchmove", x + 4, y - 40); t("touchend", x + 4, y - 40);
+    var vert = !document.getElementById("mrep").classList.contains("off");
+    t("touchstart", x, y); t("touchmove", x + 20, y + 2);
+    t("touchmove", x + 60, y + 3); t("touchend", x + 60, y + 3);
+    await new Promise(function (f) { setTimeout(f, 60); });
+    var strip = document.getElementById("mrep");
+    var seen = { vert: vert, open: !strip.classList.contains("off"),
+                 who: document.getElementById("mrepW").textContent,
+                 quoted: document.getElementById("mrepT").textContent,
+                 to: mapReplyTo };
+    var ta = document.getElementById("min");
+    ta.value = "and what does it cost"; ta.dispatchEvent(new Event("input"));
+    document.getElementById("msend").click();
+    var n = notes.filter(function (z) { return z.text === "and what does it cost"; })[0];
+    seen.rek = n && n.rek;
+    seen.cleared = document.getElementById("mrep").classList.contains("off");
+    setView("chat"); renderChat();
+    var q = document.querySelector('.cmsg[data-nid="' + (n ? n.id : "") + '"] .cq');
+    seen.quote = !!q; seen.back = q ? q.dataset.kbg : "";
+    return seen;
+  });
+  ok("a vertical drag on a map node is the map scrolling, not a reply",
+     !sw51.vert, JSON.stringify(sw51));
+  ok("swiping a map node right opens the reply strip on that fact",
+     sw51.open && sw51.to === "kl1" && sw51.who === "Map" &&
+     sw51.quoted.length > 0 && sw51.quoted.length <= 81, JSON.stringify(sw51));
+  ok("the note carries the fact it answers, and the bubble taps back to it",
+     sw51.rek === "kl1" && sw51.quote && sw51.back === "kl1" && sw51.cleared,
+     JSON.stringify(sw51));
+  ok("no console error through the map gesture", s51.errs.length === 0, s51.errs.join(" | "));
+  await s51.ctx.close();
+}
+
+/* ---- 52. News on Overview, and the jump into the map ----
+   "Add a news section to overview above the tuition card. Don't add all news
+   - just recent few with a small description and date (if applicable).
+   Clicking on the news should take me to the relevant mindmap note in the
+   same scroll and briefly highlight/animate box format." */
+{
+  var s52 = await open(390, MAPSEED);
+  var r52 = await s52.p.evaluate(function () {
+    setView("over"); render();
+    function top(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().top):null; }
+    var tile = document.querySelector(".nwst");
+    var rows = tile ? tile.querySelectorAll(".nwrow") : [];
+    return { tile: !!tile, rows: rows.length,
+             w: tile ? Math.round(tile.getBoundingClientRect().width) : 0,
+             stage: Math.round(document.getElementById("stage").clientWidth),
+             desc: !!(rows[0] && rows[0].querySelector("small")),
+             when: !!(rows[0] && rows[0].querySelector(".nwd")),
+             /* newest first, by the clock each node carries */
+             first: rows[0] ? rows[0].dataset.kbg : "",
+             nwst: top(".nwst"), tui: top(".hero.b"), trk: top(".trk") };
+  });
+  ok("Overview carries a News tile, and it is a tile and not a ribbon",
+     r52.tile && r52.w > r52.stage * 0.8, JSON.stringify(r52));
+  ok("it shows a few, newest first, each with its line and its date",
+     r52.rows > 0 && r52.rows <= 4 && r52.desc && r52.when && r52.first === "kn1",
+     JSON.stringify(r52));
+  ok("and it sits above tuition, under progress",
+     r52.nwst > r52.trk && r52.tui > r52.nwst, JSON.stringify(r52));
+  var jump = await s52.p.evaluate(async function () {
+    document.querySelector(".nwrow").click();
+    await new Promise(function (r) { setTimeout(r, 700); });
+    var sc = scroller("map"), el = document.querySelector('[data-kb="kn1"]');
+    var r = el ? el.getBoundingClientRect() : null, sr = sc.getBoundingClientRect();
+    return { view: view, drawn: !!el,
+             /* on screen inside the map's own scroller, not merely in the DOM */
+             seen: !!(r && r.top >= sr.top - 1 && r.bottom <= sr.bottom + 1),
+             flash: !!(el && el.classList.contains("mflash")) };
+  });
+  ok("tapping a News row opens that fact on the map and marks it",
+     jump.view === "map" && jump.drawn && jump.seen && jump.flash, JSON.stringify(jump));
+  ok("no console error through the jump", s52.errs.length === 0, s52.errs.join(" | "));
+  await s52.ctx.close();
 }
 
 /* ---- 15. the build stamp moved with the page ---- */

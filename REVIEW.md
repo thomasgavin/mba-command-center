@@ -13,7 +13,7 @@ cover, add the invariant to the check script in the same PR — the fix and the
 thing that stops it coming back are one change, not two.
 
 ```sh
-node checks/board-check.mjs          # 398 checks, three widths, a real browser
+node checks/board-check.mjs          # 418 checks, three widths, a real browser
 node checks/relay-history-check.mjs  # 17 checks on the relay's audit log
 node checks/relay-push-check.mjs     # 21 checks on VAPID and Web Push
 ```
@@ -377,6 +377,53 @@ one taking it, so "17 done so far" floated in the middle of its own heading.
 The check measures every heading's subtitle against the heading's right edge,
 and fails any `data-vgo` heading that has no subtitle at all -- that one would
 put the chevron against the title.
+
+### Accepting a NEWS item makes it a plain task, and closes the question
+
+Accepting is not completing: *"I am accepting that as a task."* `newsAsk()` is
+the one predicate behind the magenta, every `.nws` class and the card, so the
+moment he accepts it draws in its ordinary status colour on every view, keeps
+its `[NEWS]` title, gets the three quick actions back, and offers no path to
+Reject. While the question is open the offer box is the only thing asking: the
+quick actions are suppressed and the push lives in the box. The check reads the
+row's ink and its bar in the Timeline, not the rule that paints them.
+
+### A swipe is damped, capped, and written once a frame
+
+The travel is an asymptote on `SW_MAX`, so a 20px drag moves less than 20px and
+a 200px drag cannot pass it; the commit threshold is read off the finger, never
+off the transform. The transform is written in `requestAnimationFrame`, one per
+frame. `swipeReply()` is the single implementation and the map uses it, so the
+two views cannot drift apart in how the gesture feels.
+
+### An event row lines up with the task rows it sits between
+
+`.gerow` borrows `.grow`'s box exactly -- same padding, same gap, and a dot in
+the tick's 19px footprint. Four small disagreements about those numbers put
+every event title at a different left edge, which reads as a different font
+size. It carries a priority chip, written with the event rather than derived.
+
+### Every group on the map draws its nodes as blocks
+
+`list`, `timeline`, `cards` and `calendar` all box their nodes; the rail's dot
+and the month chart stay outside the box they describe. The check opens every
+group and measures each node's border, radius and background, then asserts the
+dot is left of its box and the chart has no node as an ancestor.
+
+### Overview's order, and the one tile that may not exist
+
+The calendar, Recently completed, progress by track and News all sit above
+tuition, in that order. The desktop rows are explicit, so moving a tile in
+`renderOverview` without moving it in the `min-width:1181px` block changes the
+phone and leaves the laptop alone. News draws only when the map has a NEWS
+group, so it is paired with tuition rather than given a row to leave empty, and
+the pairing the check measures is one that always holds.
+
+### A jump to a fact opens its group, centres it and marks it
+
+`gotoKb()` is the only way in, from "see also", from a quoted reply and from a
+News row alike. The map's scroller is `#v-map .mapw`, not `#mapw`. The check
+asserts the node is inside the scroller's viewport, not merely in the DOM.
 
 ### Every check in this file actually runs
 A section added after `process.exit` is a rule nobody enforces and nobody can

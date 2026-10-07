@@ -207,6 +207,23 @@ Two gestures from every messaging app he already uses, added 2026-10-07.
   vertical: nothing arms until the pointer has moved 12px *and* further across
   than down, and `preventDefault` is not called until it has decided, so the
   thread scrolls normally while it is still making up its mind.
+  **The travel is damped and the write is batched.** *"the box doesn't move
+  smoothly ... It also currently drags too far - make the box stop after a
+  small drag."* Both halves were in `translateX(Math.min(dx,72)px)`: the
+  travel was his thumb's travel until it hit a wall, which is a long way for
+  a gesture whose whole message is "this one", and the clamp arrived as a
+  stop rather than as a slowing down. `swTravel` is an asymptote on `SW_MAX`
+  (40px) instead -- roughly 1:1 at the start so the bubble answers the
+  finger, then giving less and less -- and the commit threshold is read off
+  the **finger** (`SW_GO`), because the transform no longer reaches it. The
+  other half of "not smoothly" was writing a transform on every `touchmove`,
+  three or four style writes a frame each invalidating the last; it is one
+  write per frame through `requestAnimationFrame` now.
+  **`swipeReply()` is the one implementation**, and the map uses it too:
+  *"Add a similar swipe to reply function on the mindmap section."* What it
+  quotes there is a fact rather than a message, so the note carries
+  `rek:<nodeId>`, the strip says "Map", and the quote in the bubble taps back
+  to the node through `gotoKb`. Like `re`, it needed no `DFIELDS` entry.
   The reply carries `re:<noteId>`. **That needed no merge rule and no
   `DFIELDS` entry**: a note travels whole and merges by id, so a field added
   to one reaches his other device by existing. The quote draws inside the
@@ -665,6 +682,25 @@ on; it answered a question nobody was asking twice a day. The `deps` data stays
   - **`list`** is the default, and **an unrecognised shape falls back to it**,
     so a future Claude can file a node under a shape this build has not learned
     without breaking the view.
+- **Every node is a block, in every shape, and the infographics stay outside
+  them.** *"Some mindmap sections don't use blocks and some do. Use blocks for
+  all sections including deadlines and programme calendar. I understand it's
+  because there are images/infographics but keep them without and outside the
+  boxes. The line in deadlines for example - can be outside and each deadline
+  in its own box."* `cards` drew boxes and `list` and `timeline` drew rows
+  separated by a hairline, so the same kind of thing looked like two kinds of
+  thing depending on which group it had been filed under. `.mn`, `.mtli` and
+  `.mcard` all carry the box now; the rail's dot is positioned clear of it and
+  the month chart is a block of its own above the rows, which is the only part
+  of this that needed care.
+- **`gotoKb()` is the one way into a fact**, the way `gotoNote()` is the one
+  way into a message. The "see also" link, a quoted reply in Chat and a row of
+  Overview's News tile all go through it: open the group (scrolling to a row
+  that is not drawn lands nowhere), `glide` the map's scroller so the node is
+  centred, and flash it for 1.7s. The scroller is **`#v-map .mapw`, not
+  `#mapw`** -- the id is on the `.mbox` inside it and the class is what carries
+  `overflow-y:auto`, so reading the id meant the map's remembered offset was
+  always 0 and a jump could not move anything.
 - **A row has no twisty at all, and every group starts collapsed.** The title
   carries the date (`when` to read, `w` the ISO key it sorts by, because
   "04 Dec" sorts above "05 Nov" on its own) and the body is on screen as soon
@@ -950,6 +986,27 @@ answering more than "what is due".
   chevron follows it at a fixed gap, which is also why **every `data-vgo`
   heading carries a `.more`** -- one without it would leave the chevron
   against the title. The wording is his: "17 tasks completed".
+- **The order is the calendar, what has gone, progress, News, then tuition.**
+  *"Also move the on the calendar, progress by tasks before the tuition card
+  in that order."* Recently completed travels with the agenda rather than
+  staying behind it, because sitting directly under it is what he asked for in
+  the first place. The desktop placement had to move with the markup: those
+  rows are explicit, so reordering the tiles in `renderOverview` alone would
+  have changed the phone and left the laptop exactly as it was.
+- **News on the first screen reads the map, not the `nw:true` tasks.** *"Add a
+  news section to overview above the tuition card. Don't add all news - just
+  recent few with a small description and date (if applicable). Clicking on the
+  news should take me to the relevant mindmap note in the same scroll and
+  briefly highlight/animate box format."* A NEWS task is one he is meant to do
+  something about and already has a date, a drawer and a place in Needs
+  attention; what this answers is the other thing a NEWS pass produces --
+  what Claude found out there -- which lives as facts in the map's NEWS group.
+  So the row goes to the fact through `gotoKb` rather than opening a task card
+  that does not exist, and `newsNodes()` matches the group **by name**, because
+  a flag on the node would be a second place the same fact is recorded. Four,
+  newest first by the clock each node carries. It is the one tile here that may
+  not exist at all, which is why the desktop layout pairs it with tuition
+  rather than giving it a row to leave empty.
 - **A tile heading opens the section it is about.** *"the progress by task
   header should be clickable and should open the board section. Similar, on
   the calendar should open the calendar."* `data-vgo` goes on the **heading,
@@ -1101,6 +1158,23 @@ note thread and a clock. What `nw:true` adds is presentation and one question.
   re-asked every time he opens the card is one he learns to ignore. Rejecting
   sets `deleted` in the same patch, so it leaves every view by the path a
   deletion already takes and is still recoverable from Timeline.
+- **Accepting does not close it, and after it there is nothing left to answer.**
+  *"When I accept a News from your pop-up message, it should not mark it
+  complete - I am accepting that as a task."* So the magenta is the question
+  rather than the item: `newsAsk()` is the one predicate behind the colour,
+  every `.nws` class and the card, and the moment he accepts it draws in its
+  ordinary status colour on every view, with the `[NEWS]` prefix left on the
+  title as the half that still says where it came from. The `.dnews.on` box
+  stays, because he asked for it to -- and it offers no Reject: rejecting
+  something he has taken on is deleting a task, which the ordinary delete
+  already does and says in those words.
+- **While the question is open, the offer box is the only thing asking.** The
+  three quick actions are suppressed and the push comes into the box instead:
+  *"Since you are already showing a message asking me to accept or reject, the
+  other action buttons are becoming redundant - remove that. Add the +2 days
+  to your offer text box as well."* Done marked an opportunity complete before
+  he had decided whether it was his, and Delete was Reject under another name.
+  Both come back the moment he accepts.
 - **`newsState` is in `DFIELDS` and in `diffOf`**, like every other field: in
   one and not the other fails silently and completely, which is the `deleted`
   bug. The check for it reloads the page.
@@ -1296,6 +1370,18 @@ never be a tab apart again.
   (#3264ff) on purpose: a bar in that exact blue already means In progress,
   and two meanings for one colour on one view is the drift the legend exists
   to prevent.
+- **An event row's geometry is the task row's geometry, to the pixel.** *"The
+  webinar items are not aligned and the text seems to be a different size."*
+  It had its own padding (`5px 8px 5px 6px` against `6px 10px`), its own gap
+  (7 against 8) and a dot 18px wide where the tick is 19 -- four small
+  disagreements that put every event title at a different left edge from the
+  task titles above and below it, which is what reads as a different size at
+  12px. The dot occupies the tick's 19px footprint and draws 9 of it.
+  It **carries a priority chip** too: *"add the same priority/importance
+  bubble under based on context."* Nothing about an event is his to do, so the
+  chip is not a property he set -- it is how much it matters that he is in the
+  room, which is a judgement written with the event (`p` on `EVENTS`) and
+  never derived from its date.
 - **An event row is `.gerow`, not `.grow`.** `.grow` means "a task row" and
   the checks count it against `pool()`, so an event wearing it made the view
   claim four tasks that are not tasks. It borrows the geometry and none of the
@@ -1807,7 +1893,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 359 invariants, three widths, a real browser. Every one of them was a
+that runs: 418 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
