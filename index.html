@@ -527,6 +527,41 @@ body::before{
 .bstamp{grid-column:1/-1;text-align:center;font-size:10.5px;font-weight:600;
   letter-spacing:.04em;color:var(--ink4);opacity:.6;padding:4px 0 2px}
 .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;grid-auto-rows:minmax(92px,auto)}
+/* ---------- arranging Overview ----------
+   *"Make the entire overview section drag-and-drop customizable. Exactly like
+   apple home screen customization which is trigger by long pressing a block.
+   I should also be able to delete blocks."* Long press anything on the view,
+   everything wobbles, blocks drag into any order and each carries a cross.
+   The wobble is the whole affordance: it says the tap that opened a task a
+   second ago now means something else, which is the one thing a mode has to
+   say about itself. */
+@keyframes wig{from{transform:rotate(-.42deg)}to{transform:rotate(.42deg)}}
+.bento.wig>[data-ov]{animation:wig .34s ease-in-out infinite alternate;
+  position:relative;   /* .mstack is not a .tile and has no position of its own */
+  touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+/* alternating the delay is what stops nine blocks reading as one sheet of
+   paper rocking together */
+.bento.wig>[data-ov]:nth-child(even){animation-delay:.17s}
+.bento.wig>[data-ov].ovdrag{animation:none;cursor:grabbing;opacity:.92;
+  box-shadow:0 10px 30px -8px rgba(40,10,56,.45);z-index:9}
+/* `.tile` is overflow:hidden, so the cross sits inside its corner rather than
+   hanging off it the way iOS does -- a badge on the corner would be clipped
+   away and look like a button that does not exist */
+.ovx{display:none;position:absolute;left:8px;top:8px;width:25px;height:25px;
+  border-radius:50%;border:none;background:var(--ink);color:var(--page);
+  font-size:16px;line-height:1;z-index:6;place-items:center;cursor:pointer;
+  box-shadow:0 2px 8px rgba(40,10,56,.35)}
+.bento.wig .ovx{display:grid}
+/* the bar is the way out, and the only place a removed block can come back
+   from -- a delete with no visible undo is a delete he will not risk */
+.ovbar{grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 12px;border:1px dashed var(--line2);border-radius:var(--r2);
+  background:var(--wash)}
+.ovbar b{font-size:12.5px;color:var(--ink2);margin-right:2px}
+.ovbar .sp{flex:1 1 auto}
+.ovchip{border:1px solid var(--line);background:var(--panel);color:var(--ink2);
+  border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+.ovchip:before{content:"+ ";color:var(--orange);font-weight:700}
 .tile{
   min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
   padding:16px 17px;box-shadow:var(--sh);position:relative;overflow:hidden;
@@ -1643,6 +1678,14 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
   /* what has gone runs the full width at the foot, under the sequences and
      above the milestones */
   .rcent{grid-column:1/13;grid-row:8;align-self:start}
+  /* Once he has arranged the view himself the hand-placed rows above are off.
+     They name specific tiles in specific rows, so they cannot survive a
+     reorder -- a tile moved in the markup would stay exactly where its rule
+     put it and the drag would look like it did nothing. `!important` is the
+     honest way to say "this overrides all of the above" rather than restating
+     thirteen selectors. */
+  .bento.cust>[data-ov]{grid-column:span 6 !important;grid-row:auto !important;
+    align-self:start !important}
 }
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
@@ -2784,7 +2827,7 @@ function renderMiles(){
   var nextUp=null;
   rows.forEach(function(r){ if(!nextUp && !r.st.done && r.st.due) nextUp=r; });
   var done=rows.filter(function(r){return r.st.done;}).length;
-  return '<div class="tile miles"><h3><span class="pin" style="background:#b066ff"></span>Milestones'+
+  return '<div class="tile miles" data-ov="miles"><h3><span class="pin" style="background:#b066ff"></span>Milestones'+
     '<span class="more">'+done+' of '+rows.length+' reached</span></h3>'+
     '<div class="mline">'+rows.map(function(r){
       var st=r.st, cls=st.done?"done":(r===nextUp?"now":(st.going?"going":""));
@@ -2805,7 +2848,7 @@ function renderVisa(){
   var nx=null; steps.forEach(function(i){ if(!nx && i.status!=="done") nx=i; });
   var outcome=null;
   MILES.forEach(function(m){ if(m.t==="Visa in hand") outcome=m; });
-  return '<div class="tile seqt"><h3><span class="pin" style="background:'+tc("visa")+'"></span>Student visa'+
+  return '<div class="tile seqt" data-ov="visa"><h3><span class="pin" style="background:'+tc("visa")+'"></span>Student visa'+
     '<span class="more">'+done+' of '+steps.length+' steps</span></h3>'+
     '<div class="steps">'+steps.map(function(i){
       var cls=i.status==="done"?"done":(i===nx?"now":"");
@@ -2824,7 +2867,7 @@ function renderHousing(){
   var a=D(HOUSING.from), b=D(HOUSING.to), e=D(HOUSING.end);
   var covered=Math.round((b-a)/(e-a)*100);
   var months=Math.round((e-b)/(30.4*86400000));
-  return '<div class="tile seqt"><h3><span class="pin" style="background:'+tc("move")+'"></span>Accommodation'+
+  return '<div class="tile seqt" data-ov="housing"><h3><span class="pin" style="background:'+tc("move")+'"></span>Accommodation'+
     '<span class="more">'+covered+'% of the programme covered</span></h3>'+
     '<div class="cbar"><i class="ok" style="width:'+covered+'%"></i><i class="gap" style="width:'+(100-covered)+'%"></i></div>'+
     '<div class="steps tight">'+
@@ -2857,7 +2900,7 @@ function renderOverview(){
        and the whole tile opens the task, which is what the Open button did;
        Push and Mark done are two taps away in the card that opens. Tuition
        keeps its buttons: he said that one is fine. */
-    h+='<div class="tile hero a" data-go="'+next.id+'">'+
+    h+='<div class="tile hero a" data-ov="deadline" data-go="'+next.id+'">'+
        '<h3><span class="pin" style="background:#fff"></span>Next deadline</h3>'+
        '<div class="hcd">'+cTxt(n)+'</div>'+
        '<div class="sub">'+esc(next.title)+'</div>'+
@@ -2871,7 +2914,7 @@ function renderOverview(){
      not the thing to read first. renderMiles() is appended last, below. */
   /* needs attention */
   var att=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n<=10; }).slice(0,7);
-  h+='<div class="tile att"><h3><span class="pin" style="background:#e0263c"></span>Needs attention<span class="more">next 10 days</span></h3>';
+  h+='<div class="tile att" data-ov="attention"><h3><span class="pin" style="background:#e0263c"></span>Needs attention<span class="more">next 10 days</span></h3>';
   h+= att.length? att.map(function(i){
         var n=dleft(i.due);
         return '<div class="arow" data-go="'+i.id+'"><span class="abar" style="background:'+tc(i.track)+'"></span>'+
@@ -2883,7 +2926,7 @@ function renderOverview(){
 
   /* agenda */
   var ag=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n>=-30&&n<=21; }).slice(0,9);
-  h+='<div class="tile agd"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
+  h+='<div class="tile agd" data-ov="agenda"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(shift(iso(todayD()),21))+'</span></h3>';
   h+= ag.length? ag.map(function(i){
         var d=D(i.due), n=dleft(i.due);
         /* the countdown goes under the date rather than out at the right
@@ -2919,7 +2962,7 @@ function renderOverview(){
      the foot of the view: *"Move the recently completed box in overview to
      the bottom just above milestones."* What has gone is the one tile on this
      screen that answers nothing about today. */
-  var rcH='<div class="tile rcent"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
+  var rcH='<div class="tile rcent" data-ov="done"><h3 data-vgo="time"><span class="pin" style="background:#00a98f"></span>Recently completed<span class="more">'+finished.length+' task'+(finished.length===1?"":"s")+' completed</span></h3>';
   rcH+= rc.length? rc.map(function(i){
         var when=i.doneAt?fmtD(i.doneAt):null;
         return '<div class="rcrow" data-go="'+i.id+'">'+
@@ -2935,7 +2978,7 @@ function renderOverview(){
      task header should be clickable and should open the board section.
      Similar, on the calendar should open the calendar." A tile that
      summarises a view and does not reach it makes him go and find the tab. */
-  h+='<div class="tile trk"><h3 data-vgo="board"><span class="pin" style="background:#00a98f"></span>Progress by track<span class="more">'+alive().filter(function(i){return i.status==="done";}).length+' of '+alive().length+' done</span></h3><div class="tbars">';
+  h+='<div class="tile trk" data-ov="tracks"><h3 data-vgo="board"><span class="pin" style="background:#00a98f"></span>Progress by track<span class="more">'+alive().filter(function(i){return i.status==="done";}).length+' of '+alive().length+' done</span></h3><div class="tbars">';
   TORDER.forEach(function(k){
     var ti=alive().filter(function(i){return i.track===k;});
     if(!ti.length) return;
@@ -2962,7 +3005,7 @@ function renderOverview(){
      node carries. */
   var nwn=newsNodes();
   if(nwn.length){
-    h+='<div class="tile nwst"><h3 data-vgo="map"><span class="pin" style="background:'+NEWSC+'"></span>'+
+    h+='<div class="tile nwst" data-ov="news"><h3 data-vgo="map"><span class="pin" style="background:'+NEWSC+'"></span>'+
        'News<span class="more">'+nwn.length+' found for you</span></h3>';
     h+=nwn.slice(0,4).map(function(n){
       return '<div class="nwrow" data-kbg="'+esc(n.id)+'">'+
@@ -2985,7 +3028,7 @@ function renderOverview(){
     if(tot2>max) max=tot2;
     weeks.push({a:a,b:bucket,n:tot2});
   }
-  h+='<div class="tile load"><h3><span class="pin" style="background:#14b5f0"></span>Workload by week<span class="more">open items falling due, coloured by track</span></h3><div class="lchart">';
+  h+='<div class="tile load" data-ov="workload"><h3><span class="pin" style="background:#14b5f0"></span>Workload by week<span class="more">open items falling due, coloured by track</span></h3><div class="lchart">';
   weeks.forEach(function(w,ix){
     h+='<div class="lcol '+(ix===0?"nowk":"")+'"><div class="lstack">';
     TORDER.forEach(function(k){ if(w.b[k]) h+='<i style="height:'+(w.b[k]/max*100)+'%;background:'+tc(k)+'" title="'+w.b[k]+' '+esc(tl(k))+'"></i>'; });
@@ -3002,7 +3045,7 @@ function renderOverview(){
   var oDone=tOct.status==="done", aDone=tApr.status==="done", dDone=tDep.status==="done";
   var paid=(dDone?MONEY.paid:0)+(oDone?MONEY.next:0)+(aDone?MONEY.last:0);
   var paidPct=paid/MONEY.total, nextPct=(oDone?0:MONEY.next/MONEY.total);
-  h+='<div class="tile hero b">'+
+  h+='<div class="tile hero b" data-ov="tuition">'+
      '<h3><span class="pin" style="background:#ff8f4e"></span>Tuition</h3>'+
      '<div class="big">'+eur(MONEY.total-paid).replace("€",'<sup style="margin:0 3px 0 0">€</sup>')+'</div>'+
      '<div class="met">still to pay of '+eur(MONEY.total)+' &middot; approx. ₹'+Math.round(MONEY.total*MONEY.rate/100000)+'L at '+MONEY.rate+'</div>'+
@@ -3024,7 +3067,7 @@ function renderOverview(){
   var dMove=dleft(moveD), admit=D("2026-06-25"), mv=D(moveD);
   var elapsed=(todayD()-admit)/(mv-admit);
   var done=alive().filter(function(i){return i.status==="done";}).length, tot=alive().length;
-  h+='<div class="mstack">'+
+  h+='<div class="mstack" data-ov="rings">'+
      '<div class="tile">'+ring(elapsed,"#b066ff",dMove)+
        '<div class="mx"><div class="v">'+dMove+' days</div><div class="k">to Fontainebleau<br>'+fmtD(moveD)+'</div></div></div>'+
      '<div class="tile">'+ring(done/tot,"#00a98f",Math.round(done/tot*100)+"%")+
@@ -3036,7 +3079,7 @@ function renderOverview(){
   h+=renderHousing();
 
   /* critical path */
-  h+='<div class="tile pipe"><h3><span class="pin" style="background:#3264ff"></span>Critical path to the start line<span class="more">money, then visa, then move</span></h3><div class="chain" id="chain">';
+  h+='<div class="tile pipe" data-ov="path"><h3><span class="pin" style="background:#3264ff"></span>Critical path to the start line<span class="more">money, then visa, then move</span></h3><div class="chain" id="chain">';
   CHAIN.forEach(function(id,ix){
     var i=items[id]; if(!i) return;
     var n=dleft(i.due);
@@ -3066,8 +3109,161 @@ function renderOverview(){
      carried over by hand: see fitChain() */
   var keep=(document.getElementById("chain")||{}).scrollLeft||0;
   document.getElementById("bento").innerHTML=h;
+  /* His arrangement is applied to the finished markup rather than woven
+     through the builder: every block here is a paragraph of reasoning about
+     what it draws, and threading an order through all of them would have put
+     the layout in thirteen places instead of one. */
+  ovApply();
   fitChain(keep);
 }
+
+/* ===========================================================
+   ARRANGING OVERVIEW
+   ===========================================================
+   The order and what is hidden live under their own localStorage key, like
+   the theme and unlike anything in the board blob. A layout is read on the
+   screen it was arranged on -- a phone is one column and a laptop is two --
+   and putting it in the blob would mean a fifth whole-blob field with its own
+   merge rule, for a preference neither device can be wrong about. */
+var OVKEY="mbacc_ov";
+var ovOrder=[], ovHide=[], ovEdit=false;
+/* The names he reads when a block is in the bar waiting to be put back. A
+   key with no name here still works; it just shows its key, which is the
+   right failure for a block added later and not yet named. */
+var OVNAME={deadline:"Next deadline",attention:"Needs attention",agenda:"On the calendar",
+  tracks:"Progress by track",news:"News",workload:"Workload by week",tuition:"Tuition",
+  rings:"Days and tasks",visa:"Student visa",housing:"Accommodation",
+  path:"Critical path",done:"Recently completed",miles:"Milestones"};
+function ovLoad(){
+  try{
+    var o=JSON.parse(localStorage.getItem(OVKEY)||"{}");
+    ovOrder=Array.isArray(o.order)?o.order:[];
+    ovHide=Array.isArray(o.hide)?o.hide:[];
+  }catch(e){ ovOrder=[]; ovHide=[]; }
+}
+function ovSave(){
+  try{ localStorage.setItem(OVKEY,JSON.stringify({order:ovOrder,hide:ovHide})); }catch(e){}
+}
+/* Lay his order over whatever the builder produced. A key he has never seen
+   -- a block added in a later version -- is NOT dropped and is not pushed to
+   the end either: it stays where the builder put it relative to the blocks
+   around it, so a new tile arrives in the place it was designed for rather
+   than under the fold. */
+function ovApply(){
+  var b=document.getElementById("bento"); if(!b) return;
+  var nat=[], node={};
+  Array.prototype.forEach.call(b.children,function(e){
+    if(e.dataset&&e.dataset.ov){ nat.push(e.dataset.ov); node[e.dataset.ov]=e; }
+  });
+  var want=[];
+  if(ovOrder.length){
+    var seen={};
+    ovOrder.forEach(function(k){ if(node[k]&&!seen[k]){ seen[k]=1; want.push(k); } });
+    /* a block the stored order has never heard of goes back where the builder
+       had it, counted among the keys it already knows */
+    nat.forEach(function(k,ix){
+      if(seen[k]) return;
+      var before=null;
+      for(var j=ix-1;j>=0;j--){ if(seen[nat[j]]){ before=nat[j]; break; } }
+      var at=before?want.indexOf(before)+1:0;
+      want.splice(at,0,k); seen[k]=1;
+    });
+  }else{ want=nat; }
+  var stamp=b.querySelector(".bstamp");
+  want.forEach(function(k){ b.appendChild(node[k]); });
+  if(stamp) b.appendChild(stamp);   /* the build line stays last, always */
+  b.classList.toggle("cust",!!ovOrder.length);
+  Array.prototype.forEach.call(b.children,function(e){
+    if(!e.dataset||!e.dataset.ov) return;
+    e.style.display = ovHide.indexOf(e.dataset.ov)>=0 ? "none" : "";
+    if(ovEdit && !e.querySelector(":scope > .ovx")){
+      var x=document.createElement("button");
+      x.className="ovx"; x.type="button"; x.dataset.ovx=e.dataset.ov;
+      x.setAttribute("aria-label","Remove "+(OVNAME[e.dataset.ov]||e.dataset.ov));
+      x.innerHTML="&times;";
+      e.appendChild(x);
+    }
+  });
+  if(ovEdit) ovBar();
+}
+/* The order is only ever written out of the DOM, so what is stored is what he
+   is looking at -- there is no second copy of the arrangement to disagree
+   with the one on screen. */
+function ovRead(){
+  var b=document.getElementById("bento"); if(!b) return;
+  ovOrder=[];
+  Array.prototype.forEach.call(b.children,function(e){
+    if(e.dataset&&e.dataset.ov) ovOrder.push(e.dataset.ov);
+  });
+  ovSave();
+}
+function ovBar(){
+  var b=document.getElementById("bento"); if(!b) return;
+  var bar=b.querySelector(".ovbar");
+  if(!bar){ bar=document.createElement("div"); bar.className="ovbar"; }
+  var back=ovHide.map(function(k){
+    return '<button class="ovchip" type="button" data-ovback="'+esc(k)+'">'+esc(OVNAME[k]||k)+'</button>';
+  }).join("");
+  bar.innerHTML='<b>Drag to arrange</b>'+back+'<span class="sp"></span>'+
+    '<button class="btn" type="button" data-ovreset="1">Reset</button>'+
+    '<button class="btn o" type="button" data-ovdone="1">Done</button>';
+  b.insertBefore(bar,b.firstChild);
+}
+function ovMode(on){
+  if(ovEdit===!!on) return;
+  ovEdit=!!on;
+  var b=document.getElementById("bento"); if(!b) return;
+  b.classList.toggle("wig",ovEdit);
+  if(!ovEdit){
+    var bar=b.querySelector(".ovbar"); if(bar) bar.remove();
+    Array.prototype.forEach.call(b.querySelectorAll(".ovx"),function(x){ x.remove(); });
+    return;
+  }
+  ovApply();
+}
+/* --- long press to arrange, then drag --- */
+(function(){
+  var b=document.getElementById("bento");
+  if(!b) return;
+  var hold=0, row=null, sx=0, sy=0, pressed=null;
+  function clear(){ if(hold){ clearTimeout(hold); hold=0; } }
+  b.addEventListener("pointerdown",function(e){
+    if(e.button) return;
+    pressed=e.target.closest?e.target.closest("[data-ov]"):null;
+    sx=e.clientX; sy=e.clientY;
+    if(ovEdit){
+      if(e.target.closest(".ovbar")||e.target.closest(".ovx")) return;
+      row=pressed;
+      if(row){ row.classList.add("ovdrag"); row.setPointerCapture&&row.setPointerCapture(e.pointerId); }
+      return;
+    }
+    if(!pressed) return;
+    /* 550ms, and any real movement cancels it: a long press that fires on a
+       scroll is the gesture you trigger by accident, which is why the swipe
+       between views was removed. */
+    clear();
+    hold=setTimeout(function(){ hold=0; ovMode(true); },550);
+  });
+  b.addEventListener("pointermove",function(e){
+    if(hold && (Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10)) clear();
+    if(!row) return;
+    e.preventDefault();
+    var over=document.elementFromPoint(e.clientX,e.clientY);
+    over=over&&over.closest?over.closest("[data-ov]"):null;
+    if(!over||over===row||over.parentNode!==row.parentNode) return;
+    var after=over.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_PRECEDING;
+    row.parentNode.insertBefore(row, after?over.nextSibling:over);
+  },{passive:false});
+  function drop(){
+    clear();
+    if(!row) return;
+    row.classList.remove("ovdrag");
+    row=null;
+    ovRead();
+  }
+  b.addEventListener("pointerup",drop);
+  b.addEventListener("pointercancel",drop);
+})();
 
 /* The critical path is a sideways rail and it opened on step one, which is
    done -- so on a 390px screen the first thing he saw was finished work and
@@ -4863,7 +5059,7 @@ var AUTO_MS=2600, AUTO_RETRY=25000, autoT=null, autoTries=0;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1605";
+var BUILD="2026-10-07-1700";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5004,6 +5200,19 @@ var stage=document.getElementById("stage");
 document.addEventListener("click",function(e){
   if(justDragged){ return; }
   var t=e.target;
+
+  /* While Overview is being arranged, a tap on a block is not a tap on a
+     task. Nothing else on the view answers a click until he is done -- a mode
+     that leaves half its taps doing the old thing is a mode nobody trusts. */
+  if(ovEdit && t.closest && t.closest("#bento")){
+    var ox=t.closest("[data-ovx]");
+    if(ox){ ovHide.push(ox.dataset.ovx); ovSave(); ovApply(); return; }
+    var ob=t.closest("[data-ovback]");
+    if(ob){ ovHide=ovHide.filter(function(k){ return k!==ob.dataset.ovback; }); ovSave(); ovApply(); return; }
+    if(t.closest("[data-ovreset]")){ ovOrder=[]; ovHide=[]; ovSave(); renderOverview(); return; }
+    if(t.closest("[data-ovdone]")){ ovMode(false); return; }
+    return;
+  }
 
   var act=t.closest("[data-act]");
   if(act){
@@ -5442,6 +5651,9 @@ function setView(v){
   if(v==="time") fitAxh();   /* the axis can only be measured once it is on screen */
   /* and the rail can only be scrolled once it has a width: a hidden view
      measures 0, so the paint that built it could not place it */
+  /* arranging ends when he leaves: a mode whose only way out is a button on
+     a screen he is no longer looking at is a mode he is stuck in */
+  if(v!=="over") ovMode(false);
   if(v==="over"){ chainAt=null; fitChain(); }
   syncDots();   /* the open section's dot goes out now, not at the next render */
   syncVSub();
@@ -5643,6 +5855,7 @@ document.addEventListener("keydown",function(e){
   if((e.metaKey||e.ctrlKey)&&(e.key==="k"||e.key==="K")){ e.preventDefault(); openPal(); return; }
   if(e.key==="Escape"){
     if(drag){ endDrag(); return; }
+    if(ovEdit){ ovMode(false); return; }
     if(document.getElementById("pal").classList.contains("on")) closePal();
     else if(document.getElementById("drawer").classList.contains("on")) hideDrawer();
     return;
@@ -6132,6 +6345,7 @@ addEventListener("resize",fitBar);
 addEventListener("orientationchange",fitBar);
 
 /* ---------- boot ---------- */
+ovLoad();
 load();
 fitBar();
 sendDiag();

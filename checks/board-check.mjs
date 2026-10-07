@@ -3963,6 +3963,180 @@ var MAPSEED = { kb: [
   await s55.ctx.close();
 }
 
+/* ---- 56. Overview arranges like a home screen ----
+   "Make the entire overview section drag-and-drop customizable. Exactly like
+   apple home screen customization which is trigger by long pressing a block.
+   I should also be able to delete blocks." */
+{
+  var s56 = await open(390);
+  var k56 = await s56.p.evaluate(function () {
+    setView("over"); render();
+    var b = document.getElementById("bento");
+    var keys = Array.prototype.map.call(b.querySelectorAll(":scope > [data-ov]"),
+      function (e) { return e.dataset.ov; });
+    return { keys: keys, wig: b.classList.contains("wig"),
+             /* nothing of the mode is on screen until he asks for it */
+             x: b.querySelectorAll(".ovx").length, bar: b.querySelectorAll(".ovbar").length,
+             stampLast: b.lastElementChild.className };
+  });
+  ok("every block on Overview carries a key, and the build line stays last",
+     k56.keys.length >= 10 && k56.keys.indexOf("attention") >= 0 &&
+     /bstamp/.test(k56.stampLast), JSON.stringify(k56));
+  ok("and nothing of the arranging mode shows until it is asked for",
+     !k56.wig && k56.x === 0 && k56.bar === 0, JSON.stringify(k56));
+
+  /* a long press on a block is what starts it, and a drag must not */
+  var box = await s56.p.evaluate(function () {
+    var e = document.querySelector('#bento [data-ov="attention"]').getBoundingClientRect();
+    return { x: Math.round(e.left + e.width / 2), y: Math.round(e.top + 14) };
+  });
+  await s56.p.mouse.move(box.x, box.y);
+  await s56.p.mouse.down();
+  await s56.p.mouse.move(box.x, box.y + 40);   /* a scroll, not a press */
+  await s56.p.mouse.up();
+  await s56.p.waitForTimeout(700);
+  var moved = await s56.p.evaluate(function () {
+    return document.getElementById("bento").classList.contains("wig");
+  });
+  ok("a drag down the view is a scroll and never arms the mode", !moved, String(moved));
+
+  await s56.p.mouse.move(box.x, box.y);
+  await s56.p.mouse.down();
+  await s56.p.waitForTimeout(750);
+  await s56.p.mouse.up();
+  var on56 = await s56.p.evaluate(function () {
+    var b = document.getElementById("bento");
+    return { wig: b.classList.contains("wig"),
+             x: b.querySelectorAll(".ovx").length,
+             bar: b.querySelectorAll(".ovbar").length,
+             done: !!b.querySelector("[data-ovdone]"),
+             reset: !!b.querySelector("[data-ovreset]"),
+             /* the cross has to be visible, not merely present: a rule that
+                hides it is the push-test-banner bug again */
+             xw: (function(){ var e=b.querySelector(".ovx");
+               return e?Math.round(e.getBoundingClientRect().width):0; })() };
+  });
+  ok("a long press wobbles the view and puts a cross on every block",
+     on56.wig && on56.x >= 10 && on56.bar === 1 && on56.done && on56.reset && on56.xw >= 20,
+     JSON.stringify(on56));
+
+  /* drag the first block past the second */
+  var pts = await s56.p.evaluate(function () {
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    function mid(e){ var r=e.getBoundingClientRect(); return {x:Math.round(r.left+r.width/2), y:Math.round(r.top+r.height/2)}; }
+    return { a: mid(el[0]), b: mid(el[1]), first: el[0].dataset.ov, second: el[1].dataset.ov };
+  });
+  await s56.p.mouse.move(pts.a.x, pts.a.y);
+  await s56.p.mouse.down();
+  await s56.p.mouse.move(pts.b.x, pts.b.y, { steps: 6 });
+  await s56.p.mouse.up();
+  var dr56 = await s56.p.evaluate(function () {
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    var stored = JSON.parse(localStorage.getItem("mbacc_ov") || "{}");
+    return { first: el[0].dataset.ov, second: el[1].dataset.ov,
+             order: (stored.order || []).slice(0, 2) };
+  });
+  ok("dragging a block past another swaps them, and the order is written out",
+     dr56.first === pts.second && dr56.second === pts.first &&
+     dr56.order[0] === pts.second, JSON.stringify({ was: pts, now: dr56 }));
+
+  /* the cross removes a block, and the bar is where it comes back from */
+  var rm56 = await s56.p.evaluate(function () {
+    var b = document.getElementById("bento");
+    var k = b.querySelector('[data-ov="workload"] .ovx');
+    k.click();
+    var t = document.querySelector('#bento [data-ov="workload"]');
+    return { gone: !t || getComputedStyle(t).display === "none",
+             chip: !!b.querySelector('[data-ovback="workload"]'),
+             stored: (JSON.parse(localStorage.getItem("mbacc_ov") || "{}").hide || []) };
+  });
+  ok("the cross takes a block off the view and remembers it",
+     rm56.gone && rm56.chip && rm56.stored.indexOf("workload") >= 0, JSON.stringify(rm56));
+  var bk56 = await s56.p.evaluate(function () {
+    document.querySelector('[data-ovback="workload"]').click();
+    var t = document.querySelector('#bento [data-ov="workload"]');
+    return { back: !!t && getComputedStyle(t).display !== "none",
+             stored: (JSON.parse(localStorage.getItem("mbacc_ov") || "{}").hide || []).length };
+  });
+  ok("and the bar puts it back", bk56.back && bk56.stored === 0, JSON.stringify(bk56));
+
+  /* it survives a repaint, which Overview does every few seconds */
+  var rp56 = await s56.p.evaluate(function () {
+    render();
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    return { first: el[0].dataset.ov, wig: document.getElementById("bento").classList.contains("wig"),
+             bar: document.querySelectorAll(".ovbar").length };
+  });
+  ok("a repaint keeps his order and does not stack a second bar",
+     rp56.first === pts.second && rp56.wig && rp56.bar === 1, JSON.stringify(rp56));
+
+  /* leaving the view ends the mode, and a reload keeps the arrangement */
+  var out56 = await s56.p.evaluate(function () {
+    setView("board");
+    var b = document.getElementById("bento");
+    return { wig: b.classList.contains("wig"), x: b.querySelectorAll(".ovx").length };
+  });
+  ok("leaving Overview ends the mode", !out56.wig && out56.x === 0, JSON.stringify(out56));
+  await s56.p.reload({ waitUntil: "load" });
+  await s56.p.waitForTimeout(500);
+  var kept = await s56.p.evaluate(function () {
+    setView("over"); render();
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    return { first: el[0].dataset.ov, cust: document.getElementById("bento").classList.contains("cust") };
+  });
+  ok("and the arrangement survives a reload",
+     kept.first === pts.second && kept.cust, JSON.stringify(kept));
+
+  /* Reset puts the board back to the order the builder wanted */
+  var rs56 = await s56.p.evaluate(async function () {
+    var b = document.getElementById("bento");
+    ovMode(true);
+    b.querySelector("[data-ovreset]").click();
+    ovMode(false);
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    return { first: el[0].dataset.ov, cust: b.classList.contains("cust"),
+             stored: localStorage.getItem("mbacc_ov") };
+  });
+  ok("Reset puts it back the way it was built",
+     rs56.first === pts.first && !rs56.cust, JSON.stringify(rs56));
+  ok("no console error through any of it", s56.errs.length === 0, s56.errs.join(" | "));
+  await s56.ctx.close();
+}
+
+/* ---- 57. arranging holds on a desktop too ---- */
+{
+  var s57 = await open(1280);
+  var w57 = await s57.p.evaluate(function () {
+    setView("over"); render();
+    /* an order he set by hand turns the hand-placed desktop rows off: they
+       name specific tiles in specific rows and cannot survive a reorder */
+    /* his whole arrangement, with tuition pulled to the front -- a partial
+       list is not what the board ever stores, and a key the stored order has
+       never heard of goes back to its natural place by design */
+    var nat = Array.prototype.map.call(document.querySelectorAll('#bento > [data-ov]'),
+      function (e) { return e.dataset.ov; });
+    ovOrder = ["tuition"].concat(nat.filter(function (k) { return k !== "tuition"; }));
+    ovSave(); render();
+    var el = document.querySelectorAll('#bento > [data-ov]');
+    var t = el[0].getBoundingClientRect(), n = el[1].getBoundingClientRect();
+    return { first: el[0].dataset.ov, second: el[1].dataset.ov,
+             cust: document.getElementById("bento").classList.contains("cust"),
+             /* two columns, flowed in his order: the block he put first is on
+                the left of the top row and the next one is beside it */
+             tuiL: Math.round(t.left), nextL: Math.round(n.left),
+             sameRow: Math.round(t.top) === Math.round(n.top),
+             w: Math.round(t.width),
+             bento: Math.round(document.getElementById("bento").getBoundingClientRect().width) };
+  });
+  ok("1280px: his order wins over the hand-placed rows",
+     w57.first === "tuition" && w57.cust && w57.tuiL < w57.nextL && w57.sameRow,
+     JSON.stringify(w57));
+  ok("and the blocks still take half the bento rather than a twelfth",
+     w57.w > w57.bento * 0.4 && w57.w < w57.bento * 0.6, JSON.stringify(w57));
+  ok("no console error at 1280", s57.errs.length === 0, s57.errs.join(" | "));
+  await s57.ctx.close();
+}
+
 /* ---- 15. the build stamp moved with the page ---- */
 {
   var html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");

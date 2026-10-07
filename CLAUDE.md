@@ -1066,6 +1066,62 @@ answering more than "what is due".
   The chevron takes `margin-left:auto` so it lands at the right edge whether
   or not the heading also carries a `.more`.
 
+## Arranging Overview himself
+
+*"Make the entire overview section drag-and-drop customizable. Exactly like
+apple home screen customization which is trigger by long pressing a block. I
+should also be able to delete blocks."* So Overview is his to lay out: long
+press anything on it, everything wobbles, blocks drag into any order and each
+carries a cross.
+
+- **Every top-level block carries `data-ov`**, a stable key -- `deadline`,
+  `attention`, `agenda`, `tracks`, `news`, `workload`, `tuition`, `rings`,
+  `visa`, `housing`, `path`, `done`, `miles`. The key is what is stored, never
+  a position, so a block that changes shape or moves in the builder keeps his
+  arrangement.
+- **`ovApply()` lays his order over the finished markup**, after
+  `renderOverview` has written it. Threading an order through the builder
+  would have put the layout in thirteen places; every one of those blocks is
+  a paragraph of reasoning about what it draws, and none of them should have
+  to know where it ends up.
+- **A key the stored order has never heard of is not dropped and is not
+  pushed to the end.** It goes back where the builder put it *relative to the
+  keys the order does know*, so a block added in a later version arrives in
+  the place it was designed for rather than under the fold.
+- **The order is read out of the DOM, never written into it.** `ovRead()`
+  walks the children after a drop, so what is stored is literally what he is
+  looking at and there is no second copy of the arrangement to drift.
+- **It is its own localStorage key (`mbacc_ov`), like the theme.** A layout is
+  read on the screen it was arranged on, and putting it in the board blob
+  would mean a fifth whole-blob field with its own merge rule -- see the
+  two-tabs section -- for a preference neither device can be wrong about. If
+  he asks for it to follow him between devices, that is the work it costs.
+- **A custom order turns the hand-placed desktop rows off.** The 1181px query
+  names specific tiles in specific rows, so a reorder could not survive it --
+  a block moved in the markup would sit exactly where its rule put it and the
+  drag would look like it did nothing. `.bento.cust>[data-ov]` flows them two
+  to a row with `!important`, which is the honest way to say "this overrides
+  all of the above" rather than restating thirteen selectors.
+- **The wobble is the affordance.** It says the tap that opened a task a
+  second ago now means something else, which is the one thing a mode has to
+  say about itself. Alternating the animation delay is what stops nine blocks
+  reading as one sheet of paper rocking together.
+- **The cross sits inside the corner, not hanging off it.** `.tile` is
+  `overflow:hidden`, so an iOS-style badge on the corner would be clipped away
+  and read as a button that does not exist. The check measures its box rather
+  than its presence -- a control that is in the DOM and not on screen is the
+  push-test-banner bug.
+- **A removed block is one tap from coming back.** The bar at the top of the
+  view carries a chip per hidden block, plus Reset and Done. A delete with no
+  visible undo is a delete he will not risk.
+- **550ms, and any real movement cancels it.** A long press that fires on a
+  scroll is the gesture you trigger by accident, which is why the swipe
+  between views was removed.
+- **While it is on, nothing else on the view answers a tap.** A mode that
+  leaves half its taps doing the old thing is a mode nobody trusts. It ends
+  on Done, on Escape, and on leaving the view -- a mode whose only way out is
+  a button on a screen he is no longer looking at is a mode he is stuck in.
+
 ## Overview on a wide screen
 
 The bento is twelve columns and every tile took the width it wanted, so a
@@ -1991,7 +2047,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 442 invariants, three widths, a real browser. Every one of them was a
+that runs: 457 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
