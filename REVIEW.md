@@ -527,42 +527,32 @@ not park the board on sending`, `and it counts as a failed send, so the retry
 and the button come back`, `nothing is marked delivered`, `a note that never
 left is sent on the next load`.*
 
-### One calendar block, two sections
-Needs attention and the agenda listed the same tasks in two tiles, so the top
-of Overview said everything inside ten days twice. One tile, two `.asec`
-sections drawing the same `.agr` row, the first carrying the red it had as a
-tile. "This month" runs to the end of the month and never less than a
-fortnight, and the heading prints the real end date. At 1181px the sections
-sit side by side and the tile takes the right column opposite the track bars
-and the rings.
-*Checked: `and it is a section inside On the calendar, not a tile of its
-own`, `Overview puts the calendar and the track bars on one row at 1280`,
-`and the calendar's two sections sit side by side at 1280`, `and the two
-rings fill the column beside the calendar`.*
+### Needs attention is the first tile, orange, and the only list on Overview
+Three moves in one evening: the two lists merged ("a lot of redundancy of
+tasks in the first 3 blocks"), then the Next deadline hero removed and its
+orange moved onto the section ("make it in bright solid orange exactly like
+next deadline card. And remove the next deadline card"), then the merge undone
+("just keep the needs attention section as it's own in the current colour.
+Remove the this month/on the calendar"). What is left is `.att`,
+`data-ov="attention"`, drawing `.agr` rows for everything inside ten days, with
+its heading opening the Calendar for the rest of the month.
 
-### The orange moved off the deadline card and onto the list
-The Next deadline hero said one thing about one task in a whole tile, which
-the calendar's first section already says about seven: *"just keep the needs
-attention but make it in bright solid orange exactly like next deadline card.
-And remove the next deadline card."* So `.asec.att` carries `.hero.a`'s
-gradient to the stop, and the hero, its `data-ov` key and its CSS are gone.
-
-Three things a solid colour inside a themed board costs. Everything on it
-goes white, because a tint chosen to read on the panel is a smudge on a
-gradient. Two of those inks have to be forced -- the priority chip carries an
-inline colour from `PRI`, and the countdown chip has a rule per urgency *per
-theme* at the same specificity as anything scoped to this section, so the
-theme's wins on source order and the chip came out orange-on-orange in the
-dark. And the section has to be the height of what is in it: side by side at
-1181px it stretched to the tile and drew a half-screen slab.
-
-Removing the hero also moved every desktop row up by one. Its row left in
-place is an empty half-row at the top of the first screen.
+A solid colour inside a themed board costs three things. Everything on it goes
+white: the priority chip (inline colour from `PRI`), the `data-vgo` chevron
+(ink-grey by default) and the countdown chip (a rule per urgency per theme, at
+the same specificity as anything scoped to the tile, so the theme's wins on
+source order and it came out orange-on-orange in the dark) each have to be
+forced. It must be the height of its own rows, or it draws a slab with the
+rows at the top. And on a wide screen it takes the narrow column, with the
+track bars spanning the two rows opposite -- a short tile in the wide column
+leaves half the screen empty.
 *Checked: `Needs attention is the solid orange the deadline card was`, `and
-everything inside it is lettered white` (both themes), `and the Next deadline
-card is gone with its gradient`, `and there is no Next deadline card left to
-say it twice`, `and neither is stretched to the height of the tile`, `the
-countdown sits under the day it counts to, and smaller`.*
+everything inside it is lettered white` (both themes), `and the chevron that
+opens the Calendar is white too`, `and it is a tile of its own, with no second
+list under it`, `and there is no Next deadline card left to say it twice`,
+`Overview puts Needs attention and the track bars on one row at 1280`, `and
+Needs attention is the height of its own rows`, `the Needs attention heading
+opens the Calendar`.*
 
 ### A drag reads direction, not which half it landed in
 Reading the order ("it is before me, so put me after it") flips on every frame

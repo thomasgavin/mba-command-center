@@ -664,47 +664,34 @@ body::before{
 .pn.late .pt{color:var(--red)}
 .arw{flex:none;width:22px;display:grid;place-items:center;color:var(--ink4);font-size:13px}
 
-/* the two sections of the calendar */
-/* Needs attention was a tile of its own and listed the same tasks as the
-   agenda under it. It is a section now, and it wears what the Next deadline
-   hero wore: *"just keep the needs attention but make it in bright solid
-   orange exactly like next deadline card. And remove the next deadline
-   card."* The hero said one thing about one task in a whole tile and this
-   section already says the same thing about seven, so the gradient moves to
-   the list and the tile goes. Red had the section for an evening -- it was
-   the hue of the countdown chips inside it -- and orange is the board's own
-   "this is the thing to look at". */
-.asecs{display:flex;flex-direction:column;gap:12px}
-.asec{min-width:0}
-.asec h4{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--ink3);margin:0 0 4px;display:flex;align-items:baseline;gap:7px}
-.asec h4 span{font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;
-  color:var(--ink4);margin-left:auto}
-/* The gradient is the deadline hero's own, to the stop -- it has to be the same orange he
-   is used to, not a second one a shade off it. Everything inside goes white:
-   a tint picked to read on the panel is a smudge on a solid colour, and the
-   priority chip carries an inline colour from PRI, so that one needs the
-   !important the rest do not. */
-.asec.att{color:#fff;border:0;border-radius:var(--r2);padding:11px 12px;
+/* Needs attention, in the orange the Next deadline card wore */
+/* It was a tile, then a section of the merged calendar for an evening, and
+   it is a tile again: *"I meant just keep the needs attention section as it's
+   own in the current colour. Remove the this month/on the calendar."* The
+   colour is what survived both moves, and it is .hero.a's gradient to the
+   stop -- a second orange a shade off it would read as a mistake.
+   Everything on it goes white, because a tint chosen to read on the panel is
+   a smudge on a solid colour. Two of those have to be forced: the priority
+   chip carries an inline colour from PRI, and the countdown chip has a rule
+   per urgency *per theme* at the same weight as anything scoped here, so the
+   theme's would win on source order and the chip came out orange on orange
+   in the dark. */
+.att{grid-column:span 12;color:#fff;border:0;
   background:linear-gradient(142deg,#ff5a1f 0%,#ff7a3d 48%,#ff9558 100%);
-  box-shadow:0 2px 8px rgba(255,100,41,.2),0 18px 34px -22px rgba(255,100,41,.6)}
-.asec.att h4{color:rgba(255,255,255,.8)}
-.asec.att h4 span{color:rgba(255,255,255,.74)}
-.asec.att .agr{border-top-color:rgba(255,255,255,.24)}
-.asec.att .at{color:#fff}
-.asec.att .at small{color:rgba(255,255,255,.78)}
-.asec.att .agd-d,.asec.att .agd-d.hot{background:rgba(255,255,255,.15)}
-.asec.att .agd-d b,.asec.att .agd-d span,
-.asec.att .agd-d.hot b,.asec.att .agd-d.hot span{color:#fff}
-/* The countdown chip has a rule per urgency and a dark-theme rule per
-   urgency on top of that, all at the same weight as anything scoped to this
-   section, so the last one in the file wins and that is the theme's. This
-   surface is solid orange in both themes, so no theme may re-tint what sits
-   on it: that is what the !important says. */
-.asec.att .chip.d,.asec.att .chip.d.late,
-.asec.att .chip.d.soon,.asec.att .chip.d.near{background:none!important;color:#fff!important}
-.asec.att .chip.p{color:#fff!important;border-color:rgba(255,255,255,.5)}
-.asec.att .hint{color:rgba(255,255,255,.82)}
+  box-shadow:0 2px 8px rgba(255,100,41,.2),0 20px 40px -22px rgba(255,100,41,.6)}
+.att h3{color:rgba(255,255,255,.8)}
+.att h3 .more{color:rgba(255,255,255,.74)}
+.att .agr{border-top-color:rgba(255,255,255,.24)}
+.att .at{color:#fff}
+.att .at small{color:rgba(255,255,255,.78)}
+.att .agd-d,.att .agd-d.hot{background:rgba(255,255,255,.15)}
+.att .agd-d b,.att .agd-d span,
+.att .agd-d.hot b,.att .agd-d.hot span{color:#fff}
+.att .chip.d,.att .chip.d.late,
+.att .chip.d.soon,.att .chip.d.near{background:none!important;color:#fff!important}
+.att .chip.p{color:#fff!important;border-color:rgba(255,255,255,.5)}
+.att .hint{color:rgba(255,255,255,.82)}
+.tile.att h3[data-vgo]::after{color:rgba(255,255,255,.72)}
 /* *"align the statuses across the board - they are a bit left or right to
    each other in some places"*. A chip sized by its own text puts "today" and
    "in 5d" and "24d late" at three different left edges down a column of
@@ -729,7 +716,6 @@ body::before{
 .tbar .tt i{display:block;height:100%;border-radius:20px;transition:width .8s var(--ease)}
 
 /* agenda */
-.agd{grid-column:span 5}
 /* Recently completed had no grid-column at all, so it took the auto-placement
    default -- ONE of twelve columns -- and rendered as an 80px ribbon of dots
    with every title clipped to nothing. It is the other seven of the row the
@@ -1685,17 +1671,13 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
      is still the order he asked for -- progress, News, the workload chart,
      then tuition -- because the explicit rows mean DOM order is not what a
      desktop sees. */
-  /* The deadline hero is gone, so the left column now opens with the track
-     bars and the calendar spans the two short tiles opposite it rather than
-     three. Leaving the hero's row in place left row 1 of the left column
-     empty, which is a hole at the top of the first screen. */
-  .agd{grid-column:6/13;grid-row:1/3}
-  /* align-items, because a section that is now a solid colour must be the
-     height of what is in it: stretched to the tile, Needs attention came out
-     as a half-screen slab of orange with three lines at the top of it. */
-  .agd .asecs{flex-direction:row;gap:18px;align-items:flex-start}
-  .agd .asec{flex:1;min-width:0}
-  .trk{grid-column:1/6;grid-row:1;align-self:start}
+  /* Needs attention is a short tile again, so it takes the narrow column and
+     the track bars take the wide one and span the two rows opposite them --
+     the other way round left half the screen empty under it. align-self,
+     because a solid colour must be the height of what is in it: stretched,
+     it drew a slab of orange with its rows at the top. */
+  .att{grid-column:1/6;grid-row:1;align-self:start}
+  .trk{grid-column:6/13;grid-row:1/3;align-self:start}
   /* the two rings are short and go under the track bars, because the column
      opposite the calendar has to be about as tall as the calendar or the
      page opens on a hole */
@@ -1735,7 +1717,7 @@ input[type=date]:focus,input[type=text]:focus,textarea:focus{outline:0;border-co
 @media (max-width:1180px){
   .hero{grid-column:span 6} .hero.b{grid-column:span 6}
   .mstack{grid-column:span 12;grid-row:span 1;flex-direction:row}
-  .pipe,.trk,.agd,.rcent,.nwst{grid-column:span 12} .seqt{grid-column:span 6}
+  .pipe,.trk,.att,.rcent,.nwst{grid-column:span 12} .seqt{grid-column:span 6}
   .cols{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:720px){
@@ -2935,33 +2917,14 @@ function renderOverview(){
   var L=live().slice().sort(byDue);
   var h="";
 
-  /* One block, two sections. The next ten days and the three weeks after
-     them were two tiles listing the same tasks, so the top of Overview said
-     the same thing twice over: *"There is a lot of redundancy of tasks in the
-     first 3 blocks. I am thinking of combining the next 10 and on the
-     calendar blocks."* The calendar is one tile now and urgency is a section
-     inside it rather than a second copy of the rows below it.
-
-     Both sections draw the same `.agr` row, which is what makes them read as
-     one list: a task crossing the ten-day line changes section and does not
-     change shape. The first keeps the red it had as a tile -- a red edge, a
-     red wash and a red heading -- because that is what he asked for: *"The
-     needs attention sub-section should still be highlight a similar way in
-     red"*. */
-  /* "This month" is the rest of the current month, and never less than a
-     fortnight: on the 28th the month holds three days and a section that
-     empties itself at the end of every month is a section he stops reading.
-     The heading prints the real end date either way, so the label can be the
-     word he used without the block being able to lie about what is in it. */
-  var tdy=iso(todayD());
-  var eom=iso(new Date(todayD().getFullYear(),todayD().getMonth()+1,0));
-  var horiz=eom<shift(tdy,14)?shift(tdy,14):eom;
-  var att =L.filter(function(i){ var n=dleft(i.due); return n!==null&&n<=10; }).slice(0,7);
-  var soon=L.filter(function(i){ return i.due&&dleft(i.due)>10&&i.due<=horiz; }).slice(0,9);
-  /* one row, two callers: the countdown goes under the date rather than out
-     at the right edge, since the row had a date block, a title and then two
-     chips competing for the same corner while the lower half of the date
-     block did nothing. */
+  /* Needs attention is a tile of its own again, in the orange it took from
+     the deadline card: *"I meant just keep the needs attention section as
+     it's own in the current colour. Remove the this month/on the calendar."*
+     Merging the two lists cut the duplication at the top of the view, and
+     what it cost was the first screen: a block of everything dated this
+     month is the Calendar's job, and the first screen only has to answer
+     what to do now. The heading still opens the Calendar, which is where
+     the rest of the month went. */
   function agRow(i){
     var d=D(i.due), n=dleft(i.due);
     return '<div class="agr'+(newsAsk(i)?" nws":"")+'" data-go="'+i.id+'">'+
@@ -2970,14 +2933,10 @@ function renderOverview(){
       '<span class="at">'+ttl(i.title)+'<small>'+esc(tl(i.track))+'</small></span>'+
       '<span class="chip p" style="color:'+PRI[i.priority]+'">'+esc(i.priority)+'</span></div>';
   }
-  h+='<div class="tile agd" data-ov="agenda"><h3 data-vgo="cal"><span class="pin" style="background:#ff9f00"></span>On the calendar<span class="more">to '+fmtD(horiz)+'</span></h3><div class="asecs">';
-  h+='<div class="asec att"><h4>Needs attention<span>next 10 days</span></h4>'+
+  var att=L.filter(function(i){ var n=dleft(i.due); return n!==null&&n<=10; }).slice(0,7);
+  h+='<div class="tile att" data-ov="attention"><h3 data-vgo="cal"><span class="pin" style="background:#fff"></span>Needs attention<span class="more">next 10 days</span></h3>'+
      (att.length? att.map(agRow).join("")
        : '<p class="hint">Nothing inside ten days. That is unusual, so check the dates are right.</p>')+'</div>';
-  h+='<div class="asec"><h4>This month</h4>'+
-     (soon.length? soon.map(agRow).join("")
-       : '<p class="hint">Nothing else dated this month.</p>')+'</div>';
-  h+='</div></div>';
 
   /* Recently completed, directly under the agenda: the agenda says what is
      coming and this says what has gone, which is the half of "where do I
@@ -3167,7 +3126,7 @@ var ovOrder=[], ovHide=[], ovEdit=false;
 /* The names he reads when a block is in the bar waiting to be put back. A
    key with no name here still works; it just shows its key, which is the
    right failure for a block added later and not yet named. */
-var OVNAME={agenda:"On the calendar",
+var OVNAME={attention:"Needs attention",
   tracks:"Progress by track",news:"News",workload:"Workload by week",tuition:"Tuition",
   rings:"Days and tasks",visa:"Student visa",housing:"Accommodation",
   path:"Critical path",done:"Recently completed",miles:"Milestones"};
@@ -5120,7 +5079,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-1930";
+var BUILD="2026-10-07-2010";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

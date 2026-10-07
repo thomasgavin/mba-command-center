@@ -1020,43 +1020,36 @@ answering more than "what is due".
   detached and reports zero for everything.
   `setView("over")` clears `chainAt` and calls it again, because a hidden view
   measures zero and the paint that built the rail could not place it.
-- **Needs attention is a section of the calendar, not a tile of its own.**
+- **Needs attention is the first tile, in orange, and it is the only list on
+  the first screen.** It went through both halves of that in one evening.
+  First the two tiles were merged, because they listed the same tasks twice:
   *"There is a lot of redundancy of tasks in the first 3 blocks. I am
-  thinking of combining the next 10 and on the calendar blocks. Just a 'On
-  the calendar' block but divided into 2 - 'needs attention, next 10 days'.
-  And 'this month'."* The two tiles listed the same tasks in two shapes, so
-  anything inside ten days was on screen twice before he had scrolled. One
-  tile now, two `.asec` sections, and **both draw the same `.agr` row** --
-  that is what makes them read as one list, since a task crossing the ten-day
-  line changes section and does not change shape.
-  **It wears the Next deadline card's orange, and that card is gone.**
-  *"Changed my mind, just keep the needs attention but make it in bright
-  solid orange exactly like next deadline card. And remove the next deadline
-  card."* The hero said one thing about one task in a whole tile, and the
-  section under it already said the same thing about seven; so the gradient
-  moved to the list and the tile went. It is `.hero.a`'s gradient to the
-  stop -- a second orange a shade off it would read as a mistake -- and
-  everything inside goes white, because a tint chosen to read on the panel
-  is a smudge on a solid colour. Two of those need forcing: the priority
-  chip carries an inline colour from `PRI`, and the countdown chip has a
-  rule per urgency *per theme* at the same weight as anything scoped to the
-  section, so the theme's would win on source order. Red had it for an
-  evening in between (*"should still be highlight a similar way in red"*).
-  **A solid block must be the height of what is in it.** Side by side at
-  1181px the sections stretch to the tile by default, which drew Needs
-  attention as a half-screen slab of orange with three lines at the top.
-  **"This month" is the rest of the calendar month, and never less than a
-  fortnight.** On the 28th the month holds three days, and a section that
-  empties itself at the end of every month is one he stops reading. The
-  heading prints the real end date either way, so the label can be his word
-  without the block being able to lie about what is in it.
-  At 1181px the two sections sit **side by side** inside the tile, which is
-  the whole of what a desktop buys here, and the tile takes the right column
-  opposite the track bars and the rings -- a column shorter than the
-  calendar is a hole in the first screen, which is what News being absent
-  used to leave. The hero held the left half of row 1, so removing it meant
-  moving every row up by one: leaving its row in place opened the first
-  screen on an empty half-row.
+  thinking of combining the next 10 and on the calendar blocks."* Then the
+  Next deadline hero was removed and its orange moved onto the section:
+  *"just keep the needs attention but make it in bright solid orange exactly
+  like next deadline card. And remove the next deadline card."* Then the
+  merge itself was undone: *"I meant just keep the needs attention section as
+  it's own in the current colour. Remove the this month/on the calendar."*
+  What is left is one tile, `.att`, `data-ov="attention"`, drawing the `.agr`
+  rows for everything inside ten days.
+  **The colour is what survived all three moves.** It is `.hero.a`'s gradient
+  to the stop -- a second orange a shade off it reads as a mistake -- and
+  everything on it goes white, because a tint chosen to read on the panel is
+  a smudge on a solid colour. Three of those need forcing: the priority chip
+  carries an inline colour from `PRI`, the chevron that opens the Calendar is
+  ink-grey by default, and the countdown chip has a rule per urgency *per
+  theme* at the same weight as anything scoped to the tile, so the theme's
+  wins on source order and the chip came out orange on orange in the dark.
+  **A solid block must be the height of what is in it**, so it takes
+  `align-self:start` on a wide screen: stretched to the rows it spans it drew
+  a slab of orange with its rows at the top.
+  **What is dated later this month is the Calendar's job**, which is where
+  the heading goes. The first screen only has to answer what to do now, and
+  a second list of everything dated this month is the duplication the merge
+  was meant to remove, wearing the other hat.
+  At 1181px it takes the narrow left column with the track bars spanning the
+  two rows opposite it -- the other way round left half the screen empty
+  under a short tile.
 - **"Recently completed" sits directly under "On the calendar"**, where he
   asked for it: the agenda says what is coming and this says what has gone.
   The order is **`doneAt`**, the day a task was actually closed, and a task

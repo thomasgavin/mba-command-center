@@ -794,13 +794,13 @@ for (var w2 of [390, 1280]) {
    2026-10-05 (see 35) and Needs attention took the top. */
 {
   var src = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile agd"');
+  var iMiles = src.indexOf("h+=renderMiles();"), iAtt = src.indexOf('class="tile att"');
   /* *"just keep the needs attention but make it in bright solid orange
      exactly like next deadline card. And remove the next deadline card."* The
      hero said one thing about one task in a whole tile, which the calendar's
      first section already says about seven, so the calendar opens the view
      and the milestone rail is still the last tile on it. */
-  ok("the calendar opens the view and the milestones close it", iAtt > 0 && iMiles > iAtt, iMiles + "/" + iAtt);
+  ok("Needs attention opens the view and the milestones close it", iAtt > 0 && iMiles > iAtt, iMiles + "/" + iAtt);
   ok("and there is no Next deadline card left to say it twice",
      src.indexOf('tile hero a') < 0 && src.indexOf('data-ov="deadline"') < 0, "");
 }
@@ -1292,17 +1292,15 @@ for (var tw26 of [390, 1280]) {
     function top(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().top):null; }
     function right(sel){ var e=document.querySelector(sel); return e?Math.round(e.getBoundingClientRect().right):null; }
     var st=document.getElementById("stage");
-    return { att: top(".asec.att"),
+    return { att: top(".att"),
              tui: top(".hero.b"), pipe: top(".pipe"), mst: top(".mstack"),
-             agd: top(".agd"), rcent: top(".rcent"), trk: top(".trk"),
+             rcent: top(".rcent"), trk: top(".trk"),
              load: top(".load"), nwst: top(".nwst"), miles: top(".miles"),
-             attR: right(".agd"), stageR: Math.round(st.getBoundingClientRect().right),
+             attR: right(".att"), stageR: Math.round(st.getBoundingClientRect().right),
              /* the two sections sit side by side at this width */
-             secs: Array.prototype.map.call(document.querySelectorAll(".agd .asec"), function (e) {
-               var r = e.getBoundingClientRect();
-               return { t: Math.round(r.top), l: Math.round(r.left), h: Math.round(r.height) };
-             }),
-             agdH: (function(){ var e=document.querySelector(".agd");
+             attH: (function(){ var e=document.querySelector(".att");
+               return e?Math.round(e.getBoundingClientRect().height):0; })(),
+             bentoH: (function(){ var e=document.getElementById("bento");
                return e?Math.round(e.getBoundingClientRect().height):0; })() };
   });
   var st28 = await s28.p.evaluate(function () {
@@ -1318,19 +1316,14 @@ for (var tw26 of [390, 1280]) {
   /* The deadline hero held the left half of row 1 and is gone, so the track
      bars moved up into it: leaving the hero's row in place opened the first
      screen on an empty half-row. */
-  ok("Overview puts the calendar and the track bars on one row at 1280",
-     ov28.agd !== null && ov28.agd === ov28.trk, JSON.stringify(ov28));
-  /* a column of two sections in a tile that has half the screen is a column
-     of two half-empty sections */
-  ok("and the calendar's two sections sit side by side at 1280",
-     ov28.secs.length === 2 && ov28.secs[0].t === ov28.secs[1].t &&
-     ov28.secs[0].l < ov28.secs[1].l, JSON.stringify(ov28.secs));
-  /* and each is the height of what is in it. Needs attention is a solid
-     colour now, so stretching it to the tile drew a half-screen slab of
-     orange with three lines at the top of it. */
-  ok("and neither is stretched to the height of the tile",
-     ov28.secs.every(function (x) { return x.h < ov28.agdH - 20; }),
-     JSON.stringify({ secs: ov28.secs, agd: ov28.agdH }));
+  ok("Overview puts Needs attention and the track bars on one row at 1280",
+     ov28.att !== null && ov28.att === ov28.trk, JSON.stringify(ov28));
+  /* a solid colour has to be the height of what is in it: stretched to the
+     rows it spans, Needs attention drew a slab of orange with its rows at
+     the top of it. */
+  ok("and Needs attention is the height of its own rows",
+     ov28.attH > 0 && ov28.attH < ov28.bentoH * 0.5,
+     JSON.stringify({ att: ov28.attH, bento: ov28.bentoH }));
   /* The pairing that always holds, whatever is on the board: News may be
      absent (it draws only when the map has one), so tuition's own row is not
      the thing to measure. */
@@ -1341,8 +1334,8 @@ for (var tw26 of [390, 1280]) {
      moved to the foot, *"to the bottom just above milestones"*. The explicit
      rows in the 1181px query mean DOM order is not what a desktop sees, so
      this has to be measured here as well as at 390. */
-  ok("the calendar, progress and the workload chart sit above tuition at 1280",
-     ov28.agd <= ov28.trk && ov28.load > ov28.mst && ov28.tui >= ov28.load,
+  ok("Needs attention, progress and the workload chart sit above tuition at 1280",
+     ov28.att <= ov28.trk && ov28.load > ov28.mst && ov28.tui >= ov28.load,
      JSON.stringify(ov28));
   ok("and what has gone is at the foot, above the milestones, at 1280",
      ov28.rcent > ov28.pipe && ov28.miles > ov28.rcent, JSON.stringify(ov28));
@@ -2387,7 +2380,7 @@ for (var bw of [390, 1280]) {
      the list that says it about seven. */
   var hero = await s36.p.evaluate(function () {
     setView("over");
-    var t = document.querySelector(".agd .asec.att");
+    var t = document.querySelector(".tile.att");
     var cs = getComputedStyle(t);
     function lum(c) {
       var m = c.match(/(\d+), (\d+), (\d+)/); if (!m) return 0;
@@ -2399,7 +2392,7 @@ for (var bw of [390, 1280]) {
     var inks = [];
     ["light", "dark"].forEach(function (th) {
       document.documentElement.setAttribute("data-theme", th);
-      Array.prototype.forEach.call(t.querySelectorAll("h4,.at,.at small,.agd-d b,.agd-d span,.chip.d,.chip.p"),
+      Array.prototype.forEach.call(t.querySelectorAll("h3,.at,.at small,.agd-d b,.agd-d span,.chip.d,.chip.p"),
         function (e) { inks.push({ s: th + ":" + (e.className || e.tagName), l: lum(getComputedStyle(e).color) }); });
     });
     document.documentElement.removeAttribute("data-theme");
@@ -2411,8 +2404,12 @@ for (var bw of [390, 1280]) {
       edge: parseFloat(cs.borderLeftWidth),
       inks: inks,
       rows: t.querySelectorAll(".agr").length,
-      /* and it is a section of the calendar, not a tile of its own */
-      attIn: !!t.closest(".tile.agd"), attTile: document.querySelectorAll(".tile.att").length,
+      /* the chevron that opens the Calendar is ink-grey by default, which is
+         a smudge on the gradient */
+      chev: getComputedStyle(t.querySelector("h3"), "::after").color,
+      /* and it is a tile of its own again, with the second list gone */
+      attTile: document.querySelectorAll(".tile.att").length,
+      agdTile: document.querySelectorAll(".tile.agd").length,
       /* nothing is left of the card it took the colour from */
       heroes: document.querySelectorAll(".tile.hero.a").length,
       dl: document.querySelectorAll('[data-ov="deadline"]').length
@@ -2427,16 +2424,20 @@ for (var bw of [390, 1280]) {
      JSON.stringify(hero.inks));
   ok("and the Next deadline card is gone with its gradient",
      hero.heroes === 0 && hero.dl === 0, JSON.stringify(hero));
-  /* *"combining the next 10 and on the calendar blocks"*: two tiles listing
-     the same tasks said the same thing twice at the top of the view. */
-  ok("and it is a section inside On the calendar, not a tile of its own",
-     hero.attIn && hero.attTile === 0 && hero.rows > 0, JSON.stringify(hero));
+  /* *"just keep the needs attention section as it's own in the current
+     colour. Remove the this month/on the calendar."* A list of everything
+     dated this month is the Calendar's job, and the first screen only has to
+     answer what to do now. */
+  ok("and the chevron that opens the Calendar is white too",
+     /255, 255, 255/.test(hero.chev), hero.chev);
+  ok("and it is a tile of its own, with no second list under it",
+     hero.attTile === 1 && hero.agdTile === 0 && hero.rows > 0, JSON.stringify(hero));
 
   /* "the 'tomorrow' bubble on due tasks are too dark" */
   var chips = await s36.p.evaluate(function () {
     document.documentElement.setAttribute("data-theme", "dark");
     var out = [];
-    Array.prototype.forEach.call(document.querySelectorAll(".asec.att .chip.d"), function (e) {
+    Array.prototype.forEach.call(document.querySelectorAll(".att .chip.d"), function (e) {
       var cs = getComputedStyle(e);
       out.push({ bg: cs.backgroundColor, fg: cs.color });
     });
@@ -2454,11 +2455,11 @@ for (var bw of [390, 1280]) {
   /* "move the in 15d text under the date" + "align the statuses across the
      board - they are a bit left or right to each other" */
   var agd = await s36.p.evaluate(function () {
-    var rows = document.querySelectorAll(".agd .agr");
+    var rows = document.querySelectorAll(".att .agr");
     if (!rows.length) return { none: true };
     var inDate = !!rows[0].querySelector(".agd-d .chip.d");
     var atRight = !!rows[0].querySelector(":scope > .chip.d");
-    var lefts = Array.prototype.map.call(document.querySelectorAll(".asec.att .chip.d"), function (e) {
+    var lefts = Array.prototype.map.call(document.querySelectorAll(".att .chip.d"), function (e) {
       return Math.round(e.getBoundingClientRect().left);
     });
     return { inDate: inDate, atRight: atRight, lefts: lefts, n: rows.length };
@@ -2746,7 +2747,7 @@ for (var bw of [390, 1280]) {
      reads as a countdown rather than a second date. */
   var cd = await s38.p.evaluate(function () {
     setView("over");
-    var c = document.querySelector(".asec.att .agd-d .chip.d");
+    var c = document.querySelector(".att .agd-d .chip.d");
     if (!c) return { none: true };
     var day = c.parentNode.querySelector("b");
     return { txt: c.textContent.trim(),
@@ -3170,11 +3171,11 @@ for (var ew of [390, 1280]) {
     document.querySelector("#bento .trk h3").click();
     out.trk = view;
     setView("over"); render();
-    document.querySelector("#bento .agd h3").click();
+    document.querySelector("#bento .att h3").click();
     out.agd = view;
     /* and a row inside the same tile still opens its task */
     setView("over"); render();
-    var row = document.querySelector("#bento .agd .agr");
+    var row = document.querySelector("#bento .att .agr");
     out.rowId = row ? row.dataset.go : null;
     if (row) row.click();
     out.opened = openId;
@@ -3182,7 +3183,7 @@ for (var ew of [390, 1280]) {
     return out;
   });
   ok("the Progress by track heading opens the Board", hv.trk === "board", JSON.stringify(hv));
-  ok("the On the calendar heading opens the Calendar", hv.agd === "cal", JSON.stringify(hv));
+  ok("the Needs attention heading opens the Calendar", hv.agd === "cal", JSON.stringify(hv));
   ok("and a row in the same tile still opens its task",
      !!hv.rowId && hv.opened === hv.rowId, JSON.stringify(hv));
   ok("no console errors through the heading checks", s44.errs.length === 0, s44.errs.join(" | "));
@@ -3347,7 +3348,7 @@ for (var nw of [390, 1280]) {
     setView("over"); render();
     var t = document.querySelector(".rcent").getBoundingClientRect();
     var b = document.querySelector("#bento").getBoundingClientRect();
-    var a = document.querySelector(".agd").getBoundingClientRect();
+    var a = document.querySelector(".att").getBoundingClientRect();
     return { w: t.width, b: b.width, agd: a.width,
              /* It ran opposite the agenda until 2026-10-07 and now runs the
                 full width at the foot: *"Move the recently completed box in
@@ -4035,14 +4036,14 @@ var MAPSEED = { kb: [
              stampLast: b.lastElementChild.className };
   });
   ok("every block on Overview carries a key, and the build line stays last",
-     k56.keys.length >= 10 && k56.keys.indexOf("agenda") >= 0 &&
+     k56.keys.length >= 10 && k56.keys.indexOf("attention") >= 0 &&
      /bstamp/.test(k56.stampLast), JSON.stringify(k56));
   ok("and nothing of the arranging mode shows until it is asked for",
      !k56.wig && k56.x === 0 && k56.bar === 0, JSON.stringify(k56));
 
   /* a long press on a block is what starts it, and a drag must not */
   var box = await s56.p.evaluate(function () {
-    var e = document.querySelector('#bento [data-ov="agenda"]').getBoundingClientRect();
+    var e = document.querySelector('#bento [data-ov="attention"]').getBoundingClientRect();
     return { x: Math.round(e.left + e.width / 2), y: Math.round(e.top + 14) };
   });
   await s56.p.mouse.move(box.x, box.y);
@@ -4079,17 +4080,17 @@ var MAPSEED = { kb: [
   var pts = await s56.p.evaluate(function () {
     var el = document.querySelectorAll('#bento > [data-ov]');
     var st = document.getElementById("stage");
-    /* The calendar opens the view now that the deadline card is gone, and it
-       is taller than a 390x844 screen, so the block after it starts well
-       below the fold and neither midpoint is a point he can drag to. Scroll
-       the next block into view and drag it *up* over the calendar instead:
-       same swap, and it is the case the rule has to survive. */
+    /* The first block is taller than the drag, so scroll the second into
+       view and drag it *up* over the first. The drop lands in the lower half
+       of the block it passes, which is the case the rule has to survive: a
+       rule reading which half it landed in would refuse to swap. */
     st.scrollTop = st.scrollTop + el[1].getBoundingClientRect().top - 300;
     var r1 = el[1].getBoundingClientRect(), r0 = el[0].getBoundingClientRect();
+    var to = Math.round(r1.top - 160);
     return { a: { x: Math.round(r1.left + r1.width / 2), y: Math.round(r1.top + 20) },
-             b: { x: Math.round(r1.left + r1.width / 2), y: Math.round(r1.top - 160) },
+             b: { x: Math.round(r1.left + r1.width / 2), y: to },
              first: el[0].dataset.ov, second: el[1].dataset.ov,
-             bh: Math.round(r0.height), vh: window.innerHeight };
+             bh: Math.round(r0.height), mid: Math.round(r0.top + r0.height / 2), to: to };
   });
   await s56.p.mouse.move(pts.a.x, pts.a.y);
   await s56.p.mouse.down();
@@ -4101,12 +4102,12 @@ var MAPSEED = { kb: [
     return { first: el[0].dataset.ov, second: el[1].dataset.ov,
              order: (stored.order || []).slice(0, 2) };
   });
-  /* and the block it was dragged past is taller than the screen, which is
-     the case that decides the rule: its midpoint is a point he cannot drag
-     to, so "which half of it am I on" would make it impossible to move
-     anything past the calendar at all. */
-  ok("the block dragged past is taller than the screen", pts.bh > pts.vh,
-     JSON.stringify({ bh: pts.bh, vh: pts.vh }));
+  /* and the drop lands in the *lower* half of the block it passed, which is
+     the case that decides the rule: "which half of it am I on" would read
+     that as "stay where you are" and refuse the move. Reading the direction
+     of travel asks for the position the row is already heading to. */
+  ok("the drop lands on the far side of the block's own midpoint",
+     pts.to > pts.mid, JSON.stringify({ to: pts.to, mid: pts.mid, bh: pts.bh }));
   ok("dragging a block past another swaps them, and the order is written out",
      dr56.first === pts.second && dr56.second === pts.first &&
      dr56.order[0] === pts.second, JSON.stringify({ was: pts, now: dr56 }));
