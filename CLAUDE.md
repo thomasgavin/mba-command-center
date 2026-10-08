@@ -562,6 +562,47 @@ the thing it was never allowed to be. **`/push/test` stays on the relay**: the
 next time this goes quiet the banner comes back for an evening, rather than
 the route being rebuilt from memory.
 
+**And the lock screen went silent for three days because the sender was
+never told.** *"Still not getting any notifications"*, and nothing about the
+push machinery was broken: the subscription, the VAPID signature, `sw.js` and
+all three gates were fine. The relay is the only sender, and it runs those
+gates only on a payload that arrives at **`/agent/reply`**. The Routine that
+writes the nudges and the briefs fires into a cloud session whose egress
+policy **blocks `workers.dev` outright** -- `curl` to it returns `000` from
+there -- so every one of those runs falls back to committing into
+`claude-inbox/`, and a file in that folder is something the relay never hears
+about. Three days of briefs and nudges landed as commits, the board picked
+them up on its next pull, and not one of them was ever sent to a phone.
+
+`.github/workflows/relay-notify.yml` is the missing leg: on a push to
+`claude-inbox/` it posts each file Claude just committed to `/agent/reply`
+from a runner, which can reach the relay. It is the **complement of Answer
+notes** -- that job skips a head commit starting `Claude:`, this one runs on
+nothing else -- because a board payload posted to `/agent/reply` would be
+filed as Claude's own words and would never start the run that answers it. It
+runs no Claude CLI, so it cannot loop and costs nothing. Re-applying a file
+the board also pulled is a no-op by construction: every item carries its own
+clock.
+
+**The rule this leaves: a sender that is unreachable from where the message is
+written is not a sender.** Nothing on the board could show this, which is
+exactly why it is checked rather than trusted.
+
+**"Sent" was not the same as "accepted", and `notify()` could not tell them
+apart.** It recorded `sent` and `dropped`, so a 403 on a bad signature and a
+201 that reached Apple both came back as `sent:1, dropped:0` -- the two cases
+the test button exists to separate, indistinguishable from the relay as well
+as from his phone. It records the status each push came back with now, and
+`/push/test` reports them, so one tap says which of the three it is: nothing
+subscribed, refused by the push service, or accepted and dropped by iOS.
+
+**The banner is back, for as long as that is the question.** It is silent once
+subscribed, which is right only while it is working -- a subscription exists
+either way, so a quiet banner is the state nothing on screen can tell apart
+from a working one. The check measures the button's **box**, not its
+`textContent`, because a label with no box is the trap it fell into the first
+time.
+
 `checks/relay-push-check.mjs` verifies the VAPID JWT against the public key the
 board is handed, the same way the push service will. A signature that is subtly
 wrong is a 403 at Apple and silence on his phone hours later, which is
@@ -2105,7 +2146,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 469 invariants, three widths, a real browser. Every one of them was a
+that runs: 473 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

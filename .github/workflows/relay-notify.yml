@@ -1,0 +1,75 @@
+# A nudge written on the file route still has to be able to ring his phone.
+#
+# The relay is the only push sender -- it is the only part of this that is
+# awake when a nudge is written -- and it only looks at a payload that arrives
+# on /agent/reply. The Routine that writes the nudges and the briefs runs in a
+# cloud session whose egress policy blocks workers.dev outright, so every one
+# of those runs falls back to committing into claude-inbox/, and a file in that
+# folder is something the relay never hears about. The board picked them up on
+# its next pull and the lock screen stayed silent: three days of briefs and
+# nudges landed as commits and not one of them was sent to a phone.
+#
+# So this job is the missing leg. It takes the files Claude just committed and
+# posts each one to /agent/reply from a runner, which can reach the relay. The
+# relay then folds it, pushes it down the open socket and runs its three
+# notification gates exactly as it does on the fast route.
+#
+# It is deliberately the complement of "Answer notes": that job skips a head
+# commit starting "Claude:", this one is the only thing that runs on them.
+name: Relay Claude's files
+
+on:
+  push:
+    branches: [main]
+    paths: ["claude-inbox/**"]
+  workflow_dispatch:
+
+# One at a time, in order. Two runs posting overlapping files is harmless --
+# every item carries its own clock -- but the log reads better in sequence.
+concurrency:
+  group: relay-notify
+  cancel-in-progress: false
+
+jobs:
+  relay:
+    # Only Claude's own files. His board publishes into the same folder on the
+    # GitHub fallback route, and posting one of those to /agent/reply would
+    # file his note as Claude's and skip the run that answers it. The relay's
+    # own daily archive holds nothing the board has not already seen.
+    if: >-
+      startsWith(github.event.head_commit.message, 'Claude:') &&
+      !startsWith(github.event.head_commit.message, 'Relay snapshot')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # the diff of the pushed commit is the list of files to send
+          fetch-depth: 2
+
+      - name: Post each new file to the relay
+        env:
+          RELAY_URL: https://mba-cc-relay.thomasgavin777.workers.dev
+          RELAY_AGENT_KEY: ${{ secrets.RELAY_AGENT_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RELAY_AGENT_KEY:-}" ]; then
+            echo "RELAY_AGENT_KEY is not set; nothing can be posted." >&2
+            exit 1
+          fi
+          files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'claude-inbox/*.json' || true)
+          if [ -z "$files" ]; then echo "no inbox files in this commit"; exit 0; fi
+          rc=0
+          for f in $files; do
+            echo "--- $f"
+            # --fail-with-body so a rejection prints the reason rather than a
+            # bare exit code, and a bad file does not stop the rest going
+            code=$(curl -sS -o /tmp/resp -w '%{http_code}' -X POST \
+              "$RELAY_URL/agent/reply" \
+              -H "Content-Type: application/json" \
+              -H "X-Agent-Key: $RELAY_AGENT_KEY" \
+              --data-binary "@$f") || code=000
+            echo "  -> $code $(cat /tmp/resp)"
+            [ "$code" = "200" ] || rc=1
+          done
+          exit $rc

@@ -896,11 +896,15 @@ for (var w2 of [390, 1280]) {
   });
   ok("it offers once, with a button to tap",
      !states.offer.off && !!states.offer.btn && states.offer.shown, JSON.stringify(states.offer));
-  /* It carried a test button for one evening, which is what proved his phone
-     was reachable; then it was a banner restating a working state at the top
-     of the thread every time he opened Chat. "Perfect, now I got the
-     notification. Remove the test banner." */
-  ok("and goes away once he is subscribed", states.done.off, JSON.stringify(states.done));
+  /* It was silent once he was subscribed, which is right only while it is
+     working. It went quiet again -- *"Still not getting any notifications"* --
+     and that is the state nothing on screen can tell apart from a working
+     one: a subscription exists either way. The button is back, and the trap
+     it fell into the first time is a label with no box, so this measures the
+     box rather than reading `textContent`. */
+  ok("and carries a test he can actually tap once he is subscribed",
+     !states.done.off && states.done.quiet && /test/i.test(states.done.btn)
+       && states.done.shown, JSON.stringify(states.done));
 
   /* An iPhone in a Safari tab cannot be asked at all. A dead button there reads
      as the feature being broken; the sentence is the whole fix. */
@@ -919,6 +923,38 @@ for (var w2 of [390, 1280]) {
      !safari.off && safari.quiet && /Home Screen/.test(safari.txt) && !safari.btn,
      JSON.stringify(safari));
   await s18.ctx.close();
+}
+
+/* ---- 18b. a nudge written on the file route still reaches the relay ----
+   The relay is the only push sender, and it only runs its notification gates
+   on a payload that arrives at /agent/reply. The Routine that writes the
+   nudges and the briefs runs where workers.dev is blocked outright, so it
+   commits into claude-inbox/ instead -- and three days of briefs and nudges
+   landed as commits with the lock screen silent, because a file in that
+   folder is something the relay never hears about. The workflow is the
+   missing leg, and it is checked rather than trusted: it is the one piece of
+   this whose failure is invisible from the board. */
+{
+  var wf = fs.readFileSync(path.join(ROOT, ".github/workflows/relay-notify.yml"), "utf8");
+  var nt = fs.readFileSync(path.join(ROOT, ".github/workflows/notes.yml"), "utf8");
+  ok("the file route posts what Claude committed to /agent/reply",
+     /claude-inbox\/\*\*/.test(wf) && /\/agent\/reply/.test(wf) && /X-Agent-Key/.test(wf), "");
+  /* and it is the complement of Answer notes, not a second copy of it: that
+     job skips a "Claude:" head commit, this one runs on nothing else. A board
+     payload posted to /agent/reply would be filed as Claude's own words and
+     would never start the run that answers it. */
+  ok("and only on Claude's own commits, which Answer notes skips",
+     /startsWith\(github\.event\.head_commit\.message, 'Claude:'\)/.test(wf)
+       && /!startsWith\(github\.event\.head_commit\.message, 'Claude:'\)/.test(nt), "");
+  ok("and it never asks for a Claude run, so it cannot loop",
+     !/claude -p|CLAUDE_CODE_OAUTH_TOKEN/.test(wf), "");
+
+  /* the relay has to say what the push service answered, or the test button
+     cannot separate "accepted and iOS dropped it" from "refused" -- counting
+     sends gave the same number for both */
+  var rw = fs.readFileSync(path.join(ROOT, "relay/worker.js"), "utf8");
+  ok("and the relay records the status each push came back with",
+     /codes\.push\(r \? r\.status : 0\)/.test(rw) && /accepted:accepted/.test(rw), "");
 }
 
 /* ---- 19. a tapped notification lands on the task it was about ---- */

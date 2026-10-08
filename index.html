@@ -5079,7 +5079,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-07-2010";
+var BUILD="2026-10-08-1545";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -6263,13 +6263,13 @@ function syncPush(){
   if(!pushOK()) return hide();
   if(Notification.permission==="denied")
     return show("Notifications are blocked. Turn them back on in Settings, under Notifications.","",true);
-  /* Already on: nothing to say. It carried a test button for one evening,
-     which is what proved his phone was reachable -- and then it was a banner
-     restating a working state at the top of the thread, every time he opened
-     Chat. *"Perfect, now I got the notification. Remove the test banner."*
-     `/push/test` on the relay stays: the next time this goes quiet, the
-     banner can come back for an evening rather than the route being rebuilt. */
-  if(pushSubbed) return hide();
+  /* Already on, and silence is the honest state only while it is working.
+     It has gone quiet again -- *"Still not getting any notifications"* -- and
+     this is the case the route was kept alive for: a subscription exists, so
+     nothing on screen can tell a relay that sent nothing from a subscription
+     iOS has dropped from under him. One tap answers it. The banner comes
+     back for as long as that is the question and goes again when it is not. */
+  if(pushSubbed) return show("Notifications are on for this device.","Send a test",true);
   show("Get nudges on your lock screen, not just here.","Turn on");
 }
 
@@ -6316,10 +6316,28 @@ function askPush(){
     });
   }).catch(function(){ toast("Could not turn notifications on."); syncPush(); });
 }
-/* The banner is the offer to subscribe and nothing else now. The relay keeps
-   `/push/test`, which is how this was proved working; nothing on the board
-   calls it while the board has nothing to diagnose. */
-document.getElementById("pbnB").addEventListener("click",askPush);
+/* One button, two jobs, decided by the state the banner is already in: an
+   offer to subscribe while he is not, and the test while he is. */
+function testPush(){
+  toast("Sending a test notification\u2026");
+  fetch(RELAY+"/push/test",{method:"POST"})
+    .then(function(r){ return r.json().then(function(j){ return {s:r.status,j:j}; }); })
+    .then(function(res){
+      var j=res.j||{};
+      /* The three answers this separates, and they are three different jobs:
+         nothing is subscribed (subscribe again), the push service refused it
+         (the relay's problem), or it was accepted and never arrived (iOS, and
+         Settings is the only place left to look). */
+      if(res.s===429) return toast("Already sent one in the last minute. Try again shortly.");
+      if(!j.devices) return toast("No device is subscribed. Press Turn on again from your Home Screen app.");
+      if(!j.accepted) return toast("Sent to "+j.devices+" device, and the push service refused it ("+(j.codes||[]).join(", ")+"). That is on the relay, not your phone.");
+      toast("Accepted by the push service for "+j.accepted+" device. If nothing arrives, it is iOS: check Settings \u203a Notifications.");
+    })
+    .catch(function(){ toast("Could not reach the relay to send a test."); });
+}
+document.getElementById("pbnB").addEventListener("click",function(){
+  if(pushSubbed) testPush(); else askPush();
+});
 
 /* ---------- the one measurement the CSS could not be trusted with ----------
    His installed app reports env(safe-area-inset-bottom) at about 93px where

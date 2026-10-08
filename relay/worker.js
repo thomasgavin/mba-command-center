@@ -302,7 +302,7 @@ export class Board {
      service entirely and keeps aes128gcm out of this file. */
   async notify(){
     var subs = (await this.ctx.storage.get("subs")) || {};
-    var eps = Object.keys(subs), dead = [];
+    var eps = Object.keys(subs), dead = [], codes = [];
     for(var i=0;i<eps.length && i<PUSH_MAX;i++){
       var ep = eps[i], r = null;
       try{
@@ -312,6 +312,12 @@ export class Board {
           "Authorization":"vapid t="+a.jwt+", k="+a.pub
         }});
       }catch(e){ r = null; }
+      /* What the push service actually answered. Counting sends was not
+         enough: a 403 on a bad VAPID signature and a 201 that reached Apple
+         both recorded `sent:1, dropped:0`, so "sent and accepted" and "sent
+         and refused" -- the two cases the test button exists to separate --
+         were indistinguishable from here as well as from his phone. */
+      codes.push(r ? r.status : 0);
       /* 404 and 410 are the push service saying this device is gone for good.
          Anything else may be transient and the subscription stays. */
       if(r && (r.status===404 || r.status===410)) dead.push(ep);
@@ -320,7 +326,9 @@ export class Board {
       dead.forEach(function(k){ delete subs[k]; });
       await this.ctx.storage.put("subs", subs);
     }
-    await this.ctx.storage.put("lastPush", {at:new Date().toISOString(), sent:eps.length, dropped:dead.length});
+    await this.ctx.storage.put("lastPush", {at:new Date().toISOString(),
+      sent:eps.length, dropped:dead.length, codes:codes});
+    return codes;
   }
 
   /* What the worker will read back. Only Claude's own notes ring a phone: his
@@ -766,9 +774,14 @@ export class Board {
         body: "If you can read this, the lock screen works.",
         tag: "mbacc-test", about: null, at: new Date().toISOString()
       });
-      await this.notify();
+      var codesT = await this.notify();
       var lp = (await this.ctx.storage.get("lastPush")) || {};
-      return out(200, {ok:true, devices:Object.keys(subsT).length, sent:lp.sent||0, dropped:lp.dropped||0});
+      /* 201 is Apple accepting it. Anything else is the answer he needs to
+         see, because from the phone a refusal and a silent delivery look the
+         same: nothing happens. */
+      var accepted = (codesT||[]).filter(function(c){ return c === 201 || c === 200; }).length;
+      return out(200, {ok:accepted>0, devices:Object.keys(subsT).length,
+        sent:lp.sent||0, dropped:lp.dropped||0, accepted:accepted, codes:codesT||[]});
     }
 
     if(p === "/push/sub" || p === "/push/unsub"){
