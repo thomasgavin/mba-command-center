@@ -206,3 +206,18 @@ not send, and what you are waiting on. If nothing qualified, say so in one line.
 - Do not change `index.html` from this skill. A nudge run that decides the
   board needs a code change should say so in the nudge and leave it; code
   requests come through `answer-notes`, where he has asked for one.
+
+## Committing it, on the file route
+
+Commit to `main`, data only, with a message starting `Claude:` — and **never
+with `[skip ci]` in it**. GitHub honours `[skip ci]` for the entire push, so
+no workflow runs, including `relay-notify.yml`, which is the job that hands
+the file to the relay. The relay is the only thing that can send a
+notification, so a nudge committed with `[skip ci]` reaches the board on its
+next refresh and never reaches his phone at all. That is exactly what happened
+for three days up to 2026-10-08. The `Claude:` prefix is the loop guard and it
+is enough on its own.
+
+```
+git commit -m "Claude: <the nudge in a few words>"
+```

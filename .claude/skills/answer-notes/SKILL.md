@@ -302,7 +302,8 @@ between them is a bug.
 
 On the relay route there is no commit, so write the node into `kb[]` of the
 reply you post to `/agent/reply`, and commit `KNOWLEDGE.md` on its own with
-`[skip ci]`.
+`[skip ci]` — that is a commit touching no file in `claude-inbox/`, which is
+the only kind `[skip ci]` is still right for. See §5.
 
 ## 4. Age out the thread
 
@@ -324,6 +325,16 @@ The message must start with `Claude:` — the workflow skips its own pushes on
 that prefix, and without it your reply triggers another run that replies to
 itself. (The relay route cannot loop at all: a reply posted to the relay never
 asks for a run.)
+
+**And it must NOT contain `[skip ci]`.** That is not a second belt on the same
+loop; it is the one thing that breaks the only route a nudge has to his
+phone. GitHub honours `[skip ci]` for the whole push, so **no workflow runs at
+all** — including `relay-notify.yml`, which is what hands the file to the
+relay, and the relay is the only thing that can send a notification. Three
+days of briefs and nudges went out carrying it and his lock screen stayed
+silent. The `Claude:` prefix is the loop guard and it is sufficient on its
+own: `notes.yml` skips on it. `[skip ci]` belongs only on a commit that
+touches nothing in `claude-inbox/`.
 
 ## 6. A note can ask for a code change, and you make it
 

@@ -283,3 +283,9 @@ Say in the run log which edition you wrote, which sections it carried, and
 anything you deliberately left out. Confirm the post landed — on the file route
 that means the commit is pushed, and the commit message starts `Claude:` so the
 Answer notes workflow does not spend a run on it.
+
+**Never put `[skip ci]` in that message.** GitHub honours it for the whole
+push, so no workflow runs — including `relay-notify.yml`, the job that hands
+the file to the relay, and the relay is the only thing that can send the
+"today's daily brief is ready" notification he asked for by name. The
+`Claude:` prefix is the loop guard and it is enough on its own.

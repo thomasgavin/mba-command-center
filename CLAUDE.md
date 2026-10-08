@@ -576,7 +576,17 @@ them up on its next pull, and not one of them was ever sent to a phone.
 
 `.github/workflows/relay-notify.yml` is the missing leg: on a push to
 `claude-inbox/` it posts each file Claude just committed to `/agent/reply`
-from a runner, which can reach the relay. It is the **complement of Answer
+from a runner, which can reach the relay.
+
+**So a commit into `claude-inbox/` must never carry `[skip ci]`**, and that is
+the other half of why the lock screen was silent: every one of those commits
+had it. GitHub honours `[skip ci]` for the whole push, so it stops *every*
+workflow, this one included -- the belt that was meant to save a Claude run
+was cutting the only wire a nudge has to his phone. The `Claude:` prefix is
+the loop guard and `notes.yml` skips on it alone, so `[skip ci]` belongs only
+on a commit that touches nothing in that folder. It is written into all three
+skills and `REVIEW.md`, because the Routine's own prompt lives outside this
+repo and only he can change it. It is the **complement of Answer
 notes** -- that job skips a head commit starting `Claude:`, this one runs on
 nothing else -- because a board payload posted to `/agent/reply` would be
 filed as Claude's own words and would never start the run that answers it. It

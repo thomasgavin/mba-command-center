@@ -1,0 +1,26 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-08T15:55:21Z",
+ "notes": [
+  {
+   "id": "claude-20261008T155521Z-cf",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "cf-interview",
+   "round": 1,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-09"
+   },
+   "title": "Interview still unconfirmed",
+   "text": "Your Campus France interview is tomorrow morning and you have not confirmed it yet. Fitria will postpone it unless you bring the original bachelor's certificate and transcript. - Confirm tonight and check both originals are actually with you.",
+   "state": "new",
+   "createdAt": "2026-10-08T15:55:21Z",
+   "at": "2026-10-08T15:55:21Z"
+  }
+ ],
+ "changed": []
+}

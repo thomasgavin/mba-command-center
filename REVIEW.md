@@ -628,6 +628,16 @@ main" does not save the run -- observed, 7 Oct. The Answer notes workflow fires 
 merging a code PR that happens to correct a file there spends a Claude run on
 nothing. Observed once, on the PR that wrote this document.
 
+**But never on a commit that is only Claude writing to the board.** A nudge, a
+brief, a mail note or a reply committed into `claude-inbox/` must carry
+`Claude:` and nothing else. `[skip ci]` is honoured by GitHub for the entire
+push, so it stops **every** workflow -- including `relay-notify.yml`, which is
+the job that hands the file to the relay, and the relay is the only thing that
+can send a notification. Three days of briefs and nudges shipped with it and
+his lock screen stayed silent; that is the bug, not a saved run. The `Claude:`
+prefix already skips Answer notes on its own, which is why the prefix is the
+marker and `[skip ci]` was only ever the belt.
+
 The standing permission to commit, push, open the PR and merge without asking is
 paid for by the list above, not by care taken afterwards.
 
