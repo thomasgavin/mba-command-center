@@ -36,9 +36,14 @@ jobs:
     # GitHub fallback route, and posting one of those to /agent/reply would
     # file his note as Claude's and skip the run that answers it. The relay's
     # own daily archive holds nothing the board has not already seen.
+    # A dispatch carries no head commit, so both reads below are null and the
+    # job would skip itself -- which would leave the one piece of this whose
+    # failure is invisible from the board with no way to prove it still works
+    # short of waiting for the next nudge.
     if: >-
-      startsWith(github.event.head_commit.message, 'Claude:') &&
-      !startsWith(github.event.head_commit.message, 'Relay snapshot')
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.head_commit.message, 'Claude:') &&
+       !startsWith(github.event.head_commit.message, 'Relay snapshot'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
