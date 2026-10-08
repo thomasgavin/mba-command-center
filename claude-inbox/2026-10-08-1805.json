@@ -1,0 +1,50 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-08T18:05:00.000Z",
+ "ack": [],
+ "notes": [
+  {
+   "id": "claude-20261008-1805-cfint",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Interview moves to next week",
+   "text": "You told me your original degree certificate and transcript only reach you next week, so the Friday slot cannot happen. I have dated this Friday 16 October as a placeholder - change it when Fitria gives you the new slot. - Tell her now rather than no-showing, or rebooking gets harder.",
+   "state": "new",
+   "createdAt": "2026-10-08T18:05:00.000Z",
+   "at": "2026-10-08T18:05:00.000Z"
+  },
+  {
+   "id": "claude-20261008-1805-visa",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at TLS Contact",
+   "title": "Passport clash with your KITAS",
+   "text": "The consulate keeps your passport from submission until the decision, roughly two to three weeks, and you also need it for the KITAS exit permit and your 7 November flight. Submitting in Jakarta after a mid-October interview leaves no margin. - Applying from India in November is the safer route.",
+   "state": "new",
+   "createdAt": "2026-10-08T18:05:01.000Z",
+   "at": "2026-10-08T18:05:01.000Z"
+  }
+ ],
+ "changed": [
+  {
+   "id": "cf-interview",
+   "at": "2026-10-08T18:05:00.000Z",
+   "due": "2026-10-16",
+   "status": "todo",
+   "priority": "Critical",
+   "manual": true
+  },
+  {
+   "id": "vfs-appt",
+   "at": "2026-10-08T18:05:00.000Z",
+   "due": "2026-10-23",
+   "status": "blocked",
+   "priority": "Critical",
+   "manual": true,
+   "title": "Submit the visa application at TLS Contact",
+   "effort": "day"
+  }
+ ]
+}
