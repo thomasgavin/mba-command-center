@@ -221,3 +221,9 @@ is enough on its own.
 ```
 git commit -m "Claude: <the nudge in a few words>"
 ```
+
+**And never write the marker in the body either.** GitHub matches it anywhere
+in the commit message, not just the subject line. The commit that documented
+this rule quoted the marker in its own explanation and skipped every workflow
+on the way in -- the nudge it carried never reached the relay. Name it in
+prose ("the CI-skip marker") when a commit message has to talk about it.

@@ -638,6 +638,13 @@ his lock screen stayed silent; that is the bug, not a saved run. The `Claude:`
 prefix already skips Answer notes on its own, which is why the prefix is the
 marker and `[skip ci]` was only ever the belt.
 
+**And never write the marker in the body either.** GitHub matches it anywhere
+in the commit message, not just the subject line. The commit that documented
+this rule quoted the marker in its own explanation and skipped every workflow
+on the way in -- the nudge it carried never reached the relay. Name it in
+prose ("the CI-skip marker") when a commit message has to talk about it.
+
+
 The standing permission to commit, push, open the PR and merge without asking is
 paid for by the list above, not by care taken afterwards.
 

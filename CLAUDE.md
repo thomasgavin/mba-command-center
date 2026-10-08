@@ -586,7 +586,11 @@ was cutting the only wire a nudge has to his phone. The `Claude:` prefix is
 the loop guard and `notes.yml` skips on it alone, so `[skip ci]` belongs only
 on a commit that touches nothing in that folder. It is written into all three
 skills and `REVIEW.md`, because the Routine's own prompt lives outside this
-repo and only he can change it. It is the **complement of Answer
+repo and only he can change it. **The marker is matched anywhere in the message, body
+included** -- the commit that first wrote this rule down quoted it in its own
+explanation and skipped every workflow on the way in, so the nudge it was
+carrying never reached the relay. Name it in prose when a commit message has
+to talk about it. It is the **complement of Answer
 notes** -- that job skips a head commit starting `Claude:`, this one runs on
 nothing else -- because a board payload posted to `/agent/reply` would be
 filed as Claude's own words and would never start the run that answers it. It
