@@ -1,0 +1,26 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-08T02:06:01.000Z",
+ "notes": [
+  {
+   "id": "claude-20261008T020601000Z-sbi",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "sbi-sanction",
+   "round": 2,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-24"
+   },
+   "title": "Two days, no reply",
+   "text": "Your branch has not come back since you replied on 6 Oct that the charges confirmation already went on 3 Oct. The 5 November instalment is waiting on this sanction. - Call the branch today rather than sending another email.",
+   "state": "new",
+   "createdAt": "2026-10-08T02:06:01.000Z",
+   "at": "2026-10-08T02:06:01.000Z"
+  }
+ ],
+ "changed": []
+}
