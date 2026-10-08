@@ -1,0 +1,77 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-08T12:07:10.000Z",
+ "notes": [
+  {
+   "id": "claude-20261008-1210-cfint",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Interview is not waived",
+   "text": "You asked Campus France today about an exemption and Fitria said the interview is mandatory, whatever your INSEAD admission says. You deleted this task last week assuming it was waived, so I have put it back and dated it tomorrow. - Her slot is Friday 10.30 in Jakarta and still needs confirming.",
+   "state": "new",
+   "createdAt": "2026-10-08T12:07:10.000Z",
+   "at": "2026-10-08T12:07:10.000Z"
+  },
+  {
+   "id": "claude-20261008-1211-tls",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "VFS appointment in Indonesia",
+   "title": "Visa slot moves to Monday",
+   "text": "If tomorrow's interview goes ahead, Fitria says you can submit at TLS Contact on Monday, with a decision in about 15 days, so I moved this from 10 November to 12 October. - Create your France-Visas and TLS accounts before then, and phone TLS for a slot rather than booking on their site.",
+   "state": "new",
+   "createdAt": "2026-10-08T12:07:10.000Z",
+   "at": "2026-10-08T12:07:10.000Z"
+  },
+  {
+   "id": "claude-20261008-1212-kitas",
+   "from": "claude",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "KITAS date needs checking",
+   "text": "You told Campus France today that your KITAS expires on 11 November. This task says the 8th. - Tell me which is right and I will move it.",
+   "state": "new",
+   "createdAt": "2026-10-08T12:07:10.000Z",
+   "at": "2026-10-08T12:07:10.000Z"
+  },
+  {
+   "id": "claude-20261008-1213-nudge",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Interview tomorrow, bring originals",
+   "text": "Campus France says the interview is mandatory and has put you in the earliest slot, tomorrow at 10.30 in Jakarta. You have not confirmed it yet, and Fitria will postpone it unless you bring your original bachelor's degree certificate and transcript. - Confirm tonight and check both originals are with you.",
+   "state": "new",
+   "createdAt": "2026-10-08T12:07:10.000Z",
+   "at": "2026-10-08T12:07:10.000Z",
+   "kind": "nudge",
+   "about": "cf-interview",
+   "round": 1,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-09"
+   }
+  }
+ ],
+ "changed": [
+  {
+   "id": "cf-interview",
+   "at": "2026-10-08T12:07:10.000Z",
+   "deleted": false,
+   "status": "todo",
+   "due": "2026-10-09",
+   "priority": "Critical",
+   "manual": true,
+   "title": "Attend the Campus France interview",
+   "effort": "quick"
+  },
+  {
+   "id": "vfs-appt",
+   "at": "2026-10-08T12:07:10.000Z",
+   "due": "2026-10-12",
+   "manual": true
+  }
+ ]
+}
