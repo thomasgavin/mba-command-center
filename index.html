@@ -48,7 +48,17 @@
 <script>
 (function(){
   try{
-    var t=localStorage.getItem("mbacc_theme")==="dark"?"dark":"light";
+    /* A re-added Home Screen icon is a fresh install: localStorage is empty,
+       so nothing he ever chose is readable here and the old reading of that
+       was "light". The light page is `#f6f5f9`, which is byte for byte the
+       strip he has been reporting -- iOS keeps whatever the page looked like
+       at launch for the bar it reserves, so the board came up light, he
+       triple-tapped it dark, and the strip stayed the colour of the frame
+       iOS had already photographed. Nothing stored means nothing chosen, so
+       ask the OS instead of assuming the lighter of the two. */
+    var st=localStorage.getItem("mbacc_theme");
+    var t=st==="dark"||st==="light" ? st
+      : (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
     var m=document.querySelector('meta[name="theme-color"]');
     if(m) m.setAttribute("content", t==="dark" ? "#1b1b1b" : "#ff6429");
@@ -5079,7 +5089,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-08-1545";
+var BUILD="2026-10-08-1815";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5436,17 +5446,41 @@ document.getElementById("dBody").addEventListener("keydown",function(e){
    belongs to the screen it is read on, and putting it in the board blob would
    dim his laptop because he dimmed his phone at midnight. */
 var THEME_KEY="mbacc_theme";
-function setTheme(t){
+/* Nothing stored means nothing chosen. The boot line below used to write
+   "light" into storage on the first load of a fresh install, which turned
+   "he has not said" into "he said light" before he had touched anything --
+   and then the OS preference could never be read again. So applying a theme
+   and recording a choice are two things now: boot applies, the triple tap
+   records. */
+function prefTheme(){
+  var st=null;
+  try{ st=localStorage.getItem(THEME_KEY); }catch(e){}
+  if(st==="dark"||st==="light") return st;
+  return (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+}
+function applyTheme(t){
   if(t==="dark") document.documentElement.setAttribute("data-theme","dark");
   else document.documentElement.removeAttribute("data-theme");
   /* the iOS status bar reads this, so a dark board under a white strip is the
      one thing left looking half-done */
   var m=document.querySelector('meta[name="theme-color"]');
   if(m) m.setAttribute("content", t==="dark" ? "#1b1b1b" : "#ff6429");
+}
+function setTheme(t){
+  applyTheme(t);
   try{ localStorage.setItem(THEME_KEY,t); }catch(e){}
 }
 function theme(){ return document.documentElement.getAttribute("data-theme")==="dark" ? "dark" : "light"; }
-try{ setTheme(localStorage.getItem(THEME_KEY)==="dark" ? "dark" : "light"); }catch(e){}
+applyTheme(prefTheme());
+/* and it follows the OS while he has made no choice of his own -- a phone
+   that goes dark at sunset should take the board with it. */
+try{
+  if(window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){
+    var st=null;
+    try{ st=localStorage.getItem(THEME_KEY); }catch(e){}
+    if(st!=="dark"&&st!=="light") applyTheme(prefTheme());
+  });
+}catch(e){}
 
 var brandTaps=0, brandT=null;
 document.querySelector(".brand").addEventListener("click",function(){

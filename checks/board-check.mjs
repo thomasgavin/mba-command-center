@@ -2163,6 +2163,43 @@ for (var bw of [390, 1280]) {
          && /27, 27, 27/.test(first35.page || ""),
        JSON.stringify(first35));
     await dk.ctx.close();
+
+    /* And the case nothing had ever measured: a re-added Home Screen icon is
+       a *fresh* install, so there is no stored theme at all -- which is the
+       one thing that is different about a re-add, and the reason the strip
+       came back every time. The old reading of "nothing stored" was "light",
+       whose page is `#f6f5f9`: exactly the colour he kept reporting. Nothing
+       stored means nothing chosen, so the OS decides. */
+    var fctx = await browser.newContext({ viewport: { width: 390, height: 844 },
+      hasTouch: true, isMobile: true, colorScheme: "dark" });
+    var fp = await fctx.newPage();
+    await fp.goto(URL_, { waitUntil: "load" });
+    var fresh35 = await fp.evaluate(function () {
+      var m = document.querySelector('meta[name="theme-color"]');
+      return { theme: document.documentElement.getAttribute("data-theme"),
+               tc: m && m.getAttribute("content"),
+               page: getComputedStyle(document.body).backgroundColor,
+               stored: localStorage.getItem("mbacc_theme") };
+    });
+    ok("a fresh install on a dark phone paints dark on the very first frame",
+       fresh35.theme === "dark" && fresh35.tc === "#1b1b1b"
+         && /27, 27, 27/.test(fresh35.page || ""), JSON.stringify(fresh35));
+    /* and it must not record that as a choice: writing "light" on the first
+       load of a fresh install is what stopped the OS preference from ever
+       being read a second time. */
+    ok("and records nothing, because he has not chosen anything yet",
+       fresh35.stored === null, JSON.stringify(fresh35));
+
+    /* his own choice still outranks the OS, in the awkward direction */
+    await fp.evaluate(function () { try { localStorage.setItem("mbacc_theme", "light"); } catch (e) {} });
+    await fp.reload({ waitUntil: "load" });
+    var chose35 = await fp.evaluate(function () {
+      return { theme: document.documentElement.getAttribute("data-theme"),
+               stored: localStorage.getItem("mbacc_theme") };
+    });
+    ok("and a light board he asked for stays light on a dark phone",
+       chose35.theme === null && chose35.stored === "light", JSON.stringify(chose35));
+    await fctx.close();
   }
 
   /* The one that actually mattered, and the reason this is measured rather

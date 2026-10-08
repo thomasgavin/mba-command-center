@@ -970,6 +970,29 @@ thumb's reach.
   inset and cost seven rounds at the other end of the screen. The check
   **measures the computed canvas in both themes** rather than reading a token,
   because reading tokens is exactly what passed while his phone was white.
+- **And it came back on every re-add, because a fresh install has no stored
+  theme.** *"Everytime I re-add the app to my homescreen the top white issue
+  happens again"*, which is the one report that named its own trigger: a
+  re-added Home Screen icon is a new install, so `localStorage` is empty.
+  `"nothing stored"` was read as `"light"`, whose `--page` is **`#f6f5f9`** --
+  byte for byte the strip measured off his screenshots months of fixes ago.
+  The board launched light, iOS photographed that frame for the bar it
+  reserves, he triple-tapped to dark, and the strip kept the colour of a frame
+  nothing in the page could repaint. Every earlier fix was aimed at what
+  paints the strip; this one is about **which theme is on screen when iOS
+  takes the picture**.
+  Nothing stored means nothing chosen, so the OS decides: `prefTheme()` reads
+  `prefers-color-scheme` when the key is absent, in the head init and at boot
+  alike. And **boot no longer writes**. It called `setTheme("light")` on the
+  first load of a fresh install, which turned "he has not said" into "he said
+  light" before he had touched anything -- after which the OS preference could
+  never be read again, so the recovery was a triple tap every time. Applying a
+  theme and recording a choice are two functions now (`applyTheme` and
+  `setTheme`); only the triple tap records, and a `prefers-color-scheme`
+  listener follows the phone while he has made no choice of his own.
+  **The rule: a default is not a choice, and writing one down loses the
+  difference.**
+
 - **`layoutLine()` is why there was no seventh round, and it lives in the
   log.** Six reports were spent measuring his screenshots in pixels to work
   out which number was wrong — the viewport, the bar's height, the padding or
@@ -2160,7 +2183,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 474 invariants, three widths, a real browser. Every one of them was a
+that runs: 477 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
