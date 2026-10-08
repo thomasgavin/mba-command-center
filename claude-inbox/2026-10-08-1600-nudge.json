@@ -1,7 +1,7 @@
 {
  "v": 1,
  "op": "patch",
- "exportedAt": "2026-10-08T15:59:03Z",
+ "exportedAt": "2026-10-08T16:00:32Z",
  "notes": [
   {
    "id": "claude-20261008T155521Z-cf",
@@ -18,8 +18,8 @@
    "title": "Interview still unconfirmed",
    "text": "Your Campus France interview is tomorrow morning and you have not confirmed it yet. Fitria will postpone it unless you bring the original bachelor's certificate and transcript. - Confirm tonight and check both originals are actually with you.",
    "state": "new",
-   "createdAt": "2026-10-08T15:59:03Z",
-   "at": "2026-10-08T15:59:03Z"
+   "createdAt": "2026-10-08T16:00:32Z",
+   "at": "2026-10-08T16:00:32Z"
   }
  ],
  "changed": []

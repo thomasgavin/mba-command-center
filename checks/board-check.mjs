@@ -948,6 +948,12 @@ for (var w2 of [390, 1280]) {
        && /!startsWith\(github\.event\.head_commit\.message, 'Claude:'\)/.test(nt), "");
   ok("and it never asks for a Claude run, so it cannot loop",
      !/claude -p|CLAUDE_CODE_OAUTH_TOKEN/.test(wf), "");
+  /* Re-stamping a nudge -- writing it again under a new filename with a fresh
+     clock, which is what a resend is -- makes git call the pair a rename, and
+     a rename is neither A nor M. The job skipped the file and reported
+     success having sent nothing, which is the worst shape this can fail in. */
+  ok("and a re-stamped nudge is not read as a rename and skipped",
+     /--no-renames/.test(wf), "");
 
   /* the relay has to say what the push service answered, or the test button
      cannot separate "accepted and iOS dropped it" from "refused" -- counting

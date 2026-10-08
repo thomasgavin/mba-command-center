@@ -62,7 +62,13 @@ jobs:
             echo "RELAY_AGENT_KEY is not set; nothing can be posted." >&2
             exit 1
           fi
-          files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'claude-inbox/*.json' || true)
+          # --no-renames is load-bearing. Re-stamping a nudge -- writing it
+          # again under a new filename with a fresh clock, which is what a
+          # resend is -- makes git call the pair a rename, and a rename is
+          # neither A nor M, so the file was skipped and the job reported
+          # success having sent nothing. Observed, 8 Oct, on the first real
+          # nudge to come through here.
+          files=$(git diff --no-renames --name-only --diff-filter=AM HEAD~1 HEAD -- 'claude-inbox/*.json' || true)
           if [ -z "$files" ]; then echo "no inbox files in this commit"; exit 0; fi
           rc=0
           for f in $files; do
