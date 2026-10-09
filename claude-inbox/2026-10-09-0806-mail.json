@@ -1,0 +1,28 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-09T08:06:42.000Z",
+ "notes": [
+  {
+   "id": "claude-20261009-0806-cfint",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Interview set for Wednesday",
+   "text": "Fitria confirmed Wednesday 14 October at 10am, in person at their Thamrin office, so I moved this off Friday. Your originals have to be in your hand by then, and TLS can take the application about two working days after. - Chase the courier now, so Tuesday is not when you find out.",
+   "state": "new",
+   "createdAt": "2026-10-09T08:06:42.000Z",
+   "at": "2026-10-09T08:06:42.000Z"
+  }
+ ],
+ "changed": [
+  {
+   "id": "cf-interview",
+   "at": "2026-10-09T08:06:42.000Z",
+   "due": "2026-10-14",
+   "status": "todo",
+   "priority": "Critical",
+   "manual": true
+  }
+ ]
+}
