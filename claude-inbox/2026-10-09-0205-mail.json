@@ -1,0 +1,19 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-09T02:05:46.000Z",
+ "notes": [
+  {
+   "id": "claude-20261009-0205-cfint",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Interview waiting on courier",
+   "text": "You asked Fitria yesterday evening to push the interview back, since your original degree certificate and transcript are being couriered and arrive early next week. She has not replied, and her office says messages take two to three working days. - She signs off with a WhatsApp number, which will get you a slot faster than email.",
+   "state": "new",
+   "createdAt": "2026-10-09T02:05:46.000Z",
+   "at": "2026-10-09T02:05:46.000Z"
+  }
+ ],
+ "changed": []
+}
