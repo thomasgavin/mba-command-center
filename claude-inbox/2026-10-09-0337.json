@@ -1,0 +1,1823 @@
+{
+  "v": 3,
+  "op": "archive",
+  "exportedAt": "2026-10-09T03:37:38.158Z",
+  "why": "daily snapshot from the relay",
+  "notes": [
+    {
+      "id": "n1791085058450232",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Testing the relay",
+      "createdAt": "2026-10-04T03:37:38.450Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791108000000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "That milestone is gated on the 'Book flight to Paris for 3 January' task, and you marked that task Done last night (20:44 on 3 Oct). The milestone counts as reached whenever its gate task is done, so it flipped. It is really showing 'flight booked', not 'moved', which is misleading, since the 3 Jan date is still three months away. If the flight is booked, nothing is wrong with your data. I have not changed anything. The fix is in the board's code (gate the milestone on something that happens at arrival, or relabel it), so I'd do that on a branch rather than from this workflow.",
+      "createdAt": "2026-10-04T04:18:12.092Z",
+      "state": "read",
+      "acted": [
+        "No board changes: the flight task being Done is what ticks the milestone"
+      ]
+    },
+    {
+      "id": "n1791081138224668",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "The move to fonty milestone is marked done - why is that",
+      "createdAt": "2026-10-04T02:32:18.224Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791054175853317",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "Move this to blocked and eef validation to to-do. Validation just started",
+      "createdAt": "2026-10-03T19:02:55.853Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791050837660694",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Deadline for payment extended to 5 nov",
+      "createdAt": "2026-10-03T18:07:17.660Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791049895665591",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "Deadline for payment changed to 5 mov by insead on my request due to delay in loan processing",
+      "createdAt": "2026-10-03T17:51:35.665Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791047161234214",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "The date gas been extended by Insead on my request to 5 nov due to loan delays",
+      "createdAt": "2026-10-03T17:06:01.234Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791039114071829",
+      "itemId": "nri-fema",
+      "itemTitle": "Resolve NRI / FEMA co-applicant problem",
+      "text": "Remove this, not applicable",
+      "createdAt": "2026-10-03T14:51:54.071Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791036159823489",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "text": "1 month extension approved by INSEAD due to loan delays",
+      "createdAt": "2026-10-03T14:02:39.823Z",
+      "state": "read",
+      "answered": true
+    },
+    {
+      "id": "n1791085100626833",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Testing the relay",
+      "createdAt": "2026-10-04T03:38:20.626Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085240878322",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "testing relay",
+      "createdAt": "2026-10-04T03:40:40.878Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085365781179",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "tesing relay - 4",
+      "createdAt": "2026-10-04T03:42:45.781Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "n1791085935072805",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "test relay -5",
+      "createdAt": "2026-10-04T03:52:15.072Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791111600000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Your relay tests (including test relay -5) all arrived, and this reply is coming back down the same socket, so the round trip works. Nothing on the board needed changing.",
+      "createdAt": "2026-10-04T04:18:12.804Z",
+      "state": "read",
+      "acted": [
+        "No board changes: relay test messages only"
+      ]
+    },
+    {
+      "id": "claude-1791087487000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Your relay tests arrived and this reply is going back down the same route, so the round trip works. Nothing on the board needed changing.",
+      "createdAt": "2026-10-04T04:18:07.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: relay test messages only"
+      ]
+    },
+    {
+      "id": "n1791087585634897",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for “Moving in to Club 8” and tie this milestone completion to that task",
+      "createdAt": "2026-10-04T04:19:45.634Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791087613",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Good fix: a Club 8 move-in task is the right gate for that milestone, since it would tick on arrival rather than when the flight is booked. A new task and a re-gated milestone live in the board's code, not in your data, so I can't add them from this reply workflow. I've changed nothing and it needs a code change on a branch with a PR. Until then the milestone will keep reading as reached because the flight task is Done.",
+      "createdAt": "2026-10-04T04:20:13.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n179108765776777",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Why can’t you directly do the code change and merge/commit?",
+      "createdAt": "2026-10-04T04:20:57.767Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791087688",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "I can, just not from this chat. This quick-reply job is deliberately limited to your data (dates, statuses, replies). Its rules say code changes go on a branch with a PR, and it has no way to open a browser and test. The repo does let me commit, open a PR and merge without asking, but only after I've tried the change in a real browser and the board checks pass, because a merge goes live straight away. That needs a full coding session. In one of those, adding the 'Moving in to Club 8' task and gating the milestone on it is a small change I can make and merge. Start a session on the repo and ask for it, and it will go through.",
+      "createdAt": "2026-10-04T04:21:28.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: explained why code changes need a full session"
+      ]
+    },
+    {
+      "id": "n179108824845392",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for “Moving in to Club 8” and tie this milestone completion to that task",
+      "createdAt": "2026-10-04T04:30:48.453Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088284000",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Good call, and it fixes the 'move to Fontainebleau is done' problem properly: the milestone should be reached by moving in, not by booking the flight. Adding a task means editing the board's task list in code, which I can't do from this reply workflow, so I haven't changed anything yet. I'd add a 'Move in to Club 8' task due 3 Jan 2027 and gate the milestone on it, on a branch with a check. Say go (or ask me from a code session) and I'll do it.",
+      "createdAt": "2026-10-04T04:31:24.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n179108834874360",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "The latest change we pushed explicitly was so you can make changes on your own",
+      "createdAt": "2026-10-04T04:32:28.743Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088389",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "You're right that the repo now lets small code changes go straight to main, and I've read that commit. Two things still keep it out of this chat job: the Club 8 move-in task changes the task list and the milestone gate, which counts as a data-model change and so still gets a PR, and this job's own rules forbid editing code and give it no browser to test in. A normal Claude Code session on the repo has none of those limits, so the move-in task and the re-gated milestone have to be done there. I've changed nothing on the board.",
+      "createdAt": "2026-10-04T04:33:09.516Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791088695064689",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Add a task for move in to club 8 dated 3 jan and tie this milestone completion to that task instead",
+      "createdAt": "2026-10-04T04:38:15.064Z",
+      "state": "read",
+      "from": "me",
+      "answered": true
+    },
+    {
+      "id": "claude-1791088728",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Understood: a 'Move in to Club 8' task dated 3 Jan, with the move milestone gated on it instead of the flight. I haven't made it, because new tasks and milestone gates live in the board's code (SEED and MILES), and this reply job is limited to your data. The change itself is small. It needs a full coding session on the repo, where I can test it in a browser and run the board checks before merging. Ask for it there and it will ship. Until then the milestone keeps reading as reached because the flight task is Done.",
+      "createdAt": "2026-10-04T04:38:48.000Z",
+      "state": "read",
+      "acted": [
+        "No board changes: new task and milestone gate need a code change"
+      ]
+    },
+    {
+      "id": "n1791119072828765",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Move the beds attention section up on the overview tab",
+      "createdAt": "2026-10-04T13:04:32.828Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119235",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Done. I read 'beds attention' as 'Needs attention'. It now sits straight under the milestones at the top of Overview, full width. It's live. Force-quit the app once to pick it up. If you meant a different section, tell me which.",
+      "createdAt": "2026-10-04T13:07:15.000Z",
+      "state": "read",
+      "acted": [
+        "Overview: Needs attention moved directly under the milestones",
+        "Checks pass, with a new one for the order"
+      ]
+    },
+    {
+      "id": "n1791119359180992",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "Add a follow-up subtask to check with Campus France Indonesia team",
+      "createdAt": "2026-10-04T13:09:19.180Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119459",
+      "from": "claude",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "Added \"Follow up with Campus France Indonesia team\" as its own task under Visa, High priority, due 14 Oct. The board has no subtasks, so it sits alongside EEF validation rather than inside it, and it isn't blocked on anything so you can do it now. The date is my placeholder, so move it to suit. It's live; force-quit the app once to pick it up.",
+      "createdAt": "2026-10-04T13:10:59.000Z",
+      "state": "read",
+      "acted": [
+        "New task cf-indonesia (Visa, High, 14 Oct)",
+        "BUILD bumped, 85 board checks pass, pushed to main"
+      ]
+    },
+    {
+      "id": "n1791126016347316",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Canpus France - have sent them an email but no response yet. Remind me to follow up Tuesday.",
+      "createdAt": "2026-10-04T15:00:16.347Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791119880313",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "sbi-sanction",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "text": "Where does the SBI sanction stand — have they come back, or is it still sitting with the branch? It is dated 24 Oct and the 5 Nov instalment depends on it, and since nothing on your board carries a time estimate yet I am reminding you off the date alone, which is far too late for something that is mostly three weeks of their time.",
+      "createdAt": "2026-10-04T13:18:01.312Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-10-24"
+      }
+    },
+    {
+      "id": "claude-1791119880312",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "cf-indonesia",
+      "itemId": "cf-indonesia",
+      "itemTitle": "Follow up with Campus France Indonesia team",
+      "text": "Booking the Campus France interview is Critical and dated 10 Oct, but the only thing that moves it — chasing the Indonesia team — is sitting on a placeholder date of 14 Oct, four days after. Chase them this week, or move the interview date so the board stops saying you are on track.",
+      "createdAt": "2026-10-04T13:18:00.312Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-14"
+      }
+    },
+    {
+      "id": "n1791126024349402",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "SBI - still in process",
+      "createdAt": "2026-10-04T15:00:24.349Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791126120000",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Done: the Campus France Indonesia follow-up was due Monday 5 Oct, so I moved it to Tuesday 6 Oct, and it will show up as due that day. On SBI, noted that it is still in process. I left the 24 Oct sanction date alone, and I'll keep it in view since the 5 Nov instalment depends on it.",
+      "createdAt": "2026-10-04T15:01:19.786Z",
+      "state": "read",
+      "acted": [
+        "Follow up with Campus France Indonesia team moved from 5 Oct to Tue 6 Oct"
+      ]
+    },
+    {
+      "id": "n179112688047396",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "I deleted this task - why is it still in visa overview section",
+      "createdAt": "2026-10-04T15:14:40.473Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791127128000",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Book Campus France interview",
+      "text": "That was a bug: the Visa overview tile read the task list directly and ignored deletions, so a deleted step stayed in the sequence. It now skips deleted tasks, and so do the milestones and the Accommodation tile, which had the same flaw. It's live. Force-quit the app once to pick it up.",
+      "createdAt": "2026-10-04T15:18:48.000Z",
+      "state": "read",
+      "acted": [
+        "Visa tile, milestones and Accommodation tile now ignore deleted tasks",
+        "Added a board check for it"
+      ]
+    },
+    {
+      "id": "n1791130309766342",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "my flight ticket to paris is booked on 3 rd jan",
+      "createdAt": "2026-10-04T16:11:49.766Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791130386",
+      "from": "claude",
+      "itemId": "flight",
+      "itemTitle": "Book flight to Paris for 3 January",
+      "text": "Noted. The flight task was already Done on the board, so nothing needed to change. The 'Move in to Club 8' task now gates the move milestone, so that one will stay open until you arrive.",
+      "createdAt": "2026-10-04T16:13:06.000Z",
+      "state": "read",
+      "acted": []
+    },
+    {
+      "id": "claude-1791181370000",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "locus-exit",
+      "itemId": "locus-exit",
+      "itemTitle": "Plan Locus exit: notice, LWD, handover",
+      "text": "The Locus exit is Critical and you pulled it to 7 Oct, two days out, but the board has no resignation date, notice period or last working day on it. Where does it stand, and how long is what is left?",
+      "createdAt": "2026-10-05T06:22:50.000Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-10-07"
+      }
+    },
+    {
+      "id": "n1791197018924615",
+      "itemId": "cf-indonesia",
+      "itemTitle": "Follow up with Campus France Indonesia team",
+      "text": "Got a reply from them, additional documents are required - mark it for today",
+      "createdAt": "2026-10-05T10:43:38.925Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791197066",
+      "from": "claude",
+      "itemId": "cf-indonesia",
+      "itemTitle": "Follow up with Campus France Indonesia team",
+      "text": "Done. The follow-up is now due today, 5 Oct (it was 6 Oct). Once you have the extra documents they asked for, tell me which ones and I can add a task to gather them.",
+      "createdAt": "2026-10-05T10:44:26.000Z",
+      "state": "read",
+      "acted": [
+        "Campus France Indonesia follow-up due moved 6 Oct to 5 Oct"
+      ]
+    },
+    {
+      "id": "n1791197097220585",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "Why is it still named follow-up when the action is on me? I expect you to be smarter than this",
+      "createdAt": "2026-10-05T10:44:57.220Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791197156",
+      "from": "claude",
+      "itemId": "cf-indonesia",
+      "itemTitle": "Send Campus France the additional documents they asked for",
+      "text": "You're right. They replied and asked for more, so the next move is yours: sending them documents, not chasing them. I should have renamed it when I moved the date. It's now 'Send Campus France the additional documents they asked for', still due today. I don't know which documents they want, so tell me and I'll list them as a checklist.",
+      "createdAt": "2026-10-05T10:45:56.000Z",
+      "state": "read",
+      "acted": [
+        "Renamed 'Follow up with Campus France Indonesia team' to 'Send Campus France the additional documents they asked for'"
+      ]
+    },
+    {
+      "id": "claude-20261005T145136",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "text": "I've filled the Mind map from the two P0 decks you shared - the 24 September P0 intro and the 2 October Career Journey webinar. 45 things, under Academics, Career and Student Life, with the ones that have a task on the board linked to it.\n\nThe internship point is in there as you put it: optional, an 8-week Short-Term Summer Project in the 1 July to 22 August break after P3, with a startup tour or time off as the alternatives, and your plan to start looking from day one. Worth knowing two things the decks add to that. Internship recruitment activities run through P2, so the hunt really starts in March, and some internships begin in June 2027 before P3 even finishes. And CDC asks 27Ds not to book a Sector Advisor until after the Careers Across Geographies & Sectors workshop in February - except for early internship applications, which is the stated exception, so that is your route in.\n\nEverything in there came off those two decks. Nothing is invented. Ask the map anything and I'll answer from it.",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "state": "read",
+      "acted": [
+        "45 nodes filed under Academics, Career and Student Life",
+        "Linked to 19 tasks already on your board",
+        "Mirrored into KNOWLEDGE.md in the repo"
+      ]
+    },
+    {
+      "id": "claude-1791222540004",
+      "from": "claude",
+      "itemId": "cdc-quests",
+      "itemTitle": "Do the CareerLeader and Career Anchors questionnaires",
+      "text": "✉ [CDC] How to prepare for your first coaching session - Create your Career Reports! (5 Oct, An Cao and Jade Phung, CDC)\n\nThis is the official brief for the two exercises this task already covers: CareerLeader (register at careerleader.com with your INSEAD address and the class registration key, three assessments, then pull the report off the dashboard) and Career Anchors (an Excel from the CDC site). The deadline is \"before your first coaching session\", coaches open from early November, and they push you to do the coaching in P0 because P1 is academically brutal. Registration key left out of this note on purpose. They also link registration for P0 Webinar #2 on 13 November, which is the webinar already on the board.",
+      "createdAt": "2026-10-05T14:09:01.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791222540002",
+      "from": "claude",
+      "itemId": "vmock",
+      "itemTitle": "Activate VMock CV platform access",
+      "text": "✉ Welcome to VMock, Gavin (5 Oct, VMock)\n\nThe welcome mail landed on your INSEAD address at 14:29 Paris, so the account is live. Marking this done — untick it if you only half finished the signup. The CV itself is the next step, and it is already waiting on this one.",
+      "createdAt": "2026-10-05T12:59:26.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791222540003",
+      "from": "claude",
+      "itemId": "casecoach",
+      "itemTitle": "Register for Case Coach",
+      "text": "✉ Your interview prep journey starts here (5 Oct, CaseCoach)\n\nCaseCoach confirmed the registration and sent the first onboarding mail from their founder, so the account exists. Marking this done. Their course starts with what to expect from a case interview, which is reading rather than a task.",
+      "createdAt": "2026-10-05T12:55:05.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791222540001",
+      "from": "claude",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "✉ Soumission de votre dossier pré-consulaire (5 Oct, Etudes en France)\n\nEtudes en France confirmed your corrected preconsular file was submitted to Espace Campus France Indonésie, and you wrote back to Fitria the same afternoon saying the changes were done and re-submitted, noting you added your current role as a second entry because the Academic/Professional section needs a minimum of two. So the file is with them again and the ball is in their court. Dossier reference left out of this note on purpose.",
+      "createdAt": "2026-10-05T12:38:38.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791198042000",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "cf-validation",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "Campus France has reviewed your file and sent it back for corrections this morning, asking for them as soon as possible: one fix in the identity section and your bachelor's certificate and transcripts re-uploaded. You have to submit the file again before they will re-check it, and nothing downstream moves until they do. I have left the specifics out of here on purpose, since this board is public - they are in your inbox.",
+      "createdAt": "2026-10-05T11:00:42.000Z",
+      "state": "read",
+      "round": 1,
+      "was": {
+        "status": "blocked",
+        "due": "2026-10-25"
+      },
+      "acted": [
+        "Marked 'Follow up with Campus France Indonesia team' done - they came back to you today, so the chase is over"
+      ]
+    },
+    {
+      "id": "claude-1791199150002",
+      "from": "claude",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "✉ RE: Account Verification (5 Oct, Fitria, Campus France Jakarta)\n\n\"We have sent you access to make the requested modifications to the relevant sections. Please let us know once the modifications have been completed.\" So the portal is open for the corrections above, and they want a note back when you are done.",
+      "createdAt": "2026-10-05T10:30:56.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791199150005",
+      "from": "claude",
+      "itemId": "casecoach",
+      "itemTitle": "Register for Case Coach",
+      "text": "✉ Fw: Your CaseCoach INSEAD Subscription invitation (5 Oct, CaseCoach)\n\nThe CaseCoach subscription invitation, forwarded from your INSEAD address. This is the registration the task is about.",
+      "createdAt": "2026-10-05T10:30:07.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791199150004",
+      "from": "claude",
+      "itemId": "vmock",
+      "itemTitle": "Activate VMock CV platform access",
+      "text": "✉ Fw: Enhance your CV with VMock SMART Career Platform (5 Oct, INSEAD)\n\nThe VMock invitation, forwarded from your INSEAD address. This is the access the task is about.",
+      "createdAt": "2026-10-05T10:29:51.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791199150003",
+      "from": "claude",
+      "itemId": "docs-apost",
+      "itemTitle": "Apostille and attest academic documents",
+      "text": "✉ Etudes en France: Please correct your preconsular file (5 Oct, Campus France Indonesia)\n\nThis is the task the correction lands on: they want the original bachelor certificate in colour and the transcripts re-uploaded. Due 18 Oct here, but Campus France asked for it as soon as possible and the EEF validation waits on it.",
+      "createdAt": "2026-10-05T10:29:36.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791199150001",
+      "from": "claude",
+      "itemId": "cf-validation",
+      "itemTitle": "Campus France EEF validated",
+      "text": "✉ Etudes en France: Please correct your preconsular file (5 Oct, Campus France Indonesia)\n\nThey have checked the file and sent it back for corrections, asked for as soon as possible. Two things: add your ITAS in the identity section, and upload the original bachelor certificate in colour plus your transcripts. The fields are marked \"to correct\" in the portal. You have to submit the file again before they re-check it, and they warn that each extra round costs time. Dossier reference left out of this note on purpose.",
+      "createdAt": "2026-10-05T10:29:35.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-1791199150006",
+      "from": "claude",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "text": "✉ Authority to recover legal and valuation charges (3 Oct, sent by you to the branch)\n\nYou sent the branch the authority to recover legal and valuation charges against the education loan application, copying your parents. Nothing back from them yet as of this scan.",
+      "createdAt": "2026-10-03T13:21:40.000Z",
+      "state": "read"
+    },
+    {
+      "id": "n1791239957159647",
+      "itemId": "vfs-appt",
+      "itemTitle": "VFS appointment during India trip",
+      "text": "I’m doing VFS from here in Indonesia, not india",
+      "createdAt": "2026-10-05T22:39:17.159Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true,
+      "answered": true
+    },
+    {
+      "id": "claude-1791240243",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "VFS appointment in Indonesia",
+      "text": "Got it, the VFS appointment is in Indonesia. I renamed the task to 'VFS appointment in Indonesia'. The old name was wrong in the board's base data, so I fixed it there as well. It will show on your devices after a force-quit.",
+      "createdAt": "2026-10-05T22:44:03.000Z",
+      "state": "read",
+      "acted": [
+        "Renamed the VFS task to say Indonesia instead of India trip, live now; force-quit the app once to pick it up"
+      ]
+    },
+    {
+      "id": "claude-1791240290000",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "VFS appointment in Indonesia",
+      "text": "Noted: VFS is in Indonesia, not India. Your board already carries the renamed task, so nothing needed changing. The date (10 Nov) and the Campus France validation it waits on are unaffected by where you go.",
+      "createdAt": "2026-10-05T22:44:50.000Z",
+      "state": "read"
+    },
+    {
+      "id": "claude-20261008T155521Z-cf",
+      "itemId": "cf-interview",
+      "itemTitle": "Attend the Campus France interview",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "cf-interview",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-09"
+      },
+      "title": "Interview still unconfirmed",
+      "text": "Your Campus France interview is tomorrow morning and you have not confirmed it yet. Fitria will postpone it unless you bring the original bachelor's certificate and transcript. - Confirm tonight and check both originals are actually with you.",
+      "state": "new",
+      "createdAt": "2026-10-08T16:00:32Z",
+      "at": "2026-10-08T16:00:32Z"
+    },
+    {
+      "id": "claude-20261008-1805-cfint",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Attend the Campus France interview",
+      "title": "Interview moves to next week",
+      "text": "You told me your original degree certificate and transcript only reach you next week, so the Friday slot cannot happen. I have dated this Friday 16 October as a placeholder - change it when Fitria gives you the new slot. - Tell her now rather than no-showing, or rebooking gets harder.",
+      "state": "new",
+      "createdAt": "2026-10-08T18:05:00.000Z",
+      "at": "2026-10-08T18:05:00.000Z"
+    },
+    {
+      "id": "claude-20261008-1805-visa",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Passport clash with your KITAS",
+      "text": "The consulate keeps your passport from submission until the decision, roughly two to three weeks, and you also need it for the KITAS exit permit and your 7 November flight. Submitting in Jakarta after a mid-October interview leaves no margin. - Applying from India in November is the safer route.",
+      "state": "new",
+      "createdAt": "2026-10-08T18:05:01.000Z",
+      "at": "2026-10-08T18:05:01.000Z"
+    }
+  ],
+  "changed": [
+    {
+      "id": "tuition-oct",
+      "title": "Pay EUR 53,000 tuition instalment",
+      "status": "doing",
+      "due": "2026-11-05",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T20:45:03.561Z"
+    },
+    {
+      "id": "scholarship-r3",
+      "title": "Chase Round 3 scholarship decision",
+      "status": "done",
+      "due": "2026-09-11",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:15:54.671Z"
+    },
+    {
+      "id": "poa-exec",
+      "title": "Execute PoA at SBI Hindon branch",
+      "status": "done",
+      "due": "2026-10-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "sbi-sanction",
+      "title": "SBI Global Ed-Vantage sanction letter",
+      "status": "todo",
+      "due": "2026-10-24",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T16:17:20.782Z"
+    },
+    {
+      "id": "tuition-apr",
+      "title": "Pay EUR 44,860 final instalment",
+      "status": "blocked",
+      "due": "2027-04-15",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T16:17:20.782Z"
+    },
+    {
+      "id": "cf-interview",
+      "at": "2026-10-08T18:05:00.000Z",
+      "due": "2026-10-16",
+      "status": "todo",
+      "priority": "Critical",
+      "manual": true
+    },
+    {
+      "id": "docs-apost",
+      "title": "Apostille and attest academic documents",
+      "status": "todo",
+      "due": "2026-10-18",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T11:58:15.824Z"
+    },
+    {
+      "id": "cf-validation",
+      "title": "Campus France EEF validated",
+      "status": "todo",
+      "due": "2026-10-21",
+      "priority": "Critical",
+      "snoozes": 1,
+      "origDue": "2026-10-07",
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-05T22:05:54.126Z"
+    },
+    {
+      "id": "flight",
+      "title": "Book flight to Paris for 3 January",
+      "status": "done",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T02:41:19.227Z"
+    },
+    {
+      "id": "bank-fr",
+      "title": "Open French bank account",
+      "status": "blocked",
+      "due": "2027-01-10",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T20:44:28.039Z"
+    },
+    {
+      "id": "portal",
+      "title": "Complete MyINSEAD profile and practical info",
+      "at": "2026-10-05T10:42:41.558Z",
+      "seed": true
+    },
+    {
+      "id": "locus-exit",
+      "title": "Plan Locus exit: notice, LWD, handover",
+      "status": "doing",
+      "due": "2026-10-07",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T13:02:54.344Z"
+    },
+    {
+      "id": "handover-hf",
+      "title": "Hand over HelloFresh FR and UK engagements",
+      "status": "done",
+      "due": "2026-12-05",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "postmba",
+      "title": "Write down post-MBA function, industry, geography",
+      "status": "blocked",
+      "due": "2026-10-31",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:30.806Z"
+    },
+    {
+      "id": "club8-movein",
+      "title": "Move in to Club 8",
+      "status": "blocked",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:28:50.040Z"
+    },
+    {
+      "id": "club8-detail",
+      "title": "Confirm Club 8 inventory and move-in window",
+      "status": "todo",
+      "due": "2026-11-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T10:43:37.258Z"
+    },
+    {
+      "id": "cf-indonesia",
+      "title": "Send Campus France the additional documents they asked for",
+      "status": "done",
+      "due": "2026-10-05",
+      "priority": "High",
+      "snoozes": 1,
+      "origDue": "2026-10-05",
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-06T04:33:17.120Z"
+    },
+    {
+      "id": "third-lang",
+      "title": "Decide and register the third language",
+      "status": "todo",
+      "due": "2027-02-28",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T15:28:36.958Z"
+    },
+    {
+      "id": "housing-h2",
+      "title": "Solve housing after 3 July 2027",
+      "status": "blocked",
+      "due": "2027-03-01",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:28:45.219Z"
+    },
+    {
+      "id": "shipping",
+      "title": "Shipping and baggage plan",
+      "status": "todo",
+      "due": "2026-12-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "at": "2026-10-04T15:28:59.057Z"
+    },
+    {
+      "id": "cv",
+      "title": "Rebuild CV in INSEAD format",
+      "status": "todo",
+      "due": "2026-11-02",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:14.680Z"
+    },
+    {
+      "id": "forex",
+      "title": "Open EUR account for fees and living costs",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:48.122Z"
+    },
+    {
+      "id": "classmates",
+      "title": "Reach out to five MBA'27D classmates",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Low",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:29:52.989Z"
+    },
+    {
+      "id": "insurance",
+      "title": "French health cover and travel insurance",
+      "status": "blocked",
+      "due": "2026-12-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-04T15:30:05.824Z"
+    },
+    {
+      "id": "bizfound",
+      "title": "Decide on Business Foundations and register",
+      "status": "blocked",
+      "due": "2026-10-30",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-05T22:05:54.126Z"
+    },
+    {
+      "id": "vmock",
+      "title": "Activate VMock CV platform access",
+      "status": "done",
+      "due": "2026-10-06",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "at": "2026-10-05T17:09:00.000Z"
+    },
+    {
+      "id": "casecoach",
+      "title": "Register for Case Coach",
+      "status": "done",
+      "due": "2026-10-06",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "at": "2026-10-05T17:09:00.000Z"
+    },
+    {
+      "id": "cdc-coach1",
+      "title": "Book the first CDC coaching session",
+      "status": "blocked",
+      "due": "2026-11-15",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "at": "2026-10-05T22:05:54.126Z"
+    },
+    {
+      "id": "vfs-appt",
+      "at": "2026-10-08T18:05:00.000Z",
+      "due": "2026-10-23",
+      "status": "blocked",
+      "priority": "Critical",
+      "manual": true,
+      "title": "Submit the visa application at TLS Contact",
+      "effort": "day"
+    }
+  ],
+  "kb": [
+    {
+      "id": "k-iaa",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "IAA Alumni Meet & Greet",
+      "body": "The INSEAD Alumni Association's own introduction to the network: who they are, what the regional chapters do, and how alumni actually get used during and after the MBA. Optional in INSEAD's own rating, and the one P0 session that is about the twenty years after the degree rather than the year of it.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "28 October 2026",
+      "w": "2026-10-28"
+    },
+    {
+      "id": "k-pldp-web",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "PLDP intro webinar",
+      "body": "On Zoom. Walks through the Personal Leadership Development Programme: what the P0 assignments ask for, how individual and group coaching fit together across the year, and what your coach does with what you write. INSEAD marks this MUST DO, and it is the session that makes the assignment window make sense rather than feel like homework.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "05 November 2026",
+      "w": "2026-11-05",
+      "item": "pldp-webinar",
+      "rel": [
+        "k-pldp",
+        "k-pldp-p0"
+      ]
+    },
+    {
+      "id": "k-ama",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "AMA on student platforms",
+      "body": "An open question session on the tools you are about to live in: the LMS, CareerGlobe, and the rest of the stack. Optional, and worth it only if something in the platforms is already confusing you by then.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "10 November 2026",
+      "w": "2026-11-10",
+      "rel": [
+        "k-lms",
+        "k-careerglobe"
+      ]
+    },
+    {
+      "id": "k-cvweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "INSEAD CV & Cover Letter webinar",
+      "body": "13:00 Paris / 20:00 Singapore. What belongs in the INSEAD CV format and what gets cut, how recruiters read it, and where the CV work sits in the year: a first draft through VMock before a human sees it, then review with your coach, and the CV Book after that. Must-do for career switchers.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "13 November 2026",
+      "w": "2026-11-13",
+      "item": "cv-webinar",
+      "rel": [
+        "k-cvbook",
+        "k-vmock"
+      ]
+    },
+    {
+      "id": "k-acadweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "Academics overview webinar",
+      "body": "On Zoom, with the MBA Programme Management Director and current students. The curriculum end to end, how the core and electives fit, exemptions, and what people wish they had done before arriving. Highly recommended rather than required, and the one place to ask a second-hand question about workload.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "26 November 2026",
+      "w": "2026-11-26",
+      "item": "acad-webinar",
+      "rel": [
+        "k-p1cores",
+        "k-exempt"
+      ]
+    },
+    {
+      "id": "k-sumweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "Your Summer Experience & Prep for Arrival",
+      "body": "The three honest ways to spend the eight-week break after P3: a short-term summer project with a company, a startup tour, or deliberate time off to prepare for full-time recruitment. Also covers arrival logistics. This is the session that decides what you spend P2 recruiting for.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "04 December 2026",
+      "w": "2026-12-04",
+      "item": "summer-webinar",
+      "rel": [
+        "k-intern",
+        "k-interntiming"
+      ]
+    },
+    {
+      "id": "k-bizfound",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "Business Foundations: register by 30 October",
+      "body": "The course itself runs one week online, 16-20 November: an intensive introduction to Financial Accounting, Finance and Quantitative Methods aimed at people arriving without a quant background. Optional, registered through MyINSEAD, and the decision has to be made three weeks before it runs.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Register by 30 October 2026",
+      "w": "2026-10-30",
+      "item": "bizfound",
+      "rel": [
+        "k-p1cores"
+      ]
+    },
+    {
+      "id": "k-quest",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "CareerLeader and Career Anchors, before the first coaching session",
+      "body": "Two profiling questionnaires plus the workbook questions that go with them. They are the entire raw material for the first coaching conversation, so the session is only as good as what you put in: arriving without them turns a 45-minute slot into an introduction you could have had by email.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Before November 2026",
+      "w": "2026-11-01",
+      "item": "cdc-quests",
+      "rel": [
+        "k-coach1",
+        "k-coach-ses"
+      ]
+    },
+    {
+      "id": "k-pldp-p0",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "PLDP assignments window",
+      "body": "Delivered online through the LMS across roughly seven weeks. Your coach reads these before meeting you, so they are what shapes the coaching you get rather than a box to tick. INSEAD marks them MUST DO, and the window deliberately spans the December break because they are not a single sitting.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "06 Nov - 28 Dec 2026",
+      "w": "2026-11-06",
+      "item": "pldp-work",
+      "rel": [
+        "k-pldp",
+        "k-pldp-web"
+      ]
+    },
+    {
+      "id": "k-launchprep",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "Launch Week career pre-work appears on the LMS",
+      "body": "Posted in early December, to be completed before Launch Week rather than during it. Launch Week is dense enough that anything left undone gets done badly or not at all, and the career workshop assumes the pre-work is behind you.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Early December 2026",
+      "w": "2026-12-01",
+      "item": "launch-prework",
+      "rel": [
+        "k-launch"
+      ]
+    },
+    {
+      "id": "k-p0span",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "P0, the pre-programme period",
+      "when": "26 Oct 2026 - 17 Jan 2027",
+      "w": "2026-10-26",
+      "body": "Where the board is right now: the twelve weeks between the LMS going live and Launch Week. Three strands run through it at once -- Academics, Careers and Student Life -- and almost everything in the Webinars and Deadlines blocks sits inside this stretch. It ends the day Launch Week begins.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-launch"
+      ],
+      "rows": [
+        {
+          "t": "P0",
+          "a": "2026-10-26",
+          "b": "2027-01-17",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-launch",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Launch Week",
+      "body": "Fontainebleau, eleven days. The P1 core exemption exams sit inside it along with orientation, the career workshop and the first run of sessions that set up P1. The pre-work that goes with it lands on the LMS in early December.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "07 - 17 January 2027",
+      "w": "2027-01-07",
+      "rel": [
+        "k-exempt",
+        "k-launchprep"
+      ],
+      "rows": [
+        {
+          "t": "Launch Week",
+          "a": "2027-01-07",
+          "b": "2027-01-17",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-cal",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Period dates, P1 to P5",
+      "body": "Five eight-week periods across eleven months, with a long summer gap in the middle. INSEAD publishes these as provisional and says they can still move, so treat anything booked around the edges as provisional too.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "18 Jan - 4 Dec 2027",
+      "w": "2027-01-18",
+      "rows": [
+        {
+          "t": "P1",
+          "a": "2027-01-18",
+          "b": "2027-03-10",
+          "k": "period"
+        },
+        {
+          "t": "P2",
+          "a": "2027-03-15",
+          "b": "2027-05-04",
+          "k": "period"
+        },
+        {
+          "t": "P3",
+          "a": "2027-05-10",
+          "b": "2027-06-30",
+          "k": "period"
+        },
+        {
+          "t": "P4",
+          "a": "2027-08-23",
+          "b": "2027-10-12",
+          "k": "period"
+        },
+        {
+          "t": "P5",
+          "a": "2027-10-18",
+          "b": "2027-12-04",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-breaks",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Breaks",
+      "body": "Three short ones and the long summer. The short breaks are not empty: career treks and club treks run in them, which is most of what people mean when they say the MBA has no holidays. The 1 July to 22 August gap is the one the summer project fits inside.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Mar / May / Jul-Aug / Oct 2027",
+      "w": "2027-03-11",
+      "rel": [
+        "k-intern"
+      ],
+      "rows": [
+        {
+          "t": "Break",
+          "a": "2027-03-11",
+          "b": "2027-03-14",
+          "k": "break"
+        },
+        {
+          "t": "Break",
+          "a": "2027-05-05",
+          "b": "2027-05-09",
+          "k": "break"
+        },
+        {
+          "t": "Summer",
+          "a": "2027-07-01",
+          "b": "2027-08-22",
+          "k": "break"
+        },
+        {
+          "t": "Break",
+          "a": "2027-10-13",
+          "b": "2027-10-17",
+          "k": "break"
+        }
+      ]
+    },
+    {
+      "id": "k-exchange",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Campus exchange bidding happens during P1",
+      "body": "Campus is Fontainebleau or Singapore for P1 and P2; exchange opens from P3 onwards, and the bidding for it runs inside P1 while you are still finding your feet. The rules change year to year, so the P1 briefing is the authority rather than anything written now.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Bid during P1, Jan - Mar 2027",
+      "w": "2027-01-19"
+    },
+    {
+      "id": "k-grad",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Graduation, Singapore",
+      "body": "Singapore campus, with the grad trip after it. Twenty-three months from the deposit to the gown.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "15 December 2027",
+      "w": "2027-12-15",
+      "rows": [
+        {
+          "t": "Graduation",
+          "a": "2027-12-15",
+          "k": "point"
+        }
+      ]
+    },
+    {
+      "id": "k-lms",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "LMS",
+      "body": "Live from 26 October. Every piece of academic content runs through it, a chunk of the CDC curriculum as well, and club registration too. The PLDP assignments are delivered here.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Live 26 October 2026",
+      "w": "2026-10-26",
+      "item": "lms-start",
+      "rel": [
+        "k-pldp-p0",
+        "k-clubs"
+      ]
+    },
+    {
+      "id": "k-careerglobe",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "CareerGlobe",
+      "body": "Live from 27 October. The CDC platform: appointments, jobs, events. The profile has to be set up before you can book the first coaching appointment, which makes it the gate on everything else CDC.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Live 27 October 2026",
+      "w": "2026-10-27",
+      "item": "careerglobe",
+      "rel": [
+        "k-coach1"
+      ]
+    },
+    {
+      "id": "k-vmock",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "VMock",
+      "body": "Part 1 of the INSEAD CV process. It scores a draft against the format and tells you what to fix, so the version a human finally reads is not the first one you wrote.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "vmock",
+      "rel": [
+        "k-cvbook",
+        "k-cvweb"
+      ]
+    },
+    {
+      "id": "k-cvbook",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "The INSEAD CV format",
+      "body": "One format, used as a networking and marketing document rather than a record of employment, and the basis for the INSEAD CV Book that goes to recruiters. The process runs on through P1, so the first version is not the last.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "cv",
+      "rel": [
+        "k-vmock",
+        "k-cvweb"
+      ]
+    },
+    {
+      "id": "k-cdc",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Two teams behind you: a Career Coach and Employer Engagement",
+      "body": "That is the whole of CDC's structure, and it is worth knowing which one to ask. The coach is your primary contact for strategy, materials and accountability. Employer Engagement are the sector specialists who know what a given industry is actually hiring for this year.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-coach-ses",
+        "k-ee"
+      ]
+    },
+    {
+      "id": "k-coach-ses",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Coaching sessions are 45 minutes and you set the agenda",
+      "body": "Short enough to fit before class, which is deliberate. You bring the update and the question and agree the next steps; the coach pressure-tests the plan rather than making it. A session you arrive at without having done the last set of next steps is a session spent recapping.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-quest",
+        "k-coach1"
+      ]
+    },
+    {
+      "id": "k-coach-alloc",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Your coach is allocated on P1 location and never changes",
+      "body": "Deliberately coach-agnostic: they are allocated by where you start, follow you the whole MBA including exchange, and there are no coach changes. So the relationship is worth investing in early rather than shopping around.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-coach1",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "First coaching session, from November",
+      "body": "Covers how the partnership works, what CareerLeader and Career Anchors said about you, and the three stages of the career journey. CareerGlobe has to be set up before you can book it.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "From November 2026",
+      "w": "2026-11-02",
+      "item": "cdc-coach1",
+      "rel": [
+        "k-quest",
+        "k-careerglobe"
+      ]
+    },
+    {
+      "id": "k-journey",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "The career journey is three stages",
+      "body": "Self Awareness: strengths, interests, values, and what you actually bring. Market Exploration: industry knowledge built through networking, narrowed to two or three target plans rather than one bet or ten. Execution: a value proposition you can say out loud, and recruiting to each sector's real timetable, which differs by months.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "postmba",
+      "rel": [
+        "k-takeaways"
+      ]
+    },
+    {
+      "id": "k-switcher",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Career switcher status decides how much of CDC is must-do",
+      "body": "Most CDC items are marked must-do for people switching Location, Sector or Function, and only highly recommended for everyone else. Which of the three you are switching is therefore the single input that sets your CDC workload, and it is worth writing down early.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "postmba"
+    },
+    {
+      "id": "k-ee",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Employer Engagement are Sector Advisors",
+      "body": "Subject-matter experts who split their time between advising students and talking to companies, which is what makes their market read current. They give market intelligence, name who to connect with, sharpen a pitch for a specific sector, and help with offer negotiation.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-cags"
+      ]
+    },
+    {
+      "id": "k-cags",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Careers Across Geographies & Sectors workshop",
+      "body": "February 2027, for Fontainebleau and Singapore. CDC asks 27Ds not to book Sector Advisor appointments until after it, because most of the sector information is delivered there and a one-to-one before it just repeats the workshop. The one exception is roles with early internship application deadlines.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "February 2027",
+      "w": "2027-02-01",
+      "rel": [
+        "k-ee",
+        "k-interntiming"
+      ]
+    },
+    {
+      "id": "k-events",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Company events, treks and the Industry Expert Series",
+      "body": "Pre-MBA company event invitations arrive through the Sunday newsletters, which is the practical reason to read them. During the year there are treks, networking forums, the Tech Symposium and the Industry Expert Series.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-takeaways",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "CDC's own key takeaways",
+      "body": "Networking is what works: alumni first, then people in the target industry, then classmates. Pick a few priorities rather than defaulting to consulting because it recruits loudest. Take a leadership role in a club. A radical career changer should start before the programme, not in P1. If you are targeting one country with no experience there, explore widely early and aim at roles where local competition is thinner. And only apply where you genuinely fit, because the interview exposes the rest.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-journey"
+      ]
+    },
+    {
+      "id": "k-pldp",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "PLDP runs the whole year, not just P0",
+      "body": "The Personal Leadership Development Programme: individual and group coaching that starts with the P0 assignments and continues across the periods. It is the leadership counterpart to CDC's career coaching, and it is the one INSEAD flags as high-importance alongside CDC.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-pldp-p0",
+        "k-pldp-web"
+      ]
+    },
+    {
+      "id": "k-interntiming",
+      "group": "The summer internship",
+      "ord": 60,
+      "shape": "timeline",
+      "label": "Internship recruiting runs through P2",
+      "body": "March to May 2027. Some internships start as early as June, before P3 finishes. Roles with early application deadlines are the one reason to approach Employer Engagement before the February workshop.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Mar - May 2027",
+      "w": "2027-03-15",
+      "rel": [
+        "k-cags"
+      ]
+    },
+    {
+      "id": "k-intern",
+      "group": "The summer internship",
+      "ord": 60,
+      "shape": "timeline",
+      "label": "The summer project itself: optional, 8 weeks",
+      "body": "A Short-Term Summer Project in the break after P3. The alternatives INSEAD names are a startup tour or deliberate time off to prepare for full-time recruitment, and it does not treat the internship as obligatory for this cohort. Gavin's own plan is to start looking from the day the course starts rather than waiting for P2.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "01 Jul - 22 Aug 2027",
+      "w": "2027-07-01",
+      "rel": [
+        "k-interntiming",
+        "k-sumweb",
+        "k-breaks"
+      ]
+    },
+    {
+      "id": "k-p1cores",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "Six P1 core courses",
+      "body": "Financial Accounting, Financial Markets & Valuation, Organisational Behaviour I, Prices & Markets, Uncertainty Data & Judgment, and Introduction to Strategy. Three of the six are quantitative, which is what Business Foundations exists for.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-bizfound",
+        "k-prereads"
+      ]
+    },
+    {
+      "id": "k-prereads",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "P1 pre-readings",
+      "body": "For Financial Accounting and Prices & Markets specifically, with book recommendations on the MBA Journey pages. Highly recommended rather than required, which in practice means the people who do them have an easier first three weeks.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "prereads",
+      "rel": [
+        "k-p1cores"
+      ]
+    },
+    {
+      "id": "k-exempt",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "Core exemption exams",
+      "body": "P1 core exemptions are examined during Launch Week; P2 and P3 exemptions are taken during P1. Passing one frees the slot for an elective, so an exemption is worth a course you would rather take than a week of revision saved.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Launch Week, Jan 2027",
+      "w": "2027-01-08",
+      "rel": [
+        "k-launch"
+      ]
+    },
+    {
+      "id": "k-clubs",
+      "group": "Clubs and elections",
+      "ord": 80,
+      "shape": "timeline",
+      "label": "Club introduction and registration",
+      "body": "Runs through the LMS from 26 October. Club leadership elections and the handover to the 27D cohort come in P1 and P2, so the clubs you join now are the ones you can take a leadership role in later, which CDC names as one of its key takeaways.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "From 26 October 2026",
+      "w": "2026-10-26",
+      "rel": [
+        "k-lms",
+        "k-takeaways"
+      ]
+    },
+    {
+      "id": "k-council",
+      "group": "Clubs and elections",
+      "ord": 80,
+      "shape": "timeline",
+      "label": "27D Student Council and Student Rep elections",
+      "body": "January 2027. Team diversity is a stated requirement for the slates, so the teams form before the election rather than after it.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "January 2027",
+      "w": "2027-01-05"
+    },
+    {
+      "id": "k-contacts",
+      "group": "Who to contact",
+      "ord": 90,
+      "shape": "cards",
+      "label": "Programme questions",
+      "body": "degree.programmes@insead.edu for anything about the programme itself: dates, registration, admin, documents.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-contact-cdc",
+      "group": "Who to contact",
+      "ord": 90,
+      "shape": "cards",
+      "label": "Career questions",
+      "body": "careerdevelopmentcentre@insead.edu for CDC: coaching, CareerGlobe, Employer Engagement, anything career.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-cdc"
+      ]
+    },
+    {
+      "id": "k-visa",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-myinsead",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-news",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-p0",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-prio",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-partnership",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-webinars",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-p0life",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-coach",
+      "label": "Career Coach",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Your primary contact all year. Career strategy, target and transferable skills, networking approach, CV and cover letter review, elevator pitch, mock interviews, choosing between offers, and holding you accountable.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-mbax",
+      "label": "MBA-Exchange.com",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "The CDC's third-party global careers platform, premium access through INSEAD's partnership: vetted postings, industry and country reports, employer profiles with Talent Radar visibility, and Talent Talks with recruiters. The welcome mail arrived on 5 October with a login of your INSEAD address and a password in plain text, so change that password on first login — the password itself is deliberately not recorded here, because this repository is public. Bilal Ojjeh, their founder, offers himself as the direct contact.",
+      "cat": "work",
+      "rel": [
+        "k-careerglobe"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-aced",
+      "label": "Aced, formerly Exponent",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "Technical interview preparation, free through an INSEAD invitation that landed on 5 October: courses in software engineering, SQL and data analytics and system design, mock technical interviews, a question bank of recently asked questions, and company-by-company hiring guides. Sign up at aced.io with the INSEAD address the invitation was sent to. It is the one career platform aimed at technical interviews rather than the consulting-and-finance case track that CaseCoach covers.",
+      "cat": "work",
+      "rel": [
+        "k-casecoach",
+        "k-mbax"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-casecoach",
+      "label": "CaseCoach",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "Case interview preparation, free on the INSEAD subscription, which you registered for on 5 October. Their own course opens with what to expect from a case interview and is reading rather than a task; the founder, Enguerran Loos, is a former consultant and headhunter for the top three firms. It is the consulting-and-finance counterpart to Aced's technical track, and the one to work through if consulting stays on your list.",
+      "cat": "work",
+      "item": "casecoach",
+      "rel": [
+        "k-aced",
+        "k-cvbook"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    }
+  ],
+  "news": [
+    {
+      "id": "news-daily-2026-10-06",
+      "period": "daily",
+      "date": "2026-10-06",
+      "body": "## Tomorrow\n- Plan Locus exit, due 7 Oct, and the only Critical thing with a date this week.\nThere is no resignation date, no notice period and no last working day on the board. What last working day are you aiming for, and do you owe notice? The January move hangs off that one date.\n\n## Not yours right now\n- Campus France, corrected preconsular file sent yesterday afternoon.\nNothing to do but wait. What it gates: EEF validation reads 21 Oct and the VFS appointment is 10 Nov, so there is about three weeks of slack behind it. If validation slips past the 21st, that slack is gone.\n- SBI sanction letter, due 24 Oct.\nThe PoA was executed at Hindon on 3 Oct, so the bank should have everything. Is anything still outstanding from your side, or is it purely theirs now?\n\n## Worth an hour this week\n- VMock and CaseCoach both went live yesterday, good.\nThe CDC mail that came with them wants CareerLeader and Career Anchors done before your first coaching session, which is why booking the coach still reads as blocked. They are due 31 Oct and take an hour or two. Start with CareerLeader: it is the longer one and it feeds the report the CDC asks for.",
+      "at": "2026-10-06T04:17:53.000Z",
+      "createdAt": "2026-10-06T04:17:53.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-09",
+      "period": "daily",
+      "date": "2026-10-09",
+      "body": "## The passport is the decision now\n- TLS keeps your passport from the day you submit, now dated 23 October, for two to three weeks.\nThree things want it in that window: the exit permit for your KITAS, your flight out of Jakarta, and the visa itself. The ways out are different enough that choosing is the work -- submit before you leave and ask whether someone else can collect, apply from India after you land, or move your departure. Tell me which and I will set every date after it accordingly.\n- The 16 October interview still waits on a courier.\nYour originals reach you early next week, and Fitria postpones the interview if they are not in your hand on the day. Tracking on that parcel is what would let you confirm the slot rather than hope.\n\n## Nothing here waits on anyone\n- Create your France-Visas and TLS Contact accounts.\nFitria asked for both and neither needs the interview done first, so this is the one piece of the visa you can finish today.\n- Upload your CV to VMock, 18 October.\nThe next date on the board that is nobody's but yours, and it is a short job.",
+      "at": "2026-10-09T02:54:28.000Z",
+      "createdAt": "2026-10-09T02:54:28.000Z"
+    }
+  ]
+}
