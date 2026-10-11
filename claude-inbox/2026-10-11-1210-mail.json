@@ -1,0 +1,41 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-11T12:10:20.000Z",
+ "notes": [
+  {
+   "id": "claude-2026-10-11-1215-tls",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at TLS Contact",
+   "title": "TLS account now open",
+   "text": "TLScontact emailed you an activation link this afternoon, so both of the logins Fitria asked for now exist. - Activate it before Wednesday, so nothing at the interview waits on a login you cannot open on the day.",
+   "state": "new",
+   "createdAt": "2026-10-11T12:10:20.000Z",
+   "at": "2026-10-11T12:10:20.000Z"
+  },
+  {
+   "id": "claude-2026-10-11-1215-cfindia",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at TLS Contact",
+   "title": "Asked Campus France India",
+   "text": "You wrote to Campus France New Delhi this evening asking whether your dossier transfers and whether you can apply from India after November. Until they answer, Jakarta is still the plan. - Keep Wednesday and the TLS submission on track either way.",
+   "state": "new",
+   "createdAt": "2026-10-11T12:10:20.000Z",
+   "at": "2026-10-11T12:10:20.000Z"
+  },
+  {
+   "id": "claude-2026-10-11-1215-incorp",
+   "from": "claude",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "InCorp still owes the quote",
+   "text": "You chased InCorp again today for the revised exit quotation. Nobody there has answered since you pushed back on the price on 29 September. - Chitra replies on WhatsApp faster than on this thread, and the exit permit sits behind it.",
+   "state": "new",
+   "createdAt": "2026-10-11T12:10:20.000Z",
+   "at": "2026-10-11T12:10:20.000Z"
+  }
+ ],
+ "changed": []
+}
