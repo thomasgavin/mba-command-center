@@ -1359,6 +1359,36 @@ single pass, then clears itself whether or not it found anything. Re-merging
 is harmless by construction -- every item carries its own clock -- which is the
 same property that lets a file be read twice.
 
+## A device missing part of the map, which is worse than one missing all of it
+
+*"Why can't I see the news section on mindmap on desktop?"* The seven NEWS
+nodes were real, filed on 7 October into `claude-inbox/2026-10-07-1220-map.json`
+-- and the relay's snapshot had never heard of them, because
+`relay-notify.yml` did not exist until the 8th. Nothing could repair that
+afterwards, and the three mechanisms that look like they should each miss it
+for a different reason:
+
+- the **socket** replays only above `relaySeq`, and that file was never an
+  event in the log at all;
+- the **folder pull** reads the newest `PULL_FILES` and skips by filename, and
+  by then the file was twenty behind;
+- **`kbCold`** recovers a map that is *empty*, and his was merely incomplete.
+
+So the daily archive is the thing every device is entitled to catch up from,
+and it can only do that job if the relay has folded everything. The fix is
+the one `d60f062` already set the precedent for: the same payload goes in
+again under a fresh name with the `Claude:` prefix at the head, so the relay
+hears it for the first time, pushes it down the socket, and carries it in
+every archive from then on. The node clocks are left exactly as they were --
+`at` is when the fact was written -- so a device that already has them merges
+a no-op.
+
+**The check is on the folder, not on the page.** A map node that exists only
+in a file *older* than the newest archive is one the relay never folded,
+which is this bug stated as an assertion. It fails on the seven and goes
+green on the repair, and it is the only thing here that can catch the next
+file the relay never hears about.
+
 ## Dark mode, on three taps of the name
 
 *"Add a dark mode hidden switch - tapping on the logo/name 3 times."* Hidden is
@@ -2248,7 +2278,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 483 invariants, three widths, a real browser. Every one of them was a
+that runs: 485 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

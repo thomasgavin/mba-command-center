@@ -4425,6 +4425,47 @@ var MAPSEED = { kb: [
        && /body:wire/.test(boardSrc), "wire");
 }
 
+/* ---- 18d. a map node that reached the folder must reach the relay ----
+   *"Why can't I see the news section on mindmap on desktop?"* The seven
+   NEWS nodes were written into `claude-inbox/` on 7 October, which is
+   before `relay-notify.yml` existed -- so the relay never heard that file,
+   its snapshot never carried the group, and its daily archive could not
+   hand it to a device that had missed it. The folder pull reads only the
+   newest PULL_FILES, and by then the file was twenty behind; `kbCold`
+   recovers an *empty* map and his was merely incomplete. Three mechanisms,
+   none of which can reach a node in that position.
+   So the archive is what every device is entitled to catch up from, and
+   this asserts it holds everything: the union of map ids across the whole
+   folder has to be covered by the newest archive plus whatever was written
+   after it. A node that exists only in a file older than the archive is one
+   the relay never folded, which is this bug exactly. */
+{
+  var inboxDir = path.join(ROOT, "claude-inbox");
+  var files = fs.readdirSync(inboxDir).filter(function (f) { return /\.json$/.test(f); }).sort();
+  var archives = files.filter(function (f) { return /^\d{4}-\d{2}-\d{2}-\d{4}\.json$/.test(f); });
+  var newestArchive = archives[archives.length - 1];
+  ok("the relay still writes a daily archive into the folder", !!newestArchive, String(newestArchive));
+
+  var readKb = function (f) {
+    try { return (JSON.parse(fs.readFileSync(path.join(inboxDir, f), "utf8")).kb) || []; }
+    catch (e) { return []; }
+  };
+  var everywhere = {}, reachable = {};
+  files.forEach(function (f) {
+    readKb(f).forEach(function (n) {
+      if (!n || !n.id) return;
+      everywhere[n.id] = f;
+      /* the archive itself, and anything written after it: those are what a
+         device still pulling the newest files can actually see */
+      if (f >= newestArchive) reachable[n.id] = true;
+    });
+  });
+  var stranded = Object.keys(everywhere).filter(function (id) { return !reachable[id]; });
+  ok("and every map node in the folder is in it, or in a file written after it",
+     stranded.length === 0,
+     JSON.stringify(stranded.slice(0, 8).map(function (id) { return id + " only in " + everywhere[id]; })));
+}
+
 await browser.close();
 server.close();
 console.log(out.join("\n"));
