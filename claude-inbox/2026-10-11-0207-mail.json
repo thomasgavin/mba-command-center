@@ -1,0 +1,48 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-11T02:07:13.000Z",
+ "notes": [
+  {
+   "id": "claude-2026-10-11-0207-sbiprov",
+   "from": "claude",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "title": "Asked SBI for provisional letter",
+   "text": "You asked your branch yesterday for an in-principle sanction letter, so the visa file has proof of funds before the full sanction lands. That is two things now from the same branch, on two different dates. - The branch landline is in her signature, and a call will be quicker than this thread.",
+   "state": "new",
+   "createdAt": "2026-10-11T02:07:13.000Z",
+   "at": "2026-10-11T02:07:13.000Z"
+  },
+  {
+   "id": "claude-2026-10-11-0207-fvacct",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at TLS Contact",
+   "title": "France-Visas account started",
+   "text": "France-Visas wrote to you on Saturday evening to confirm the address on your new account. That is one of the two logins Fitria asked for. - TLS Contact is the other, and that one takes a phone call rather than the website.",
+   "state": "new",
+   "createdAt": "2026-10-11T02:07:13.000Z",
+   "at": "2026-10-11T02:07:13.000Z"
+  },
+  {
+   "id": "claude-2026-10-11-0207-cfint",
+   "from": "claude",
+   "itemId": "cf-interview",
+   "itemTitle": "Attend the Campus France interview",
+   "title": "Wednesday is still unconfirmed",
+   "text": "Fitria offered Wednesday at 10am and you have not written back. Your originals are still with the courier, and she needs them in your hand on the day. - A line to her today confirms it, and you can still move it if the parcel is late.",
+   "state": "new",
+   "createdAt": "2026-10-11T02:07:13.000Z",
+   "at": "2026-10-11T02:07:13.000Z",
+   "kind": "nudge",
+   "about": "cf-interview",
+   "round": 2,
+   "was": {
+    "status": "todo",
+    "due": "2026-10-14"
+   }
+  }
+ ],
+ "changed": []
+}
