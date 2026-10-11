@@ -369,6 +369,17 @@ Three things keep it from eating itself or his subscription:
   route the job skips any head commit whose message starts `Claude:` (the
   skill's prefix) or `Relay snapshot` (the daily archive, which holds nothing
   the board has not seen), or contains `[skip ci]`.
+
+  **A merge commit defeats that guard, and it costs a run every time.** The
+  relay commits into this folder while a pass is working, so a push is
+  rejected often; merging origin/main makes `Merge origin/main` the head
+  commit, the prefix is gone, and Answer notes spends a run re-reading notes
+  the same pass has just written and answered. So a rejected push is
+  **rebased, not merged** -- `git pull --rebase origin main` keeps the
+  `Claude:` commit at the head -- and where a merge really is needed its
+  message starts `Claude:` like any other. It is the loop guard being a
+  convention rather than a check that makes this possible at all, which is
+  why it is written down here next to the rule it breaks.
 - `concurrency: answer-notes` so a burst of notes is one conversation, with
   `--max-turns 30` and a 12-minute timeout as the ceiling on a single run.
 - It needs the repository secret `CLAUDE_CODE_OAUTH_TOKEN`, generated with
