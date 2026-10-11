@@ -370,7 +370,15 @@ Three things keep it from eating itself or his subscription:
   skill's prefix) or `Relay snapshot` (the daily archive, which holds nothing
   the board has not seen), or contains `[skip ci]`.
 
-  **A merge commit defeats that guard, and it costs a run every time.** The
+  **A merge commit inverts both legs of this, and the expensive half is the
+  silent one.** `relay-notify.yml` is the complement of this job: it runs on
+  nothing but a `Claude:` head commit. So a merge commit does not merely cost
+  an Answer notes run -- it also makes the relay leg **skip**, and a nudge or
+  a brief that skips that leg never reaches his phone at all. That is the
+  `[skip ci]` failure again, reached by a different route, and nothing on the
+  board can show it.
+
+  **It costs a run every time, too.** The
   relay commits into this folder while a pass is working, so a push is
   rejected often; merging origin/main makes `Merge origin/main` the head
   commit, the prefix is gone, and Answer notes spends a run re-reading notes

@@ -1,0 +1,33 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-11T08:15:22.000Z",
+ "notes": [
+  {
+   "id": "claude-2026-10-11-0815-pldp",
+   "from": "claude",
+   "itemId": "pldp-work",
+   "itemTitle": "Complete the PLDP assignments",
+   "title": "PLDP webinar is mandatory",
+   "text": "INSEAD's newsletter this morning says the 5 November PLDP intro webinar is mandatory, live or by recording. The alumni meet and greet on 28 October is new, and both are on your calendar now. - Register for the PLDP one while the mail is open.",
+   "state": "new",
+   "createdAt": "2026-10-11T08:15:22.000Z",
+   "at": "2026-10-11T08:15:22.000Z",
+   "acted": [
+    "Added the alumni meet and greet on 28 October and the Amazon info session on 2 November to the calendar as events."
+   ]
+  },
+  {
+   "id": "claude-2026-10-11-0815-amzn",
+   "from": "claude",
+   "itemId": "news-amzn-path",
+   "itemTitle": "[NEWS] Apply to Amazon Pathways (MBA Operations LDP)",
+   "title": "Amazon session before you apply",
+   "text": "Amazon runs an internships info session on 2 November for Pathways and Launch, and they fill on a rolling basis, so the application goes in right after. It is on your calendar. - The newsletter also links open roles with early deadlines, and a J&J session on Tuesday.",
+   "state": "new",
+   "createdAt": "2026-10-11T08:15:22.000Z",
+   "at": "2026-10-11T08:15:22.000Z"
+  }
+ ],
+ "changed": []
+}
