@@ -4365,6 +4365,66 @@ var MAPSEED = { kb: [
   ok("and there is exactly one of it in the file", decls === 1, String(decls));
 }
 
+/* ---- 18c. the board can never build a payload the relay will refuse ----
+   The relay answers 413 above MAX, and for six days every message he typed
+   came back 413 while the thread said "sending…" and nothing else said
+   anything. `lastJob` at the relay was frozen at 5 October, which is the day
+   his board's payload first crossed the cap: the map and the briefs had just
+   started riding whole in every message, and the wire was indented two
+   spaces on top of that. The cap is a number in one file and the payload is
+   built in another, so this reads both and makes them agree. */
+{
+  var relaySrc = fs.readFileSync(path.join(ROOT, "relay", "worker.js"), "utf8");
+  var maxM = /var MAX\s*=\s*(\d+)\s*\*\s*1024/.exec(relaySrc);
+  ok("the relay still states its cap in one readable place", !!maxM, String(maxM));
+  var relayMax = maxM ? +maxM[1] * 1024 : 0;
+
+  var s18c = await open(390);
+  /* a board at every bound it allows itself: the map full at 300 nodes and
+     the briefs full at NEWS_KEEP, with realistic text in both */
+  var sat = await s18c.p.evaluate(function (cap) {
+    var txt = new Array(60).join("word ");
+    kb = []; for (var i = 0; i < 300; i++)
+      kb.push({ id: "n" + i, group: "G", t: "Node " + i, body: txt, at: "2026-10-01T00:00:00.000Z" });
+    news = []; for (var j = 0; j < NEWS_KEEP; j++)
+      news.push({ id: "e" + j, period: "daily", date: "2026-08-01", body: txt + txt, at: "2026-10-01T00:00:00.000Z" });
+    var pay = leanPayload();
+    return { bytes: JSON.stringify(pay).length, wireMax: cap,
+             notes: pay.notes.length, changed: pay.changed.length,
+             kb: (pay.kb || []).length, news: (pay.news || []).length,
+             kbFull: pay.kbFull, newsFull: pay.newsFull };
+  }, 0);
+  ok("a saturated board still fits inside the relay's cap",
+     sat.bytes < relayMax, JSON.stringify({ bytes: sat.bytes, max: relayMax }));
+  /* and it gives way from the right end: the two fields that grow on their
+     own, never what he actually wrote */
+  ok("and it is the map that gives way, not his notes",
+     sat.kb < 300 && sat.kbFull === false, JSON.stringify(sat));
+  /* a trimmed field is not a sent field, or the rest of the map would never
+     be offered again */
+  ok("so a trimmed map is offered again on the next send",
+     sat.kbFull === false, JSON.stringify(sat));
+
+  /* nothing changed since the last confirmed send means nothing to say about
+     it, which is the rule every other field on this board already follows */
+  var quiet = await s18c.p.evaluate(function () {
+    var a = leanPayload();
+    sentKb = builtKb; sentNews = builtNews;          /* as a confirmed send does */
+    var b = leanPayload();
+    return { first: !!a.kb, again: !!b.kb, news: !!b.news, notes: b.notes.length !== undefined };
+  });
+  ok("an unchanged map does not ride in the next message",
+     quiet.first && !quiet.again && !quiet.news && quiet.notes, JSON.stringify(quiet));
+  await s18c.ctx.close();
+
+  /* the wire is compact; the indentation is for the human reading the GitHub
+     editor on the fallback route, and it was a sixth of the payload */
+  var boardSrc = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  ok("and the wire is not pretty-printed",
+     /var wire=JSON\.stringify\(pay\);/.test(boardSrc)
+       && /body:wire/.test(boardSrc), "wire");
+}
+
 await browser.close();
 server.close();
 console.log(out.join("\n"));

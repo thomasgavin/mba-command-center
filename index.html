@@ -5014,20 +5014,69 @@ function outNotes(){
   var cut=new Date(Date.now()-172800000).toISOString();
   return notes.filter(function(n){ return n.forClaude!==false && (!n.answered || (n.createdAt||"")>cut); });
 }
+/* What the last confirmed send carried, so the next one can leave alone what
+   nobody has touched. Deliberately not saved: a fresh load re-sends the map
+   once, which is a no-op by construction and the safe direction to be wrong
+   in. */
+var sentKb=null, sentNews=null, builtKb=null, builtNews=null;
+/* cheap "did the briefs change": there is no editing an edition, so the ids
+   are the whole of it */
+function newsStamp(){ return news.map(function(n){ return n.id; }).sort().join("|"); }
+/* Everything else on this board travels as a diff; `kb` and `news` were the
+   two that travelled whole on every message, and together they were two
+   thirds of a payload the relay caps -- the map alone is 23KB today and is
+   allowed to reach 300 nodes. A field a payload leaves out makes no claim at
+   all, which is already how the merge rules read it, so omitting one that
+   has not moved since the last confirmed send costs nothing and is what
+   keeps this under the cap as the map fills up. */
 function leanPayload(){
-  return {v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
+  var ks=kbStamp(), ns=newsStamp();
+  builtKb=ks; builtNews=ns;
+  var p={v:1,exportedAt:new Date().toISOString(),source:"MBA Command Center",
     note:"Baseline is SEED in index.html; apply changed[] over it.",
     /* the relay names the file from this, so both routes stamp in the same zone
        and the newest-file sort on pull stays honest */
     stamp:stamp(),
-    notes:outNotes(), changed:changedItems(), kb:outKb(), news:outNews()};
+    notes:outNotes(), changed:changedItems()};
+  if(ks!==sentKb) p.kb=outKb();
+  if(ns!==sentNews) p.news=outNews();
+  return fitWire(p);
+}
+/* The relay answers 413 above MAX and the board has no business discovering
+   that by being refused -- which is exactly how six days of his messages were
+   lost. So the payload is measured here, against a number below the relay's,
+   and the two fields that can grow without his doing anything give way from
+   the oldest end until it fits. Notes and changes are never trimmed: they are
+   what he actually said and did, and a board that drops those to make room is
+   worse than one that is refused.
+   A trimmed field is not a sent field, so `full` stays false and the next
+   send offers it again. */
+var WIRE_MAX=80*1024;
+function fitWire(p){
+  p.kbFull = !!p.kb; p.newsFull = !!p.news;
+  var size=function(){ return JSON.stringify(p).length; };
+  while(size()>WIRE_MAX && p.kb && p.kb.length){ p.kb.pop(); p.kbFull=false; }
+  while(size()>WIRE_MAX && p.news && p.news.length){ p.news.pop(); p.newsFull=false; }
+  if(p.kb && !p.kb.length) delete p.kb;
+  if(p.news && !p.news.length) delete p.news;
+  return p;
 }
 /* The relay strips `read` out of its archive for a reason -- reading Sunday's
    report on the laptop says nothing about the phone -- and the board has to
    strip it on the way out for the same one, or the live socket would carry
    over the top of that and mark an edition read on a screen he never opened. */
+/* NEWS_KEEP is how many editions this device keeps; NEWS_SEND is how many ride
+   in a payload, and they are deliberately different numbers. An edition is
+   immutable once written and reaches his other device from the relay's log the
+   moment Claude writes it, so re-posting sixty of them on every message was
+   sixty copies of something nobody had changed -- and it was the field growing
+   without bound inside a payload the relay caps. Two weeks of dailies is far
+   more than a device that has been offline needs, and the daily archive in
+   claude-inbox/ still carries every edition for one that has been offline
+   longer. */
+var NEWS_SEND=12;
 function outNews(){
-  return news.map(function(n){
+  return news.slice(0,NEWS_SEND).map(function(n){
     var c={}; Object.keys(n).forEach(function(k){ if(k!=="read") c[k]=n[k]; });
     return c;
   });
@@ -5093,7 +5142,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-11-0810";
+var BUILD="2026-10-11-1115";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
@@ -5184,7 +5233,13 @@ function relaySend(pay, json, quiet){
      devices keep working instead of silently failing to send. */
   var ac=window.AbortController?new AbortController():null, late=false;
   var killT=setTimeout(function(){ late=true; if(ac) ac.abort(); },SEND_MS);
-  var opt={method:"POST",headers:hd,body:json}; if(ac) opt.signal=ac.signal;
+  /* `json` is indented two spaces because a human reads it in GitHub's editor
+     on the fallback route. Nobody reads the wire, and the indentation was a
+     sixth of a payload the relay measures against a cap -- which is how every
+     message he typed for six days came back 413 and sat on "sending…" with
+     the relay never hearing one of them. Compact here, pretty there. */
+  var wire=JSON.stringify(pay);
+  var opt={method:"POST",headers:hd,body:wire}; if(ac) opt.signal=ac.signal;
   fetch(RELAY+"/send",opt)
     .then(function(r){ return r.status===404 ? fetch(RELAY,opt) : r; })
     .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
@@ -5192,6 +5247,10 @@ function relaySend(pay, json, quiet){
       if(!res.ok||!res.j.ok) throw res;
       clearTimeout(killT);
       sending=false; autoTries=0;
+      /* only a confirmed send may narrow the next one: a payload the relay
+         refused carried the map nowhere */
+      if(pay&&pay.kbFull) sentKb=builtKb;
+      if(pay&&pay.newsFull) sentNews=builtNews;
       /* only what we actually sent: a note written while this was in flight
          has not reached the repo */
       markSent(ids);
@@ -5207,8 +5266,13 @@ function relaySend(pay, json, quiet){
       /* notes deliberately stay unread: nothing was delivered */
       clearTimeout(killT);
       sendDone();
+      /* "could not be reached" was wrong for six days and that is why nobody
+         looked: the relay answered every time, and what it said was that the
+         payload was too big. A failure that misnames itself is worse than a
+         silent one, so a refusal is quoted and a size is given a size. */
       var why=late?"the relay did not answer"
-                  :((err&&err.j&&err.j.error)||"the relay could not be reached");
+            :(err&&err.status===413)?("it is too big ("+Math.round(wire.length/1024)+"KB)")
+            :((err&&err.j&&err.j.error)||"the relay could not be reached");
       if(quiet){
         /* never open a tab the owner did not ask for. Try again shortly, then
            say plainly that it needs the button. */

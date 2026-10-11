@@ -156,6 +156,52 @@ worst kind: the relay accepted every note, logged it, told the board all was
 well, and never asked GitHub for a run. `/state` now reports the last attempt
 as `lastJob` so that failure is one URL away instead of invisible.
 
+## The cap his messages were hitting, and the six days nobody could see
+
+Every message he typed from 6 October to 11 October came back **413 payload
+too large**, and the thread said "sending…" and nothing else said anything.
+*"My messages are still stuck - why are you not able to fix issues at once?"*
+
+The relay settled it in one reading, which is the whole reason
+`.github/workflows/relay-probe.yml` exists: `lastJob` was frozen at
+**5 October**, and a run is started only by a note of his arriving on
+`/send`. Nothing of his had reached the relay for six days. `/state` also
+said `devices:5` and `lastPush` all `201`, so the push half was never
+broken -- which is the half everyone had been looking at.
+
+**6 October is the day the map and the briefs started riding whole in every
+message.** `kb` is 23KB today and allowed 300 nodes; `news` was all sixty
+editions; and the wire was `JSON.stringify(pay,null,2)` on top of that, so a
+sixth of it was indentation nobody reads. The relay's `MAX` was 64KiB and
+"generous", which it stopped being that day. Four things, each small:
+
+- **The wire is compact.** The two-space indent is for the human reading
+  GitHub's editor on the fallback route, and `relaySend` serialises its own
+  body now rather than posting the pretty copy.
+- **`kb` and `news` are omitted when they have not moved.** A field a payload
+  leaves out makes no claim at all -- that is already how the merge rules read
+  one -- so re-posting sixty immutable editions and the whole map on every
+  message was the one place this board broke its own "only the deltas travel"
+  rule. `sentKb`/`sentNews` advance on a **confirmed** send only.
+- **`fitWire()` measures before it sends.** The board has no business
+  discovering a cap by being refused, so it trims from the oldest end of
+  `kb`, then `news`, until the payload is under `WIRE_MAX` (80KiB), below the
+  relay's. **Notes and changes are never trimmed**: they are what he actually
+  said and did. A trimmed field sets `kbFull`/`newsFull` false and is offered
+  again next time.
+- **`MAX` is 96KiB**, headroom rather than a cliff, and still well under the
+  128KiB a Durable Object stores under one key, which is the real ceiling.
+
+A saturated board -- 300 nodes, `NEWS_KEEP` editions -- now measures 82KB,
+and the check reads `MAX` out of `relay/worker.js` and the payload out of the
+page so the two numbers cannot drift apart again.
+
+**And "could not be reached" was a lie for six days.** The relay answered
+every single time; what it said was 413. A failure that misnames itself is
+worse than a silent one, so the toast quotes the refusal and gives a size.
+
+**The rule: a cap enforced at one end must be measured at the other.**
+
 ## Time, and the one clock that was wrong
 
 The thread sorts by `createdAt`, and a note carries the clock of whoever wrote
@@ -2202,7 +2248,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 477 invariants, three widths, a real browser. Every one of them was a
+that runs: 483 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming

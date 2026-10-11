@@ -35,7 +35,14 @@
 var REPO   = "thomasgavin/mba-command-center";
 var BRANCH = "main";
 var INBOX  = "claude-inbox";
-var MAX    = 64 * 1024;          /* a note payload is a few KB; this is generous */
+/* It was 64 KiB and "generous", which it stopped being the day the mind map
+   and the briefs started riding along: his board crossed it on 6 October and
+   every message he typed for the next six days came back 413, with nothing on
+   screen saying so and `lastJob` frozen at 5 October. The board is compact on
+   the wire now and sends a window of the briefs rather than all of them, so
+   this is headroom rather than a cliff -- and it stays well under the 128 KiB
+   a Durable Object will store under one key, which is the real ceiling. */
+var MAX    = 96 * 1024;
 var ORIGIN = "https://thomasgavin.github.io";
 
 /* The board's own origin, and the only one allowed to call this. An
