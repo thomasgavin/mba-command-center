@@ -1,0 +1,47 @@
+# Three bugs in a row have turned on a question nobody in this repository can
+# answer from here: what does the relay actually say? The cloud sessions that
+# write the nudges and the briefs cannot reach workers.dev at all -- curl comes
+# back 000 -- so every diagnosis of a silent phone or a stuck message has been
+# a guess read off the board instead of a measurement taken at the relay.
+#
+# A GitHub runner can reach it, which is the whole reason relay-notify.yml
+# works. This is the same leg with nothing in it: it reads /state and probes
+# the size cap, and it writes nothing, sends no note and starts no Claude run.
+# The probe is deliberately junk rather than a board payload: the cap is
+# checked before the body is parsed, so an oversized blob answers 413 and a
+# small one answers 400, and neither reaches the log.
+name: Ask the relay
+on:
+  workflow_dispatch:
+    inputs:
+      bytes:
+        description: "Size of the cap probe, in bytes"
+        required: false
+        default: "70000"
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read the relay's own account of itself
+        env:
+          RELAY_URL: https://mba-cc-relay.thomasgavin777.workers.dev
+          N: ${{ inputs.bytes }}
+        run: |
+          set -uo pipefail
+          # since= past the end of the log, or /state hands back seven days of chat
+          echo "--- /state"
+          curl -sS -m 20 -o /tmp/state -w 'HTTP %{http_code}\n' "$RELAY_URL/state?since=99999999" || true
+          # the backlog is empty by construction; print the rest
+          head -c 2000 /tmp/state; echo
+          echo "--- /push/key"
+          curl -sS -m 20 -o /dev/null -w 'HTTP %{http_code}\n' "$RELAY_URL/push/key" || true
+          echo "--- /send cap probe (${N} bytes of junk; 413 means the cap bites here)"
+          head -c "$N" /dev/zero | tr '\0' 'x' > /tmp/junk
+          curl -sS -m 20 -o /tmp/r1 -w 'HTTP %{http_code}\n' -X POST "$RELAY_URL/send" \
+            -H 'Content-Type: application/json' --data-binary @/tmp/junk || true
+          head -c 300 /tmp/r1; echo
+          echo "--- /send small-but-invalid probe (400 means the route is alive and parsing)"
+          curl -sS -m 20 -o /tmp/r2 -w 'HTTP %{http_code}\n' -X POST "$RELAY_URL/send" \
+            -H 'Content-Type: application/json' --data '{"probe":true}' || true
+          head -c 300 /tmp/r2; echo
