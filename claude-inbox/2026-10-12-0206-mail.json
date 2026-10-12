@@ -1,0 +1,34 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-12T02:06:00.000Z",
+ "ack": ["claude-20261008-1212-kitas"],
+ "notes": [
+  {
+   "id": "claude-2026-10-12-0210-incorp",
+   "from": "claude",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "InCorp replied with options",
+   "text": "Chitra was on leave and has come back with a 10 percent discount on all three fees. The useful part is the alternative she offers: cancel the KITAS by ERP after you have left Indonesia, rather than an EPO before. - Ask her what ERP needs, because it would free your passport for the visa.",
+   "state": "new",
+   "createdAt": "2026-10-12T02:06:00.000Z",
+   "at": "2026-10-12T02:06:00.000Z"
+  },
+  {
+   "id": "claude-2026-10-12-0210-vmock",
+   "from": "claude",
+   "itemId": "vmock-cv",
+   "itemTitle": "Upload your CV to VMock for the SMART score",
+   "title": "VMock scored your CV 63",
+   "text": "VMock came back yesterday with 63, in the yellow zone. The upload is what this task was for, so I have closed it, and the SMART Editor is what takes the score to green. - Worth one pass this week while the CV is still fresh.",
+   "state": "new",
+   "createdAt": "2026-10-12T02:06:00.000Z",
+   "at": "2026-10-12T02:06:00.000Z",
+   "acted": ["Upload your CV to VMock for the SMART score: To-do -> Done"]
+  }
+ ],
+ "changed": [
+  {"id": "vmock-cv", "at": "2026-10-12T02:06:00.000Z", "status": "done", "manual": true, "doneAt": "2026-10-11"}
+ ]
+}
