@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-12T12:09:30.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-12-1209-club8",
+      "from": "claude",
+      "itemId": "club8-detail",
+      "itemTitle": "Confirm Club 8 inventory and move-in window",
+      "title": "Club 8 contract link",
+      "text": "Yousign sent a fresh link on Saturday to your signed Club 8 contract, which names Room 8 from January 2027. It warns the link can be removed at any time, and this one is already a replacement. - Download the PDF now and keep it with your visa documents.",
+      "state": "new",
+      "createdAt": "2026-10-12T12:09:30.000Z",
+      "at": "2026-10-12T12:09:30.000Z"
+    }
+  ],
+  "changed": []
+}
