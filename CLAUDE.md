@@ -537,6 +537,23 @@ the snapshot and inside a `try`, because the archive is what keeps the GitHub
 fallback alive and bookkeeping must never be able to cost it. A write that
 fails leaves the entries pending for the next run rather than dropping them.
 
+**A sparse patch has to be laid over the row, not put in its place.** Closing
+a task from a pass sends `{id,at,status,manual,doneAt}` and nothing else, and
+`fold()` was assigning that straight into `snap.items[id]`. So one status
+change wrote four rows saying the title, the due date, the priority and the
+effort had each gone to "—", and no row for the status that had actually
+moved -- the diff was reading absent-from-the-patch as emptied. The expensive
+half was silent: the snapshot is what the daily archive publishes and what
+`/agent/pull` hands the next run, and it was left holding a task with no name
+and no date. His own board was never wrong, because the page's merge applies
+only the fields a payload carries; the relay was the one end that did not.
+The fold resolves the row first -- `Object.assign({}, had, c)` -- and both the
+diff and the snapshot read that, which is why it is computed before the diff
+rather than after. A **revert** is the one patch that still replaces:
+`{id,at,seed:true}` means "back to SEED" and the relay has no `SEED`, so the
+marker standing alone is more honest than stale fields under it. Every payload
+in the check carried a title, which is exactly why this shipped.
+
 `HIST_FIELDS` is deliberately not every field in the diff. `manual`, `snoozes`
 and `origDue` are bookkeeping the board keeps about itself — a snooze already
 shows up as the due date it moved — and logging them would bury the three or

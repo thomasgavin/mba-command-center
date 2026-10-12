@@ -85,6 +85,51 @@ ok("only what moved is recorded, not the whole row",
 ok("who did it is kept", h.some(x=>x.by==="you") && h.some(x=>x.by==="Claude"),
    JSON.stringify(h.map(x=>x.by)));
 
+/* A sparse patch is the shape every board pass actually writes -- closing a
+   task is {id,at,status,manual,doneAt} and nothing else -- and the fold used to
+   replace the snapshot row with it. Two things broke at once: the log said the
+   title, the due date, the priority and the effort had all gone to "—" on a
+   pass that moved only a status, and said nothing about the status; and the
+   snapshot, which is what the daily archive publishes and what /agent/pull
+   hands the next run, was left holding a task with no name and no date.
+   The payloads above all carry the title, which is why this was never caught.  */
+var bSparse = mkBoard();
+await bSparse.fold({exportedAt:"2026-10-05T09:00:00.000Z", changed:[
+  {id:"vmock-cv", title:"Upload your CV to VMock for the SMART score",
+   status:"todo", due:"2026-10-18", priority:"High", effort:"hours",
+   at:"2026-10-05T09:00:00.000Z"}
+]}, "board");
+await bSparse.fold({exportedAt:"2026-10-05T10:00:00.000Z", changed:[
+  {id:"vmock-cv", status:"done", manual:true, doneAt:"2026-10-05",
+   at:"2026-10-05T10:00:00.000Z"}
+]}, "claude");
+var hs = (await bSparse.ctx.storage.get("hist"))
+         .filter(x=>x.at.startsWith("2026-10-05T10:00"));
+ok("a sparse patch logs the field it moved",
+   hs.length===1 && hs[0].f==="Status" && hs[0].a==="To do" && hs[0].b==="Done",
+   JSON.stringify(hs));
+ok("and does not report the fields it left alone as emptied",
+   hs.every(x=>x.b!=="\u2014"), JSON.stringify(hs.map(x=>[x.f,x.b])));
+ok("and the row it names is still the task's own name",
+   hs.length===1 && hs[0].title==="Upload your CV to VMock for the SMART score",
+   JSON.stringify(hs.map(x=>x.title)));
+var snapS = (await bSparse.ctx.storage.get("snap")).items["vmock-cv"];
+ok("and the snapshot keeps the fields the patch did not carry",
+   snapS.title==="Upload your CV to VMock for the SMART score" &&
+   snapS.due==="2026-10-18" && snapS.priority==="High" && snapS.effort==="hours" &&
+   snapS.status==="done" && snapS.doneAt==="2026-10-05",
+   JSON.stringify(snapS));
+/* a revert is the one patch that must replace rather than merge: the relay has
+   no SEED to resolve it against, so stale fields under a seed marker would be
+   worse than a row that says only "back to SEED" */
+await bSparse.fold({exportedAt:"2026-10-05T11:00:00.000Z", changed:[
+  {id:"vmock-cv", seed:true, at:"2026-10-05T11:00:00.000Z"}
+]}, "board");
+var snapR = (await bSparse.ctx.storage.get("snap")).items["vmock-cv"];
+ok("but a revert replaces the row rather than merging onto it",
+   snapR.seed===true && snapR.status===undefined && snapR.title===undefined,
+   JSON.stringify(snapR));
+
 /* --- written out --- */
 var w = await b.writeHistory();
 ok("a day is written", w.days===1 && w.lines===h.length, JSON.stringify(w));

@@ -444,16 +444,32 @@ export class Board {
          records the move, not the state: "what did this become, from what, and
          who did it" is the question a log is for, and the snapshot already
          answers "what is it now". */
+      /* A patch is sparse. A pass that closes a task sends {id,at,status} and
+         nothing else, so the row the snapshot must hold is the patch laid over
+         what was already there -- exactly what the board does in its own merge,
+         which applies only the fields a payload actually carries. Replacing the
+         row instead dropped the title, the due date, the priority and the
+         effort out of the snapshot, and the snapshot is what the daily archive
+         publishes and what /agent/pull hands the next run.
+         The log is where it showed: closing one task wrote four rows saying a
+         field had gone to "\u2014" and no row for the status that had actually
+         moved, because the diff was reading absent-from-the-patch as emptied.
+         One resolved row fixes both halves, which is the point of computing it
+         before the diff rather than after.
+         A revert is the one thing that cannot merge: {id,at,seed:true} means
+         "back to SEED" and the relay has no SEED to read, so the marker
+         replaces the row rather than sitting on top of values it contradicts. */
+      var now = c.seed ? c : Object.assign({}, had||{}, c);
       HIST_FIELDS.forEach(function(f){
-        var a = fieldOf(had, f.k), b = fieldOf(c, f.k);
+        var a = fieldOf(had, f.k), b = fieldOf(now, f.k);
         if(a===b) return;
         if(hist.length < HIST_MAX) hist.push({
           at: c.at || payload.exportedAt || new Date().toISOString(),
-          id: c.id, title: c.title || had&&had.title || c.id,
+          id: c.id, title: now.title || had&&had.title || c.id,
           f: f.label, a: f.show(a), b: f.show(b), by: who
         });
       });
-      snap.items[c.id] = c;
+      snap.items[c.id] = now;
     });
     (payload.notes||[]).forEach(function(n){
       if(!n || !n.id) return;
