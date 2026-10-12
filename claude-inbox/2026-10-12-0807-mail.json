@@ -1,0 +1,29 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-10-12T08:07:29.000Z",
+ "notes": [
+  {
+   "id": "claude-2026-10-12-0810-sbi",
+   "from": "claude",
+   "itemId": "sbi-sanction",
+   "itemTitle": "SBI Global Ed-Vantage sanction letter",
+   "title": "SBI's in-principle offer",
+   "text": "Your branch sent the in-principle offer and the application form this afternoon, and SBI pulled your credit report this morning, so the full sanction is moving. That is the proof of funds your visa file was waiting on. - Check whether the offer needs signing and returning before it counts.",
+   "state": "new",
+   "createdAt": "2026-10-12T08:07:29.000Z",
+   "at": "2026-10-12T08:07:29.000Z",
+   "acted": [
+    "SBI Global Ed-Vantage sanction letter: To-do -> In progress"
+   ]
+  }
+ ],
+ "changed": [
+  {
+   "id": "sbi-sanction",
+   "at": "2026-10-12T08:07:29.000Z",
+   "status": "doing",
+   "manual": true
+  }
+ ]
+}
