@@ -1,0 +1,50 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-13T02:06:59.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-13-0206-cdcq",
+      "from": "claude",
+      "itemId": "cdc-quests",
+      "itemTitle": "Do the CareerLeader and Career Anchors questionnaires",
+      "title": "CDC sent the instructions",
+      "text": "The Career Development Centre emailed you yesterday with how to do both assignments. CareerLeader is about 30 minutes and Career Anchors is a 20-minute Excel, and the mail carries the CareerLeader registration key, which I have kept off the board. Coaching slots open in early November, and both have to be done before your first session.",
+      "state": "new",
+      "createdAt": "2026-10-13T02:06:59.000Z",
+      "at": "2026-10-13T02:06:59.000Z"
+    },
+    {
+      "id": "claude-2026-10-13-0206-cvweb",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "CV webinar link is open",
+      "text": "The same CDC mail carries the registration link for the 13 November CV and cover letter webinar, run by their career coach Rita Neto. It is the session that explains the format you are rebuilding your CV into. - Register now rather than nearer the date.",
+      "state": "new",
+      "createdAt": "2026-10-13T02:06:59.000Z",
+      "at": "2026-10-13T02:06:59.000Z"
+    }
+  ],
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-quest",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "CareerLeader and Career Anchors, before the first coaching session",
+      "body": "Two profiling questionnaires plus the workbook questions that go with them. They are the entire raw material for the first coaching conversation, so the session is only as good as what you put in: arriving without them turns a 45-minute slot into an introduction you could have had by email. The CDC's mail of 12 October carries the mechanism: register at careerleader.com as a new user with your INSEAD address and the registration key that mail holds — the key is deliberately not recorded here, because this repository is public — then complete the profile and the three assessments and keep the report for the session. Career Anchors is an Excel workbook downloaded from INSEAD's own site. Thirty minutes and twenty, so both fit in one evening. Coaching slots open in early November.",
+      "cat": "work",
+      "when": "Before November 2026",
+      "w": "2026-11-01",
+      "item": "cdc-quests",
+      "rel": [
+        "k-coach1",
+        "k-coach-ses"
+      ],
+      "at": "2026-10-13T02:06:59.000Z",
+      "by": "claude"
+    }
+  ]
+}
