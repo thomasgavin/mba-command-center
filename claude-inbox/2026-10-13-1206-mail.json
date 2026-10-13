@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-13T12:06:53.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-13-1206-cfint",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Attend the Campus France interview",
+      "title": "Interview confirmed for tomorrow",
+      "text": "You wrote to Fitria this afternoon confirming you will be there in person at 10am tomorrow, and that your original documents have arrived. That closes both halves of what Wednesday needed.",
+      "state": "new",
+      "createdAt": "2026-10-13T12:06:53.000Z",
+      "at": "2026-10-13T12:06:53.000Z"
+    }
+  ],
+  "changed": []
+}
