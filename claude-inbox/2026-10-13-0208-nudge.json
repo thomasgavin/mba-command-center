@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-13T02:08:05.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-13-0208-cfint",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Attend the Campus France interview",
+      "title": "Interview is tomorrow",
+      "text": "The interview is tomorrow morning and you still have not written back to Fitria. Nothing on the board says the originals have arrived either. - This is the last time I will raise it: confirm with her today, or ask her to move it.",
+      "state": "new",
+      "createdAt": "2026-10-13T02:08:05.000Z",
+      "at": "2026-10-13T02:08:05.000Z",
+      "kind": "nudge",
+      "about": "cf-interview",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-14"
+      }
+    }
+  ],
+  "changed": []
+}
