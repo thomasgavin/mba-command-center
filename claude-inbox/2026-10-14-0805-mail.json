@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-14T08:06:20.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-14-0805-cfindia",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Dossier can move to India",
+      "text": "Campus France Indonesia confirmed this morning that they can transfer your dossier to New Delhi, so you can continue the France-Visas application from India. You have written to Delhi asking what they need from your side. - Ask Fitria to start the transfer from her end rather than waiting for Delhi to describe it.",
+      "state": "new",
+      "createdAt": "2026-10-14T08:06:20.000Z",
+      "at": "2026-10-14T08:06:20.000Z"
+    },
+    {
+      "id": "claude-2026-10-14-0805-kitas",
+      "from": "claude",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "Locus asked to approve",
+      "text": "You asked Ravi and Jishnu this morning to approve proceeding with InCorp's revised quote. The exit now waits on Locus rather than on you or InCorp. - Give them the date: anything agreed after late October leaves no room before 8 November.",
+      "state": "new",
+      "createdAt": "2026-10-14T08:06:20.000Z",
+      "at": "2026-10-14T08:06:20.000Z"
+    }
+  ],
+  "changed": []
+}
