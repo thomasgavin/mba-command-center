@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-15T12:06:15.000Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-15-1205-reint",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Nobody asked Delhi this",
+      "text": "Your mother sent you a draft letter for Campus France India today, and it asks something none of your three emails did: whether you would have to sit the academic interview again in India. If Delhi says yes, the India route costs weeks instead of days. - Put that question to them in writing.",
+      "state": "new",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "round": 1,
+      "was": {
+        "status": "blocked",
+        "due": "2026-10-23"
+      },
+      "createdAt": "2026-10-15T12:06:15.000Z",
+      "at": "2026-10-15T12:06:15.000Z"
+    }
+  ],
+  "changed": []
+}
