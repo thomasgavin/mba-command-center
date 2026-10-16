@@ -1,0 +1,38 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-16T02:08:12Z",
+  "notes": [
+    {
+      "id": "claude-2026-10-16-0208-cfdone",
+      "from": "claude",
+      "itemId": "cf-interview",
+      "itemTitle": "Attend the Campus France interview",
+      "title": "Interview done, closed it",
+      "text": "You thanked Fitria this morning for the interview on 14 October, so it happened and I have closed the task, dated the 14th.",
+      "state": "new",
+      "at": "2026-10-16T02:08:12Z",
+      "createdAt": "2026-10-16T02:08:12Z"
+    },
+    {
+      "id": "claude-2026-10-16-0208-india",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "You chose India",
+      "text": "You have asked Fitria to transfer your dossier to New Delhi and told her you will apply from India. That answers the question the brief put to you, so the 23 October date on this task is no longer the plan. - Move it once Delhi says how long a transfer takes.",
+      "state": "new",
+      "at": "2026-10-16T02:08:12Z",
+      "createdAt": "2026-10-16T02:08:12Z"
+    }
+  ],
+  "changed": [
+    {
+      "id": "cf-interview",
+      "at": "2026-10-16T02:08:12Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-10-14"
+    }
+  ]
+}
