@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-17T02:05:52Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-17-0206-apost",
+      "from": "claude",
+      "itemId": "docs-apost",
+      "itemTitle": "Apostille and attest academic documents",
+      "title": "Apostille is dated tomorrow",
+      "text": "The apostille task is dated tomorrow and still reads To-do. The submission it was feeding has moved to India, so that date is pointed at a plan you changed. - Give it a date that matches the Delhi file rather than leaving it to go late.",
+      "state": "new",
+      "kind": "nudge",
+      "about": "docs-apost",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-18"
+      },
+      "at": "2026-10-17T02:05:52Z",
+      "createdAt": "2026-10-17T02:05:52Z"
+    }
+  ]
+}
