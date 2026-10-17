@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-17T12:03:48Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-17-1205-vmock",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "VMock score is 92 now",
+      "text": "VMock put your CV in the green zone this morning at 92, up from 63 on 11 October. Maria Caliap and Jade Phung at the CDC were copied on it. - The INSEAD format rebuild is a separate job from the score, and it is what is left on this task.",
+      "state": "new",
+      "at": "2026-10-17T12:03:48Z",
+      "createdAt": "2026-10-17T12:03:48Z"
+    }
+  ]
+}
