@@ -2988,6 +2988,30 @@ for (var bw of [390, 1280]) {
   ok("each is its own colour and the size of the Close button",
      new Set(qr.cols).size === 3 && qr.h >= 40 && qr.h <= qr.closeH, JSON.stringify(qr));
 
+  /* "add the links to the board as well as a hyperlink (not the full link)".
+     A link that is in the DOM and not on screen is the push-test-banner bug,
+     so this measures the anchor's box; and it checks the label is a label
+     rather than the URL, which is the whole of what he asked for. */
+  var lk = await s39.p.evaluate(function () {
+    var withU = SEED.filter(function (s) { return s.u; });
+    var bad = withU.filter(function (s) { return !/^https:\/\//.test(s.u); }).map(function (s) { return s.id; });
+    openItem(withU[0].id);
+    var a = document.querySelector(".dlink"), r = a && a.getBoundingClientRect();
+    var out = { n: withU.length, bad: bad, href: a ? a.getAttribute("href") : null,
+                txt: a ? a.textContent.trim() : null,
+                rel: a ? a.getAttribute("rel") : null,
+                w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0 };
+    hideDrawer();
+    return out;
+  });
+  ok("a task carrying an apply link draws one, on screen",
+     lk.n > 0 && lk.w > 20 && lk.h > 10, JSON.stringify(lk));
+  ok("and it is a label, not the URL printed out",
+     !!lk.txt && lk.txt.length < 40 && lk.txt.indexOf("http") < 0 && /^https:\/\//.test(lk.href || ""),
+     JSON.stringify(lk));
+  ok("every apply link is https and opens without handing over this page",
+     lk.bad.length === 0 && /noopener/.test(lk.rel || ""), JSON.stringify(lk));
+
   /* "the how long field is for you to fill" -- every open task in SEED now
      carries one, and every value is a real EFFORT key. */
   var ef = await s39.p.evaluate(function () {
