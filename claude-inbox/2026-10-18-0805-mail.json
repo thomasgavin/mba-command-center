@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-18T08:04:10Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-18-0805-cvreview",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "CV review slots this week",
+      "text": "INSEAD is running CV and cover letter reviews with a career coach for anyone applying before 15 November, and your Amazon Pathways task is dated the 15th. The sessions are 22, 23 and 26 October by sector, and they want a VMock-formatted CV, which you have as of yesterday. - Sign up for one slot only.",
+      "state": "new",
+      "kind": "nudge",
+      "about": "cv",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-02"
+      },
+      "at": "2026-10-18T08:04:10Z",
+      "createdAt": "2026-10-18T08:04:10Z"
+    },
+    {
+      "id": "claude-2026-10-18-0805-amzn",
+      "from": "claude",
+      "itemId": "news-amzn-path",
+      "itemTitle": "[NEWS] Apply to Amazon Pathways (MBA Operations LDP)",
+      "title": "Amazon session, 2 November",
+      "text": "Amazon is running an info session on 2 November about the Pathways Leadership Internship, with the registration link in this morning's Pre-MBA newsletter. INSEAD notes their recruiting is rolling, so roles close as they fill rather than on a deadline. - Worth applying soon after the session rather than waiting for the date on this task.",
+      "state": "new",
+      "at": "2026-10-18T08:04:10Z",
+      "createdAt": "2026-10-18T08:04:10Z"
+    }
+  ]
+}
