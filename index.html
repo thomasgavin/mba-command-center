@@ -2099,7 +2099,38 @@ var EVENTS=[
     n:"12:00 Paris. Pathways and Launch. Amazon fills these on a rolling basis, so the application goes in straight after."},
   {id:"ev-acad",   t:"Academics overview webinar",          k:"acad",   d:"2026-11-26", p:"Medium"},
   {id:"ev-summer", t:"Summer experience webinar",           k:"career", d:"2026-12-04", p:"High",
-    n:"The 8-week summer project, the startup tour, and taking the break to recruit."}
+    n:"The 8-week summer project, the startup tour, and taking the break to recruit."},
+  /* The LatAm career fair, 9 to 12 November, eleven Zoom sessions over four
+     evenings. Medium where the employer recruits globally and a recruiter
+     contact carries beyond the region -- Amazon, World Bank, McKinsey, Uber,
+     J&J -- Low where the business is LatAm-only and the session is market
+     colour rather than a lead he can use from Europe. **The Zoom links are
+     deliberately not here.** Each one carries a `pwd=` token that admits the
+     holder to the session, which is a credential, and this repository is
+     public; they are in his Google Calendar instead, which is where he will
+     be when the session starts. */
+  {id:"ev-latam-amzn", t:"LatAm fair: Amazon", k:"career", d:"2026-11-09", p:"Medium",
+    n:"20:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-cred", t:"LatAm fair: Credicorp", k:"career", d:"2026-11-09", p:"Low",
+    n:"20:30 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-lily", t:"LatAm fair: Eli Lilly", k:"career", d:"2026-11-09", p:"Low",
+    n:"21:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-mtx", t:"LatAm fair: Matrix Consulting", k:"career", d:"2026-11-09", p:"Low",
+    n:"21:30 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-wbg", t:"LatAm fair: World Bank Group", k:"career", d:"2026-11-10", p:"Medium",
+    n:"21:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-itau", t:"LatAm fair: Itau", k:"career", d:"2026-11-10", p:"Low",
+    n:"21:30 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-intc", t:"LatAm fair: Grupo Intercorp", k:"career", d:"2026-11-11", p:"Low",
+    n:"20:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-mck", t:"LatAm fair: McKinsey & Company", k:"career", d:"2026-11-11", p:"Medium",
+    n:"20:30 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-uber", t:"LatAm fair: Uber", k:"career", d:"2026-11-11", p:"Medium",
+    n:"21:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-jnj", t:"LatAm fair: Johnson & Johnson", k:"career", d:"2026-11-12", p:"Medium",
+    n:"20:00 London. Zoom link is on the calendar invite."},
+  {id:"ev-latam-hilt", t:"LatAm fair: Hilti", k:"career", d:"2026-11-12", p:"Low",
+    n:"20:30 London. Zoom link is on the calendar invite."}
 ];
 function evCat(e){ return cat==="all" || TRACK_CAT[e.k]===cat; }
 function evPool(){ return EVENTS.filter(evCat); }
@@ -5179,7 +5210,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-18-0820";
+var BUILD="2026-10-18-1330";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
