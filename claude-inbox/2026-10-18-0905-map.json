@@ -1,0 +1,109 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-10-18T09:05:00.000Z",
+  "notes": [],
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-aps",
+      "label": "The French APS is France-only, and it is the thing that removes sponsorship",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Graduating at Fontainebleau makes him a French master's graduate, which entitles him to the APS (autorisation provisoire de sejour, also called the RECE) -- a residence permit that lets him work in France without an employer sponsoring anything. That is the answer to the barrier he hit when job-hunting: outside France an employer has to sponsor from scratch, in France it only has to convert a permit he already holds. The permit is national, so it carries no right to work in Germany, Spain or the Netherlands, and the usual quoted length is 12 months with sources disagreeing about a longer window for Indian nationals. Its real value is as a bridge: a year of legal French employment is what makes the next two routes available.",
+      "cat": "work",
+      "rel": [
+        "k-bluecard",
+        "k-targetgeo"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-bluecard",
+      "label": "How a French job becomes a job anywhere in the EU",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Two mechanisms, both on a clock that only starts once he is employed. The EU Blue Card is issued for a graduate-level job above a salary threshold, and after roughly twelve months in the first country it allows a move to another EU state on a simplified application rather than a fresh sponsorship. EU long-term residence arrives at five years of legal residence and carries broad mobility with it. So the sequence that actually works is France first on the APS, convert to a Blue Card, then move -- not applying cold into the Netherlands or Spain from outside.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-targetgeo"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-targetgeo",
+      "label": "Where to aim: France, the Netherlands, Ireland -- and why not Switzerland",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "France is the base because the APS makes it the one country with no permission problem. The Netherlands is the strongest second: English-language workplaces are normal, Amsterdam carries real tech and consumer headquarters, and quality of life is high. Ireland is the third, with Dublin holding the European seats of Google, Meta, Microsoft and Stripe and a Critical Skills Employment Permit that is comparatively straightforward. Switzerland is ruled out despite the salaries -- non-EU hires face a labour market test and a national quota, which is exactly the barrier he is trying to avoid. Spain is the leisure-weighted alternative and became more plausible once he said he already speaks basic Spanish and can reach decent proficiency by graduation; it is thinner on Big Tech but Barcelona and Madrid are real markets. Belgium is the underrated one: the lowest salary bar of the group. Singapore stays a maybe on the Employment Pass and COMPASS framework. The structural point behind all of it: pick the employer first and the country follows, because a multinational moves people between its own offices far more easily than a new employer sponsors a stranger.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-bluecard",
+        "k-nl-zoekjaar"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-visa-intern",
+      "label": "A summer internship abroad needs its own permission, and it is not the student visa",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "His French student residence permit covers work in France and nothing outside it, so each of the internship markets has its own route. Ireland uses the Atypical Working Scheme, which must be applied for from outside Ireland and wants at least twelve weeks' notice -- that lead time is the one that bites, since the applications close in November for a July start. Luxembourg requires a trainee authorisation arranged by the host company. The UK route is Temporary Work -- Government Authorised Exchange, again employer-led. The United States is possible rather than closed: the J-1 Intern category explicitly covers students enrolled at a university outside the US, but a State Department designated sponsor has to issue the DS-2019, so it depends entirely on whether the employer already runs that programme. The practical rule is to ask the recruiter which route they use before assuming an offer is workable.",
+      "cat": "work",
+      "rel": [
+        "k-jobreport",
+        "k-aps"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude",
+      "item": "int-amzn-lux"
+    },
+    {
+      "id": "k-nl-zoekjaar",
+      "label": "The Dutch orientation year probably does not apply to an INSEAD degree",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "The zoekjaar is the Netherlands' post-study search year, and it is open either to graduates of a Dutch institution or to graduates of a university in the global top 200 of QS, Times Higher Education or ARWU. INSEAD is a business school and does not appear in those general university rankings, so the second door is likely shut -- worth confirming with Nuffic before counting on it. The consequence is that the Dutch route runs through an employer and a Blue Card rather than through a job-search permit, which makes the timing different: the offer has to come first.",
+      "cat": "work",
+      "rel": [
+        "k-targetgeo",
+        "k-bluecard"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-jobreport",
+      "label": "The 27D job report is the CDC's live list of what is open now",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "A spreadsheet circulated with the newsletter, listing roles open to the 27D cohort with company, title, location, type and deadline. It mixes full-time graduate roles with summer internships and the type column is not always right -- a Google row tagged full-time is titled MBA intern. It is the source the five application tasks on the board came from, and it is reissued, so it is worth re-reading each time rather than treating the current shortlist as final. Deadlines on it run close: four of the five chosen roles close on 8 November.",
+      "cat": "work",
+      "rel": [
+        "k-visa-intern",
+        "k-cvbook"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude",
+      "when": "Reissued with the newsletter",
+      "w": "2026-10-17"
+    }
+  ]
+}
