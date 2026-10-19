@@ -1,0 +1,23 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-19T02:12:30Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-19-0212-apost",
+      "from": "claude",
+      "itemId": "docs-apost",
+      "itemTitle": "Apostille and attest academic documents",
+      "title": "Apostille went past its date",
+      "text": "The apostille was dated yesterday and still reads To-do. If it has to wait until you are in India, then the date it carries is wrong rather than late. - Give it a date you believe in instead of letting it drift.",
+      "state": "new",
+      "createdAt": "2026-10-19T02:12:30Z",
+      "at": "2026-10-19T02:12:30Z",
+      "kind": "nudge",
+      "about": "docs-apost",
+      "round": 2,
+      "was": { "status": "todo", "due": "2026-10-18" }
+    }
+  ]
+}
