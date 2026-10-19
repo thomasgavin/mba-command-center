@@ -1,0 +1,29 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-10-19T09:00:00.000Z",
+  "notes": [
+    {
+      "id": "claude-sbi-sign-1019",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "title": "Sign in India, not Jakarta",
+      "body": "Bank SBI Indonesia is a separate Indonesian company, not an SBI branch, so it cannot execute documents for your Indian loan. You land in India on 7 November and the in-principle offer expires on the 12th, which leaves a five-day window. - Tell the branch now which day that week you will come in, and ask them to confirm the offer holds until then.",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-10-19T09:00:00.000Z",
+      "acted": [
+        "SBI Global Ed-Vantage sanction letter: 24 Oct -> 10 Nov"
+      ]
+    }
+  ],
+  "changed": [
+    {
+      "id": "sbi-sanction",
+      "at": "2026-10-19T09:00:00.000Z",
+      "due": "2026-11-10",
+      "effort": "day"
+    }
+  ],
+  "kb": []
+}
