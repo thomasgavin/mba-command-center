@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-20T08:10:20Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-20-0810-tuition",
+      "from": "claude",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "INSEAD will take a transfer",
+      "text": "Marie Rose agreed this morning to accept the instalment as a direct bank transfer from your Indian bank, and sent the account details, which are left out here. She wants your name and student reference in the payment and a copy of the transfer proof. - Send her the receipt the day the bank pays, since that is what closes it at their end.",
+      "state": "new",
+      "createdAt": "2026-10-20T08:10:20Z",
+      "at": "2026-10-20T08:10:20Z"
+    },
+    {
+      "id": "claude-2026-10-20-0810-sbi",
+      "from": "claude",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "title": "Bank says it is ready",
+      "text": "You told INSEAD yesterday that the loan is nearly through and your bank can pay the tuition directly. That sits oddly with the 10 November date on this task, which assumes you sign the documents only after you land in India. - Worth asking the branch what is genuinely left before you fly.",
+      "state": "new",
+      "createdAt": "2026-10-20T08:10:20Z",
+      "at": "2026-10-20T08:10:20Z"
+    }
+  ]
+}
