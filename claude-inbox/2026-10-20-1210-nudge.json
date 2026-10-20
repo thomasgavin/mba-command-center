@@ -1,0 +1,23 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-20T12:10:30Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-20-1210-cv",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "First CV slot is Thursday",
+      "text": "The CDC's CV review sessions start on Thursday and nothing on the board says you have booked one. You already have the VMock-formatted CV they ask for, and the Google and Amazon applications all close on 8 November. - Book tomorrow at the latest, or the 26th is the only slot left.",
+      "state": "new",
+      "createdAt": "2026-10-20T12:10:30Z",
+      "at": "2026-10-20T12:10:30Z",
+      "kind": "nudge",
+      "about": "cv",
+      "round": 2,
+      "was": { "status": "doing", "due": "2026-11-02" }
+    }
+  ]
+}
