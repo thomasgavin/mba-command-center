@@ -1,0 +1,23 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-20T02:10:40Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-20-0210-fitria",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Jakarta needs Delhi first",
+      "text": "Fitria replied yesterday: Campus France Jakarta will only transfer your dossier once New Delhi confirms, and she asks you to write to Delhi and copy her. Nothing on this track moves until that email goes. - Send it today, and ask in the same message whether you have to sit the interview again.",
+      "state": "new",
+      "createdAt": "2026-10-20T02:10:40Z",
+      "at": "2026-10-20T02:10:40Z",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "round": 1,
+      "was": { "status": "blocked", "due": "2026-10-23" }
+    }
+  ]
+}
