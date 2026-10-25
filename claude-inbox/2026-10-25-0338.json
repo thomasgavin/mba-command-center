@@ -1,0 +1,1781 @@
+{
+  "v": 3,
+  "op": "archive",
+  "exportedAt": "2026-10-25T03:38:42.417Z",
+  "why": "daily snapshot from the relay",
+  "notes": [
+    {
+      "id": "claude-2026-10-18-0805-cvreview",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "CV review slots this week",
+      "text": "INSEAD is running CV and cover letter reviews with a career coach for anyone applying before 15 November, and your Amazon Pathways task is dated the 15th. The sessions are 22, 23 and 26 October by sector, and they want a VMock-formatted CV, which you have as of yesterday. - Sign up for one slot only.",
+      "state": "read",
+      "kind": "nudge",
+      "about": "cv",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-02"
+      },
+      "at": "2026-10-18T08:04:10Z",
+      "createdAt": "2026-10-18T08:04:10Z"
+    },
+    {
+      "id": "claude-2026-10-18-0805-amzn",
+      "from": "claude",
+      "itemId": "news-amzn-path",
+      "itemTitle": "[NEWS] Apply to Amazon Pathways (MBA Operations LDP)",
+      "title": "Amazon session, 2 November",
+      "text": "Amazon is running an info session on 2 November about the Pathways Leadership Internship, with the registration link in this morning's Pre-MBA newsletter. INSEAD notes their recruiting is rolling, so roles close as they fill rather than on a deadline. - Worth applying soon after the session rather than waiting for the date on this task.",
+      "state": "read",
+      "at": "2026-10-18T08:04:10Z",
+      "createdAt": "2026-10-18T08:04:10Z"
+    },
+    {
+      "id": "n1792338671830719",
+      "itemId": "int-nike-dg",
+      "itemTitle": "Apply: Nike Digital Growth graduate intern, Oregon",
+      "text": "Remove this from all places, US is a no",
+      "createdAt": "2026-10-18T15:51:11.830Z",
+      "state": "read",
+      "from": "me",
+      "forClaude": true
+    },
+    {
+      "id": "claude-2026-10-18-nike",
+      "from": "claude",
+      "itemId": null,
+      "itemTitle": null,
+      "title": "Nike removed everywhere",
+      "text": "Done: the Nike Oregon application is gone from the board and the project's baseline, so it will not come back on a reload or on your other device. You are left with the four other internships, all closing 8 November.",
+      "createdAt": "2026-10-18T15:58:19Z",
+      "state": "new",
+      "acted": [
+        "Removed the Nike Digital Growth task from the board's baseline and the notes on the internship shortlist. Live after a force-quit of the app."
+      ]
+    },
+    {
+      "id": "claude-2026-10-19-0212-apost",
+      "from": "claude",
+      "itemId": "docs-apost",
+      "itemTitle": "Apostille and attest academic documents",
+      "title": "Apostille went past its date",
+      "text": "The apostille was dated yesterday and still reads To-do. If it has to wait until you are in India, then the date it carries is wrong rather than late. - Give it a date you believe in instead of letting it drift.",
+      "state": "new",
+      "createdAt": "2026-10-19T02:12:30Z",
+      "at": "2026-10-19T02:12:30Z",
+      "kind": "nudge",
+      "about": "docs-apost",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-18"
+      }
+    },
+    {
+      "id": "claude-sbi-sign-1019",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "title": "Sign in India, not Jakarta",
+      "body": "Bank SBI Indonesia is a separate Indonesian company, not an SBI branch, so it cannot execute documents for your Indian loan. You land in India on 7 November and the in-principle offer expires on the 12th, which leaves a five-day window. - Tell the branch now which day that week you will come in, and ask them to confirm the offer holds until then.",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-10-19T09:00:00.000Z",
+      "acted": [
+        "SBI Global Ed-Vantage sanction letter: 24 Oct -> 10 Nov"
+      ]
+    },
+    {
+      "id": "claude-2026-10-20-0210-fitria",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Jakarta needs Delhi first",
+      "text": "Fitria replied yesterday: Campus France Jakarta will only transfer your dossier once New Delhi confirms, and she asks you to write to Delhi and copy her. Nothing on this track moves until that email goes. - Send it today, and ask in the same message whether you have to sit the interview again.",
+      "state": "new",
+      "createdAt": "2026-10-20T02:10:40Z",
+      "at": "2026-10-20T02:10:40Z",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "round": 1,
+      "was": {
+        "status": "blocked",
+        "due": "2026-10-23"
+      }
+    },
+    {
+      "id": "claude-2026-10-20-0810-tuition",
+      "from": "claude",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "INSEAD will take a transfer",
+      "text": "Marie Rose agreed this morning to accept the instalment as a direct bank transfer from your Indian bank, and sent the account details, which are left out here. She wants your name and student reference in the payment and a copy of the transfer proof. - Send her the receipt the day the bank pays, since that is what closes it at their end.",
+      "state": "new",
+      "createdAt": "2026-10-20T08:10:20Z",
+      "at": "2026-10-20T08:10:20Z"
+    },
+    {
+      "id": "claude-2026-10-20-0810-sbi",
+      "from": "claude",
+      "itemId": "sbi-sanction",
+      "itemTitle": "SBI Global Ed-Vantage sanction letter",
+      "title": "Bank says it is ready",
+      "text": "You told INSEAD yesterday that the loan is nearly through and your bank can pay the tuition directly. That sits oddly with the 10 November date on this task, which assumes you sign the documents only after you land in India. - Worth asking the branch what is genuinely left before you fly.",
+      "state": "new",
+      "createdAt": "2026-10-20T08:10:20Z",
+      "at": "2026-10-20T08:10:20Z"
+    },
+    {
+      "id": "claude-2026-10-20-1210-cv",
+      "from": "claude",
+      "itemId": "cv",
+      "itemTitle": "Rebuild CV in INSEAD format",
+      "title": "First CV slot is Thursday",
+      "text": "The CDC's CV review sessions start on Thursday and nothing on the board says you have booked one. You already have the VMock-formatted CV they ask for, and the Google and Amazon applications all close on 8 November. - Book tomorrow at the latest, or the 26th is the only slot left.",
+      "state": "new",
+      "createdAt": "2026-10-20T12:10:30Z",
+      "at": "2026-10-20T12:10:30Z",
+      "kind": "nudge",
+      "about": "cv",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-02"
+      }
+    },
+    {
+      "id": "claude-2026-10-21-1210-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Delhi email has gone",
+      "text": "You wrote to Campus France New Delhi this morning and copied Fitria, so the transfer now waits on Delhi. Your email says you fly to India on 4 November and will apply through New Delhi VFS, so Friday's TLS date here is dead. - Give it a date you expect to use, or clear it until Delhi answers.",
+      "state": "new",
+      "createdAt": "2026-10-21T12:10:00.000Z",
+      "at": "2026-10-21T12:10:00.000Z"
+    },
+    {
+      "id": "claude-2026-10-21-1210-kitas",
+      "from": "claude",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "InCorp wants your answer",
+      "text": "Chitra wrote this morning asking whether you are renewing or cancelling the KITAS, and the revised quotation for cancellation, NPWP and BPJS is still unanswered. She notes renewal normally starts a month before the 8 November expiry, so that window has closed. - Tell her you are cancelling, since you leave on the 4th.",
+      "state": "new",
+      "createdAt": "2026-10-21T12:10:00.000Z",
+      "at": "2026-10-21T12:10:00.000Z"
+    }
+  ],
+  "changed": [
+    {
+      "id": "tuition-oct",
+      "title": "Pay EUR 53,000 tuition instalment",
+      "status": "doing",
+      "due": "2026-11-05",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-03T20:45:03.561Z"
+    },
+    {
+      "id": "scholarship-r3",
+      "title": "Chase Round 3 scholarship decision",
+      "status": "done",
+      "due": "2026-09-11",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-03T18:15:54.671Z"
+    },
+    {
+      "id": "poa-exec",
+      "title": "Execute PoA at SBI Hindon branch",
+      "status": "done",
+      "due": "2026-10-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "sbi-sanction",
+      "at": "2026-10-19T09:00:00.000Z",
+      "status": "doing",
+      "manual": true,
+      "title": "SBI Global Ed-Vantage sanction letter",
+      "due": "2026-11-10",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "effort": "day",
+      "deleted": false,
+      "newsState": null
+    },
+    {
+      "id": "tuition-apr",
+      "title": "Pay EUR 44,860 final instalment",
+      "status": "blocked",
+      "due": "2027-04-15",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T16:17:20.782Z"
+    },
+    {
+      "id": "cf-interview",
+      "title": "Attend the Campus France interview",
+      "status": "done",
+      "due": "2026-10-14",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-16T02:08:12Z",
+      "doneAt": "2026-10-14"
+    },
+    {
+      "id": "docs-apost",
+      "title": "Apostille and attest academic documents",
+      "status": "todo",
+      "due": "2026-10-18",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": true,
+      "newsState": null,
+      "at": "2026-10-04T11:58:15.824Z"
+    },
+    {
+      "id": "cf-validation",
+      "title": "Campus France EEF validated",
+      "status": "done",
+      "due": "2026-10-21",
+      "priority": "Critical",
+      "snoozes": 1,
+      "origDue": "2026-10-07",
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-06T08:12:00.000Z"
+    },
+    {
+      "id": "flight",
+      "title": "Book flight to Paris for 3 January",
+      "status": "done",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T02:41:19.227Z"
+    },
+    {
+      "id": "bank-fr",
+      "title": "Open French bank account",
+      "status": "blocked",
+      "due": "2027-01-10",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "multi",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-11T13:35:10.095Z"
+    },
+    {
+      "id": "portal",
+      "title": "Complete MyINSEAD profile and practical info",
+      "at": "2026-10-05T10:42:41.558Z",
+      "seed": true
+    },
+    {
+      "id": "locus-exit",
+      "title": "Plan Locus exit: notice, LWD, handover",
+      "status": "done",
+      "due": "2026-10-07",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "multi",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-11T07:36:12.688Z"
+    },
+    {
+      "id": "handover-hf",
+      "title": "Hand over HelloFresh FR and UK engagements",
+      "status": "done",
+      "due": "2026-12-05",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-03T18:36:29.211Z"
+    },
+    {
+      "id": "postmba",
+      "title": "Write down post-MBA function, industry, geography",
+      "status": "blocked",
+      "due": "2026-10-31",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:29:30.806Z"
+    },
+    {
+      "id": "club8-movein",
+      "title": "Move in to Club 8",
+      "status": "blocked",
+      "due": "2027-01-03",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:28:50.040Z"
+    },
+    {
+      "id": "club8-detail",
+      "title": "Confirm Club 8 inventory and move-in window",
+      "status": "blocked",
+      "due": "2026-11-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-11T12:01:49.587Z"
+    },
+    {
+      "id": "cf-indonesia",
+      "title": "Send Campus France the additional documents they asked for",
+      "status": "done",
+      "due": "2026-10-05",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-06T12:16:14.840Z"
+    },
+    {
+      "id": "third-lang",
+      "title": "Decide and register the third language",
+      "status": "todo",
+      "due": "2027-02-28",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "newsState": null,
+      "at": "2026-10-04T15:28:36.958Z"
+    },
+    {
+      "id": "housing-h2",
+      "title": "Solve housing after 3 July 2027",
+      "status": "blocked",
+      "due": "2027-03-01",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:28:45.219Z"
+    },
+    {
+      "id": "shipping",
+      "title": "Shipping and baggage plan",
+      "status": "todo",
+      "due": "2026-12-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": true,
+      "newsState": null,
+      "at": "2026-10-04T15:28:59.057Z"
+    },
+    {
+      "id": "cv",
+      "title": "Rebuild CV in INSEAD format",
+      "status": "doing",
+      "due": "2026-11-02",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "multi",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-11T13:33:40.328Z"
+    },
+    {
+      "id": "forex",
+      "title": "Open EUR account for fees and living costs",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:29:48.122Z"
+    },
+    {
+      "id": "classmates",
+      "title": "Reach out to five MBA'27D classmates",
+      "status": "blocked",
+      "due": "2026-11-30",
+      "priority": "Low",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:29:52.989Z"
+    },
+    {
+      "id": "insurance",
+      "title": "French health cover and travel insurance",
+      "status": "blocked",
+      "due": "2026-12-10",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-04T15:30:05.824Z"
+    },
+    {
+      "id": "bizfound",
+      "title": "Decide on Business Foundations and register",
+      "status": "blocked",
+      "due": "2026-10-30",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-05T22:05:54.126Z"
+    },
+    {
+      "id": "vmock",
+      "title": "Activate VMock CV platform access",
+      "status": "done",
+      "due": "2026-10-06",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-05T17:09:00.000Z"
+    },
+    {
+      "id": "casecoach",
+      "title": "Register for Case Coach",
+      "status": "done",
+      "due": "2026-10-06",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "quick",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-05T17:09:00.000Z"
+    },
+    {
+      "id": "cdc-coach1",
+      "title": "Book the first CDC coaching session",
+      "status": "blocked",
+      "due": "2026-11-15",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": null,
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-05T22:05:54.126Z"
+    },
+    {
+      "id": "vfs-appt",
+      "title": "Submit the visa application at TLS Contact",
+      "status": "blocked",
+      "due": "2026-10-23",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "day",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-08T18:05:00.000Z"
+    },
+    {
+      "id": "cf-eef-pay",
+      "title": "Pay the Campus France EEF fee",
+      "status": "done",
+      "due": "2026-10-13",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "hours",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-08T20:02:20.996Z"
+    },
+    {
+      "id": "news-amzn-path",
+      "title": "[NEWS] Apply to Amazon Pathways (MBA Operations LDP)",
+      "status": "blocked",
+      "due": "2026-11-15",
+      "priority": "Medium",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "hours",
+      "deleted": false,
+      "newsState": "accept",
+      "at": "2026-10-18T08:50:55.324Z"
+    },
+    {
+      "id": "vmock-cv",
+      "at": "2026-10-12T02:06:00.000Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-10-11",
+      "title": "Upload your CV to VMock for the SMART score",
+      "due": "2026-10-18",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "effort": "hours",
+      "deleted": false,
+      "newsState": null
+    },
+    {
+      "id": "cdc-quests",
+      "title": "Do the CareerLeader and Career Anchors questionnaires",
+      "status": "done",
+      "due": "2026-10-31",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": true,
+      "effort": "hours",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-18T08:50:38.460Z"
+    },
+    {
+      "id": "int-ggl-fin",
+      "title": "Apply: Google Finance MBA intern, Dublin",
+      "status": "blocked",
+      "due": "2026-11-08",
+      "priority": "Low",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": "hours",
+      "deleted": false,
+      "newsState": null,
+      "at": "2026-10-18T08:50:38.460Z"
+    },
+    {
+      "id": "int-nike-dg",
+      "title": "Apply: Nike Digital Growth graduate intern, Oregon",
+      "status": "todo",
+      "due": "2026-10-21",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "manual": false,
+      "effort": "hours",
+      "deleted": true,
+      "newsState": null,
+      "at": "2026-10-18T15:51:14.645Z"
+    }
+  ],
+  "kb": [
+    {
+      "id": "k-iaa",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "IAA Alumni Meet & Greet",
+      "body": "The INSEAD Alumni Association's own introduction to the network: who they are, what the regional chapters do, and how alumni actually get used during and after the MBA. Optional in INSEAD's own rating, and the one P0 session that is about the twenty years after the degree rather than the year of it.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "28 October 2026",
+      "w": "2026-10-28"
+    },
+    {
+      "id": "k-pldp-web",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "PLDP intro webinar",
+      "body": "On Zoom. Walks through the Personal Leadership Development Programme: what the P0 assignments ask for, how individual and group coaching fit together across the year, and what your coach does with what you write. INSEAD marks this MUST DO, and it is the session that makes the assignment window make sense rather than feel like homework.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "05 November 2026",
+      "w": "2026-11-05",
+      "item": "pldp-webinar",
+      "rel": [
+        "k-pldp",
+        "k-pldp-p0"
+      ]
+    },
+    {
+      "id": "k-ama",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "AMA on student platforms",
+      "body": "An open question session on the tools you are about to live in: the LMS, CareerGlobe, and the rest of the stack. Optional, and worth it only if something in the platforms is already confusing you by then.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "10 November 2026",
+      "w": "2026-11-10",
+      "rel": [
+        "k-lms",
+        "k-careerglobe"
+      ]
+    },
+    {
+      "id": "k-cvweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "INSEAD CV & Cover Letter webinar",
+      "body": "13:00 Paris / 20:00 Singapore. What belongs in the INSEAD CV format and what gets cut, how recruiters read it, and where the CV work sits in the year: a first draft through VMock before a human sees it, then review with your coach, and the CV Book after that. Must-do for career switchers.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "13 November 2026",
+      "w": "2026-11-13",
+      "item": "cv-webinar",
+      "rel": [
+        "k-cvbook",
+        "k-vmock"
+      ]
+    },
+    {
+      "id": "k-acadweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "Academics overview webinar",
+      "body": "On Zoom, with the MBA Programme Management Director and current students. The curriculum end to end, how the core and electives fit, exemptions, and what people wish they had done before arriving. Highly recommended rather than required, and the one place to ask a second-hand question about workload.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "26 November 2026",
+      "w": "2026-11-26",
+      "item": "acad-webinar",
+      "rel": [
+        "k-p1cores",
+        "k-exempt"
+      ]
+    },
+    {
+      "id": "k-sumweb",
+      "group": "Webinars and sessions",
+      "ord": 10,
+      "shape": "timeline",
+      "label": "Your Summer Experience & Prep for Arrival",
+      "body": "The three honest ways to spend the eight-week break after P3: a short-term summer project with a company, a startup tour, or deliberate time off to prepare for full-time recruitment. Also covers arrival logistics. This is the session that decides what you spend P2 recruiting for.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "04 December 2026",
+      "w": "2026-12-04",
+      "item": "summer-webinar",
+      "rel": [
+        "k-intern",
+        "k-interntiming"
+      ]
+    },
+    {
+      "id": "k-bizfound",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "Business Foundations: register by 30 October",
+      "body": "The course itself runs one week online, 16-20 November: an intensive introduction to Financial Accounting, Finance and Quantitative Methods aimed at people arriving without a quant background. Optional, registered through MyINSEAD, and the decision has to be made three weeks before it runs.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Register by 30 October 2026",
+      "w": "2026-10-30",
+      "item": "bizfound",
+      "rel": [
+        "k-p1cores"
+      ]
+    },
+    {
+      "id": "k-quest",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "CareerLeader and Career Anchors, before the first coaching session",
+      "body": "Two profiling questionnaires plus the workbook questions that go with them. They are the entire raw material for the first coaching conversation, so the session is only as good as what you put in: arriving without them turns a 45-minute slot into an introduction you could have had by email. The CDC's mail of 12 October carries the mechanism: register at careerleader.com as a new user with your INSEAD address and the registration key that mail holds — the key is deliberately not recorded here, because this repository is public — then complete the profile and the three assessments and keep the report for the session. Career Anchors is an Excel workbook downloaded from INSEAD's own site. Thirty minutes and twenty, so both fit in one evening. Coaching slots open in early November.",
+      "cat": "work",
+      "when": "Before November 2026",
+      "w": "2026-11-01",
+      "item": "cdc-quests",
+      "rel": [
+        "k-coach1",
+        "k-coach-ses"
+      ],
+      "at": "2026-10-13T02:06:59.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-pldp-p0",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "PLDP assignments window",
+      "body": "Delivered online through the LMS across roughly seven weeks. Your coach reads these before meeting you, so they are what shapes the coaching you get rather than a box to tick. INSEAD marks them MUST DO, and the window deliberately spans the December break because they are not a single sitting.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "06 Nov - 28 Dec 2026",
+      "w": "2026-11-06",
+      "item": "pldp-work",
+      "rel": [
+        "k-pldp",
+        "k-pldp-web"
+      ]
+    },
+    {
+      "id": "k-launchprep",
+      "group": "Deadlines",
+      "ord": 20,
+      "shape": "timeline",
+      "label": "Launch Week career pre-work appears on the LMS",
+      "body": "Posted in early December, to be completed before Launch Week rather than during it. Launch Week is dense enough that anything left undone gets done badly or not at all, and the career workshop assumes the pre-work is behind you.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Early December 2026",
+      "w": "2026-12-01",
+      "item": "launch-prework",
+      "rel": [
+        "k-launch"
+      ]
+    },
+    {
+      "id": "k-p0span",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "P0, the pre-programme period",
+      "when": "26 Oct 2026 - 17 Jan 2027",
+      "w": "2026-10-26",
+      "body": "Where the board is right now: the twelve weeks between the LMS going live and Launch Week. Three strands run through it at once -- Academics, Careers and Student Life -- and almost everything in the Webinars and Deadlines blocks sits inside this stretch. It ends the day Launch Week begins.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-launch"
+      ],
+      "rows": [
+        {
+          "t": "P0",
+          "a": "2026-10-26",
+          "b": "2027-01-17",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-launch",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Launch Week",
+      "body": "Fontainebleau, eleven days. The P1 core exemption exams sit inside it along with orientation, the career workshop and the first run of sessions that set up P1. The pre-work that goes with it lands on the LMS in early December.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "07 - 17 January 2027",
+      "w": "2027-01-07",
+      "rel": [
+        "k-exempt",
+        "k-launchprep"
+      ],
+      "rows": [
+        {
+          "t": "Launch Week",
+          "a": "2027-01-07",
+          "b": "2027-01-17",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-cal",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Period dates, P1 to P5",
+      "body": "Five eight-week periods across eleven months, with a long summer gap in the middle. INSEAD publishes these as provisional and says they can still move, so treat anything booked around the edges as provisional too.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "18 Jan - 4 Dec 2027",
+      "w": "2027-01-18",
+      "rows": [
+        {
+          "t": "P1",
+          "a": "2027-01-18",
+          "b": "2027-03-10",
+          "k": "period"
+        },
+        {
+          "t": "P2",
+          "a": "2027-03-15",
+          "b": "2027-05-04",
+          "k": "period"
+        },
+        {
+          "t": "P3",
+          "a": "2027-05-10",
+          "b": "2027-06-30",
+          "k": "period"
+        },
+        {
+          "t": "P4",
+          "a": "2027-08-23",
+          "b": "2027-10-12",
+          "k": "period"
+        },
+        {
+          "t": "P5",
+          "a": "2027-10-18",
+          "b": "2027-12-04",
+          "k": "period"
+        }
+      ]
+    },
+    {
+      "id": "k-breaks",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Breaks",
+      "body": "Three short ones and the long summer. The short breaks are not empty: career treks and club treks run in them, which is most of what people mean when they say the MBA has no holidays. The 1 July to 22 August gap is the one the summer project fits inside.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Mar / May / Jul-Aug / Oct 2027",
+      "w": "2027-03-11",
+      "rel": [
+        "k-intern"
+      ],
+      "rows": [
+        {
+          "t": "Break",
+          "a": "2027-03-11",
+          "b": "2027-03-14",
+          "k": "break"
+        },
+        {
+          "t": "Break",
+          "a": "2027-05-05",
+          "b": "2027-05-09",
+          "k": "break"
+        },
+        {
+          "t": "Summer",
+          "a": "2027-07-01",
+          "b": "2027-08-22",
+          "k": "break"
+        },
+        {
+          "t": "Break",
+          "a": "2027-10-13",
+          "b": "2027-10-17",
+          "k": "break"
+        }
+      ]
+    },
+    {
+      "id": "k-exchange",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Campus exchange bidding happens during P1",
+      "body": "Campus is Fontainebleau or Singapore for P1 and P2; exchange opens from P3 onwards, and the bidding for it runs inside P1 while you are still finding your feet. The rules change year to year, so the P1 briefing is the authority rather than anything written now.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Bid during P1, Jan - Mar 2027",
+      "w": "2027-01-19"
+    },
+    {
+      "id": "k-grad",
+      "group": "Programme calendar",
+      "ord": 30,
+      "shape": "calendar",
+      "label": "Graduation, Singapore",
+      "body": "Singapore campus, with the grad trip after it. Twenty-three months from the deposit to the gown.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "15 December 2027",
+      "w": "2027-12-15",
+      "rows": [
+        {
+          "t": "Graduation",
+          "a": "2027-12-15",
+          "k": "point"
+        }
+      ]
+    },
+    {
+      "id": "k-lms",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "LMS",
+      "body": "Live from 26 October. Every piece of academic content runs through it, a chunk of the CDC curriculum as well, and club registration too. The PLDP assignments are delivered here.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Live 26 October 2026",
+      "w": "2026-10-26",
+      "item": "lms-start",
+      "rel": [
+        "k-pldp-p0",
+        "k-clubs"
+      ]
+    },
+    {
+      "id": "k-careerglobe",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "CareerGlobe",
+      "body": "Live from 27 October. The CDC platform: appointments, jobs, events. The profile has to be set up before you can book the first coaching appointment, which makes it the gate on everything else CDC.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Live 27 October 2026",
+      "w": "2026-10-27",
+      "item": "careerglobe",
+      "rel": [
+        "k-coach1"
+      ]
+    },
+    {
+      "id": "k-vmock",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "VMock",
+      "body": "Part 1 of the INSEAD CV process. It scores a draft against the format and tells you what to fix, so the version a human finally reads is not the first one you wrote.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "vmock",
+      "rel": [
+        "k-cvbook",
+        "k-cvweb"
+      ]
+    },
+    {
+      "id": "k-cvbook",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "label": "The INSEAD CV format",
+      "body": "One format, used as a networking and marketing document rather than a record of employment, and the basis for the INSEAD CV Book that goes to recruiters. The process runs on through P1, so the first version is not the last.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "cv",
+      "rel": [
+        "k-vmock",
+        "k-cvweb"
+      ]
+    },
+    {
+      "id": "k-cdc",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Two teams behind you: a Career Coach and Employer Engagement",
+      "body": "That is the whole of CDC's structure, and it is worth knowing which one to ask. The coach is your primary contact for strategy, materials and accountability. Employer Engagement are the sector specialists who know what a given industry is actually hiring for this year.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-coach-ses",
+        "k-ee"
+      ]
+    },
+    {
+      "id": "k-coach-ses",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Coaching sessions are 45 minutes and you set the agenda",
+      "body": "Short enough to fit before class, which is deliberate. You bring the update and the question and agree the next steps; the coach pressure-tests the plan rather than making it. A session you arrive at without having done the last set of next steps is a session spent recapping.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-quest",
+        "k-coach1"
+      ]
+    },
+    {
+      "id": "k-coach-alloc",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Your coach is allocated on P1 location and never changes",
+      "body": "Deliberately coach-agnostic: they are allocated by where you start, follow you the whole MBA including exchange, and there are no coach changes. So the relationship is worth investing in early rather than shopping around.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-coach1",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "First coaching session, from November",
+      "body": "Covers how the partnership works, what CareerLeader and Career Anchors said about you, and the three stages of the career journey. CareerGlobe has to be set up before you can book it.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "From November 2026",
+      "w": "2026-11-02",
+      "item": "cdc-coach1",
+      "rel": [
+        "k-quest",
+        "k-careerglobe"
+      ]
+    },
+    {
+      "id": "k-journey",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "The career journey is three stages",
+      "body": "Self Awareness: strengths, interests, values, and what you actually bring. Market Exploration: industry knowledge built through networking, narrowed to two or three target plans rather than one bet or ten. Execution: a value proposition you can say out loud, and recruiting to each sector's real timetable, which differs by months.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "postmba",
+      "rel": [
+        "k-takeaways"
+      ]
+    },
+    {
+      "id": "k-switcher",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Career switcher status decides how much of CDC is must-do",
+      "body": "Most CDC items are marked must-do for people switching Location, Sector or Function, and only highly recommended for everyone else. Which of the three you are switching is therefore the single input that sets your CDC workload, and it is worth writing down early.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "postmba"
+    },
+    {
+      "id": "k-ee",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Employer Engagement are Sector Advisors",
+      "body": "Subject-matter experts who split their time between advising students and talking to companies, which is what makes their market read current. They give market intelligence, name who to connect with, sharpen a pitch for a specific sector, and help with offer negotiation.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-cags"
+      ]
+    },
+    {
+      "id": "k-cags",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Careers Across Geographies & Sectors workshop",
+      "body": "February 2027, for Fontainebleau and Singapore. CDC asks 27Ds not to book Sector Advisor appointments until after it, because most of the sector information is delivered there and a one-to-one before it just repeats the workshop. The one exception is roles with early internship application deadlines.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "February 2027",
+      "w": "2027-02-01",
+      "rel": [
+        "k-ee",
+        "k-interntiming"
+      ]
+    },
+    {
+      "id": "k-events",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "Company events, treks and the Industry Expert Series",
+      "body": "Pre-MBA company event invitations arrive through the Sunday newsletters, which is the practical reason to read them. During the year there are treks, networking forums, the Tech Symposium and the Industry Expert Series.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-takeaways",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "CDC's own key takeaways",
+      "body": "Networking is what works: alumni first, then people in the target industry, then classmates. Pick a few priorities rather than defaulting to consulting because it recruits loudest. Take a leadership role in a club. A radical career changer should start before the programme, not in P1. If you are targeting one country with no experience there, explore widely early and aim at roles where local competition is thinner. And only apply where you genuinely fit, because the interview exposes the rest.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-journey"
+      ]
+    },
+    {
+      "id": "k-pldp",
+      "group": "Coaching: CDC and PLDP",
+      "ord": 50,
+      "shape": "list",
+      "label": "PLDP runs the whole year, not just P0",
+      "body": "The Personal Leadership Development Programme: individual and group coaching that starts with the P0 assignments and continues across the periods. It is the leadership counterpart to CDC's career coaching, and it is the one INSEAD flags as high-importance alongside CDC.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-pldp-p0",
+        "k-pldp-web"
+      ]
+    },
+    {
+      "id": "k-interntiming",
+      "group": "The summer internship",
+      "ord": 60,
+      "shape": "timeline",
+      "label": "Internship recruiting runs through P2",
+      "body": "March to May 2027. Some internships start as early as June, before P3 finishes. Roles with early application deadlines are the one reason to approach Employer Engagement before the February workshop.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Mar - May 2027",
+      "w": "2027-03-15",
+      "rel": [
+        "k-cags"
+      ]
+    },
+    {
+      "id": "k-intern",
+      "group": "The summer internship",
+      "ord": 60,
+      "shape": "timeline",
+      "label": "The summer project itself: optional, 8 weeks",
+      "body": "A Short-Term Summer Project in the break after P3. The alternatives INSEAD names are a startup tour or deliberate time off to prepare for full-time recruitment, and it does not treat the internship as obligatory for this cohort. Gavin's own plan is to start looking from the day the course starts rather than waiting for P2.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "01 Jul - 22 Aug 2027",
+      "w": "2027-07-01",
+      "rel": [
+        "k-interntiming",
+        "k-sumweb",
+        "k-breaks"
+      ]
+    },
+    {
+      "id": "k-p1cores",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "Six P1 core courses",
+      "body": "Financial Accounting, Financial Markets & Valuation, Organisational Behaviour I, Prices & Markets, Uncertainty Data & Judgment, and Introduction to Strategy. Three of the six are quantitative, which is what Business Foundations exists for.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-bizfound",
+        "k-prereads"
+      ]
+    },
+    {
+      "id": "k-prereads",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "P1 pre-readings",
+      "body": "For Financial Accounting and Prices & Markets specifically, with book recommendations on the MBA Journey pages. Highly recommended rather than required, which in practice means the people who do them have an easier first three weeks.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "item": "prereads",
+      "rel": [
+        "k-p1cores"
+      ]
+    },
+    {
+      "id": "k-exempt",
+      "group": "Courses and exemptions",
+      "ord": 70,
+      "shape": "cards",
+      "label": "Core exemption exams",
+      "body": "P1 core exemptions are examined during Launch Week; P2 and P3 exemptions are taken during P1. Passing one frees the slot for an elective, so an exemption is worth a course you would rather take than a week of revision saved.",
+      "cat": "study",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "Launch Week, Jan 2027",
+      "w": "2027-01-08",
+      "rel": [
+        "k-launch"
+      ]
+    },
+    {
+      "id": "k-clubs",
+      "group": "Clubs and elections",
+      "ord": 80,
+      "shape": "timeline",
+      "label": "Club introduction and registration",
+      "body": "Runs through the LMS from 26 October. Club leadership elections and the handover to the 27D cohort come in P1 and P2, so the clubs you join now are the ones you can take a leadership role in later, which CDC names as one of its key takeaways.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "From 26 October 2026",
+      "w": "2026-10-26",
+      "rel": [
+        "k-lms",
+        "k-takeaways"
+      ]
+    },
+    {
+      "id": "k-council",
+      "group": "Clubs and elections",
+      "ord": 80,
+      "shape": "timeline",
+      "label": "27D Student Council and Student Rep elections",
+      "body": "January 2027. Team diversity is a stated requirement for the slates, so the teams form before the election rather than after it.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z",
+      "when": "January 2027",
+      "w": "2027-01-05"
+    },
+    {
+      "id": "k-contacts",
+      "group": "Who to contact",
+      "ord": 90,
+      "shape": "cards",
+      "label": "Programme questions",
+      "body": "degree.programmes@insead.edu for anything about the programme itself: dates, registration, admin, documents.",
+      "cat": "life",
+      "at": "2026-10-05T16:20:00.000Z"
+    },
+    {
+      "id": "k-contact-cdc",
+      "group": "Who to contact",
+      "ord": 90,
+      "shape": "cards",
+      "label": "Career questions",
+      "body": "careerdevelopmentcentre@insead.edu for CDC: coaching, CareerGlobe, Employer Engagement, anything career.",
+      "cat": "work",
+      "at": "2026-10-05T16:20:00.000Z",
+      "rel": [
+        "k-cdc"
+      ]
+    },
+    {
+      "id": "k-visa",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-myinsead",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-news",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-p0",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-prio",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-partnership",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-webinars",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-p0life",
+      "deleted": true,
+      "at": "2026-10-05T15:40:00.000Z"
+    },
+    {
+      "id": "k-coach",
+      "label": "Career Coach",
+      "at": "2026-10-05T14:51:36.000Z",
+      "createdAt": "2026-10-05T14:51:36.000Z",
+      "by": "claude",
+      "body": "Your primary contact all year. Career strategy, target and transferable skills, networking approach, CV and cover letter review, elevator pitch, mock interviews, choosing between offers, and holding you accountable.",
+      "cat": "work",
+      "parent": "k-cdc"
+    },
+    {
+      "id": "k-mbax",
+      "label": "MBA-Exchange.com",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "The CDC's third-party global careers platform, premium access through INSEAD's partnership: vetted postings, industry and country reports, employer profiles with Talent Radar visibility, and Talent Talks with recruiters. The welcome mail arrived on 5 October with a login of your INSEAD address and a password in plain text, so change that password on first login — the password itself is deliberately not recorded here, because this repository is public. Bilal Ojjeh, their founder, offers himself as the direct contact.",
+      "cat": "work",
+      "rel": [
+        "k-careerglobe"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-aced",
+      "label": "Aced, formerly Exponent",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "Technical interview preparation, free through an INSEAD invitation that landed on 5 October: courses in software engineering, SQL and data analytics and system design, mock technical interviews, a question bank of recently asked questions, and company-by-company hiring guides. Sign up at aced.io with the INSEAD address the invitation was sent to. It is the one career platform aimed at technical interviews rather than the consulting-and-finance case track that CaseCoach covers.",
+      "cat": "work",
+      "rel": [
+        "k-casecoach",
+        "k-mbax"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-casecoach",
+      "label": "CaseCoach",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "Case interview preparation, free on the INSEAD subscription, which you registered for on 5 October. Their own course opens with what to expect from a case interview and is reading rather than a task; the founder, Enguerran Loos, is a former consultant and headhunter for the top three firms. It is the consulting-and-finance counterpart to Aced's technical track, and the one to work through if consulting stays on your list.",
+      "cat": "work",
+      "item": "casecoach",
+      "rel": [
+        "k-aced",
+        "k-cvbook"
+      ],
+      "at": "2026-10-06T02:10:00.000Z",
+      "createdAt": "2026-10-06T02:10:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-news-why",
+      "label": "Why the pre-MBA window had already closed",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "McKinsey's Make Your Mark, BCG Unlock and Bain's ExperienceBain are all aimed at people who have been admitted and have not started yet, and they run over the northern summer: registration falls roughly May to July, the programme itself August to December. That is built around an autumn intake. The January 2027 intake's equivalent window had passed before the admission letter arrived, which is why Make Your Mark was never a thing that could have been applied to from here. Nothing was missed through not looking; the calendar simply does not line up. What replaces it is the on-campus cycle, which starts in P1.",
+      "cat": "work",
+      "rel": [
+        "k-news-mym",
+        "k-news-unlock",
+        "k-news-xbain"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude",
+      "item": "news-mbb-cal"
+    },
+    {
+      "id": "k-news-mym",
+      "label": "McKinsey Make Your Mark",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "A pre-MBA mentorship programme for incoming MBA students at a named set of schools, INSEAD among them: one-to-one mentoring with a McKinsey consultant, recruiting workshops, networking and interview coaching, running from late August to the end of December. Applications have closed in July in recent cycles. It is a mentorship and a foot in the door rather than an offer, and the thing it actually buys is knowing how the firm recruits before everyone else does.",
+      "cat": "work",
+      "rel": [
+        "k-news-why"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-news-unlock",
+      "label": "BCG Unlock",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "BCG's pre-MBA virtual event series: sessions with BCG leaders and consultants on what consulting work is, plus skill-building and networking, over the summer before the programme starts. Registration has been encouraged by mid-May and then reviewed on a rolling basis after that. Virtual, so geography is not the constraint - the admission timing is.",
+      "cat": "work",
+      "rel": [
+        "k-news-why"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-news-xbain",
+      "label": "ExperienceBain",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "Bain's virtual pre-MBA programme for incoming first-years at eligible schools: interactive sessions with Bain teams around the world across the summer, flexible rather than a fixed week. Recent cycles have closed applications in early May. Same shape and the same timing problem as the other two.",
+      "cat": "work",
+      "rel": [
+        "k-news-why"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-news-pathways",
+      "label": "Amazon Pathways (MBA Operations LDP)",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "Amazon's three-year operations leadership development programme, open to people enrolled in an MBA or within 24 months of graduating, with cohorts tied to a start year rather than a single deadline. There is no closing date at all: applications are read on a rolling basis and the posting comes down when they have enough people, which makes early the whole strategy. It is the closest fit on the Big Tech list to five years of SaaS presales and operations - a management track rather than a functional hire.",
+      "cat": "work",
+      "rel": [
+        "k-news-bigtech"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude",
+      "item": "news-amzn-path"
+    },
+    {
+      "id": "k-news-bigtech",
+      "label": "How the Big Tech and consumer cycles are timed",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "Both run on graduation year, not on intake. The 2027 postings at Amazon, J&J and their peers say \"graduating between August 2026 and August 2027\", which a December 2027 graduation sits outside - so the cycle that matters is the one that opens in autumn 2027, and anything open now is worth applying to only where the eligibility text actually admits it. The practical consequence: the autumn 2027 window is the one to be ready for, and the preparation for it (CV, CareerGlobe, the CDC coach) is already on the board.",
+      "cat": "work",
+      "rel": [
+        "k-news-pathways"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-news-watch",
+      "label": "What the Sunday brief watches",
+      "group": "NEWS: industry opportunities",
+      "ord": 25,
+      "shape": "cards",
+      "body": "Every Sunday the weekly report carries a NEWS section: pre-MBA and in-programme opportunities researched against the three target groups - Big Tech LDP and management-track roles, MBB consulting, and consumer LDPs. Anything worth doing becomes a task titled [NEWS], drawn in magenta, with Accept and Reject on its card. A week with nothing says so rather than padding. This group is where the findings that are facts rather than tasks collect.",
+      "cat": "work",
+      "rel": [
+        "k-news-why"
+      ],
+      "at": "2026-10-07T12:20:00.000Z",
+      "createdAt": "2026-10-07T12:20:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-aps",
+      "label": "The French APS is France-only, and it is the thing that removes sponsorship",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Graduating at Fontainebleau makes him a French master's graduate, which entitles him to the APS (autorisation provisoire de sejour, also called the RECE) -- a residence permit that lets him work in France without an employer sponsoring anything. That is the answer to the barrier he hit when job-hunting: outside France an employer has to sponsor from scratch, in France it only has to convert a permit he already holds. The permit is national, so it carries no right to work in Germany, Spain or the Netherlands, and the usual quoted length is 12 months with sources disagreeing about a longer window for Indian nationals. Its real value is as a bridge: a year of legal French employment is what makes the next two routes available.",
+      "cat": "work",
+      "rel": [
+        "k-bluecard",
+        "k-targetgeo"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-bluecard",
+      "label": "How a French job becomes a job anywhere in the EU",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Two mechanisms, both on a clock that only starts once he is employed. The EU Blue Card is issued for a graduate-level job above a salary threshold, and after roughly twelve months in the first country it allows a move to another EU state on a simplified application rather than a fresh sponsorship. EU long-term residence arrives at five years of legal residence and carries broad mobility with it. So the sequence that actually works is France first on the APS, convert to a Blue Card, then move -- not applying cold into the Netherlands or Spain from outside.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-targetgeo"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-targetgeo",
+      "label": "Where to aim: France, the Netherlands, Ireland -- and why not Switzerland",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "France is the base because the APS makes it the one country with no permission problem. The Netherlands is the strongest second: English-language workplaces are normal, Amsterdam carries real tech and consumer headquarters, and quality of life is high. Ireland is the third, with Dublin holding the European seats of Google, Meta, Microsoft and Stripe and a Critical Skills Employment Permit that is comparatively straightforward. Switzerland is ruled out despite the salaries -- non-EU hires face a labour market test and a national quota, which is exactly the barrier he is trying to avoid. Spain is the leisure-weighted alternative and became more plausible once he said he already speaks basic Spanish and can reach decent proficiency by graduation; it is thinner on Big Tech but Barcelona and Madrid are real markets. Belgium is the underrated one: the lowest salary bar of the group. Singapore stays a maybe on the Employment Pass and COMPASS framework. The structural point behind all of it: pick the employer first and the country follows, because a multinational moves people between its own offices far more easily than a new employer sponsors a stranger.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-bluecard",
+        "k-nl-zoekjaar"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-visa-intern",
+      "label": "A summer internship abroad needs its own permission, and it is not the student visa",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "His French student residence permit covers work in France and nothing outside it, so each of the internship markets has its own route. Ireland uses the Atypical Working Scheme, which must be applied for from outside Ireland and wants at least twelve weeks' notice -- that lead time is the one that bites, since the applications close in November for a July start. Luxembourg requires a trainee authorisation arranged by the host company. The UK route is Temporary Work -- Government Authorised Exchange, again employer-led. The United States is possible rather than closed: the J-1 Intern category explicitly covers students enrolled at a university outside the US, but a State Department designated sponsor has to issue the DS-2019, so it depends entirely on whether the employer already runs that programme. The practical rule is to ask the recruiter which route they use before assuming an offer is workable.",
+      "cat": "work",
+      "rel": [
+        "k-jobreport",
+        "k-aps"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude",
+      "item": "int-amzn-lux"
+    },
+    {
+      "id": "k-nl-zoekjaar",
+      "label": "The Dutch orientation year probably does not apply to an INSEAD degree",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "The zoekjaar is the Netherlands' post-study search year, and it is open either to graduates of a Dutch institution or to graduates of a university in the global top 200 of QS, Times Higher Education or ARWU. INSEAD is a business school and does not appear in those general university rankings, so the second door is likely shut -- worth confirming with Nuffic before counting on it. The consequence is that the Dutch route runs through an employer and a Blue Card rather than through a job-search permit, which makes the timing different: the offer has to come first.",
+      "cat": "work",
+      "rel": [
+        "k-targetgeo",
+        "k-bluecard"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    },
+    {
+      "id": "k-jobreport",
+      "label": "The 27D job report is the CDC's live list of what is open now",
+      "group": "Platforms and tools",
+      "ord": 40,
+      "shape": "cards",
+      "body": "A spreadsheet circulated with the newsletter, listing roles open to the 27D cohort with company, title, location, type and deadline. It mixes full-time graduate roles with summer internships and the type column is not always right -- a Google row tagged full-time is titled MBA intern. It is the source the five application tasks on the board came from, and it is reissued, so it is worth re-reading each time rather than treating the current shortlist as final. Deadlines on it run close: four of the five chosen roles close on 8 November.",
+      "cat": "work",
+      "rel": [
+        "k-visa-intern",
+        "k-cvbook"
+      ],
+      "at": "2026-10-18T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude",
+      "when": "Reissued with the newsletter",
+      "w": "2026-10-17"
+    }
+  ],
+  "news": [
+    {
+      "id": "news-daily-2026-10-06",
+      "period": "daily",
+      "date": "2026-10-06",
+      "body": "## Tomorrow\n- Plan Locus exit, due 7 Oct, and the only Critical thing with a date this week.\nThere is no resignation date, no notice period and no last working day on the board. What last working day are you aiming for, and do you owe notice? The January move hangs off that one date.\n\n## Not yours right now\n- Campus France, corrected preconsular file sent yesterday afternoon.\nNothing to do but wait. What it gates: EEF validation reads 21 Oct and the VFS appointment is 10 Nov, so there is about three weeks of slack behind it. If validation slips past the 21st, that slack is gone.\n- SBI sanction letter, due 24 Oct.\nThe PoA was executed at Hindon on 3 Oct, so the bank should have everything. Is anything still outstanding from your side, or is it purely theirs now?\n\n## Worth an hour this week\n- VMock and CaseCoach both went live yesterday, good.\nThe CDC mail that came with them wants CareerLeader and Career Anchors done before your first coaching session, which is why booking the coach still reads as blocked. They are due 31 Oct and take an hour or two. Start with CareerLeader: it is the longer one and it feeds the report the CDC asks for.",
+      "at": "2026-10-06T04:17:53.000Z",
+      "createdAt": "2026-10-06T04:17:53.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-09",
+      "period": "daily",
+      "date": "2026-10-09",
+      "body": "## The passport is the decision now\n- TLS keeps your passport from the day you submit, now dated 23 October, for two to three weeks.\nThree things want it in that window: the exit permit for your KITAS, your flight out of Jakarta, and the visa itself. The ways out are different enough that choosing is the work -- submit before you leave and ask whether someone else can collect, apply from India after you land, or move your departure. Tell me which and I will set every date after it accordingly.\n- The 16 October interview still waits on a courier.\nYour originals reach you early next week, and Fitria postpones the interview if they are not in your hand on the day. Tracking on that parcel is what would let you confirm the slot rather than hope.\n\n## Nothing here waits on anyone\n- Create your France-Visas and TLS Contact accounts.\nFitria asked for both and neither needs the interview done first, so this is the one piece of the visa you can finish today.\n- Upload your CV to VMock, 18 October.\nThe next date on the board that is nobody's but yours, and it is a short job.",
+      "at": "2026-10-09T02:54:28.000Z",
+      "createdAt": "2026-10-09T02:54:28.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-10",
+      "period": "daily",
+      "date": "2026-10-10",
+      "body": "## Wednesday's interview is the whole visa now\n- Campus France put you at 10:00 on Wednesday 14 October, two days earlier than the board had it.\nFitria gave you the earliest slot you asked for, and the originals still have to be in your hand on the day, so the courier is the only thing standing between you and it. A tracking number today is what turns Wednesday from a hope into a plan.\n- Submitting at TLS two working days after the interview, rather than on the 23rd, is what saves your flight.\nFitria put submission about two working days after the interview and a decision about fifteen days after that. From 16 October that lands at the end of the month; from the 23rd it lands on 7 November, the day you leave Jakarta. Creating your France-Visas and TLS Contact accounts this weekend is what lets you book the slot the moment the interview ends.\n\n## The loan has less slack than it looks\n- The SBI sanction is dated 24 October and the 5 November instalment sits behind it.\nYour branch has not come back since you told them on 6 October that the charges confirmation went on the 3rd. Monday is a working day there, and a call to the branch will move this where another email has not.",
+      "at": "2026-10-10T02:57:05.000Z",
+      "createdAt": "2026-10-10T02:57:05.000Z"
+    },
+    {
+      "id": "news-weekly-2026-10-11",
+      "period": "weekly",
+      "date": "2026-10-11",
+      "body": "## What moved\n- You cleared the Campus France file and two of the career platforms.\nThe EEF was validated and the fee paid on 6 October, the extra documents went on the 5th, and VMock access and Case Coach were both closed the same day. Five tasks closed in the week, all of them yours rather than anyone else's.\n- The visa turned out to be three weeks earlier than the board thought.\nCampus France refused the interview exemption on Thursday, which revived a task you had deleted, and in the same conversation Fitria put submission at about two working days after the interview. That moved it from 10 November to 23 October, and the provider is TLS Contact, not VFS.\n- On Saturday evening you did the unglamorous half.\nThe France-Visas account, your employer's details for the form, and a request to SBI for an in-principle sanction letter. None of it shows as a tick and all three were holding up the submission.\n\n## What did not\n- The SBI branch has not written since 6 October.\nTheir last substantive word was on 27 September, that verification of the collateral would take more time. Two requests are sitting with them now, not one.\n- Your degree originals are still with the courier.\nWednesday's interview needs them in your hand, and nothing on the board says where the parcel is.\n- Career did not move at all.\nWriting down your post-MBA function, industry and geography is still open, and CareerGlobe, the two questionnaires, the CV and the first CDC session all sit behind it.\n\n## Risks\n- The passport window is the one that can cost you the flight.\nTLS keeps your passport from submission until the decision, about fifteen days by Fitria's account. Submitting on 16 October gets it back near the end of the month; submitting on the 23rd gets it back around 7 November, the day you leave Jakarta, and you need it for the KITAS exit permit as well. Every day between the interview and the submission comes off that margin.\n- Proof of funds has quietly become a visa problem and not only a tuition one.\nThe loan used to be a 5 November deadline. The visa file now needs evidence of it too, and both requests sit with the same branch that has gone quiet. If the in-principle letter does not come, the submission has nothing to show.\n- One parcel gates the whole visa sequence.\nThe interview, the submission, the decision and the exit permit all run off a courier nobody has a tracking number for.\n- The career chain is the cheapest thing to fix and the most expensive to leave.\nOne question only you can answer unblocks four tasks, and the first CDC coaching session is already dated 15 November.\n\n## Put first this week\n- Write back to Fitria and confirm Wednesday. One line, and everything downstream waits on it.\n- Call the branch on Monday, and ask for the in-principle letter and the state of the full sanction in the same call.\n- Get the tracking number today, so Tuesday is not when you find out the parcel is late.\n- Answer the post-MBA question. Nobody outside is holding that one up.",
+      "at": "2026-10-11T02:54:38.000Z",
+      "createdAt": "2026-10-11T02:54:38.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-08",
+      "period": "daily",
+      "date": "2026-10-08",
+      "body": "## Two decisions sitting on the board\n- Amazon Pathways, the operations LDP, dated 15 November.\nIt is a rolling posting with no deadline, which comes down when they have enough people, so the date on the board is a prompt rather than theirs. Accept it and it becomes an ordinary task; reject it and it goes.\n- The MBB pre-MBA programmes are closed for your intake.\nMake Your Mark, BCG Unlock and ExperienceBain all run over the summer for people starting in the autumn, so the January window has gone. The route from here is the on-campus cycle in P1, which is a calendar to pin down rather than an application to chase.\n\n## The nearest date is your CV\n- Upload your CV to VMock, 18 October.\nNothing else on the board is dated before it and it is a short job. The score is what tells you what to fix, and the INSEAD CV itself is due 2 November, so doing it this weekend leaves two clear weeks to act on what it says.\n\n## Business Foundations needs an answer before the bank gives you one\n- Registration closes 30 October. You are holding it for the SBI sanction, due 24 October.\nThat is six days of margin on an optional quant primer that runs 16 to 20 November online. If the sanction slips past the 24th, do you register anyway and carry the cost, or let the course go?",
+      "at": "2026-10-08T02:57:27.000Z",
+      "createdAt": "2026-10-08T02:57:27.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-12",
+      "period": "daily",
+      "date": "2026-10-12",
+      "body": "## The exit route just changed\n- InCorp has offered to cancel the KITAS after you leave\nChitra came back overnight with a 10 percent discount and, more usefully, an ERP cancellation done once you have already flown, instead of an EPO before you go. That is the first option anyone has put forward that does not need your passport in Jakarta while the consulate is holding it. Worth asking her today what ERP requires and whether Locus will sponsor it that way.\n## Wednesday needs two things from you\n- Where is the courier with your degree certificate?\nFitria needs the originals in your hand on the day, and nothing on the board says where the parcel is. If it is not in Jakarta by Tuesday, telling her on Tuesday is a postponement and telling her on Wednesday morning is a wasted slot.\n- She still has not heard back about the 10am slot\nShe offered Wednesday and nothing has gone back to her. One line confirms it, and you can still move it if the parcel is late.\n## Today is the first day the branch is open\n- Nobody has had a working day on your in-principle letter yet\nYou asked for it on Saturday and Indian branches were shut yesterday. Nothing has come back on that thread since you answered their charges question on 6 Oct, and the visa file needs the letter before the 23rd, so a call will be faster than waiting on the reply.",
+      "at": "2026-10-12T02:54:05.000Z",
+      "createdAt": "2026-10-12T02:54:05.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-13",
+      "period": "daily",
+      "date": "2026-10-13",
+      "body": "## Tomorrow's interview is the easy half\n- The TLS slot becomes bookable the moment it ends.\nFitria put submission about two working days after the interview and the decision about fifteen days after that. Your board still says 23 October, and that is the version where your passport comes back around 7 November, the day you fly. Take the earliest slot TLS offers you, not the one that matches the board.\n- Can you still get into TLScontact?\nThe activation link arrived on Sunday and nothing says you have used it. A login that does not work on Thursday costs exactly the days an early slot was meant to buy.\n- Does SBI's in-principle offer need signing before it counts?\nIt came yesterday with an application form attached, which suggests the letter is not finished business. Proof of funds is a submission document, so it has to be in a form you can hand over this week, not in late October.\n\n## The career track has a November problem\n- Your first coaching session opens in the week you move.\nThe CDC wrote yesterday that coaches take 1:1s from early November, and that CareerLeader and Career Anchors must both be done first. That is the week you leave Jakarta and the week the KITAS expires, so the real window for two assessments worth fifty minutes is the next fortnight.\n- Good job on the VMock upload on Sunday, 63 and into the yellow zone.\nThe SMART Editor is what takes it to green. Writing down your post-MBA function, industry and geography is still what the rest of this track is waiting on.",
+      "at": "2026-10-13T02:54:42.000Z",
+      "createdAt": "2026-10-13T02:54:42.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-14",
+      "period": "daily",
+      "date": "2026-10-14",
+      "body": "## This morning, and the four days after it\n- Both halves of Wednesday are closed.\nYou wrote to Fitria yesterday afternoon confirming 10am in person, and the originals are in your hand. Nothing is left to arrange before the room.\n- The apostille is dated Saturday and still reads To-do.\nCampus France's October correction asked for the original bachelor certificate in colour and the transcript, which are the same papers the courier has just delivered. Fitria is the one person who can say precisely what the consulate wants apostilled and attested - ask her in the room this morning rather than working it out on Thursday.\n\n## Money\n- Does the 5 November instalment need the EUR account?\nThe EUR 53,000 instalment sits on 5 November and the task for opening the account sits on 30 November, after it. If SBI disburses straight to INSEAD the order is harmless; if any of it has to pass through an account of yours, that date is in the wrong place.",
+      "at": "2026-10-14T02:54:12.000Z",
+      "createdAt": "2026-10-14T02:54:12.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-15",
+      "period": "daily",
+      "date": "2026-10-15",
+      "body": "## The route changed yesterday, and October has not caught up\n- Your dossier can move to Campus France India.\nThey confirmed it in Jakarta yesterday and you have asked Delhi what they need. That is the passport trap solved: you no longer have to hand your passport over before you fly on 7 November.\n- But the board still has you submitting at TLS on 23 October.\nIf the plan is now India, that date is pointed at the wrong month, and so is everything feeding it - the SBI letter by the 24th and the apostille on Saturday. Which is it, Jakarta this month or Delhi in November? The order of the next three weeks turns on that one answer.\n\n## Yesterday\n- Nothing on the board says how the interview went.\nIt is still open and dated yesterday, so the whole visa track is reading off a step with no outcome recorded. If Fitria asked for anything further, that is the thing worth writing down while it is fresh.",
+      "at": "2026-10-15T02:53:21.000Z",
+      "createdAt": "2026-10-15T02:53:21.000Z"
+    },
+    {
+      "id": "news-daily-2026-10-16",
+      "period": "daily",
+      "date": "2026-10-16",
+      "body": "## India is the plan, and three October dates are not\n- You made the call yesterday.\nYou told Fitria you will apply from India and asked her to move the dossier to New Delhi, so the question this brief put to you on Wednesday is closed. The interview is closed too, dated the 14th.\n- The apostille is the one step no route makes unnecessary.\nIt is dated Sunday and still reads To-do, and whichever consulate takes your file will want the same original certificate and transcript. The TLS date on the 23rd and the SBI letter by the 24th can wait for Delhi to answer; this one cannot, because stamping documents takes days you do not get back.\n\n## Waiting on Locus\n- Ravi and Jishnu have not answered since Wednesday.\nYou asked them to approve InCorp's revised quote and nothing has come back, so your KITAS exit is parked on an approval rather than on the paperwork. You fly on 7 November and the KITAS expires on the 8th - tell them that is the window, not a preference.",
+      "at": "2026-10-16T02:53:57Z",
+      "createdAt": "2026-10-16T02:53:57Z"
+    },
+    {
+      "id": "news-daily-2026-10-17",
+      "period": "daily",
+      "date": "2026-10-17",
+      "body": "## Nothing on the visa track is yours this weekend\n- Delhi has the question now, not you.\nYou asked Fitria to move the dossier and asked Delhi what they need from your side. Until one of them answers, the TLS date and the SBI letter are both waiting on somebody else, which makes this the first free weekend you have had in three.\n\n## The career block is a weekend's work, and it gates November\n- Your first CDC coaching session is blocked by two things you could finish today.\nCareerGlobe on the 27th and the two questionnaires on the 31st both gate the coaching session dated 15 November, and none of the three has started.\n- CareerLeader and Career Anchors are about fifty minutes together.\nThe CDC's own instructions put them at thirty and twenty minutes, and neither needs an office, a courier or a reply from anyone. They also hand you the vocabulary for the post-MBA statement, which is dated the 31st with nothing written down yet.",
+      "at": "2026-10-17T02:53:58Z",
+      "createdAt": "2026-10-17T02:53:58Z"
+    },
+    {
+      "id": "news-weekly-2026-10-18",
+      "period": "weekly",
+      "date": "2026-10-18",
+      "body": "## What moved\n- You sat the Campus France interview on the 14th and then changed the route.\nIn person in Jakarta with the originals in hand, after a week of arranging it. Two days later you wrote to Fitria choosing India and asking her to move the dossier to New Delhi. That is the biggest decision on this board since the admission, and you made it in two days.\n- Your CV went from 63 to 92.\nYou uploaded to VMock on the 11th, it came back yellow, and yesterday it came back green with two CDC people copied. That was the one thing this week nobody else could do for you.\n- SBI moved from To do to In progress.\nThe branch sent the in-principle offer and the application form on the 12th.\n- You put the KITAS exit to Locus on the 14th.\nRavi and Jishnu were asked to approve InCorp's revised quote.\n\n## What did not\n- The apostille was dated yesterday and has not started.\n- Nothing from Campus France New Delhi since you wrote on the 14th.\n- Nothing on the board says SBI's application form has gone back.\n- CareerGlobe, the two CDC questionnaires and the post-MBA statement are all untouched, and all three fall in the last week of October.\n\n## Risks\n- Every October date on the visa track is now a guess.\nThe board still says TLS on the 23rd and the SBI letter by the 24th, and both were built for a Jakarta submission you have abandoned. The real deadlines are your flight on 7 November and the programme on 3 January, and nothing between them is known until Delhi answers. Four days of silence is not alarming yet; four more would be.\n- Nobody has asked whether India means sitting the interview again.\nIt is one sentence in an email and it is the difference between the India route costing days and costing weeks. Your mother's draft letter asked it; none of your own messages has.\n- The loan and the tuition are coupled and the coupling is untested.\nEUR 53,000 falls on 5 November, the sanction is dated the 24th and is still only in principle, and the task for opening the EUR account sits on 30 November, after the payment. INSEAD extended this instalment once already for exactly this reason.\n- The KITAS exit is parked on two colleagues.\nYou fly on the 7th and it expires on the 8th, so there is no version of this that survives being settled in the first week of November.\n\n## Put first this week\n1. One email to Delhi, chasing the transfer and asking the re-interview question in the same breath. Everything else on the visa track is waiting behind that reply.\n2. Give Ravi and Jishnu a date rather than a request. The constraint is a flight, not a preference.\n3. CareerGlobe and the two questionnaires. The CDC times them at fifty minutes together, they unblock the November coaching session, and they are the only things on this list that nobody else controls.",
+      "at": "2026-10-18T02:54:19Z",
+      "createdAt": "2026-10-18T02:54:19Z"
+    },
+    {
+      "id": "news-daily-2026-10-19",
+      "period": "daily",
+      "date": "2026-10-19",
+      "body": "## The internship applications are what this week is for\n- Four applications close on 8 November, the day after you fly.\nGoogle Strategy and Operations in London, Google Business Analyst and Finance in Dublin, and Amazon Launch in Luxembourg all shut on the same day, which falls in your first week in India and the day your KITAS runs out. Four applications on a moving week is how one of them quietly gets dropped.\n- The CDC's CV review slots are Thursday, Friday and next Monday.\n22, 23 and 26 October, by sector, and they ask for a VMock-formatted CV, which you have at 92 since Saturday. Booking one this week is the difference between four applications and four good ones.\n\n## SBI has a date on Saturday\n- Nothing on the board says the application form went back.\nThe branch sent the in-principle offer and the form on 12 October, and the sanction is dated this Saturday. The 53,000 euro instalment on 5 November is sitting behind it. - If the form has gone, close the loop here; if not, it is this week's one piece of paper.\n",
+      "at": "2026-10-19T02:53:52Z",
+      "createdAt": "2026-10-19T02:53:52Z"
+    },
+    {
+      "id": "news-daily-2026-10-20",
+      "period": "daily",
+      "date": "2026-10-20",
+      "body": "## The tuition and the loan have stopped lining up\n- The sanction is now dated five days after the payment.\nYesterday the SBI task moved to 10 November, because the documents have to be signed at your Indian branch and you only land on the 7th. The 53,000 euro instalment falls on the 5th. INSEAD already moved that date once at your request when the loan was slow, so the question is whether you pay it from your own funds or ask them again - and asking is easier three weeks out than three days out.\n\n## Campus France put the sequence in writing\n- Jakarta transfers only after Delhi says yes.\nFitria answered yesterday that she will move the dossier once Campus France New Delhi confirms they will take it, and she wants to be copied on your email to them. That makes Friday's TLS date on the board a date nothing will happen on, and your flight on 7 November the one that counts.\n",
+      "at": "2026-10-20T02:54:04Z",
+      "createdAt": "2026-10-20T02:54:04Z"
+    },
+    {
+      "id": "news-daily-2026-10-21",
+      "period": "daily",
+      "date": "2026-10-21",
+      "body": "## Four dates in the next ten days, and none of them has started\n- The LMS tutorials, CareerGlobe and the two CDC questionnaires are all yours alone.\nThey fall on the 26th, the 27th and the 31st, every one of them still reads To-do, and together they are about a day's work with nobody else in the way. The questionnaires are also what unblocks your first CDC coaching session, which is dated 15 November.\n- The post-MBA statement on the 31st is the one that is actually hard.\nFunction, industry and geography, written down in one place. The mind map already holds your target countries and the work-rights reasoning behind them, so the thinking exists - what is missing is the page. It decides your electives, your exchange and when you recruit, so it is worth an evening rather than a gap between other things.\n",
+      "at": "2026-10-21T02:54:05Z",
+      "createdAt": "2026-10-21T02:54:05Z"
+    },
+    {
+      "id": "news-daily-2026-10-22",
+      "period": "daily",
+      "date": "2026-10-22",
+      "body": "## InCorp is waiting on one word from you\n- Chitra asked yesterday whether you are renewing or cancelling the KITAS.\nShe also pointed out that a renewal normally has to start a month before expiry, and 8 November is too close for that now, so the only live question is whether to confirm the cancellation, NPWP revocation and BPJS package she quoted. That quotation has sat unanswered since 12 October, and your BPJS claim goes through the same people. - One line confirming cancellation unblocks all of it.\n\n## Campus France is Delhi's to answer now\n- You wrote to New Delhi yesterday and copied Fitria, which is exactly what the transfer was waiting on.\nNothing else on this track is yours until they reply. The task still says TLS Contact tomorrow, and that is a date and a city that cannot happen now you are applying from Delhi after 4 November. - Give it a date you expect to use, or clear it, so it stops sitting in your next ten days.",
+      "at": "2026-10-22T02:53:23.318271Z",
+      "createdAt": "2026-10-22T02:53:23.318271Z"
+    },
+    {
+      "id": "news-daily-2026-10-23",
+      "period": "daily",
+      "date": "2026-10-23",
+      "body": "## CareerGlobe is the only thing left in the way\n- You closed the CareerLeader and Career Anchors questionnaires on 18 October.\nThey were one of the two things holding up your first CDC coaching session. The other is the CareerGlobe profile, dated the 27th and about an hour's work, and once it is done the 15 November booking is yours to make whenever you want it.\n\n## Monday is the last CV review slot\n- The CDC is running three, on the 22nd, 23rd and 26th, and today's is the second.\nMonday is also the day your LMS tutorials are due, and the Google and Amazon applications close on 8 November. Your VMock CV has been in the green since the 11th, so the review is the last step between that score and four applications. - If Monday is the slot you take, move the LMS tutorials to the weekend.",
+      "at": "2026-10-23T02:53:58.390546Z",
+      "createdAt": "2026-10-23T02:53:58.390546Z"
+    },
+    {
+      "id": "news-daily-2026-10-24",
+      "period": "daily",
+      "date": "2026-10-24",
+      "body": "## Two tasks next week say they are waiting, and neither really is\n- Business Foundations has to be decided on the 30th and is marked as waiting on the SBI loan.\nThe sanction is now dated 10 November, eleven days after the decision is due. If the fee is what that dependency was about, INSEAD will want your answer long before the money lands, so this is a decision to make on its own rather than one to hold.\n- The post-MBA statement on the 31st reads Upcoming and has nothing behind it.\nNothing on the board gates it and nobody else is involved. It is an evening's thinking that then decides your electives, your exchange and when you recruit. - Of everything dated next week, it is the one that gets harder the longer it sits.",
+      "at": "2026-10-24T02:53:42.865791Z",
+      "createdAt": "2026-10-24T02:53:42.865791Z"
+    },
+    {
+      "id": "news-weekly-2026-10-25",
+      "period": "weekly",
+      "date": "2026-10-25",
+      "body": "## What moved\n- You closed the CareerLeader and Career Anchors questionnaires on 18 October.\n- You wrote to Campus France New Delhi on the 21st, copying Fitria in Jakarta. That was the one thing the dossier transfer was waiting on.\n- INSEAD agreed on the 20th to take the 53,000 euro instalment as a direct bank transfer from your Indian bank.\n- The SBI sanction moved to 10 November once it was clear the documents have to be signed at your Indian branch, not in Jakarta.\n\n## What did not\n- The board has recorded no change since 19 October. Six days.\n- CareerGlobe is dated the 27th and is now the only thing standing between you and booking your first CDC coaching session.\n- InCorp's revised quotation has been unanswered since the 12th.\n- The four internship applications, the post-MBA statement and the LMS tutorials are all untouched.\n\n## Risks\n- The visa is entirely out of your hands and the clock is not. Campus France Delhi has not replied since you wrote on the 21st, and if they are still silent at the end of this week you fly on 4 November with the dossier still in Jakarta. There is nothing to do but chase, which is why it is worth chasing early rather than waiting politely.\n- Your first week in India carries almost everything at once. You land on the 4th, your KITAS expires on the 8th, all four applications close on the 8th, and the SBI documents are dated the 10th. Any one of those slipping is survivable; all four landing in the same week in a country you have just moved to is the real exposure.\n- The KITAS is the one with no route back. The renewal window closed while the quotation sat, so cancellation is the only option left, and the BPJS claim runs through the same people.\n- The money is the one risk that got smaller. With INSEAD taking a direct transfer, the 5 November instalment no longer waits on the loan landing first.\n\n## Put first this week\n- One line to InCorp confirming the cancellation. It is the shortest thing on the list and the one with the hardest deadline behind it.\n- CareerGlobe, an hour, which unblocks the coaching booking.\n- Chase Delhi if nothing has arrived by Tuesday, and copy Fitria again so Jakarta can see you are pushing.",
+      "at": "2026-10-25T02:53:35.271158Z",
+      "createdAt": "2026-10-25T02:53:35.271158Z"
+    }
+  ]
+}
