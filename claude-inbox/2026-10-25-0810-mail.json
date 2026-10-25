@@ -1,0 +1,31 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-25T08:04:56.000Z",
+  "why": "Mail scan, Sunday 09:00 Jakarta: INSEAD Pre-MBA Newsletter #8",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-25-0810-bizfound",
+      "from": "claude",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Last call on Business Foundations",
+      "text": "INSEAD sent its final reminder this morning: registration and the 1,530 euro payment both close on 30 October, and the module runs 16 to 20 November online. Your task still waits on the SBI sanction, which is dated 10 November. - Worth deciding this week, since the loan will not have landed either way.",
+      "state": "new",
+      "createdAt": "2026-10-25T08:04:56.000Z",
+      "at": "2026-10-25T08:04:56.000Z"
+    },
+    {
+      "id": "claude-2026-10-25-0810-lms",
+      "from": "claude",
+      "itemId": "lms-start",
+      "itemTitle": "Work through the LMS tutorials",
+      "title": "LMS opens tomorrow",
+      "text": "INSEAD says the LMS goes live by end of day on 26 October, reached from a new My Courses tab on MyINSEAD. Three tiles to start: Programme Management, PLDP with its mandatory P0 assignments, and CDC with the career webinar sign-ups. - Your task is dated the same day, so give it the evening or move it.",
+      "state": "new",
+      "createdAt": "2026-10-25T08:04:56.000Z",
+      "at": "2026-10-25T08:04:56.000Z"
+    }
+  ]
+}
