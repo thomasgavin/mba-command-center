@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-25T12:04:14.000Z",
+  "why": "Mail scan, Sunday 15:00 Jakarta: his follow-up to Campus France New Delhi",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-25-1210-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "You chased Delhi",
+      "text": "You have followed up on your transfer request to Campus France New Delhi, with Fitria and the Jakarta office still copied. Nothing on the visa is yours until they answer. - If they are still silent midweek, Fitria may be able to push from the Indonesia end.",
+      "state": "new",
+      "createdAt": "2026-10-25T12:04:14.000Z",
+      "at": "2026-10-25T12:04:14.000Z"
+    }
+  ]
+}
