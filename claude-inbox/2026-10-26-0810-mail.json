@@ -1,0 +1,28 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-26T08:04:18.000Z",
+  "why": "Mail scan, Monday 15:00 Jakarta: INSEAD confirmed his Business Foundations registration",
+  "changed": [
+    {
+      "id": "bizfound",
+      "at": "2026-10-26T08:04:18.000Z",
+      "status": "doing",
+      "manual": true,
+      "newsState": "accept"
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-10-26-0810-bizfound",
+      "from": "claude",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Registered for Business Foundations",
+      "text": "Celine Chin has confirmed your place on Business Foundations, 16 to 20 November online, so I have moved the task off waiting on the loan. The 1,530 euro fee still has to reach INSEAD by 30 October by bank transfer, and her email carries the details. - The transfer is the only part left.",
+      "state": "new",
+      "createdAt": "2026-10-26T08:04:18.000Z",
+      "at": "2026-10-26T08:04:18.000Z"
+    }
+  ]
+}
