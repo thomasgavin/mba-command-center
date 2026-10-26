@@ -1,0 +1,36 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-26T02:04:20.000Z",
+  "why": "Mail scan, Monday 09:00 Jakarta: admissions email on upcoming events",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-26-0210-vfs",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Visa Q and A tomorrow",
+      "text": "INSEAD is running an Ask Me Anything on the French visa tomorrow, 12:00 Paris for 45 minutes, open to anyone who has not applied yet. Your route through Delhi is unusual enough to be worth asking about live. - The registration link is in Bi Hui Ko's email this morning.",
+      "state": "new",
+      "createdAt": "2026-10-26T02:04:20.000Z",
+      "at": "2026-10-26T02:04:20.000Z",
+      "round": 1,
+      "was": {"status": "blocked", "due": "2026-10-23"}
+    },
+    {
+      "id": "claude-2026-10-26-0210-classmates",
+      "from": "claude",
+      "itemId": "classmates",
+      "itemTitle": "Reach out to five MBA'27D classmates",
+      "title": "Meet Your Class online",
+      "text": "There is an online Meet Your Class session on 29 October, 16:00 Paris. The in-person admit events are Madrid, Dubai, Toronto and Milan, so none of them is reachable from where you are. - The online one is the only one you can make."
+      ,
+      "state": "new",
+      "createdAt": "2026-10-26T02:04:20.000Z",
+      "at": "2026-10-26T02:04:20.000Z"
+    }
+  ]
+}
