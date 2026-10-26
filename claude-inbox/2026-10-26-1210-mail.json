@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-26T12:08:05.000Z",
+  "why": "Mail scan, Monday 19:00 Jakarta: Campus France Jakarta auto-reply",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-26-1210-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Jakarta office is backed up",
+      "text": "Campus France Jakarta auto-replied to your follow-up: they are short-handed through the application season and expect normal service back on 16 November. They are the office that has to send the dossier once Delhi confirms, and you fly on 4 November. - Pressing Delhi is the lever you have left.",
+      "state": "new",
+      "createdAt": "2026-10-26T12:08:05.000Z",
+      "at": "2026-10-26T12:08:05.000Z"
+    }
+  ]
+}
