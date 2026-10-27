@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-27T12:27:09.000Z",
+  "why": "Mail scan, Tuesday 19:00 Jakarta: INSEAD Fontainebleau immigration mail",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-27-1210-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "INSEAD has a visa officer",
+      "text": "Amanda Heurteau runs French immigration for your intake at Fontainebleau and takes one-to-one calls through a booking link in her email. She says the long-stay visa can take seven to eight weeks, and your intake is 3 January. - A dossier stuck in Jakarta is exactly what that call is for.",
+      "state": "new",
+      "createdAt": "2026-10-27T12:27:09.000Z",
+      "at": "2026-10-27T12:27:09.000Z"
+    }
+  ]
+}
