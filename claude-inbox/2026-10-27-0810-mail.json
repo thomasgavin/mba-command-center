@@ -1,0 +1,27 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-27T08:03:55.000Z",
+  "why": "Mail scan, Tuesday 15:00 Jakarta: INSEAD chasing the Business Foundations payment",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-27-0810-bizfound",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "bizfound",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Pay Business Foundations by Friday",
+      "text": "INSEAD says your 1,530 euros has not arrived and wants it by Friday to hold your place. They also ask you to reply to Celine Chin's reminder with the payment proof attached, which is the part most people miss. - The bank details are in that email.",
+      "state": "new",
+      "createdAt": "2026-10-27T08:03:55.000Z",
+      "at": "2026-10-27T08:03:55.000Z",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-10-30"
+      }
+    }
+  ]
+}
