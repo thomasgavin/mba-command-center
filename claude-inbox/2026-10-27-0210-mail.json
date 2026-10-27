@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-27T02:04:22.000Z",
+  "why": "Mail scan, Tuesday 09:00 Jakarta: CDC opened CareerGlobe and the LMS career tile",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-27-0210-coach",
+      "from": "claude",
+      "itemId": "cdc-coach1",
+      "itemTitle": "Book the first CDC coaching session",
+      "title": "Coach invite is coming",
+      "text": "The CDC opened CareerGlobe and the LMS career tile yesterday, and says your assigned career coach will email you this week to book the first session. Booking is under Appointments in CareerGlobe. - Worth taking a slot before you fly on 4 November, since your first week in India is full.",
+      "state": "new",
+      "createdAt": "2026-10-27T02:04:22.000Z",
+      "at": "2026-10-27T02:04:22.000Z"
+    }
+  ]
+}
