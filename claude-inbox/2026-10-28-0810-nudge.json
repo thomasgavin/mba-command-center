@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-28T08:07:40Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-28-0810-lms",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "lms-start",
+      "itemId": "lms-start",
+      "itemTitle": "Work through the LMS tutorials",
+      "title": "P0 work is waiting",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-26"
+      },
+      "text": "The LMS went live on Monday and your task was dated the same day. The PLDP tile carries the mandatory P0 assignments, and its webinar is on 5 November, the day after you fly. - Worth an evening this week, before the move eats the time.",
+      "at": "2026-10-28T08:07:40Z",
+      "createdAt": "2026-10-28T08:07:40Z",
+      "state": "new"
+    }
+  ]
+}
