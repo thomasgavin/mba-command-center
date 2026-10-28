@@ -1,0 +1,27 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-28T02:06:05.000Z",
+  "why": "Nudge pass, Wednesday 09:00 Jakarta (Gmail quota exhausted, no mail scan)",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-28-0210-vfs",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at TLS Contact",
+      "title": "Go round Delhi, not through it",
+      "text": "Delhi has answered neither your transfer request nor your follow-up, and Jakarta is short-handed until 16 November. INSEAD's own immigration officer, Amanda Heurteau, takes one-to-one calls and puts the long-stay visa at seven to eight weeks against a 3 January start. - Book that call this week rather than waiting on Delhi.",
+      "state": "new",
+      "createdAt": "2026-10-28T02:06:05.000Z",
+      "at": "2026-10-28T02:06:05.000Z",
+      "round": 2,
+      "was": {
+        "status": "blocked",
+        "due": "2026-10-23"
+      }
+    }
+  ]
+}
