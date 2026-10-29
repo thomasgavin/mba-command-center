@@ -1,0 +1,39 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-29T08:04:29Z",
+  "changed": [
+    {
+      "id": "vfs-appt",
+      "at": "2026-10-29T08:04:29Z",
+      "status": "todo",
+      "manual": true,
+      "title": "Submit the visa application at VFS New Delhi",
+      "due": "2026-11-09"
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-10-29-0810-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Your dossier is in Delhi",
+      "text": "Fitria completed the transfer this morning, and Campus France has confirmed your file now sits with the French consulate in New Delhi and that you can apply there. Muskan Jain's team could not see it until Fitria retried, which is what the silence since the 21st was. - Nothing is holding the application now except being in India.",
+      "at": "2026-10-29T08:04:29Z",
+      "createdAt": "2026-10-29T08:04:29Z",
+      "state": "new"
+    },
+    {
+      "id": "claude-2026-10-29-0811-vfs-act",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Moved the visa task",
+      "text": "I have taken this off Upcoming and dated it 9 November, because the transfer was the only thing holding it and you land in India on the 4th. I also renamed it to VFS New Delhi, since TLS Jakarta is no longer the route. - Change either if you plan to go in sooner.",
+      "at": "2026-10-29T08:04:29Z",
+      "createdAt": "2026-10-29T08:04:29Z",
+      "state": "new"
+    }
+  ]
+}
