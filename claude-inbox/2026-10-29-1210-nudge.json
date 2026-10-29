@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-29T12:21:10Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-29-1210-bizfound",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "bizfound",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Business Foundations closes tomorrow",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-10-30"
+      },
+      "text": "Tomorrow is the deadline and nothing on the board says the 1,530 euros has gone. INSEAD wants the transfer with them by Friday and the payment proof emailed back to Celine Chin. - If you have already sent the transfer, the proof is the part still outstanding.",
+      "at": "2026-10-29T12:21:10Z",
+      "createdAt": "2026-10-29T12:21:10Z",
+      "state": "new"
+    }
+  ]
+}
