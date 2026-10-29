@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-29T02:03:32Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-29-0210-cdc",
+      "from": "claude",
+      "itemId": "cdc-coach1",
+      "itemTitle": "Book the first CDC coaching session",
+      "title": "Your coach has written",
+      "text": "Liesbeth Van Loock is your career coach, and P0 slots are open from 2 November to 1 December on CareerGlobe. She wants your CareerLeader and Career Anchors scores put on the CareerPlan Workbook and emailed to her at least 48 hours before the session. - Worth booking before you fly on the 4th.",
+      "at": "2026-10-29T02:03:32Z",
+      "createdAt": "2026-10-29T02:03:32Z",
+      "state": "new"
+    }
+  ]
+}
