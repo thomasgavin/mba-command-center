@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-30T12:04:25Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-30-1210-lms",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "lms-start",
+      "itemId": "lms-start",
+      "itemTitle": "Work through the LMS tutorials",
+      "title": "The weekend is the window",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-26"
+      },
+      "text": "Four days past its date and the LMS is still untouched, with the mandatory P0 assignments sitting on the PLDP tile. Next week carries your flight on the 4th, the PLDP webinar on the 5th and three application deadlines on the 8th. - The weekend is the last clear stretch before all of that.",
+      "at": "2026-10-30T12:04:25Z",
+      "createdAt": "2026-10-30T12:04:25Z",
+      "state": "new"
+    }
+  ]
+}
