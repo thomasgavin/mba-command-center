@@ -1,0 +1,45 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-31T12:09:06Z",
+  "why": "board pass nudges",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-10-31-1209-tuition",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "tuition-oct",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "Thursday is the tuition date",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-05"
+      },
+      "state": "new",
+      "at": "2026-10-31T12:09:06Z",
+      "createdAt": "2026-10-31T12:09:06Z",
+      "text": "You dated the EUR 53,000 instalment 5 November, and the SBI sanction task is not dated until the 10th, so the money has to come from somewhere else first. You also fly to India on the 4th, the day before. - Worth starting the transfer this weekend rather than in transit."
+    },
+    {
+      "id": "claude-2026-10-31-1209-kitas",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "kitas-close",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "The KITAS closes before you fly",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-08"
+      },
+      "state": "new",
+      "at": "2026-10-31T12:09:06Z",
+      "createdAt": "2026-10-31T12:09:06Z",
+      "text": "Closing the KITAS and withdrawing BPJS is dated 8 November, but you leave Indonesia on the 4th and the exit permit has to be done before the expiry, not after. You are still waiting on InCorp's revised quote. - Worth chasing them now, since the window closes when you fly."
+    }
+  ]
+}
