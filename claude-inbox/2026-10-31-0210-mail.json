@@ -1,0 +1,27 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-10-31T02:03:39Z",
+  "changed": [
+    {
+      "id": "bizfound",
+      "at": "2026-10-31T02:03:39Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-10-30"
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-10-31-0210-bizfound",
+      "from": "claude",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Business Foundations is paid",
+      "text": "You sent the transfer yesterday with the receipt attached, and Aurore has passed the proof to INSEAD's finance team. The module runs 16 to 20 November, fully online. - I have closed the task, since they will write again themselves once finance has matched it.",
+      "at": "2026-10-31T02:03:39Z",
+      "createdAt": "2026-10-31T02:03:39Z",
+      "state": "new"
+    }
+  ]
+}
