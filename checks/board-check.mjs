@@ -4050,9 +4050,14 @@ var MAPSEED = { kb: [
    chat." */
 {
   var MANY = [];
+  /* Dated off the clock, never off a literal. These were fixed at 7 October
+     once, and `CHAT_DAYS` is 7 -- so a week later `load()` aged all forty out,
+     the thread the scroll checks measure was empty, and two invariants failed
+     on every run for a fortnight without naming why. A chat fixture that
+     carries a date older than the window tests nothing. */
   for (var m = 0; m < 40; m++) MANY.push({
     id: "m" + m, text: "Message number " + m + ", long enough to take a line of its own.",
-    createdAt: new Date(Date.UTC(2026, 9, 7, 1, m)).toISOString(),
+    createdAt: new Date(Date.now() - (40 - m) * 60000).toISOString(),
     state: "read", forClaude: true
   });
   var s55 = await open(390, { notes: MANY });
@@ -4095,6 +4100,20 @@ var MAPSEED = { kb: [
      k55b.back > 0 && k55b.after > 0, JSON.stringify(k55b));
   ok("the same holds on every other typing screen",
      k55b.map === 0 && k55b.ren === 0, JSON.stringify(k55b));
+
+  /* The fixture has to still be there. A thread emptied by CHAT_DAYS cannot
+     scroll, so every scroll assertion below would pass or fail for a reason
+     that has nothing to do with the button -- which is exactly how the aged
+     dates hid for a fortnight. Name it before measuring it. */
+  var seed55 = await s55.p.evaluate(function () {
+    setView("chat"); render();
+    /* #cwait is waitingFor()'s own bubble, which the fixture's newest note
+       earns by being a minute old -- it is not one of the forty. */
+    return { kept: notes.length,
+             drawn: document.querySelectorAll("#v-chat .cmsg:not(#cwait)").length };
+  });
+  ok("the chat fixture survives the 7-day window",
+     seed55.kept === 40 && seed55.drawn === 40, JSON.stringify(seed55));
 
   var d55 = await s55.p.evaluate(async function () {
     hideDrawer();
@@ -4360,7 +4379,8 @@ var MAPSEED = { kb: [
      something else. The tab that comes back is what delivers it. */
   var s58b = await open(390, [{ id: "owed", itemId: null, text: "never left the last session",
                                 from: "me", forClaude: true, state: "new",
-                                createdAt: "2026-10-07T15:12:00.000Z" }]);
+                                /* an hour ago, not a literal: see MANY above */
+                                createdAt: new Date(Date.now() - 36e5).toISOString() }]);
   var r58b = await s58b.p.evaluate(async function (port) {
     var nap = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
     RELAY = "http://127.0.0.1:" + port; AUTO_MS = 20;
