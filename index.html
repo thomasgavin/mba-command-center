@@ -2100,6 +2100,12 @@ var EVENTS=[
   {id:"ev-amzn",   t:"Amazon internships info session",     k:"career", d:"2026-11-02", p:"High",
     n:"12:00 Paris. Pathways and Launch. Amazon fills these on a rolling basis, so the application goes in straight after."},
   {id:"ev-acad",   t:"Academics overview webinar",          k:"acad",   d:"2026-11-26", p:"Medium"},
+  /* The one new session in newsletter #9 that was not already here. Medium
+     rather than Low because the LMS half of it is the thing he is actually
+     behind on, and a deck for a platforms walkthrough is worth less than the
+     walkthrough. */
+  {id:"ev-platforms", t:"Student platforms walkthrough",    k:"acad",   d:"2026-11-17", p:"Medium",
+    n:"12:00 Paris, 45 minutes. LMS, MyINSEAD and CareerGlobe, and how to track the assignments."},
   {id:"ev-summer", t:"Summer experience webinar",           k:"career", d:"2026-12-04", p:"High",
     n:"The 8-week summer project, the startup tour, and taking the break to recruit."},
   /* The LatAm career fair, 9 to 12 November, eleven Zoom sessions over four
@@ -5213,7 +5219,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-10-31-1500";
+var BUILD="2026-11-01-1500";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

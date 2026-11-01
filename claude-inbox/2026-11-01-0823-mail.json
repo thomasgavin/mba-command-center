@@ -1,0 +1,38 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-01T08:23:56Z",
+  "why": "newsletter #9",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-01-0823-lms",
+      "from": "claude",
+      "itemId": "lms-start",
+      "itemTitle": "Work through the LMS tutorials",
+      "title": "Two new LMS tiles Wednesday",
+      "state": "new",
+      "at": "2026-11-01T08:23:56Z",
+      "createdAt": "2026-11-01T08:23:56Z",
+      "text": "Pre-Programme Newsletter #9 says you will be enrolled in two more tiles by Wednesday. The Student Life one carries the immigration, visa and medical insurance material and the Fontainebleau guide. - Worth opening the LMS before you fly, since that is the day it lands."
+    },
+    {
+      "id": "claude-2026-11-01-0823-amzn",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "int-amzn-lux",
+      "itemId": "int-amzn-lux",
+      "itemTitle": "Apply: Amazon Launch MBA intern, Luxembourg",
+      "title": "Amazon session is tomorrow",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-08"
+      },
+      "state": "new",
+      "at": "2026-11-01T08:23:56Z",
+      "createdAt": "2026-11-01T08:23:56Z",
+      "text": "Amazon's info session on Pathways and Launch is tomorrow, and INSEAD says to apply straight after because the roles fill on a rolling basis. Your Launch application is dated the 8th and you fly on Wednesday. - Worth doing the application the same evening as the session."
+    }
+  ]
+}

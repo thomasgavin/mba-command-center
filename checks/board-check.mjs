@@ -3112,10 +3112,24 @@ for (var ew of [390, 1280]) {
     var taskRows = document.querySelectorAll("#gantt .grow").length;
     var eventRows = document.querySelectorAll("#gantt .gerow").length;
     var poolN = pool().length;
-    /* walk the calendar forward far enough to pass every event's month */
+    /* Walk every month that holds an event, starting at the earliest rather
+       than at today. It used to run five fixed steps forward from the current
+       month, which made the invariant depend on the date the check was run:
+       on the first of a month an event dated in the month just gone fell out
+       of range, and at 1280 it was still found -- by the accident of the
+       grid's leading days from the previous month. The narrow agenda has no
+       leading days, so the same board passed at one width and failed at the
+       other for a reason that had nothing to do with the Calendar. Five steps
+       was a second cliff, for any event more than five months out. */
     setView("cal");
     var found = {};
-    for (var n = 0; n < 5; n++) {
+    var eds = EVENTS.map(function (e) { return e.d; }).sort();
+    var evFrom = eds[0].slice(0, 7), evTo = eds[eds.length - 1].slice(0, 7);
+    calCur = new Date(evFrom + "-01T00:00:00");
+    renderCal();
+    var walked = [];
+    for (var n = 0; n < 60 && calCur.toISOString().slice(0, 7) <= evTo; n++) {
+      walked.push(calCur.toISOString().slice(0, 7));
       /* The wide grid truncates a chip's text at 21 characters, so reading
          innerText found only the one short title and the check failed on its
          own matching rather than on the board. The full text is in `title`
@@ -3136,6 +3150,9 @@ for (var ew of [390, 1280]) {
       onTimeline: EVENTS.filter(function (e) { return tl.indexOf(e.t) >= 0; }).length,
       onCalendar: Object.keys(found).length,
       taskRows: taskRows, eventRows: eventRows, poolN: poolN,
+      /* what the walk actually covered, so a narrowed range cannot make the
+         invariant above pass by never looking */
+      evFrom: evFrom, evTo: evTo, walked: walked,
       /* nothing an event draws may carry an id: `openItem` has no event to
          open, and a row that answers a tap with silence is the Calendar bug
          this board already shipped once */
@@ -3144,6 +3161,10 @@ for (var ew of [390, 1280]) {
   });
   ok(ew + "px: no webinar is a task any more",
      e41.seedWebinars === 0 && e41.itemWebinars === 0, JSON.stringify(e41));
+  ok(ew + "px: the calendar walk covers every event's month",
+     e41.walked.length > 0 && e41.walked[0] === e41.evFrom
+       && e41.walked[e41.walked.length - 1] === e41.evTo,
+     JSON.stringify({ from: e41.evFrom, to: e41.evTo, walked: e41.walked }));
   ok(ew + "px: every event is on the Calendar",
      e41.events > 0 && e41.onCalendar === e41.events, JSON.stringify(e41));
   ok(ew + "px: and every event is on the Timeline",
