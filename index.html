@@ -2282,9 +2282,19 @@ var SEED=[
  {id:"int-ggl-ba",  t:"Apply: Google Business Analyst MBA intern, Dublin", k:"career",s:"todo", p:"High", d:"2026-11-08", ef:"day", dep:["vmock-cv"],
    u:"https://www.google.com/about/careers/applications/jobs/results/82600333812867782",
    n:"Summer 2027 internship. The report tags it a full-time role, which is an error in the sheet -- the title itself says intern."},
- {id:"int-amzn-lux",t:"Apply: Amazon Launch MBA intern, Luxembourg", k:"career",s:"todo", p:"High", d:"2026-11-08", ef:"day", dep:["vmock-cv"],
+ {id:"int-amzn-lux",t:"Apply: Amazon Launch MBA intern, Luxembourg", k:"career",s:"done", p:"High", d:"2026-11-08", manual:true, doneAt:"2026-11-02", dep:["vmock-cv"],
    u:"https://www.amazon.jobs/en/jobs/10552888",
-   n:"Amazon's MBA internship into its European business, run out of the Luxembourg headquarters."},
+   n:"Submitted 2 November, six days inside the deadline, straight off the info session. Amazon's MBA internship into its European business, run out of the Luxembourg headquarters. Pathways was the other half of that session and is not open to him: it wants B2 in the local language. The application is not finished until the online assessment is -- that is amzn-oa, and Amazon will not review this one until it is done."},
+ /* The assessment is a separate task rather than a line on the application
+    above, because it has its own hard expiry (2 December, 19:33) that the
+    application's 8 November deadline says nothing about, and because Amazon
+    states outright it will not consider the application until this is done.
+    Folding it into a task already marked done would make a required, dated
+    step invisible on every view. He said he would do it the day after
+    applying, which is the due date here; the real cliff is in the note. */
+ {id:"amzn-oa",     t:"Amazon Launch online assessment",         k:"career",s:"todo", p:"Critical", d:"2026-11-03", ef:"hours", dep:["int-amzn-lux"],
+   u:"https://account.amazon.jobs/en-US/applicant/jobs/10552888/summary",
+   n:"Required, and the application is dead without it. Work-style and work-simulation questions scored against the Leadership Principles, run by a third-party provider in a new window. Expires 2 December 19:33, so there is room, but it wants one uninterrupted sitting rather than a gap between other things."},
  {id:"int-ggl-fin", t:"Apply: Google Finance MBA intern, Dublin",      k:"career",s:"todo", p:"Low",  d:"2026-11-08", ef:"hours", dep:["int-ggl-ba"],
    u:"https://www.google.com/about/careers/applications/jobs/results/93402210922046150",
    n:"Only once the other Google applications are in. Finance is the weakest match to his CareerLeader profile; treat it as practice for the interview loop."},
@@ -5228,7 +5238,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-02-1210";
+var BUILD="2026-11-02-1240";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

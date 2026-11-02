@@ -1,0 +1,11 @@
+{"v":3,"op":"claude","exportedAt":"2026-11-02T12:40:00.000Z",
+ "notes":[{"id":"claude-amzn-oa-1102","itemId":"amzn-oa",
+   "itemTitle":"Amazon Launch online assessment",
+   "title":"Assessment is the last step",
+   "body":"Your Amazon Launch application is in, six days early. One required step is left: the online assessment, which expires 2 December. Amazon will not review the application until it is done. - Give it one uninterrupted sitting rather than squeezing it between other things.",
+   "from":"claude","state":"new","createdAt":"2026-11-02T12:40:00.000Z",
+   "acted":["Apply: Amazon Launch MBA intern, Luxembourg: To-do -> Done","Amazon Launch online assessment: added, due 03 Nov"]}],
+ "changed":[
+   {"id":"int-amzn-lux","at":"2026-11-02T12:40:00.000Z","status":"done","manual":true,"doneAt":"2026-11-02"},
+   {"id":"amzn-oa","at":"2026-11-02T12:40:00.000Z","status":"todo","due":"2026-11-03","priority":"Critical","effort":"hours"}],
+ "kb":[]}
