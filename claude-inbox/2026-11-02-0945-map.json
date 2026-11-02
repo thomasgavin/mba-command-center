@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-11-02T09:45:00.000Z",
+  "notes": [],
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-targetgeo",
+      "label": "The top five cities, ranked -- and why Paris is no longer the base",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Reranked on 2 November 2026 after he said he does not speak French and has no intention of learning it. That changes what Paris is worth, because the APS only pays off on roles he could actually take in France. 1. Dublin -- the Critical Skills Employment Permit qualifies on salary alone with no labour market test, it works in English, and Google, Meta, Microsoft, Stripe and Workday run EMEA from there; rent and weather are the cost. 2. Amsterdam -- English-language workplaces are normal and it is the best of these to live in, but the zoekjaar probably does not cover an INSEAD degree, so the offer has to come first. 3. Paris -- narrow rather than out. Consulting in France is French-speaking and MBB Paris will not take him for French client work without it; consumer goods is the same at LVMH, Danone and L'Oreal. What survives is Big Tech EMEA offices, which genuinely operate in English, and that happens to be his first-choice industry. 4. Singapore -- an INSEAD campus and a deep alumni base, English, the APAC seat for most Big Tech, a manageable Employment Pass, and the one market where his five years in South-East Asia read as an asset. 5. Barcelona or Madrid -- in on the Spanish he is building and on leisure, out on Big Tech density and pay. Just outside: Brussels, lowest salary bar of the group. Ruled out: Switzerland on the labour market test and quota; Germany, the UK and the UAE by his own choice; Copenhagen is a company target rather than a city target. The consequence that matters more than the order: with the APS usable only on English-speaking tech roles in France, the post-graduation search year is no longer a safety net, so the plan is offer-first and the recruiting has to happen in P1 and P2.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-bluecard",
+        "k-nl-zoekjaar"
+      ],
+      "at": "2026-11-02T09:45:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    }
+  ]
+}
