@@ -3874,7 +3874,18 @@ var MAPSEED = { kb: [
   var s53 = await open(390);
   var r53 = await s53.p.evaluate(function () {
     var d = alive().filter(function (i) { return i.isDec; });
-    if (!d.length) return { none: true };
+    /* The board need not carry an OPEN decision at any given moment -- bizfound
+       was the only `dc:true` task and he accepted and paid for it on 26 and 30
+       October, so the flag came off. What is under test is the mechanism, not
+       whether SEED happens to hold an example of it today, and a check that
+       reads the board's current contents as its premise fails the day the
+       board moves on. It makes its own instead. */
+    if (!d.length) {
+      var c = alive().filter(function (i) {
+        return i.status !== "done" && !i.isNews && !i.isDec; })[0];
+      c.isDec = true; c.newsState = null;
+      d = [c];
+    }
     var id = d[0].id;
     openItem(id);
     var card = document.getElementById("dBody");
@@ -3913,6 +3924,8 @@ var MAPSEED = { kb: [
   /* and now reject one from scratch, in its own session */
   var s53b = await open(390);
   var rej53 = await s53b.p.evaluate(function (id) {
+    /* its own session, so the promotion above has to happen again here */
+    if (!items[id].isDec) { items[id].isDec = true; items[id].newsState = null; }
     openItem(id);
     document.querySelector("[data-nrej]").click();
     var n = notesFor(id);

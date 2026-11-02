@@ -1,0 +1,31 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-11-02T10:20:00.000Z",
+  "notes": [
+    {
+      "id": "claude-bizfound-close-1102",
+      "itemId": "bizfound",
+      "itemTitle": "Decide on Business Foundations and register",
+      "title": "Business Foundations is done",
+      "body": "You registered on 26 October, paid the 1,530 euro fee on the 30th, and INSEAD Finance confirmed receipt this morning. The board still had this open as an undecided question, which was wrong. - Closed it on the strength of those emails; the module itself stays on the calendar for 16 to 20 November.",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-02T10:20:00.000Z",
+      "acted": [
+        "Decide on Business Foundations and register: To-do -> Done"
+      ]
+    }
+  ],
+  "changed": [
+    {
+      "id": "bizfound",
+      "at": "2026-11-02T10:20:00.000Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-10-30",
+      "newsState": "accept"
+    }
+  ],
+  "kb": []
+}
