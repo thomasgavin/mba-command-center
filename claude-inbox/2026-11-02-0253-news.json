@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-02T02:53:49Z",
+  "why": "daily brief",
+  "notes": [],
+  "changed": [],
+  "news": [
+    {
+      "id": "news-daily-2026-11-02",
+      "period": "daily",
+      "date": "2026-11-02",
+      "body": "## Today\n- Amazon's info session on Pathways and Launch runs this evening, 18:00 Jakarta.\nINSEAD's own wording is that these roles fill on a rolling basis and to apply straight after the session. Your Launch application is dated the 8th and nothing has been started on it. - The application is worth doing the same evening, while the session is still fresh.\n\n## Before Wednesday\n- The 53,000 euro instalment is dated Thursday and you fly Wednesday.\nAn international transfer started Wednesday may not clear by Thursday, so today and tomorrow are the real window. The SBI sanction is not dated until the 10th, which is after the instalment is due.\n- Closing the KITAS has to happen while you are still in Indonesia.\nThe task is dated the 8th because that is the expiry, but the cancellation and the exit permit have to be done before it and from here. You are still waiting on InCorp's revised quote. - Worth a call rather than another email, with two days left in the country.",
+      "at": "2026-11-02T02:53:49Z",
+      "createdAt": "2026-11-02T02:53:49Z",
+      "from": "claude"
+    }
+  ]
+}
