@@ -1,0 +1,27 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-02T02:03:46Z",
+  "why": "final LMS round",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-02-0203-lms",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "lms-start",
+      "itemId": "lms-start",
+      "itemTitle": "Work through the LMS tutorials",
+      "title": "LMS, a week late",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-10-26"
+      },
+      "state": "new",
+      "at": "2026-11-02T02:03:46Z",
+      "createdAt": "2026-11-02T02:03:46Z",
+      "text": "A week past its date now, and the weekend I pointed you at has gone. Wednesday is your flight, Thursday is the PLDP webinar, and the assignments it explains start the day after. This is the last time I raise it - the task stays on the board either way."
+    }
+  ]
+}
