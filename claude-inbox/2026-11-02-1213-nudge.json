@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-02T12:14:14Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-02-1213-tuition",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "tuition-oct",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "Tuition is Thursday",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-05"
+      },
+      "state": "new",
+      "createdAt": "2026-11-02T12:14:14Z",
+      "at": "2026-11-02T12:14:14Z",
+      "text": "Thursday is the date and you fly Wednesday, so tomorrow is the last clear day to start it. Nothing on the board says the transfer has gone. - If it has, mark it paid and it drops off this list."
+    },
+    {
+      "id": "claude-2026-11-02-1213-kitas",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "kitas-close",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "Two days left in country",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-08"
+      },
+      "state": "new",
+      "createdAt": "2026-11-02T12:14:14Z",
+      "at": "2026-11-02T12:14:14Z",
+      "text": "The cancellation and the exit permit have to be done from Indonesia, and you leave on Wednesday. The task is dated the 8th, which is the expiry, not the last day you can act on it. - Worth calling InCorp tomorrow rather than waiting on the quote by email."
+    }
+  ]
+}
