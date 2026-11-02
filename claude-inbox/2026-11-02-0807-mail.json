@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-02T08:07:26Z",
+  "why": "Delhi reply timing",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-02-0807-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Delhi's reply window",
+      "state": "new",
+      "at": "2026-11-02T08:07:26Z",
+      "createdAt": "2026-11-02T08:07:26Z",
+      "text": "Your question about the VFS steps reached Muskan Jain and Shubhra Sharma. The out of office is from their manager Shagun Handa, back on 16 November, so it needs no chasing. Delhi asks for two to three working days at this time of year, so expect an answer mid-week while you are travelling."
+    }
+  ]
+}
