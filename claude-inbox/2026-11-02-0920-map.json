@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-11-02T09:20:00.000Z",
+  "notes": [],
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-targetgeo",
+      "label": "The top five cities, ranked -- and what each one costs",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "Ranked on 2 November 2026, after he asked for a top five. 1. Paris -- the only one he can land in without an offer, because the APS gives him a year and an employer converts rather than sponsors. 2. Dublin -- the Critical Skills Employment Permit qualifies on salary alone with no labour market test, it works in English, and Google, Meta, Microsoft, Stripe and Workday run EMEA from there; rent and weather are the cost. 3. Amsterdam -- the best of the three to live in and English-language workplaces are normal, but it is third because the zoekjaar probably does not cover an INSEAD degree, so the offer has to come first. 4. Singapore -- an INSEAD campus and a deep alumni base, English, the APAC seat for most Big Tech, a manageable Employment Pass, and the one market where his five years in South-East Asia read as an asset rather than something to explain. 5. Barcelona or Madrid -- in on the Spanish he will have and on leisure, out on Big Tech density, pay, and working Spanish being assumed outside MBB. Just outside: Brussels, which has the lowest salary bar of the group and moves up the moment permits become the binding constraint. Ruled out: Switzerland on the labour market test and quota, and Germany, the UK and the UAE by his own choice. Copenhagen is a company target rather than a city target -- Novo Nordisk, Maersk, Orsted and a short list of others hire in English, but INSEAD barely places in the Nordics and there is no job-search permit for a non-Danish graduate. The structural point behind the whole list: pick the employer first and the city follows, because a multinational moves people between its own offices far more easily than a new employer sponsors a stranger.",
+      "cat": "work",
+      "rel": [
+        "k-aps",
+        "k-bluecard",
+        "k-nl-zoekjaar"
+      ],
+      "at": "2026-11-02T09:20:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    }
+  ]
+}
