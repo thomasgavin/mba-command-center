@@ -1,0 +1,25 @@
+{
+  "v": 3,
+  "op": "claude",
+  "exportedAt": "2026-11-02T09:05:00.000Z",
+  "notes": [],
+  "changed": [],
+  "kb": [
+    {
+      "id": "k-nl-zoekjaar",
+      "label": "The Dutch orientation year, and the ranking rule it turns on",
+      "group": "Working abroad: visas and markets",
+      "ord": 65,
+      "shape": "cards",
+      "body": "The zoekjaar is the Netherlands' post-study search year. It is open to graduates of a Dutch institution, or to graduates of an institution in the top 200 of the accepted rankings -- and the detail that matters is which rankings those are. IND accepts Times Higher Education, QS and ShanghaiRanking/ARWU, counting both their general lists and their by-subject lists where the subject matches what you studied. The QS Global MBA Ranking, where INSEAD places first or second, is a different product and is not one of them. The rule was also tightened: top 200 in at least TWO of the three publishers is now required, not one. INSEAD plausibly appears in QS by subject for Business and Management, but THE and ARWU rank research-and-teaching institutions and a standalone business school typically does not enter them, so one of three is the likely answer and that does not clear the bar. Worth checking rather than assuming, because if two come back yes then Amsterdam is a landing point rather than a second move. Until then the Dutch route runs through an employer and a Blue Card, so the offer has to come first -- which is the whole reason Paris is the base and Amsterdam is not.",
+      "cat": "work",
+      "rel": [
+        "k-targetgeo",
+        "k-bluecard"
+      ],
+      "at": "2026-11-02T09:05:00.000Z",
+      "createdAt": "2026-10-18T09:05:00.000Z",
+      "by": "claude"
+    }
+  ]
+}
