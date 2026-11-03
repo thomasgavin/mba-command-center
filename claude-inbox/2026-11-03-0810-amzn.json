@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-03T08:04:25Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-03-0810-amzn",
+      "from": "claude",
+      "itemId": "amzn-oa",
+      "itemTitle": "Amazon Launch online assessment",
+      "title": "Two hours, within the week",
+      "state": "new",
+      "createdAt": "2026-11-03T08:04:25Z",
+      "at": "2026-11-03T08:04:25Z",
+      "text": "Amazon's assessment mail says to complete it within the week, and that you do not move forward without it. It asks for at least two uninterrupted hours on a laptop with a solid connection. - Worth doing today, because the week runs out while you are moving to India."
+    }
+  ]
+}
