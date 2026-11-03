@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-03T02:04:51Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-03-0210-kitas",
+      "from": "claude",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "No renewal left to buy",
+      "state": "new",
+      "createdAt": "2026-11-03T02:04:51Z",
+      "at": "2026-11-03T02:04:51Z",
+      "text": "Chitra at InCorp wrote overnight that a renewal is no longer possible, because it had to start a month before the 8 November expiry. Staying past that date risks an overstay charge of IDR 1 million a day, and consequences for Locus as your sponsor. - So the cancellation and the exit permit before you fly are the whole of it now."
+    },
+    {
+      "id": "claude-2026-11-03-0210-ggl",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "int-ggl-ba",
+      "itemId": "int-ggl-ba",
+      "itemTitle": "Apply: Google Business Analyst MBA intern, Dublin",
+      "title": "Google closes while you travel",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-08"
+      },
+      "state": "new",
+      "createdAt": "2026-11-03T02:04:51Z",
+      "at": "2026-11-03T02:04:51Z",
+      "text": "Today is the start-by for both Google applications, Dublin and London, and they close on the 8th while you are moving countries. The Amazon one is in, so the CV is ready to reuse. - Worth doing both today while you are still at a desk."
+    }
+  ]
+}
