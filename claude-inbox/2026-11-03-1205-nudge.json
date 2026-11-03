@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-03T12:04:14Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-03-1205-amzn",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "amzn-oa",
+      "itemId": "amzn-oa",
+      "itemTitle": "Amazon Launch online assessment",
+      "title": "Assessment still open",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-03"
+      },
+      "state": "new",
+      "createdAt": "2026-11-03T12:04:14Z",
+      "at": "2026-11-03T12:04:14Z",
+      "text": "The assessment is dated today and the board shows nothing moved on it. Amazon wants two uninterrupted hours and will not take the application further without it, and tomorrow you are flying. - Tonight is the last quiet two hours you have for a while."
+    }
+  ]
+}
