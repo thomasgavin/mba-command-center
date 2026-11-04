@@ -1,0 +1,67 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-11-04T12:07:36Z",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-2026-11-04-1210-kitas",
+   "from": "claude",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "You are out of Indonesia",
+   "state": "new",
+   "createdAt": "2026-11-04T12:07:36Z",
+   "at": "2026-11-04T12:07:36Z",
+   "text": "You told Chitra today that you left Indonesia yesterday and will work online until 6 December, so the departure step is done. What your mail does not say is whether the KITAS cancellation itself was completed before you flew. - Worth asking InCorp to confirm that in writing, because the expiry is the 8th."
+  },
+  {
+   "id": "claude-2026-11-04-1210-amzn",
+   "from": "claude",
+   "itemId": "amzn-oa",
+   "itemTitle": "Amazon Launch online assessment",
+   "title": "First come, first served",
+   "state": "new",
+   "createdAt": "2026-11-04T12:07:36Z",
+   "at": "2026-11-04T12:07:36Z",
+   "text": "INSEAD's recap of Monday's Amazon session says roles stay open only until the pool is full, and that recruiters interview as applications arrive. The assessment mixes practical examples with theory, and they say to prepare against the Leadership Principles. - There is no deadline to wait for, so the assessment is the only thing holding your place in the queue."
+  }
+ ],
+ "kb": [
+  {
+   "id": "k-internwin",
+   "group": "The summer internship",
+   "ord": 60,
+   "shape": "timeline",
+   "cat": "work",
+   "label": "Your internship window starts 1 July, not 24 June",
+   "body": "INSEAD's P0 recap puts the official 27D summer break at 1 July to 22 August 2027, with classes back on 23 August. In Singapore P3 core and electives both end on 23 June, so students there can start an internship on 24 June; in Fontainebleau P3 core also ends on 23 June but the electives run to 30 June, so his own earliest start is 1 July unless he drops them. The CDC added that tech internships often need longer than the official eight weeks, which is a conversation to have with the employer rather than with the school.",
+   "when": "01 Jul - 22 Aug 2027",
+   "w": "2027-07-01",
+   "at": "2026-11-04T12:07:36Z",
+   "rel": [
+    "k-intern",
+    "k-breaks",
+    "k-cal"
+   ]
+  },
+  {
+   "id": "k-intern",
+   "group": "The summer internship",
+   "ord": 60,
+   "shape": "timeline",
+   "cat": "work",
+   "label": "The summer project itself: optional, 8 weeks",
+   "body": "A Short-Term Summer Project in the break after P3. The alternatives INSEAD names are a startup tour or deliberate time off to prepare for full-time recruitment, and it does not treat the internship as obligatory for this cohort. Gavin's own plan is to start looking from the day the course starts rather than waiting for P2.",
+   "when": "01 Jul - 22 Aug 2027",
+   "w": "2027-07-01",
+   "at": "2026-11-04T12:07:36Z",
+   "rel": [
+    "k-interntiming",
+    "k-sumweb",
+    "k-breaks",
+    "k-internwin"
+   ]
+  }
+ ]
+}
