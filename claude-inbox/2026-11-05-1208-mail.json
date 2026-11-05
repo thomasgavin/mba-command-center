@@ -1,0 +1,37 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-11-05T12:05:54Z",
+ "changed": [
+  {
+   "id": "vfs-appt",
+   "at": "2026-11-05T12:05:54Z",
+   "due": "2026-11-11",
+   "manual": true
+  }
+ ],
+ "notes": [
+  {
+   "id": "claude-2026-11-05-1210-vfs",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at VFS New Delhi",
+   "title": "Delhi has answered",
+   "state": "new",
+   "createdAt": "2026-11-05T12:05:54Z",
+   "at": "2026-11-05T12:05:54Z",
+   "text": "Muskan Jain booked you a counselling session and then moved it to 10 November, asking you to confirm you are free. That is how Delhi handles the VFS question, so it comes before the appointment rather than after. - Confirm the slot today, because it is the only thing she is waiting on."
+  },
+  {
+   "id": "claude-2026-11-05-1210-vfsdate",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at VFS New Delhi",
+   "title": "Moved the visa task again",
+   "state": "new",
+   "createdAt": "2026-11-05T12:05:54Z",
+   "at": "2026-11-05T12:05:54Z",
+   "text": "I have moved this from the 9th to the 11th, because counselling is on the 10th and you cannot submit before it. The date is still the board's estimate, not a booking. - Change it once Delhi gives you a real VFS slot."
+  }
+ ]
+}

@@ -2089,6 +2089,15 @@ var EVENTS=[
      registered for in advance and the CV gates the career track; PLDP is High
      because the assignments it explains start the next day; the academics
      overview is the one of the four he could read the deck for instead. */
+  /* Not a webinar: his own appointment with Campus France Delhi, and the step
+     that stands between him and a VFS submission. Muskan Jain booked it for
+     the 11th and rescheduled it to the 10th the same day. It is an event
+     rather than a task because the slot is theirs and attending it is all
+     there is -- confirming availability is one line in a reply, not a task
+     with an effort. Critical on the only question a priority answers here,
+     because the whole visa chain and now the tuition deadline wait behind it. */
+  {id:"ev-cf-counsel", t:"Campus France Delhi counselling session", k:"visa", d:"2026-11-10", p:"Critical",
+    n:"Rescheduled from 11 November by Campus France Delhi, who asked him to confirm he is free. The session is how Delhi answers the question about VFS next steps."},
   {id:"ev-pldp",   t:"PLDP webinar",                        k:"acad",   d:"2026-11-05", p:"High",
     n:"Mandatory, live or the recording. 11:00 Paris. Explains the assignments that run 6 November to 28 December."},
   {id:"ev-bizfound", t:"Business Foundations module",      k:"acad",   d:"2026-11-16", p:"High",
@@ -5238,7 +5247,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-03-0210";
+var BUILD="2026-11-05-1210";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
