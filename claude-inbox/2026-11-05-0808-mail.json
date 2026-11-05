@@ -1,0 +1,37 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-11-05T08:04:40Z",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-2026-11-05-0810-tuition",
+   "from": "claude",
+   "itemId": "tuition-oct",
+   "itemTitle": "Pay EUR 53,000 tuition instalment",
+   "title": "INSEAD will not write that letter",
+   "state": "new",
+   "createdAt": "2026-11-05T08:04:40Z",
+   "at": "2026-11-05T08:04:40Z",
+   "text": "Marie Rose replied this morning that INSEAD cannot confirm in writing that a refund would go back to SBI if your visa is refused. She will instead extend your deadline until the visa outcome is known, and has asked where you are in the process. - Answering her today is what secures the extension."
+  },
+  {
+   "id": "claude-2026-11-05-0810-nudge-vfs",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "vfs-appt",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at VFS New Delhi",
+   "title": "The visa gates the money",
+   "state": "new",
+   "createdAt": "2026-11-05T08:04:40Z",
+   "at": "2026-11-05T08:04:40Z",
+   "round": 1,
+   "was": {
+    "status": "todo",
+    "due": "2026-11-09"
+   },
+   "text": "INSEAD has asked where you are in the visa process before extending the tuition deadline, and you still have no VFS appointment because Delhi has not answered. The visa is now holding the 53,000 euros as well as your start date. - If Delhi is silent again today, Amanda Heurteau at INSEAD is the faster route."
+  }
+ ]
+}
