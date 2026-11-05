@@ -1,0 +1,26 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-11-05T02:03:54Z",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-2026-11-05-0210-nudge-tuition",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "tuition-oct",
+   "itemId": "tuition-oct",
+   "itemTitle": "Pay EUR 53,000 tuition instalment",
+   "title": "The instalment is due today",
+   "state": "new",
+   "createdAt": "2026-11-05T02:03:54Z",
+   "at": "2026-11-05T02:03:54Z",
+   "round": 3,
+   "was": {
+    "status": "doing",
+    "due": "2026-11-05"
+   },
+   "text": "The 53,000 euro instalment is dated today and the board still shows it open. The SBI sanction is not due until the 10th, so if this one is yours to fund it has to come from your own account. - Last nudge on this one; mark it paid and it drops off."
+  }
+ ]
+}
