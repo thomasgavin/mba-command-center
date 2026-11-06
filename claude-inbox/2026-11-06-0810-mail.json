@@ -1,0 +1,49 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-06T08:05:22Z",
+  "changed": [
+    {
+      "id": "vfs-appt",
+      "at": "2026-11-06T08:05:22Z",
+      "due": "2026-11-10",
+      "status": "doing",
+      "manual": true
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-11-06-0810-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "VFS slot is booked",
+      "text": "VFS has confirmed your student long-stay appointment for 10 November at 2:45pm, at the New Delhi centre on KG Marg. I have moved this task to the 10th and marked it in progress, because the date is a booking now rather than the board's estimate. - Carry the printed appointment letter and your passport.",
+      "state": "new",
+      "createdAt": "2026-11-06T08:05:22Z",
+      "at": "2026-11-06T08:05:22Z",
+      "acted": [
+        "Submit the visa application at VFS New Delhi: 2026-11-11 -> 2026-11-10",
+        "Submit the visa application at VFS New Delhi: To-do -> In progress"
+      ]
+    },
+    {
+      "id": "claude-2026-11-06-0810-clash",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "vfs-appt",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Your 10 November clashes",
+      "text": "Your VFS slot is 2:45pm Delhi time on the 10th, and the Campus France counselling shows as 5pm Jakarta time the same day, which is 3:30pm in Delhi. So the session meant to settle the EEF transfer starts while you are inside the visa centre. - Worth asking Muskan to move it earlier.",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-11"
+      },
+      "state": "new",
+      "createdAt": "2026-11-06T08:05:22Z",
+      "at": "2026-11-06T08:05:22Z"
+    }
+  ]
+}
