@@ -1,0 +1,33 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-06T12:04:34Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-06-1215-x360",
+      "from": "claude",
+      "itemId": "pldp-x360",
+      "itemTitle": "x360: self-assessment and nominate observers",
+      "title": "x360 is open, and it needs names",
+      "text": "INSEAD has opened the x360 leadership survey on LearningBridge. Your own self-assessment and your observer nominations are due 11 December, and the observers have until the 28th to answer. - Your last day at Locus is 6 December, so name your manager and peers before you lose the colleagues.",
+      "state": "new",
+      "createdAt": "2026-11-06T12:04:34Z",
+      "at": "2026-11-06T12:04:34Z",
+      "acted": [
+        "Board: added \"x360: self-assessment and nominate observers\", due 11 December, because its deadline is two weeks earlier than the rest of the PLDP work"
+      ]
+    },
+    {
+      "id": "claude-2026-11-06-1215-ppin",
+      "from": "claude",
+      "itemId": "pldp-work",
+      "itemTitle": "Complete the PLDP assignments",
+      "title": "PPIN questionnaire is open",
+      "text": "The PPIN questionnaire is now open as part of the PLDP, on Qualtrics, with a deadline of 28 December. You also have to download the response summary at the end and upload it to the PPIN assignment page on the LMS. - The upload is the half people forget.",
+      "state": "new",
+      "createdAt": "2026-11-06T12:04:34Z",
+      "at": "2026-11-06T12:04:34Z"
+    }
+  ]
+}

@@ -2244,6 +2244,18 @@ var SEED=[
    n:"Done. He registered on 26 October, paid the 1,530 euro fee on the 30th and INSEAD Finance confirmed receipt on 2 November, so the decision this task existed to force has been made and the dc flag is gone with it. The module itself is the event on 16 November: a week of Quantitative Methods, Finance and Financial Accounting, delivered online against the SGT clock he chose at registration."},
  {id:"pldp-work",   t:"Complete the PLDP assignments",                 k:"acad",  s:"todo", p:"High",     d:"2026-12-28", ef:"multi",
    n:"Must do, on the LMS. The coach prepares from what is submitted, so late means a wasted first session."},
+  /* Its own task rather than a line inside pldp-work, because the two
+     dates disagree and the earlier one is the one that binds. The x360
+     self-assessment and the observer nominations are due 11 December;
+     the observers themselves have until the 28th, which is pldp-work's
+     date. multi rather than hours: the survey is twenty minutes, but
+     naming two or three observers per category and getting their email
+     addresses is not something done in one sitting -- and his last day
+     at Locus is 6 December, five days before the nomination deadline,
+     so the lead has to put the start-by in front of that rather than
+     after it. */
+ {id:"pldp-x360",   t:"x360: self-assessment and nominate observers",  k:"acad",  s:"todo", p:"High",     d:"2026-12-11", ef:"multi",
+   n:"LearningBridge, not the LMS. Minimum two observers per category and three recommended: manager, peers, direct reports, plus clients or mentors. Observers have until 28 December to answer, so they need naming while he still has Locus colleagues."},
  {id:"quant",       t:"Quant refresher: accounting and statistics",   k:"acad",  s:"todo", p:"Medium",   d:"2026-12-31", ef:"multi",},
  {id:"third-lang",  t:"Decide and register the third language",       k:"acad",  s:"todo", p:"High",     d:"2027-02-28", ef:"hours",
    n:"Required for graduation. What Gavin is using for it is not recorded."},
@@ -5247,7 +5259,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-05-1210";
+var BUILD="2026-11-06-1215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
