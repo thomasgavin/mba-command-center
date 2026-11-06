@@ -1,0 +1,55 @@
+{
+ "v": 1,
+ "op": "patch",
+ "exportedAt": "2026-11-06T02:04:15Z",
+ "changed": [],
+ "notes": [
+  {
+   "id": "claude-2026-11-06-0210-vfs",
+   "from": "claude",
+   "itemId": "vfs-appt",
+   "itemTitle": "Submit the visa application at VFS New Delhi",
+   "title": "VFS needs one email first",
+   "state": "new",
+   "createdAt": "2026-11-06T02:04:15Z",
+   "at": "2026-11-06T02:04:15Z",
+   "text": "Delhi says to fill the long-stay form on France-Visas and book the VFS slot there, but only once the automated Etudes en France mail says your Campus France process is complete. Take that printout, your expense statement, proof of funds, accommodation booking and the EEF attestation. - The slot waits on that mail, not on you."
+  },
+  {
+   "id": "claude-2026-11-06-0210-nudge-ggl",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "int-ggl-ba",
+   "itemId": "int-ggl-ba",
+   "itemTitle": "Apply: Google Business Analyst MBA intern, Dublin",
+   "title": "Google closes on Sunday",
+   "state": "new",
+   "createdAt": "2026-11-06T02:04:15Z",
+   "at": "2026-11-06T02:04:15Z",
+   "round": 2,
+   "was": {
+    "status": "todo",
+    "due": "2026-11-08"
+   },
+   "text": "Both Google applications close Sunday and neither has moved since their start-by on Tuesday. Today is the last working day before that, and the CV you used for Amazon is the same one. - An hour each, and they are the only two things this week that close for good."
+  },
+  {
+   "id": "claude-2026-11-06-0210-nudge-kitas",
+   "from": "claude",
+   "kind": "nudge",
+   "about": "kitas-close",
+   "itemId": "kitas-close",
+   "itemTitle": "Close the KITAS and withdraw BPJS",
+   "title": "Last working day for InCorp",
+   "state": "new",
+   "createdAt": "2026-11-06T02:04:15Z",
+   "at": "2026-11-06T02:04:15Z",
+   "round": 3,
+   "was": {
+    "status": "doing",
+    "due": "2026-11-08"
+   },
+   "text": "Your permit expires Sunday and nobody at InCorp can confirm anything over a weekend, so today is the last working day to get the cancellation in writing. You are out of the country, so the exposure left is Locus's as your sponsor. - Last nudge on this one; a call to Chitra closes it."
+  }
+ ]
+}
