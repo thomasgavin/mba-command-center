@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-08T08:03:58.830562Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-08-0803-visa8w",
+      "kind": "nudge",
+      "from": "claude",
+      "about": "vfs-appt",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Visa may miss your flight",
+      "text": "INSEAD told Fontainebleau starters this morning that the French visa can take up to eight weeks, and holiday volumes will stretch it. Eight weeks from Tuesday lands after your 3 January flight. - Worth raising the January start at the counter and with visas.fb@insead.edu.",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-10"
+      },
+      "state": "new",
+      "at": "2026-11-08T08:03:58.830562Z",
+      "createdAt": "2026-11-08T08:03:58.830562Z"
+    },
+    {
+      "id": "claude-2026-11-08-0803-cdc",
+      "from": "claude",
+      "itemId": "news-mbb-cal",
+      "itemTitle": "[NEWS] Pin down the MBB recruiting calendar for 2027",
+      "title": "CDC posted open roles",
+      "text": "The CDC newsletter this morning links a list of internship and full-time roles already open, refreshed weekly. Kraft Heinz is also running its Ketchup Invitational, with a presentation on 12 November and a route to a summer internship in Amsterdam. - The Kraft Heinz route fits your consumer target.",
+      "state": "new",
+      "at": "2026-11-08T08:03:58.830562Z",
+      "createdAt": "2026-11-08T08:03:58.830562Z"
+    }
+  ]
+}
