@@ -519,6 +519,51 @@ board on its open socket in the same second; on the file route it commits into
 `claude-inbox/` and the board applies it on the next page load. So a date does
 move, just one page load later, not during the run.
 
+## His Google Calendar
+
+He asked for this on 2026-11-08: *"any event/meeting/schedule I register for
+and I recieve the confirmation or invite - all of these should be added to my
+Gcal. Whenever you see one, check if it exists in my Gcal and if not, add it
+(be aware of the timezones and links) as part of your daily checks. The Gcal
+should have all deadlines, events, schedules as tasks or events."*
+
+So the board pass has a third step, between the mail scan and the nudge, and
+the Routine's prompt carries it. It is the one place anything Claude does
+reaches outside the repository and his browser, which is why the rules are
+narrow.
+
+- **Check before writing.** He adds events himself -- the student-platforms
+  and academics-overview sessions went in half an hour before he asked for
+  this -- so every entry is looked for first, by date or by a word in the
+  title. A duplicate is worse than a gap: a gap is a missing reminder and a
+  duplicate is two reminders that disagree about which is real.
+- **The time zone is read off the mail, never computed.** His calendar is
+  `Asia/Kolkata` while he is in India, INSEAD's sessions are Paris time, and
+  VFS and Campus France Delhi are IST. The local time goes in with no offset
+  and no trailing `Z` and the IANA name goes in `timeZone`; converting by
+  hand **and** naming a zone lands the entry an hour or two out, which is the
+  failure that matters most for a visa appointment.
+- **The link is in `location` and everything else in `description`** -- the
+  dial-in, the password, the CareerGlobe or registration URL. A calendar entry
+  he has to go back to his inbox to use is half an entry.
+- **A deadline with no clock is an all-day event titled `Deadline — <what>`,
+  marked free.** Free rather than busy, because a due date is not an hour of
+  his day and a month of solid blocks is a calendar he stops reading.
+- **The privacy rule does not apply here.** It is about this repository being
+  public; his calendar is his own, so an entry may carry the appointment
+  reference, the address and the booking details that a commit may never
+  carry. That asymmetry is the whole reason it is worth stating.
+- **Nothing he created is ever deleted or moved.** Where a calendar entry and
+  an email disagree, the note says so and both are left alone -- the board
+  argues with him nowhere else either.
+
+The first backfill ran on 2026-11-08 and put in nineteen entries: the VFS
+submission on the 10th, the Business Foundations week, his last working day
+at Locus, the move to Fontainebleau, and an all-day deadline for every open
+dated task out to the final instalment. `tuition-oct` got none, because
+INSEAD has offered an extension and named no date, and an invented date is
+the drift this board exists to prevent.
+
 ## The audit log
 
 `history/YYYY-MM-DD.md` is a readable table of every board change that day:
