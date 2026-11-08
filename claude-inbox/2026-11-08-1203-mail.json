@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-08T12:03:25.701862Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-08-1203-ggl",
+      "from": "claude",
+      "itemId": "int-ggl-ba",
+      "itemTitle": "Apply: Google Business Analyst MBA intern, Dublin",
+      "title": "Google has your application",
+      "text": "Google acknowledged an application this morning, a few hours after the last call. The mail does not name the role and only one came, so I have not ticked either task. - Mark off whichever you sent, and send the other if it is still open.",
+      "state": "new",
+      "at": "2026-11-08T12:03:25.701862Z",
+      "createdAt": "2026-11-08T12:03:25.701862Z"
+    }
+  ]
+}
