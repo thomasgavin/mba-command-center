@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-08T02:04:12.041525Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-08-0204-ggl",
+      "kind": "nudge",
+      "from": "claude",
+      "about": "int-ggl-ba",
+      "itemId": "int-ggl-ba",
+      "itemTitle": "Apply: Google Business Analyst MBA intern, Dublin",
+      "title": "Last call on Google",
+      "text": "Both Google applications close today, Dublin and London, and both still read To-do. This is the last time I will raise it. - An hour each, and start with the one you actually want in case only one gets done.",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-08"
+      },
+      "state": "new",
+      "at": "2026-11-08T02:04:12.041525Z",
+      "createdAt": "2026-11-08T02:04:12.041525Z"
+    }
+  ]
+}
