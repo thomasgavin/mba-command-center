@@ -1,0 +1,9 @@
+{"v":3,"op":"claude","exportedAt":"2026-11-08T13:00:00.000Z",
+ "notes":[{"id":"claude-amzn-oa-done-1108","itemId":"amzn-oa",
+   "itemTitle":"Amazon Launch online assessment",
+   "title":"Assessment submitted",
+   "body":"You submitted the Amazon assessment today, three weeks ahead of the 2 December expiry, so the Launch application is now complete and sitting with Amazon. Next, if they move, is a recruiter interview, then a writing exercise, then a four-interview panel. - INSEAD's session recap puts that whole process at four to six weeks, so chase nothing before mid-December.",
+   "from":"claude","state":"new","createdAt":"2026-11-08T13:00:00.000Z",
+   "acted":["Amazon Launch online assessment: To-do -> Done"]}],
+ "changed":[{"id":"amzn-oa","at":"2026-11-08T13:00:00.000Z","status":"done","manual":true,"doneAt":"2026-11-08"}],
+ "kb":[]}
