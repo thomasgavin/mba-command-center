@@ -444,6 +444,19 @@ Three things keep it from eating itself or his subscription:
   is public, and a run spends his subscription rather than a line in a public
   folder.
 
+**The runner is pinned, because the browser is.** The job installs
+`playwright@1.56.1` so it can run the checks before pushing. On 9 November
+2026 GitHub rolled the `ubuntu-latest` label forward to Ubuntu 26.04 and that
+build refused it outright -- *"does not support chromium on
+ubuntu26.04-x64"*. The run died at the install step, sixteen seconds in,
+**before reading a single note**, which is the one shape of failure that
+takes his chat with it: a job that writes nothing leaves the board nothing to
+pull, so he got a failure mail and a message that never arrived and reported
+them as two problems. `runs-on: ubuntu-24.04` now, and the next Ubuntu comes
+with a Playwright pin bumped in the same commit. A pinned browser and a
+moving label is a time bomb with no owner. `workflow_dispatch` is how a note
+stranded by a failed run is answered afterwards.
+
 ## The Routine, three times a day
 
 `MBA board pass (3x daily)` (`trig_01NzPtMyET8r329X7UCtjeoa`) fires at 09:00,
@@ -2340,7 +2353,7 @@ committed file before naming anything.
 ## Before merging anything
 
 `REVIEW.md` is the rulebook, and `node checks/board-check.mjs` is the part of it
-that runs: 491 invariants, three widths, a real browser. Every one of them was a
+that runs: 492 invariants, three widths, a real browser. Every one of them was a
 bug first, which is why they are executable rather than another paragraph here.
 It has to pass before a PR merges, and a fix for something it does not yet cover
 adds the invariant in the same PR -- the fix and the thing that stops it coming
