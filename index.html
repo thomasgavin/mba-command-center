@@ -2288,6 +2288,15 @@ var SEED=[
    n:"Both, plus the workbook questions: together they are the prep for the first coaching session."},
  {id:"cdc-coach1",  t:"Book the first CDC coaching session",          k:"career",s:"todo", p:"High",     d:"2026-11-15", ef:"quick", dep:["careerglobe","cdc-quests"],
    n:"Slots from November, 45 minutes, and the coach is allocated by P1 location with no changes later."},
+ /* Her introduction mail sets the condition on the session itself: the
+    CareerLeader and Career Anchor scores go on the Personal Summary tab of the
+    CareerPlan workbook and reach her by reply "at least 48 hours prior to our
+    first meeting". The session is 25 November, so this is the 23rd, and it is a
+    date the board could not derive from the booking alone -- which is why it is
+    a task of its own rather than a line under cdc-coach1. The questionnaires
+    are already done; what is left is the sending. */
+ {id:"cdc-anchors",t:"Send your Career Anchor scores to Liesbeth",k:"career",s:"todo", p:"High",     d:"2026-11-23", ef:"quick", dep:["cdc-quests","cdc-coach1"],
+   n:"Reply to her introduction mail with the scores on the Personal Summary tab of the CareerPlan workbook. Her rule is 48 hours before the session, which is the 25th."},
  {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
  {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",},
@@ -5267,7 +5276,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-09-0208";
+var BUILD="2026-11-09-1215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

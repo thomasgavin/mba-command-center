@@ -1,0 +1,32 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-09T12:18:00.260114Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-09-1218-anchors",
+      "itemId": "cdc-anchors",
+      "from": "claude",
+      "title": "Scores due 48 hours before",
+      "text": "Liesbeth's introduction mail asks for the CareerLeader and Career Anchor scores at least 48 hours before your first session, which makes it the 23rd. The questionnaires are already done, so what is left is the sending. - Reply to her own mail with the Personal Summary tab of the CareerPlan workbook.",
+      "state": "new",
+      "at": "2026-11-09T12:18:00.260114Z",
+      "createdAt": "2026-11-09T12:18:00.260114Z",
+      "acted": [
+        "Added a task to send your Career Anchor scores to Liesbeth, due 23 November",
+        "Put the 23 November deadline in your Google Calendar"
+      ]
+    },
+    {
+      "id": "claude-2026-11-09-1218-lwd",
+      "itemId": "locus-exit",
+      "from": "claude",
+      "title": "Last day, two dates",
+      "text": "You told Chitra on 4 November that your last working day is 6 December. Ravikanth told her today it is the 4th. The task is closed, so I have left the date alone. - Worth a line to Ravikanth, because InCorp closes your payroll and tax deregistration on whichever date they are given.",
+      "state": "new",
+      "at": "2026-11-09T12:18:00.260114Z",
+      "createdAt": "2026-11-09T12:18:00.260114Z"
+    }
+  ]
+}
