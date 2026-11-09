@@ -49,7 +49,15 @@ jobs:
       !contains(github.event.head_commit.message, '[skip ci]') &&
       !startsWith(github.event.head_commit.message, 'Claude:') &&
       !startsWith(github.event.head_commit.message, 'Relay snapshot')
-    runs-on: ubuntu-latest
+    # Pinned, not `ubuntu-latest`. GitHub rolled that label forward to Ubuntu
+    # 26.04 on 9 Nov 2026 and the browser install died on the spot --
+    # "Playwright does not support chromium on ubuntu26.04-x64" -- so the job
+    # failed before it ever read a note. Nothing was committed, so his message
+    # never reached the board either, and the only thing he saw was a failure
+    # mail. This job is the one that answers him, so it runs on a stated
+    # version and moves when a build of Playwright that supports the next one
+    # is pinned here, never because a label changed underneath it.
+    runs-on: ubuntu-24.04
     # A note can ask for a code change, and answering one means editing the
     # page, installing a browser and running the 40 checks before pushing.
     # Twelve minutes and thirty turns was sized for "read notes, write a

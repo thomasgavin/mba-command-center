@@ -955,6 +955,17 @@ for (var w2 of [390, 1280]) {
   ok("and a re-stamped nudge is not read as a rename and skipped",
      /--no-renames/.test(wf), "");
 
+  /* And the job that answers him runs on a stated Ubuntu, never on whatever
+     `ubuntu-latest` points at today. GitHub rolled that label to 26.04 on
+     9 Nov 2026, the pinned Playwright refused to install a browser there --
+     "does not support chromium on ubuntu26.04-x64" -- and the run died before
+     reading a single note. Nothing committed, so his message never reached
+     the board and all he saw was a failure mail. A pinned browser needs a
+     pinned OS: the pair moves together or not at all. */
+  ok("Answer notes pins its runner, because it pins a browser",
+     /runs-on: ubuntu-\d+\.\d+/.test(nt) && !/runs-on: ubuntu-latest/.test(nt),
+     (nt.match(/runs-on: \S+/) || ["none"])[0]);
+
   /* the relay has to say what the push service answered, or the test button
      cannot separate "accepted and iOS dropped it" from "refused" -- counting
      sends gave the same number for both */
