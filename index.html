@@ -2160,7 +2160,15 @@ var EVENTS=[
   {id:"ev-latam-hilt", t:"LatAm fair: Hilti", k:"career", d:"2026-11-12", p:"Low",
     n:"20:30 CET. Zoom and CareerGlobe links are on the calendar invite."},
   {id:"ev-latam-mdel", t:"LatAm fair: Monitor Deloitte", k:"career", d:"2026-11-12", p:"Medium",
-    n:"21:00 CET. Zoom and CareerGlobe links are on the calendar invite."}
+    n:"21:00 CET. Zoom and CareerGlobe links are on the calendar invite."},
+  /* His own slot, not a broadcast, which is why it is High: Liesbeth Van Loock
+     is the coach he will keep, and the Career Anchor scores he already filled
+     in are what the hour is spent on. Booked through CareerGlobe on 8
+     November, which is also what closed the task that asked him to book it. */
+  {id:"ev-cdc-coach", t:"CDC career coaching: P0 session", k:"career", d:"2026-11-25", p:"High",
+    n:"10:00 CET with Liesbeth Van Loock, on Zoom. Introduction and the Career Anchor scores. The confirmation gives only a start time; CareerGlobe has the length."},
+  {id:"ev-pricing-ai", t:"Lifelong Learning: Pricing in the Age of AI", k:"acad", d:"2026-11-25", p:"Low",
+    n:"18:30 to 19:30 IST, the same evening as the coaching call. Open INSEAD webinar he registered for himself; nothing in the programme depends on it."}
 ];
 function evCat(e){ return cat==="all" || TRACK_CAT[e.k]===cat; }
 function evPool(){ return EVENTS.filter(evCat); }
@@ -5259,7 +5267,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-08-1300";
+var BUILD="2026-11-09-0208";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

@@ -1,0 +1,40 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-09T02:12:40.118204Z",
+  "changed": [
+    {
+      "id": "cdc-coach1",
+      "at": "2026-11-09T02:12:40.118204Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-11-08",
+      "title": "Book the first CDC coaching session",
+      "due": "2026-11-15",
+      "priority": "High",
+      "snoozes": 0,
+      "origDue": null,
+      "effort": "quick",
+      "deleted": false,
+      "newsState": null
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-11-09-0212-cdc",
+      "from": "claude",
+      "itemId": "cdc-coach1",
+      "itemTitle": "Book the first CDC coaching session",
+      "title": "Coaching session is booked",
+      "text": "CareerGlobe confirmed your first CDC session for 25 November, 10:00 CET with Liesbeth Van Loock, to go through your Career Anchor scores. That is what this task was asking for, so I have ticked it. - Only a start time was given, so check the length in CareerGlobe before you put anything after it.",
+      "acted": [
+        "Book the first CDC coaching session: To-do -> Done",
+        "Added the coaching session and the Pricing in the Age of AI webinar to the Calendar and Timeline as events",
+        "Put both in your Google Calendar"
+      ],
+      "state": "new",
+      "at": "2026-11-09T02:12:40.118204Z",
+      "createdAt": "2026-11-09T02:12:40.118204Z"
+    }
+  ]
+}
