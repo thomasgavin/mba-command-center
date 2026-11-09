@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-09T08:12:05.447219Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-09-0812-kitas",
+      "from": "claude",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "InCorp is waiting on you",
+      "text": "Chitra replied this morning. She has noted your exit and looped in payroll, but the cancellation, the tax deregistration and the BPJS deactivation all still sit behind her quotation, and she starts only when you say yes. - Decide whether to pay or let it lapse; nothing moves while it is undecided.",
+      "state": "new",
+      "at": "2026-11-09T08:12:05.447219Z",
+      "createdAt": "2026-11-09T08:12:05.447219Z"
+    },
+    {
+      "id": "claude-2026-11-09-0812-x360",
+      "from": "claude",
+      "itemId": "pldp-x360",
+      "itemTitle": "x360: self-assessment and nominate observers",
+      "title": "Two dates for x360",
+      "text": "The PLDP welcome this morning puts the x360 survey and PPIN at 28 December, but the LearningBridge mail gave you 11 December for your own part and the 28th for your observers. I left it on the earlier date. - Work to 11 December; it is the one that protects you if the welcome is rounding.",
+      "state": "new",
+      "at": "2026-11-09T08:12:05.447219Z",
+      "createdAt": "2026-11-09T08:12:05.447219Z"
+    }
+  ]
+}
