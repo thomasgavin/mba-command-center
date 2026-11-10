@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-10T12:04:22.067621Z",
+  "changed": [
+    {
+      "id": "vfs-appt",
+      "at": "2026-11-10T12:04:22.067621Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-11-10",
+      "title": "Submit the visa application at VFS New Delhi",
+      "due": "2026-11-10",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "deleted": false,
+      "newsState": null
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-11-10-1204-vfs",
+      "itemId": "vfs-appt",
+      "from": "claude",
+      "title": "Visa application submitted",
+      "text": "Your application was received at the Delhi centre this afternoon and VFS has registered it for processing, so I have ticked this task. The tracking reference is in the VFS mail and left off the board, which is public. - Send Marie Rose the receipt, since she asked to be kept updated and the tuition extension rests on it.",
+      "state": "new",
+      "at": "2026-11-10T12:04:22.067621Z",
+      "createdAt": "2026-11-10T12:04:22.067621Z",
+      "acted": [
+        "Submit the visa application at VFS New Delhi: In progress -> Done"
+      ]
+    },
+    {
+      "id": "claude-2026-11-10-1204-kitas",
+      "itemId": "kitas-close",
+      "from": "claude",
+      "title": "Locus approved the invoice",
+      "text": "Jishnu told Chitra this morning to go ahead and raise the invoice, so Locus has approved it. InCorp can start the cancellation, the tax deregistration and the BPJS withdrawal now. - Nothing needed from you until the invoice arrives.",
+      "state": "new",
+      "at": "2026-11-10T12:04:22.067621Z",
+      "createdAt": "2026-11-10T12:04:22.067621Z"
+    }
+  ]
+}
