@@ -1,0 +1,36 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-10T08:04:54.204561Z",
+  "changed": [
+    {
+      "id": "tuition-oct",
+      "at": "2026-11-10T08:04:54.204561Z",
+      "status": "doing",
+      "manual": true,
+      "title": "Pay EUR 53,000 tuition instalment",
+      "due": "2026-11-24",
+      "priority": "Critical",
+      "snoozes": 0,
+      "origDue": null,
+      "deleted": false,
+      "newsState": null
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-11-10-0804-tuition",
+      "itemId": "tuition-oct",
+      "from": "claude",
+      "title": "Tuition moved to 24 November",
+      "text": "Marie Rose has moved your instalment to 24 November, two weeks on, after you sent her the visa update. That is a firm date rather than an open offer, so the board carries it now. - She asked to be kept posted on the visa, which is what the extension rests on.",
+      "state": "new",
+      "at": "2026-11-10T08:04:54.204561Z",
+      "createdAt": "2026-11-10T08:04:54.204561Z",
+      "acted": [
+        "Pay EUR 53,000 tuition instalment: 5 November -> 24 November",
+        "Put the 24 November deadline in your Google Calendar"
+      ]
+    }
+  ]
+}
