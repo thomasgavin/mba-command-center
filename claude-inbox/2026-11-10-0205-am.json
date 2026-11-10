@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-10T02:05:34.188451Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-10-0205-fv",
+      "itemId": "vfs-appt",
+      "from": "claude",
+      "title": "Print the France-Visas receipt",
+      "text": "France-Visas registered your application yesterday afternoon and says the proof of registration is asked for when you submit. It is a separate printout from the Etudes en France one, downloaded from the France-Visas application page. - Print it before you leave for KG Marg this afternoon.",
+      "state": "new",
+      "at": "2026-11-10T02:05:34.188451Z",
+      "createdAt": "2026-11-10T02:05:34.188451Z",
+      "acted": [
+        "Added the France-Visas receipt to today's VFS calendar entry"
+      ]
+    },
+    {
+      "id": "claude-2026-11-10-0205-bf",
+      "itemId": "bizfound",
+      "from": "claude",
+      "title": "Business Foundations hours",
+      "text": "The welcome mail gives the hours at last: classes run 8:00 to 14:30 CET from the 16th, which is 12:30 to 19:00 where you are, then group work. That is five working days gone, inside your Locus notice period. - Tell Ravikanth this week rather than the weekend before.",
+      "state": "new",
+      "at": "2026-11-10T02:05:34.188451Z",
+      "createdAt": "2026-11-10T02:05:34.188451Z",
+      "acted": [
+        "Put the daily hours on the Business Foundations calendar entry"
+      ]
+    },
+    {
+      "id": "claude-2026-11-10-0205-kt",
+      "itemId": "kitas-close",
+      "from": "claude",
+      "title": "Now waits on Locus",
+      "text": "You asked Ravi and Jishnu yesterday to approve the cancellation, minus the tax filing you have already done yourself. So this now waits on Locus rather than on you or Chitra. - Nothing to do until one of them replies.",
+      "state": "new",
+      "at": "2026-11-10T02:05:34.188451Z",
+      "createdAt": "2026-11-10T02:05:34.188451Z"
+    }
+  ]
+}
