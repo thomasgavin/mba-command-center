@@ -2215,6 +2215,18 @@ var SEED=[
    n:"Campus France Jakarta asked for this the moment the file was validated, following their payment guideline. It gates the VFS appointment. The date is Claude's, not theirs: they named no deadline, so move it."},
  {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", ef:"day", dep:["cf-eef-pay"]},
  {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", ef:"hours",},
+ /* Campus France Indonesia's pre-departure mail is the only place this has
+    ever been stated to him, and it is the one visa step that happens after the
+    visa: the VLS-TS has to be validated on ANEF within three months of
+    arriving in France, from a permanent French address. Miss it and the stay
+    is out of order, which bites hardest at next year's renewal rather than on
+    the day. The date is the rule applied to his own arrival -- 3 January plus
+    three months -- not a date anyone wrote down for him, which is why the note
+    says to do it in the first week instead of running it to the wire. `quick`
+    because it is one online form; what it waits on is the Club 8 address, so
+    club8-movein gates it. */
+ {id:"vls-validate",t:"Validate your VLS-TS on ANEF",                  k:"visa",  s:"todo", p:"High",     d:"2027-04-03", ef:"quick", dep:["club8-movein"],
+   n:"Online at administration-etrangers-en-france.interieur.gouv.fr, once you have the Club 8 address. For an E1 Etudiant visa the reference code is CESEDA R431-16 13. It returns a PDF that is your proof of residence for the life of the visa, so print it and keep it with the passport."},
 
  /* housing and move */
  {id:"flight",      t:"Book flight to Paris for 3 January",           k:"move",  s:"blocked",p:"High",   d:"2026-11-20", ef:"hours", dep:["vfs-appt"],
@@ -5276,7 +5288,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-09-1215";
+var BUILD="2026-11-11-0810";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

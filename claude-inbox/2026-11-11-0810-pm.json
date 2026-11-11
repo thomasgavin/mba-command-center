@@ -1,0 +1,23 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-11T08:07:15.480825Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-11-0810-vls",
+      "from": "claude",
+      "itemId": "vls-validate",
+      "itemTitle": "Validate your VLS-TS on ANEF",
+      "title": "One visa step after France",
+      "state": "new",
+      "createdAt": "2026-11-11T08:07:15.480825Z",
+      "at": "2026-11-11T08:07:15.480825Z",
+      "text": "Campus France Indonesia's pre-departure mail this morning names one step nobody has mentioned: your long-stay visa has to be validated on ANEF within three months of landing, from your French address. Miss it and your stay is irregular, which bites when you renew next year. - Do it in your first week at Club 8, not in April.",
+      "acted": [
+        "Added a task to validate your VLS-TS on ANEF, due 3 April 2027",
+        "Put the 3 April deadline in your Google Calendar"
+      ]
+    }
+  ],
+  "changed": []
+}
