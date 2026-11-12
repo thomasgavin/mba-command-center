@@ -2161,6 +2161,15 @@ var EVENTS=[
     n:"20:30 CET. Zoom and CareerGlobe links are on the calendar invite."},
   {id:"ev-latam-mdel", t:"LatAm fair: Monitor Deloitte", k:"career", d:"2026-11-12", p:"Medium",
     n:"21:00 CET. Zoom and CareerGlobe links are on the calendar invite."},
+  /* A seat he confirmed, for a programme he has not applied to: the sprint's
+     own applications close on 1 December, which is the half of this mail that
+     has a deadline in it. That date rides in the line under the title rather
+     than becoming a task -- registering for an information session is not
+     deciding to apply, and a task with a date he has not committed to is the
+     drift this board exists to prevent. Medium because an hour on a Wednesday
+     morning in India is cheap and the thing it gates is not. */
+  {id:"ev-avl-sprint", t:"AI Venture Lab: Founder Sprint 2027 info session", k:"career", d:"2026-11-18", p:"Medium",
+    n:"11:30 IST (14:00 Singapore), 45 minutes, with Sean Lau. What the sprint is and how the application works. Applications close 1 December."},
   /* His own slot, not a broadcast, which is why it is High: Liesbeth Van Loock
      is the coach he will keep, and the Career Anchor scores he already filled
      in are what the hour is spent on. Booked through CareerGlobe on 8
@@ -5288,7 +5297,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-11-0810";
+var BUILD="2026-11-12-0225";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
