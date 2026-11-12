@@ -1,0 +1,18 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-12T02:53:30.757972Z",
+  "why": "daily brief 2026-11-12",
+  "notes": [],
+  "changed": [],
+  "news": [
+    {
+      "id": "news-daily-2026-11-12",
+      "period": "daily",
+      "date": "2026-11-12",
+      "body": "## A decision with a date on it now\n- The Founder Sprint applications close on 1 December, and your info session is the 18th.\nAI Venture Lab confirmed your seat this morning. It is 45 minutes, and the application window shuts thirteen days after it. - Go in with the two questions that actually decide it: when the sprint runs, and how many hours a week it wants.\n## Tonight runs past midnight\n- Hilti at 01:00 and Monitor Deloitte at 01:30, your time.\nBoth LatAm fair slots are listed in CET, so they land after midnight in India. Tomorrow's CDC CV webinar is a civilised 17:30. - Pick one of the two tonight rather than sitting through both.",
+      "at": "2026-11-12T02:53:30.757972Z",
+      "createdAt": "2026-11-12T02:53:30.757972Z"
+    }
+  ]
+}
