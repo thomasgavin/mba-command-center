@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-12T08:03:34.336938Z",
+  "why": "afternoon pass 2026-11-12",
+  "notes": [
+    {
+      "id": "claude-2026-11-12-0810-vfs",
+      "from": "claude",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Visa is with the embassy",
+      "body": "VFS moved your file to the Embassy of France in New Delhi this morning, two days after you handed it in. They will mail you again when it comes back to the centre. - Worth sending Marie Rose that line, since the visa is what the 24 November extension was given for.",
+      "state": "new",
+      "createdAt": "2026-11-12T08:03:34.336938Z",
+      "at": "2026-11-12T08:03:34.336938Z"
+    }
+  ],
+  "changed": []
+}
