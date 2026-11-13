@@ -1,0 +1,37 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-13T02:03:47.859599Z",
+  "why": "morning pass 2026-11-13",
+  "notes": [
+    {
+      "id": "claude-2026-11-13-0210-club8",
+      "from": "claude",
+      "kind": "nudge",
+      "about": "club8-detail",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-15"
+      },
+      "itemId": "club8-detail",
+      "itemTitle": "Confirm Club 8 inventory and move-in window",
+      "title": "Club 8 before the weekend",
+      "body": "Club 8 is due on Sunday, so today is the last working day to ask. What is still open is what Room 8 comes with and when you can collect the keys. - One email settles both, and you have the time now that you will not have in January.",
+      "state": "new",
+      "createdAt": "2026-11-13T02:03:47.859599Z",
+      "at": "2026-11-13T02:03:47.859599Z"
+    }
+  ],
+  "changed": [],
+  "news": [
+    {
+      "id": "news-daily-2026-11-11",
+      "period": "daily",
+      "date": "2026-11-11",
+      "body": "## The receipt is the answer Marie Rose asked for\n- Your instalment is 24 November now, and she asked to be kept updated on the visa.\nShe moved it two weeks yesterday morning, hours before your slot, so the extension is in writing but the update is not. VFS registered the application that same afternoon. - Forward her the VFS receipt today, since it is the proof the extension was given for.\n## Sunday has something on it\n- Club 8 is due on the 15th, and you moved it off Upcoming on Monday.\nWhat is still open is what Room 8 comes with and when you can collect the keys. You are in India with time; in January you arrive with whatever you packed. - One email to Club 8 settles both.\n## Off your desk since yesterday\n- The visa application is submitted and registered at the Delhi centre, and Locus approved the KITAS invoice the same morning.\nBoth of those were yours yesterday and neither is now.",
+      "at": "2026-11-13T02:03:47.859599Z",
+      "createdAt": "2026-11-11T02:53:24.852988Z"
+    }
+  ]
+}
