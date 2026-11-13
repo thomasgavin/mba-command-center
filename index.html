@@ -2318,6 +2318,15 @@ var SEED=[
     are already done; what is left is the sending. */
  {id:"cdc-anchors",t:"Send your Career Anchor scores to Liesbeth",k:"career",s:"todo", p:"High",     d:"2026-11-23", ef:"quick", dep:["cdc-quests","cdc-coach1"],
    n:"Reply to her introduction mail with the scores on the Personal Summary tab of the CareerPlan workbook. Her rule is 48 hours before the session, which is the 25th."},
+ /* The CDC's mail after the Kraft Heinz session: the company asked for a CV
+    book of the students who attended, and the upload closes Monday at 09:00
+    CET. That is a task rather than a line under the session, because it has a
+    date of its own and nothing else on the board carries it -- and the clock
+    matters here: 09:00 in Fontainebleau is half past one in the afternoon for
+    him, so Sunday evening is the last comfortable moment. Quick, because the
+    CV is already rebuilt and what is left is a form. */
+ {id:"kh-cvbook",t:"Upload your CV for the Kraft Heinz CV book",k:"career",s:"todo", p:"High",     d:"2026-11-16", ef:"quick",
+   n:"The CDC is collecting CVs from the session attendees for Kraft Heinz. The Qualtrics upload closes Monday 09:00 CET, which is 13:30 your time."},
  {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
  {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",},
@@ -5297,7 +5306,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-12-0225";
+var BUILD="2026-11-13-1215";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;

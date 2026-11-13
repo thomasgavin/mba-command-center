@@ -1,0 +1,33 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-13T12:07:38.511993Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-13-1210-kh",
+      "from": "claude",
+      "state": "new",
+      "itemId": "kh-cvbook",
+      "itemTitle": "Upload your CV for the Kraft Heinz CV book",
+      "title": "Kraft Heinz wants your CV",
+      "body": "The CDC is collecting CVs from everyone who attended today's Kraft Heinz session, and the form closes Monday 09:00 CET. That is 13:30 your time, in the middle of your first Business Foundations class. - Do it on Sunday instead; the form link is in your calendar.",
+      "createdAt": "2026-11-13T12:07:38.511993Z",
+      "at": "2026-11-13T12:07:38.511993Z",
+      "acted": [
+        "Added a career task for the Kraft Heinz CV book, due Monday 16 November, and put the deadline in your calendar with the upload link."
+      ]
+    },
+    {
+      "id": "claude-2026-11-13-1210-vfs",
+      "from": "claude",
+      "state": "new",
+      "itemId": "vfs-appt",
+      "itemTitle": "Submit the visa application at VFS New Delhi",
+      "title": "Your passport is coming back",
+      "body": "VFS says the embassy has finished with your application and sent it back to the Delhi centre this morning. They will email you when it is ready to collect. - The decision is made either way now, so tell Marie Rose as soon as you have it.",
+      "createdAt": "2026-11-13T12:07:38.511993Z",
+      "at": "2026-11-13T12:07:38.511993Z"
+    }
+  ],
+  "changed": []
+}
