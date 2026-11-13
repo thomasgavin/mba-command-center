@@ -1,0 +1,18 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-13T02:53:10.747497Z",
+  "why": "daily brief 2026-11-13",
+  "notes": [],
+  "changed": [],
+  "news": [
+    {
+      "id": "news-daily-2026-11-13",
+      "period": "daily",
+      "date": "2026-11-13",
+      "body": "## Fixed hours, today and Monday\n- The CDC CV webinar is 17:30 your time, and your CV is already rebuilt.\nIt covers the CV process and the key dates, so what is worth knowing is whether what you have matches what they ask for. - Have the file open while you watch.\n- Business Foundations starts Monday at 12:30 your time and runs to Friday.\nClasses are on the CET clock, so 8:00 there is half past twelve here every day that week. Your Founder Sprint session on the 18th ends fifteen minutes before that day's class. - Nothing clashes, but keep that week's mornings clear.",
+      "at": "2026-11-13T02:53:10.747497Z",
+      "createdAt": "2026-11-13T02:53:10.747497Z"
+    }
+  ]
+}
