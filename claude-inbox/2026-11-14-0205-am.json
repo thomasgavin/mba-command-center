@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-14T02:05:01.191746Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-14-0205-visacollect",
+      "from": "claude",
+      "state": "new",
+      "kind": "nudge",
+      "about": "visa-collect",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-16"
+      },
+      "itemId": "visa-collect",
+      "itemTitle": "Collect your passport from the Delhi visa centre",
+      "title": "Your passport is ready",
+      "body": "VFS says your passport is back at the Delhi centre and ready to collect, as of yesterday evening. The embassy finished with it the same morning, three days after you handed it in. - Check the centre's collection hours before you go; Monday is on the board and in your calendar.",
+      "acted": [
+        "Added a Critical visa task to collect the passport, dated Monday 16 November, and put it in your calendar with what to take.",
+        "Put the 4 December summer-experience webinar in your calendar at 17:30 your time, with the Zoom link, and wrote the time onto the board."
+      ],
+      "createdAt": "2026-11-14T02:05:01.191746Z",
+      "at": "2026-11-14T02:05:01.191746Z"
+    }
+  ],
+  "changed": []
+}

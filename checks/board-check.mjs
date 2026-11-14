@@ -1415,6 +1415,19 @@ for (var tw26 of [390, 1280]) {
    but never merges, fails silently and completely -- so every assertion here
    goes through a real merge and then a real reload. */
 {
+  /* The live dot has to be in the FUTURE on the day the suite runs, and it was
+     a literal -- "13 November 2026" -- so on 14 November 2026 both dots were
+     past, both were hollow, and the one check that proves a passed dot looks
+     different from a coming one failed on nothing having changed. A fixture
+     dated by hand against a check about "has this date passed" is a time bomb
+     with no owner, like the moving ubuntu-latest label. It is a month out from
+     whenever the suite runs now. */
+  var LIVE = new Date(Date.now() + 30 * 864e5);
+  var LIVE_W = LIVE.toISOString().slice(0, 10);
+  var LIVE_WHEN = String(LIVE.getUTCDate()).padStart(2, "0") + " " +
+    ["January","February","March","April","May","June","July","August",
+     "September","October","November","December"][LIVE.getUTCMonth()] + " " +
+    LIVE.getUTCFullYear();
   var KB = [
     /* cards: peers, nothing in sequence */
     { id: "k-vmock", label: "VMock scores a CV draft", body: "Says what to fix before a human reads it.",
@@ -1428,7 +1441,7 @@ for (var tw26 of [390, 1280]) {
        and the second of his: a sequence of dated events wants a rail, not a
        list. One is in the past so the hollow dot is exercised. */
     { id: "k-cvweb", label: "INSEAD CV & Cover Letter webinar", body: "What goes in the format and what stays out.",
-      group: "Webinars and sessions", ord: 10, shape: "timeline", when: "13 November 2026", w: "2026-11-13",
+      group: "Webinars and sessions", ord: 10, shape: "timeline", when: LIVE_WHEN, w: LIVE_W,
       cat: "work", at: "2026-10-05T09:00:00.000Z", by: "claude" },
     { id: "k-pldpweb", label: "PLDP intro webinar", body: "Clarifies the P0 leadership assignments.",
       group: "Webinars and sessions", ord: 10, shape: "timeline", when: "05 November 2026", w: "2026-11-05",

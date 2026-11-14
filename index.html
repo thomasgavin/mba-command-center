@@ -2125,7 +2125,7 @@ var EVENTS=[
   {id:"ev-khz",    t:"Kraft Heinz Ketchup Invitational",    k:"career", d:"2026-11-12", p:"High",
     n:"12:00 to 13:00 CET, and registration closes at 12:00 CET the same day. The 7th annual case competition, fast-tracked for a summer internship in Amsterdam."},
   {id:"ev-summer", t:"Summer experience webinar",           k:"career", d:"2026-12-04", p:"High",
-    n:"The 8-week summer project, the startup tour, and taking the break to recruit."},
+    n:"17:30 your time, and you are registered. The 8-week summer project, the startup tour, and taking the break to recruit."},
   /* The LatAm career fair, 9 to 12 November, eleven Zoom sessions over four
      evenings. Medium where the employer recruits globally and a recruiter
      contact carries beyond the region -- Amazon, World Bank, McKinsey, Uber,
@@ -2224,6 +2224,19 @@ var SEED=[
    n:"Campus France Jakarta asked for this the moment the file was validated, following their payment guideline. It gates the VFS appointment. The date is Claude's, not theirs: they named no deadline, so move it."},
  {id:"vfs-appt",    t:"VFS appointment in Indonesia",            k:"visa",  s:"blocked",p:"Critical",d:"2026-11-10", ef:"day", dep:["cf-eef-pay"]},
  {id:"insurance",   t:"French health cover and travel insurance",     k:"visa",  s:"todo", p:"High",     d:"2026-12-10", ef:"hours",},
+ /* VFS mailed four notifications in two hours on 13 November: the embassy
+    finished with the application, it came back to the centre, and the last one
+    says it is there for collection. So the decision is made and the passport
+    is waiting in New Delhi -- which is why this is a task rather than a note
+    on vfs-appt: there is something for him to go and do, and the next three
+    things on the board all wait on what is inside it. No collection deadline
+    and no opening hours were given, so the date is Monday because that is the
+    first working day, not because anyone wrote it down; the note says so.
+    Critical, because the EUR 53,000 instalment and the ANEF validation both
+    read off this outcome. */
+ {id:"visa-collect",t:"Collect your passport from the Delhi visa centre",   k:"visa",  s:"todo", p:"Critical", d:"2026-11-16", ef:"quick",
+   n:"VFS says your application is back at the France Visa Application Centre in New Delhi and ready to collect. They named no deadline and no hours, so check those before you go, and take the appointment confirmation and photo ID."},
+
  /* Campus France Indonesia's pre-departure mail is the only place this has
     ever been stated to him, and it is the one visa step that happens after the
     visa: the VLS-TS has to be validated on ANEF within three months of
@@ -5306,7 +5319,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-13-1215";
+var BUILD="2026-11-14-0205";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
