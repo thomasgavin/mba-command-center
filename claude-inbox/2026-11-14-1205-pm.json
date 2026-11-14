@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-14T12:06:06.844396Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-14-1205-bf",
+      "from": "claude",
+      "state": "new",
+      "itemId": "prereads",
+      "itemTitle": "INSEAD pre-course work and pre-reading",
+      "title": "Nothing due before Monday",
+      "body": "Martina Andreani sent the Financial Accounting plan: five sessions, Monday to Friday, and Session 1 needs nothing beforehand. Each reading and exercise is set after the session before it, so the prep falls in your evenings rather than this weekend. - Your group is expected to attempt the exercises together, so find them early in the week.",
+      "acted": [
+        "Added the Financial Accounting week to your Business Foundations calendar entry: what each session covers and which exercise belongs to which day."
+      ],
+      "createdAt": "2026-11-14T12:06:06.844396Z",
+      "at": "2026-11-14T12:06:06.844396Z"
+    }
+  ],
+  "changed": []
+}
