@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-14T08:03:41.870872Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-14-0805-cvbook",
+      "from": "claude",
+      "state": "new",
+      "itemId": "kh-cvbook",
+      "itemTitle": "Upload your CV for the Kraft Heinz CV book",
+      "title": "CV books need the template",
+      "body": "The CDC says only INSEAD-format CVs go into their employer CV books, so what you upload for Kraft Heinz has to be the template version. They attached the Word template again in yesterday's mail. - Check the file you send is the one you rebuilt, not an older copy.",
+      "createdAt": "2026-11-14T08:03:41.870872Z",
+      "at": "2026-11-14T08:03:41.870872Z"
+    }
+  ],
+  "changed": []
+}
