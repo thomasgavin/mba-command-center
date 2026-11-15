@@ -1,0 +1,58 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-15T02:07:19.872298Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-15-0205-finance",
+      "from": "claude",
+      "state": "new",
+      "kind": "nudge",
+      "about": "prereads",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-12-20"
+      },
+      "itemId": "prereads",
+      "itemTitle": "INSEAD pre-course work and pre-reading",
+      "title": "Finance reading before Monday",
+      "body": "Correcting what I wrote yesterday: that was Financial Accounting only. Rodolfo has posted the Finance Session 1 materials and asks you to read the assigned chapters and review the slides before Monday's class, on present value analysis. - It is the one thing this weekend actually owes.",
+      "createdAt": "2026-11-15T02:07:19.872298Z",
+      "at": "2026-11-15T02:07:19.872298Z"
+    },
+    {
+      "id": "claude-2026-11-15-0205-club8",
+      "from": "claude",
+      "state": "new",
+      "kind": "nudge",
+      "about": "club8-detail",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-15"
+      },
+      "itemId": "club8-detail",
+      "itemTitle": "Confirm Club 8 inventory and move-in window",
+      "title": "Club 8 is due today",
+      "body": "Club 8 has not moved since the 9th and today is its date. What is still open is what the room comes with and when you can collect the keys. - Send the email today; from tomorrow your days are class until seven in the evening.",
+      "createdAt": "2026-11-15T02:07:19.872298Z",
+      "at": "2026-11-15T02:07:19.872298Z"
+    },
+    {
+      "id": "claude-2026-11-15-0205-khint",
+      "from": "claude",
+      "state": "new",
+      "itemId": "int-kh",
+      "itemTitle": "Finish the Kraft Heinz internship application",
+      "title": "Kraft Heinz is unfinished",
+      "body": "Harver wrote yesterday that your Kraft Heinz procurement and supply chain application is started but not submitted, so they cannot see your results. They named no deadline; Monday is on here because that is when their CV book closed. - Log back in and finish it.",
+      "acted": [
+        "Added a career task to finish the Kraft Heinz internship application on Harver, dated Monday 16 November."
+      ],
+      "createdAt": "2026-11-15T02:07:19.872298Z",
+      "at": "2026-11-15T02:07:19.872298Z"
+    }
+  ],
+  "changed": []
+}

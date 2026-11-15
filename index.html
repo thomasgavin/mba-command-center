@@ -2340,6 +2340,18 @@ var SEED=[
     CV is already rebuilt and what is left is a form. */
  {id:"kh-cvbook",t:"Upload your CV for the Kraft Heinz CV book",k:"career",s:"todo", p:"High",     d:"2026-11-16", ef:"quick",
    n:"The CDC is collecting CVs from the session attendees for Kraft Heinz. The Qualtrics upload closes Monday 09:00 CET, which is 13:30 your time."},
+ /* Harver chased him on 14 November: the Kraft Heinz Procurement and Supply
+    Chain application is started and not finished, so the employer cannot see
+    his results. It is a task of its own rather than a note on kh-cvbook --
+    he closed that one the same morning by uploading the CV, and the two are
+    separate things at the same employer: the CV book is the Ketchup
+    Invitational's book, this is the role application. Harver named no
+    deadline, so the date is Monday because that is when the CV book closed
+    and the cycle is live now, not because anyone wrote it down; the note
+    says so. `hours` because there is an assessment behind it, not a form. */
+ {id:"int-kh",t:"Finish the Kraft Heinz internship application",k:"career",s:"todo", p:"High",     d:"2026-11-16", ef:"hours",
+   n:"Started on Harver and not submitted, so Kraft Heinz cannot see your results. Procurement and Supply Chain, from the Ketchup Invitational. Log back in with your INSEAD address."},
+
  {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
  {id:"classmates",  t:"Reach out to five MBA'27D classmates",         k:"career",s:"todo", p:"Low",      d:"2026-11-30", ef:"hours",},
@@ -5319,7 +5331,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-14-0205";
+var BUILD="2026-11-15-0205";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
