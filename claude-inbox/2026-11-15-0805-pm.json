@@ -1,0 +1,28 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-15T08:04:31.911488Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-15-0805-ama",
+      "from": "claude",
+      "state": "new",
+      "itemId": "prereads",
+      "itemTitle": "INSEAD pre-course work and pre-reading",
+      "title": "Tuesday's AMA is in class",
+      "body": "The student-platforms AMA on your calendar for Tuesday starts at 12:00 Paris time, which is inside the Business Foundations class block of 08:00 to 14:30. You added it on the 8th, a day before the module hours were sent. - Worth asking the Learning Experience team whether it will be recorded.",
+      "createdAt": "2026-11-15T08:04:31.911488Z",
+      "at": "2026-11-15T08:04:31.911488Z"
+    },
+    {
+      "id": "claude-2026-11-15-0805-intern",
+      "from": "claude",
+      "state": "new",
+      "title": "Two internship sessions",
+      "body": "Newsletter #11 this morning lists a British International Investment presentation on Wednesday, applications open tomorrow and closing 6 December, and a Tata Group session on the 24th. Tata needs you registered by Thursday 16:00 to be sent the link. - Both land inside your class week, so register now if either interests you.",
+      "createdAt": "2026-11-15T08:04:31.911488Z",
+      "at": "2026-11-15T08:04:31.911488Z"
+    }
+  ],
+  "changed": []
+}
