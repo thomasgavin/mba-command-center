@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-16T12:05:01.689405Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-16-1205-x360half",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-16T12:05:01.689405Z",
+      "at": "2026-11-16T12:05:01.689405Z",
+      "itemId": "pldp-x360",
+      "itemTitle": "x360: self-assessment and nominate observers",
+      "title": "Half of x360 is done",
+      "body": "LearningBridge wrote this morning to say your self-assessment is in, and that you still have no observers listed. I have moved the task to In progress, because only the naming is left. - Your observers then need until 28 December, so the names are the part that cannot wait.",
+      "acted": [
+        "x360: self-assessment and nominate observers: To do -> In progress",
+        "Board: moved off this morning's LearningBridge reminder, which confirms the self-assessment is complete."
+      ]
+    }
+  ],
+  "changed": [
+    {
+      "id": "pldp-x360",
+      "at": "2026-11-16T12:05:01.689405Z",
+      "status": "doing",
+      "manual": true
+    }
+  ]
+}
