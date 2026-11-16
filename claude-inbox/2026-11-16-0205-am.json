@@ -1,0 +1,26 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-16T02:03:21.631092Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-16-0205-visacollect",
+      "from": "claude",
+      "state": "new",
+      "kind": "nudge",
+      "about": "visa-collect",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-16"
+      },
+      "itemId": "visa-collect",
+      "itemTitle": "Collect your passport from the Delhi visa centre",
+      "title": "Passport before class today",
+      "body": "Today is the date on this one and nothing has moved since Saturday. Class runs 12:30 to 19:00, so the centre fits either side of that. - Call them first; the collection hours are the one thing VFS never told you.",
+      "createdAt": "2026-11-16T02:03:21.631092Z",
+      "at": "2026-11-16T02:03:21.631092Z"
+    }
+  ],
+  "changed": []
+}
