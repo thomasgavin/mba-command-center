@@ -1,0 +1,42 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-16T08:05:34.850057Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-16-0805-visacollected",
+      "from": "claude",
+      "state": "new",
+      "itemId": "visa-collect",
+      "itemTitle": "Collect your passport from the Delhi visa centre",
+      "title": "Passport collected",
+      "body": "VFS says your application was collected from the Delhi centre this morning, so I have marked this done. Nothing in the mail says what the decision was; that is on the sticker. - Tell Marie Rose and your SBI branch today, because the tuition extension was given against this outcome.",
+      "acted": [
+        "Collect your passport from the Delhi visa centre: To do -> Done",
+        "Board: closed it off the VFS collection notice of this morning, not off anything you typed."
+      ],
+      "createdAt": "2026-11-16T08:05:34.850057Z",
+      "at": "2026-11-16T08:05:34.850057Z"
+    },
+    {
+      "id": "claude-2026-11-16-0805-ascentium",
+      "from": "claude",
+      "state": "new",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "title": "Ascentium replied at last",
+      "body": "Chitra wrote this morning: InCorp has rebranded to Ascentium, and an email migration is why nothing arrived since October. The sales order and a document checklist are attached, and to start they need your Jakarta departure ticket, your boarding pass and a termination letter from Locus. - The letter is the slow part, so ask Jishnu for it now.",
+      "createdAt": "2026-11-16T08:05:34.850057Z",
+      "at": "2026-11-16T08:05:34.850057Z"
+    }
+  ],
+  "changed": [
+    {
+      "id": "visa-collect",
+      "at": "2026-11-16T08:05:34.850057Z",
+      "status": "done",
+      "manual": true,
+      "doneAt": "2026-11-16"
+    }
+  ]
+}
