@@ -1,0 +1,51 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-17T02:03:34.399099Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-17-0205-bfmat",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-17T02:03:34.399099Z",
+      "at": "2026-11-17T02:03:34.399099Z",
+      "itemId": "prereads",
+      "itemTitle": "INSEAD pre-course work and pre-reading",
+      "title": "Both professors left you work",
+      "body": "Martina posted the Cirklon3 template for today's accounting session and said to try it before class. Rodolfo released the Finance answer key, which means the group assignment is still yours to finish first. - The template is the one that pays off in class, so start there."
+    },
+    {
+      "id": "claude-2026-11-17-0205-club8",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-17T02:03:34.399099Z",
+      "at": "2026-11-17T02:03:34.399099Z",
+      "kind": "nudge",
+      "about": "club8-detail",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-15"
+      },
+      "title": "Last word on Club 8",
+      "body": "Two days past its date and nothing has moved since the 9th. This is my third and last word on it. - Two lines to Club 8, what the room comes with and when you can take the keys, and it is closed."
+    },
+    {
+      "id": "claude-2026-11-17-0205-kh",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-17T02:03:34.399099Z",
+      "at": "2026-11-17T02:03:34.399099Z",
+      "kind": "nudge",
+      "about": "int-kh",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-16"
+      },
+      "title": "Harver has no date",
+      "body": "Kraft Heinz cannot look at your assessment until the application itself is submitted, and nobody has put a deadline on it. Class runs from half twelve to seven again today. - It fits in this morning, and this is the only morning this week with nothing else in it."
+    }
+  ],
+  "changed": []
+}
