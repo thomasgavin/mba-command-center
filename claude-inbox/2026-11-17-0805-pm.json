@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-17T08:04:00.142076Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-17-0805-loandrawn",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-17T08:04:00.142076Z",
+      "at": "2026-11-17T08:04:00.142076Z",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "The loan money has landed",
+      "body": "SBI opened your education loan account this morning, took your margin payment, and disbursed the first tranche into your savings account. It lines up with the October instalment, so the money is with you now and not with the bank. - Nothing holds the transfer to INSEAD except telling Marie Rose, so do both at once."
+    }
+  ]
+}
