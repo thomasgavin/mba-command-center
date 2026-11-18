@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-18T12:05:14.624993Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-18-1205-cgsync",
+      "itemId": "cdc-anchors",
+      "itemTitle": "Send your Career Anchor scores to Liesbeth",
+      "from": "claude",
+      "state": "new",
+      "title": "CareerGlobe stopped syncing",
+      "body": "CareerGlobe wrote yesterday to say it can no longer sync your calendar and wants you to reauthorise the account. Until you do, anything you book there, a CDC coaching slot included, may never reach your Google Calendar. - The reauthorise link is in that mail.",
+      "at": "2026-11-18T12:05:14.624993Z",
+      "createdAt": "2026-11-18T12:05:14.624993Z"
+    }
+  ],
+  "changed": []
+}
