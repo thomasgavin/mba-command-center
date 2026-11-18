@@ -1,0 +1,33 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-18T02:03:51.145648Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-18-0205-tata",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-18T02:03:51.145648Z",
+      "at": "2026-11-18T02:03:51.145648Z",
+      "title": "Tata closes tomorrow",
+      "body": "The Tata Group session on the 24th needs you registered by four tomorrow afternoon to be sent the link. You will be in class at that hour, so today is the window. - Two minutes today, or let it go."
+    },
+    {
+      "id": "claude-2026-11-18-0205-kitasletter",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-18T02:03:51.145648Z",
+      "at": "2026-11-18T02:03:51.145648Z",
+      "kind": "nudge",
+      "about": "kitas-close",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-22"
+      },
+      "title": "The letter is the slow part",
+      "body": "Ascentium needs three documents, and the termination letter from Locus is the only one you cannot produce yourself. The task is dated Sunday, and a letter from someone else is what takes days. - If you have not asked Jishnu yet, today is the day."
+    }
+  ]
+}
