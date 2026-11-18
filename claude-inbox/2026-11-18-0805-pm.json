@@ -1,0 +1,28 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-18T08:04:02.264420Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-18-0805-lia",
+      "itemId": "pldp-work",
+      "itemTitle": "Complete the PLDP assignments",
+      "from": "claude",
+      "state": "new",
+      "title": "Launch Week goes outdoors",
+      "body": "The Leadership in Action workshop in Launch Week is a full day outdoors at one to seven degrees, with snow and rain likely, and INSEAD wants warm layers and rainproof shoes with real grip. Attendance is required and the dates come later, but you fly on 3 January. - Buy the cold-weather kit before you leave India.",
+      "at": "2026-11-18T08:04:02.264420Z",
+      "createdAt": "2026-11-18T08:04:02.264420Z"
+    },
+    {
+      "id": "claude-2026-11-18-0805-sprint",
+      "from": "claude",
+      "state": "new",
+      "title": "Founder Sprint has no deadline yet",
+      "body": "You sat the AI Venture Lab info session this morning for Founder Sprint 2027, ten weeks ending in a Demo Day. The next step is an application and nothing in the mail gives a closing date. - Worth asking Sean Lau for it while the session is fresh.",
+      "at": "2026-11-18T08:04:02.264420Z",
+      "createdAt": "2026-11-18T08:04:02.264420Z"
+    }
+  ],
+  "changed": []
+}
