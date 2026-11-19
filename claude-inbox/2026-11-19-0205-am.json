@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-19T02:03:28.363148Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-19-0205-tuitionwire",
+      "kind": "nudge",
+      "about": "tuition-oct",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-24"
+      },
+      "from": "claude",
+      "state": "new",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "title": "The transfer needs this week",
+      "body": "The money landed in your savings account on Tuesday and the instalment is dated the 24th. Nothing has touched this task since 10 November, and a transfer that size will not clear over a weekend. - If it has not gone yet, start it tomorrow and tell Marie Rose the same day.",
+      "at": "2026-11-19T02:03:28.363148Z",
+      "createdAt": "2026-11-19T02:03:28.363148Z"
+    }
+  ],
+  "changed": []
+}
