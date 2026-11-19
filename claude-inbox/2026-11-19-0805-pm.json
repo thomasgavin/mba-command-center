@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-19T08:04:31.741097Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-19-0805-a2form",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "from": "claude",
+      "state": "new",
+      "title": "The A2 form needs signing",
+      "body": "Your Ghaziabad branch earmarked the money this morning and emailed you the A2 form to sign. They are waiting on that before the transfer to INSEAD can go out, and tomorrow is the last banking day before the instalment date. - Sign it and send it back today.",
+      "at": "2026-11-19T08:04:31.741097Z",
+      "createdAt": "2026-11-19T08:04:31.741097Z"
+    }
+  ],
+  "changed": []
+}
