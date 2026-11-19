@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-19T12:06:08.727Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-19-1205-wiresent",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "from": "claude",
+      "title": "The money has gone",
+      "text": "SBI sent the wire to INSEAD’s bank this evening and emailed you the SWIFT copy and the debit advice. That is five days ahead of the instalment date, so nothing here is at risk now. - INSEAD asked for proof of transfer, so send them the SWIFT copy.",
+      "state": "new",
+      "createdAt": "2026-11-19T12:06:08.727Z",
+      "at": "2026-11-19T12:06:08.727Z"
+    }
+  ]
+}
