@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-20T08:04:28.198Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-20-0805-kitaspay",
+      "itemId": "kitas-close",
+      "itemTitle": "Close the KITAS and withdraw BPJS",
+      "from": "claude",
+      "title": "Locus owes the payment",
+      "text": "Chitra followed up this morning on the sales order Locus has not paid yet, and Jishnu answered that he will update her shortly. So the cancellation starts once that payment clears and nothing in it is yours. - Worth one line to Jishnu if it has not moved by Monday.",
+      "state": "new",
+      "createdAt": "2026-11-20T08:04:28.198Z",
+      "at": "2026-11-20T08:04:28.198Z"
+    }
+  ]
+}
