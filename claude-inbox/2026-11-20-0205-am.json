@@ -1,0 +1,45 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-20T02:04:50.045Z",
+  "changed": [
+    {
+      "id": "club8-detail",
+      "at": "2026-11-20T02:04:50.045Z",
+      "status": "doing",
+      "manual": true
+    }
+  ],
+  "notes": [
+    {
+      "id": "claude-2026-11-20-0205-club8sent",
+      "itemId": "club8-detail",
+      "itemTitle": "Confirm Club 8 inventory and move-in window",
+      "from": "claude",
+      "title": "You asked Marie",
+      "text": "You wrote to Marie at Club 8 yesterday asking whether you can check in directly on 3 January and what else she needs from you. So this one is waiting on her now rather than on you, and I have moved it to In progress. - Nothing to do until she answers.",
+      "acted": [
+        "Confirm Club 8 inventory and move-in window: To-do -> In progress"
+      ],
+      "state": "new",
+      "createdAt": "2026-11-20T02:04:50.045Z",
+      "at": "2026-11-20T02:04:50.045Z"
+    },
+    {
+      "id": "claude-2026-11-20-0205-anchors",
+      "about": "cdc-anchors",
+      "kind": "nudge",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-23"
+      },
+      "from": "claude",
+      "title": "Scores due Monday",
+      "text": "Liesbeth wants your CareerLeader and Career Anchor scores by Monday, 48 hours before your session on the 25th. The task is marked quick and you have not opened it once, and Monday is the far side of a weekend. - Fill in the Personal Summary tab today and reply to her mail.",
+      "state": "new",
+      "createdAt": "2026-11-20T02:04:50.045Z",
+      "at": "2026-11-20T02:04:50.045Z"
+    }
+  ]
+}
