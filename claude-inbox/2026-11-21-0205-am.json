@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-21T02:03:04.227Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-21-0205-harver",
+      "about": "int-kh",
+      "kind": "nudge",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-16"
+      },
+      "from": "claude",
+      "title": "Harver, five days late",
+      "text": "Kraft Heinz still cannot see your results because the Harver assessment was never finished, and nothing outside is pushing it. The class week is over, so this weekend is the first clear time you have had. - Finish it today and the application is in.",
+      "state": "new",
+      "createdAt": "2026-11-21T02:03:04.227Z",
+      "at": "2026-11-21T02:03:04.227Z"
+    }
+  ]
+}
