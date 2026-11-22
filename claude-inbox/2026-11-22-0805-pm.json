@@ -1,0 +1,35 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-22T08:13:19.919Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-22-0805-aon",
+      "itemId": "insurance",
+      "itemTitle": "French health cover and travel insurance",
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-22T08:13:19.919Z",
+      "at": "2026-11-22T08:13:19.919Z",
+      "title": "AON explains the cover",
+      "body": "INSEAD's Pre-MBA newsletter this morning names AON as your medical insurance provider and puts their session on 3 December, a week before this is due. They will cover partner cover too, and the hour is recorded. - It is on your calendar now; register from the link on the entry."
+    },
+    {
+      "id": "claude-2026-11-22-0805-bain",
+      "about": "bain-l2i",
+      "kind": "nudge",
+      "round": 1,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-29"
+      },
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-22T08:13:19.919Z",
+      "at": "2026-11-22T08:13:19.919Z",
+      "title": "Bain closes Sunday",
+      "body": "INSEAD's newsletter today carries a Bain EMEA summer-internship fellowship, with development workshops and interview coaching for anyone invited to interview. Applications close next Sunday, the 29th, and MBB is one of your three target groups. - The card has Accept and Reject on it, and the apply link is on your calendar."
+    }
+  ],
+  "changed": []
+}

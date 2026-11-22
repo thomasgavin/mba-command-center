@@ -2177,7 +2177,14 @@ var EVENTS=[
   {id:"ev-cdc-coach", t:"CDC career coaching: P0 session", k:"career", d:"2026-11-25", p:"High",
     n:"10:00 CET with Liesbeth Van Loock, on Zoom. Introduction and the Career Anchor scores. The confirmation gives only a start time; CareerGlobe has the length."},
   {id:"ev-pricing-ai", t:"Lifelong Learning: Pricing in the Age of AI", k:"acad", d:"2026-11-25", p:"Low",
-    n:"18:30 to 19:30 IST, the same evening as the coaching call. Open INSEAD webinar he registered for himself; nothing in the programme depends on it."}
+    n:"18:30 to 19:30 IST, the same evening as the coaching call. Open INSEAD webinar he registered for himself; nothing in the programme depends on it."},
+  /* The one P0 session that answers an open task rather than describing the
+     programme: `insurance` is dated 10 December and AON is the provider, so
+     the session sits a week in front of it. Medium rather than High because
+     it is recorded and the link is shared afterwards -- missing the hour
+     costs the Q&A, not the information. */
+  {id:"ev-aon",    t:"AON medical insurance presentation", k:"visa",   d:"2026-12-03", p:"Medium",
+    n:"12:00 CET, 16:30 IST. AON explain the coverage options, with a Q&A and how to buy cover for a partner. Recorded, and the link is shared after."}
 ];
 function evCat(e){ return cat==="all" || TRACK_CAT[e.k]===cat; }
 function evPool(){ return EVENTS.filter(evCat); }
@@ -2351,6 +2358,19 @@ var SEED=[
     says so. `hours` because there is an assessment behind it, not a form. */
  {id:"int-kh",t:"Finish the Kraft Heinz internship application",k:"career",s:"todo", p:"High",     d:"2026-11-16", ef:"hours",
    n:"Started on Harver and not submitted, so Kraft Heinz cannot see your results. Procurement and Supply Chain, from the Ketchup Invitational. Log back in with your INSEAD address."},
+
+ /* `dc:true` like bizfound was: something INSEAD has put in front of him that
+    he may genuinely decline, so the Accept / Reject box is the honest shape.
+    It is not `nw:true` -- the fellowship reached him in INSEAD's own Pre-MBA
+    newsletter rather than off the open web, and the magenta would say it came
+    from outside. The eligibility question is his to settle and not this
+    board's: the mail says it is open to incoming MBA'27D students and the
+    programming runs through Women at Bain, and answering that either way on
+    his behalf would be the drift this board exists to prevent. `hours`
+    because it is an application against a deadline seven days out, and High
+    because MBB is one of the three target groups on his own list. */
+ {id:"bain-l2i",t:"Decide on the Bain Lead to Inspire Fellowship",k:"career",s:"todo", p:"High",     d:"2026-11-29", ef:"hours", dc:true,
+   n:"From Pre-MBA Newsletter #12. A Bain EMEA summer-internship track running December to May: development workshops, interview coaching if you are invited to interview, and networking through Women at Bain. Applications close Sunday 29 November, and the link is on the calendar entry."},
 
  {id:"launch-prework",t:"Pre-work for the Launch Week career workshop",k:"career",s:"todo", p:"Medium",   d:"2026-12-31", ef:"hours",
    n:"On the LMS from early December; the workshop itself is in Launch Week."},
@@ -5331,7 +5351,7 @@ var SEND_MS=20000;
    page compared the comment against its own constant, never agreed with
    itself, and told him on every pull that the cache would not let go -- a
    message about a cache, caused by a duplicate. */
-var BUILD="2026-11-15-0205";
+var BUILD="2026-11-22-0805";
 var verT=0;
 function checkBuild(announce){
   if(!window.fetch||location.protocol==="file:") return;
