@@ -1,0 +1,40 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-23T02:03:48.632Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-23-0205-x360",
+      "from": "claude",
+      "about": "pldp-x360",
+      "kind": "nudge",
+      "round": 1,
+      "was": {
+        "status": "doing",
+        "due": "2026-12-11"
+      },
+      "title": "Name your x360 observers",
+      "body": "LearningBridge sent a reminder on Sunday: still no feedback providers on your x360, and you have until 11 December to enter them. Most of the people who would give you useful feedback are at Locus, and you leave on 6 December. - Worth doing this week while you can still ask them in person.",
+      "state": "new",
+      "createdAt": "2026-11-23T02:03:48.632Z",
+      "at": "2026-11-23T02:03:48.632Z"
+    },
+    {
+      "id": "claude-2026-11-23-0205-kitas",
+      "from": "claude",
+      "about": "kitas-close",
+      "kind": "nudge",
+      "round": 2,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-22"
+      },
+      "title": "KITAS is now late",
+      "body": "This was dated yesterday and nothing has moved. Jishnu told Ascentium on Thursday that he would update them shortly on the unpaid sales order, and nothing has come back since. - One line to Jishnu this morning is the whole of it.",
+      "state": "new",
+      "createdAt": "2026-11-23T02:03:48.632Z",
+      "at": "2026-11-23T02:03:48.632Z"
+    }
+  ],
+  "changed": []
+}
