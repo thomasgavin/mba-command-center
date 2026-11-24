@@ -1,0 +1,18 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-24T02:03:37.496Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-24-0205-coach",
+      "from": "claude",
+      "itemId": "cdc-anchors",
+      "title": "Liesbeth has your CV",
+      "body": "You sent Liesbeth your CV and Career Plan workbook on Monday morning and she wrote back the same day with see you on Wednesday. That clears the 48-hour rule ahead of the session on the 25th, so nothing is outstanding before it. - The Zoom link is on the calendar entry.",
+      "state": "new",
+      "createdAt": "2026-11-24T02:03:37.496Z",
+      "at": "2026-11-24T02:03:37.496Z"
+    }
+  ],
+  "changed": []
+}
