@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-25T02:03:52.195Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-25-0205-visaclose",
+      "from": "claude",
+      "about": "vls-validate",
+      "kind": "nudge",
+      "round": 1,
+      "was": {
+        "status": "blocked",
+        "due": "2027-04-03"
+      },
+      "title": "Visa help closes 18 Dec",
+      "body": "INSEAD French Immigration wrote yesterday that they are shut from 18 December to 3 January, which is the fortnight you travel. Amanda Heurteau is there until the 18th, and the board still has nothing on what your visa sticker actually says. - Worth reading the dates and type off it now, while someone is still answering.",
+      "state": "new",
+      "createdAt": "2026-11-25T02:03:52.195Z",
+      "at": "2026-11-25T02:03:52.195Z"
+    }
+  ],
+  "changed": []
+}
