@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-25T08:04:14.432Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-25-0804-feespaid",
+      "itemId": "tuition-oct",
+      "itemTitle": "Pay EUR 53,000 tuition instalment",
+      "from": "claude",
+      "title": "INSEAD has the money",
+      "text": "Marie Rose confirmed this morning that INSEAD received the EUR 53,000. That closes the instalment you have been chasing since October, and the extension no longer matters. Nothing is outstanding on it.",
+      "state": "new",
+      "createdAt": "2026-11-25T08:04:14.432Z",
+      "at": "2026-11-25T08:04:14.432Z"
+    }
+  ],
+  "changed": []
+}
