@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-26T02:03:59.857Z",
+  "notes": [
+    {
+      "id": "claude-2026-11-26-0203-bain2",
+      "about": "bain-l2i",
+      "kind": "nudge",
+      "round": 2,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-29"
+      },
+      "from": "claude",
+      "state": "new",
+      "createdAt": "2026-11-26T02:03:59.857Z",
+      "at": "2026-11-26T02:03:59.857Z",
+      "title": "Three days left on Bain",
+      "body": "Four days on and this is still unanswered, with three left before it closes. MBB is one of your three target groups and this is the only one of them carrying a date. - If you are not applying, Reject clears it off the board."
+    }
+  ],
+  "changed": []
+}
