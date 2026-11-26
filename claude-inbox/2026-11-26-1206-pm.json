@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-26T12:06:49.538Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-26-1210-kitaspaid",
+      "kind": "nudge",
+      "about": "kitas-close",
+      "round": 3,
+      "was": {
+        "status": "doing",
+        "due": "2026-11-22"
+      },
+      "from": "claude",
+      "state": "new",
+      "title": "Locus has paid",
+      "body": "Jishnu confirmed the payment to Ascentium this morning, so the cancellation can finally start. What they need from you next is your Jakarta departure ticket and boarding pass, and the termination letter from Locus. - Ask HR for the letter before your last day rather than after it.",
+      "at": "2026-11-26T12:06:49.538Z",
+      "createdAt": "2026-11-26T12:06:49.538Z"
+    }
+  ]
+}
