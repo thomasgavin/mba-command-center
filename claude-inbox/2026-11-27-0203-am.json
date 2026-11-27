@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-27T02:03:55.173Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-27-0205-kh3",
+      "kind": "nudge",
+      "about": "int-kh",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-16"
+      },
+      "from": "claude",
+      "state": "new",
+      "title": "Last word on Kraft Heinz",
+      "body": "Still not submitted, so Kraft Heinz still cannot look at your assessment. Nothing outside is pushing this, which is why it keeps sliding, and this is the last time I will raise it. - Finish it this weekend, or tell me to drop the task.",
+      "at": "2026-11-27T02:03:55.173Z",
+      "createdAt": "2026-11-27T02:03:55.173Z"
+    }
+  ]
+}
