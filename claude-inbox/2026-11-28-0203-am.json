@@ -1,0 +1,24 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-28T02:03:17.092Z",
+  "changed": [],
+  "notes": [
+    {
+      "id": "claude-2026-11-28-0205-bain3",
+      "kind": "nudge",
+      "about": "bain-l2i",
+      "round": 3,
+      "was": {
+        "status": "todo",
+        "due": "2026-11-29"
+      },
+      "from": "claude",
+      "state": "new",
+      "title": "Bain closes tomorrow",
+      "body": "This closes tomorrow and the card has sat unanswered for six days. It is the last time I will raise it, and either answer clears it. - Apply today while you have the weekend, or press Reject and it leaves the board.",
+      "at": "2026-11-28T02:03:17.092Z",
+      "createdAt": "2026-11-28T02:03:17.092Z"
+    }
+  ]
+}
