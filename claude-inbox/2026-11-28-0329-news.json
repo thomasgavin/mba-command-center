@@ -1,0 +1,17 @@
+{
+  "v": 1,
+  "op": "patch",
+  "exportedAt": "2026-11-28T03:29:31.527Z",
+  "notes": [],
+  "changed": [],
+  "news": [
+    {
+      "id": "news-daily-2026-11-28",
+      "period": "daily",
+      "date": "2026-11-28",
+      "body": "## Today\n- Send Ascentium proof of your last exit from Indonesia. They need it to cancel your KITAS.",
+      "at": "2026-11-28T03:29:31.527Z",
+      "createdAt": "2026-11-28T03:29:31.527Z"
+    }
+  ]
+}

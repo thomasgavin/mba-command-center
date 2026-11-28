@@ -89,6 +89,18 @@ If the only thing you can write under an item is a restatement of its status,
 leave the item out. Three to ten lines in total; it is read on a phone before
 work.
 
+**The action and the reason. Nothing else.** He said it on 2026-11-28 of a
+brief item reading *"It is the one thing they are waiting on that nobody else
+can give them"*: *"Wtf is the purpose of that entire thing?"* The whole item
+should have been *"Send Ascentium proof of your last exit from Indonesia. They
+need it to cancel your KITAS."* One or two short sentences: the action, then
+why they need it. Never a sentence arguing that it matters, never a chain of
+what queues behind it, never the action restated in other words.
+
+So an item needs no second line at all when the reason fits on the first. The
+second line exists to carry a question, a named suggestion or something he has
+not noticed — never to explain the first.
+
 **Credit what he did, by name, when the board says he did it** — one line, in
 whichever section fits, read off `doneAt` or `history/`. Not "great progress":
 *"Good job on registering for the platforms yesterday."*

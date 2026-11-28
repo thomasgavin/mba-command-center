@@ -2055,6 +2055,19 @@ target is his own sentence, not a word count invented here:
 - **One suggestion, last, after a dash.** Cut any sentence that does not
   change what he does next, and if nothing survives the cut the note should
   not be written at all.
+- **The action and the reason. Nothing else.** He said it on 2026-11-28, of
+  a brief item reading *"It is the one thing they are waiting on that nobody
+  else can give them"*: *"Can you fucking keep the messages concise and clear
+  instead of unnecessary bullshit ... Wtf is the purpose of that entire
+  thing?"* The whole item should have been: *"Send Ascentium proof of your
+  last exit from Indonesia. They need it to cancel your KITAS."* One or two
+  short sentences. The action, then why they need it -- never a sentence
+  arguing that it matters, never a chain of what queues behind it, never a
+  restatement of the action in other words. This is the same rule as the
+  three above, stated for the sentence that survives the cut rather than for
+  the ones that do not, because that is where the padding kept coming back.
+  **It applies to a brief, a nudge and a note alike**, and a brief item needs
+  no second line when the reason fits on the first.
 
 **The title is drawn, and it takes the colour of the task the note is about.**
 `noteTitle()` is the one place it becomes markup, so the three surfaces that

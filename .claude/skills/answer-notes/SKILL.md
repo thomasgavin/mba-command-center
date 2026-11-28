@@ -126,6 +126,14 @@ second person, no clock readings, one suggestion last. What you did and why,
 not a report about having done it. Put the mechanical detail in `acted[]`, one
 short line per change — that renders under your message as the receipt.
 
+**The action and the reason. Nothing else.** He said it on 2026-11-28 of a
+brief item reading *"It is the one thing they are waiting on that nobody else
+can give them"*: *"Wtf is the purpose of that entire thing?"* The whole item
+should have been *"Send Ascentium proof of your last exit from Indonesia. They
+need it to cancel your KITAS."* One or two short sentences: the action, then
+why they need it. Never a sentence arguing that it matters, never a chain of
+what queues behind it, never the action restated in other words.
+
 ### The shape of an `acted[]` line
 
 He asked for this on 2026-10-05, and the board renders the two kinds
